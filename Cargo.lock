@@ -2394,6 +2394,7 @@ dependencies = [
  "http",
  "http-body",
  "http-body-util",
+ "httpdate",
  "hyper",
  "hyper-util",
  "log",
