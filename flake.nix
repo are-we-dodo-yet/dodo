@@ -160,6 +160,8 @@
               export NIX_LDFLAGS="$@"
               # Nix's libclang is incompatible with system glibc (non-NixOS Linux)
               unset LIBCLANG_PATH
+            else
+              export LD_LIBRARY_PATH="${pkgs.lib.makeLibraryPath [ pkgs.vulkan-loader ]}''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
             fi
           '';
         };
