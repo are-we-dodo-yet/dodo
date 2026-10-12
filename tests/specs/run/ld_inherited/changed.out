@@ -1,0 +1,1 @@
+Requires --allow-run permissions to spawn subprocess with LD_DENO_TEST environment variable. Alternatively, spawn with the environment variable unset.

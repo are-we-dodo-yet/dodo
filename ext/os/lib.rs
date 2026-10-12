@@ -2,6 +2,7 @@
 
 use std::borrow::Cow;
 use std::collections::HashMap;
+use std::collections::HashSet;
 use std::env;
 use std::ffi::OsString;
 use std::ops::ControlFlow;
@@ -164,6 +165,26 @@ fn op_exec_path() -> Result<String, OsError> {
 }
 
 static PROCESS_ENV_LOCK: LazyLock<Mutex<()>> = LazyLock::new(Mutex::default);
+static MODIFIED_ENV_KEYS: LazyLock<Mutex<HashSet<OsString>>> =
+  LazyLock::new(Mutex::default);
+
+fn env_comparison_key(key: &std::ffi::OsStr) -> OsString {
+  #[cfg(windows)]
+  {
+    key.to_ascii_uppercase()
+  }
+  #[cfg(not(windows))]
+  {
+    key.to_os_string()
+  }
+}
+
+fn record_env_modification(key: &std::ffi::OsStr) {
+  MODIFIED_ENV_KEYS
+    .lock()
+    .unwrap_or_else(std::sync::PoisonError::into_inner)
+    .insert(env_comparison_key(key));
+}
 
 /// A guard for coordinated runtime access to the process environment.
 ///
@@ -195,12 +216,20 @@ impl ProcessEnvGuard {
     env::vars_os().collect()
   }
 
+  pub fn is_modified(&self, key: impl AsRef<std::ffi::OsStr>) -> bool {
+    MODIFIED_ENV_KEYS
+      .lock()
+      .unwrap_or_else(std::sync::PoisonError::into_inner)
+      .contains(&env_comparison_key(key.as_ref()))
+  }
+
   pub fn set_var(
     &self,
     key: impl AsRef<std::ffi::OsStr>,
     value: impl AsRef<std::ffi::OsStr>,
   ) {
     let key = key.as_ref();
+    record_env_modification(key);
     // SAFETY: Deno exposes process environment mutation for compatibility.
     // This guard coordinates the runtime mutation paths with the native
     // timezone refresh below, but cannot coordinate arbitrary native readers.
@@ -227,6 +256,7 @@ impl ProcessEnvGuard {
 
   pub fn remove_var(&self, key: impl AsRef<std::ffi::OsStr>) {
     let key = key.as_ref();
+    record_env_modification(key);
     // SAFETY: Deno exposes process environment mutation for compatibility.
     // This guard coordinates the runtime mutation paths with the native
     // timezone refresh below, but cannot coordinate arbitrary native readers.

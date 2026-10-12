@@ -2935,17 +2935,6 @@ fn permission_prompt_escapes_ansi_codes_and_control_chars() {
     context
       .new_command()
       .env("PATH", context.temp_dir().path())
-      .env("DYLD_FALLBACK_LIBRARY_PATH", "")
-      .env("LD_LIBRARY_PATH", "")
-      .envs(
-        std::env::vars_os()
-          .map(|(key, _)| key)
-          .filter(|key| {
-            let key = key.to_string_lossy().to_ascii_uppercase();
-            key.starts_with("LD_") || key.starts_with("DYLD_")
-          })
-          .map(|key| (key, "")),
-      )
       .args_vec(["repl", "--allow-write=."])
       .with_pty(|mut console| {
         console.write_line_raw(r#"const boldANSI = "\u001b[1m";"#);

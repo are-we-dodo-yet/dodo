@@ -1,0 +1,19 @@
+{
+  "envs": {
+    "LD_DENO_TEST": "1"
+  },
+  "tests": {
+    "inherited": {
+      "args": "run --allow-run=deno inherited.ts",
+      "output": "inherited.out"
+    },
+    "set_same_value": {
+      "args": "run --allow-run=deno --allow-env set_same_value.ts",
+      "output": "changed.out"
+    },
+    "env_arg_same_value": {
+      "args": "run --allow-run=deno env_arg_same_value.ts",
+      "output": "changed.out"
+    }
+  }
+}

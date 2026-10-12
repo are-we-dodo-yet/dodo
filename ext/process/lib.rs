@@ -4,6 +4,7 @@ use std::borrow::Cow;
 use std::cell::Cell;
 use std::cell::RefCell;
 use std::collections::HashMap;
+use std::collections::HashSet;
 #[cfg(unix)]
 use std::ffi::CStr;
 #[cfg(unix)]
@@ -1397,6 +1398,7 @@ impl std::cmp::PartialEq for EnvVarKey {
 
 struct RunEnv {
   envs: HashMap<EnvVarKey, OsString>,
+  inherited_envs: HashSet<EnvVarKey>,
   /// Best-effort cwd used for resolving relative cmd paths and PATH lookups.
   /// When the cwd cannot be determined and the caller permits inheritance
   /// (see `set_cwd_on_command`), this is set to `"."` as a placeholder.
@@ -1448,22 +1450,25 @@ fn compute_run_env(
       Err(e) => return Err(ProcessError::FailedResolvingCwd(e)),
     },
   };
-  let envs = if arg_clear_env {
-    arg_envs
-      .iter()
-      .map(|(k, v)| (EnvVarKey::from_str(k), OsString::from(v)))
-      .collect()
-  } else {
-    let mut envs = std::env::vars_os()
-      .map(|(k, v)| (EnvVarKey::new(k), v))
-      .collect::<HashMap<_, _>>();
-    for (key, value) in arg_envs {
-      envs.insert(EnvVarKey::from_str(key), OsString::from(value));
+  let mut envs = HashMap::new();
+  let mut inherited_envs = HashSet::new();
+  if !arg_clear_env {
+    let process_env = deno_os::ProcessEnvGuard::lock();
+    for (key, value) in process_env.vars_os() {
+      if !process_env.is_modified(&key) {
+        inherited_envs.insert(EnvVarKey::new(key.clone()));
+      }
+      envs.insert(EnvVarKey::new(key), value);
     }
-    envs
-  };
+  }
+  for (key, value) in arg_envs {
+    let key = EnvVarKey::from_str(key);
+    inherited_envs.remove(&key);
+    envs.insert(key, OsString::from(value));
+  }
   Ok(RunEnv {
     envs,
+    inherited_envs,
     cwd,
     set_cwd_on_command,
   })
@@ -1578,7 +1583,10 @@ fn get_requires_allow_all_env_vars(env: &RunEnv) -> Vec<&str> {
     .iter()
     .filter_map(|(k, v)| {
       let key = k.comparison_value().to_str()?;
-      if requires_allow_all(key) && !is_empty(v) {
+      if requires_allow_all(key)
+        && !is_empty(v)
+        && !env.inherited_envs.contains(k)
+      {
         Some(key)
       } else {
         None
