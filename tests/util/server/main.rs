@@ -14,6 +14,12 @@ fn main() {
     .install_default()
     .unwrap();
   setup_panic_hook();
+  if std::env::var_os("TEST_SERVER_EXIT_ON_STDIN_EOF").is_some() {
+    std::thread::spawn(|| {
+      let _ = std::io::copy(&mut std::io::stdin(), &mut std::io::sink());
+      std::process::exit(0);
+    });
+  }
   servers::run_all_servers();
 }
 

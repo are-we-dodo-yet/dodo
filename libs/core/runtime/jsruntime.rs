@@ -2626,7 +2626,8 @@ impl JsRuntime {
         (cb.callback)(tc_scope);
         if let Some(exception) = tc_scope.exception() {
           tc_scope.reset();
-          let report_exception_cb = context_state.js_report_exception_cb.borrow();
+          let report_exception_cb =
+            context_state.js_report_exception_cb.borrow();
           let report_exception_fn =
             report_exception_cb.as_ref().unwrap().open(tc_scope);
           let undefined: v8::Local<v8::Value> = v8::undefined(tc_scope).into();

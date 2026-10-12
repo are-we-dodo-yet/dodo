@@ -386,6 +386,8 @@ impl Default for HttpServerStarter {
     println!("test_server starting...");
     let mut test_server = Command::new(test_server_path())
       .current_dir(testdata_path())
+      .env("TEST_SERVER_EXIT_ON_STDIN_EOF", "1")
+      .stdin(Stdio::piped())
       .stdout(Stdio::piped())
       .spawn()
       .inspect_err(|_| {
