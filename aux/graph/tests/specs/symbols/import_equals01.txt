@@ -1,0 +1,166 @@
+# mod.ts
+export import MyExport = Test.Inner;
+
+namespace Test {
+  export class Inner {
+  }
+}
+
+# output
+file:///mod.ts: EsModuleInfo {
+    module_id: ModuleId(
+        0,
+    ),
+    specifier: "file:///mod.ts",
+    re_exports: [],
+    swc_id_to_symbol_id: {
+        (
+            "MyExport",
+            #2,
+        ): 1,
+        (
+            "Test",
+            #2,
+        ): 2,
+        (
+            "Inner",
+            #3,
+        ): 3,
+    },
+    symbols: {
+        0: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 0,
+            parent_id: None,
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "export import MyExport = Test.Inner;\n\nnamespace Test {\n  export class Inner {\n  }\n}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            0,
+                        ),
+                        end: SourcePos(
+                            83,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {
+                2,
+            },
+            exports: {
+                "MyExport": 1,
+            },
+            members: {},
+        },
+        1: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 1,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: QualifiedTarget(
+                        (
+                            "Test",
+                            #2,
+                        ),
+                        [
+                            "Inner",
+                        ],
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            0,
+                        ),
+                        end: SourcePos(
+                            36,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        2: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 2,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "namespace Test {\n  export class Inner {\n  }\n}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            38,
+                        ),
+                        end: SourcePos(
+                            83,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {
+                3,
+            },
+            exports: {
+                "Inner": 3,
+            },
+            members: {},
+        },
+        3: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 3,
+            parent_id: Some(
+                2,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "export class Inner {\n  }",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            57,
+                        ),
+                        end: SourcePos(
+                            81,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+    },
+}
+== export definitions ==
+[MyExport]: file:///mod.ts:57..81
+  export class Inner {
+    }

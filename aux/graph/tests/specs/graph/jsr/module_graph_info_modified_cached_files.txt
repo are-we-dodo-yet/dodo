@@ -1,0 +1,250 @@
+# https://jsr.io/@scope/a/meta.json
+{
+  "versions": {
+    "1.0.0": {}
+  }
+}
+
+# https://jsr.io/@scope/a/1.0.0_meta.json
+{
+  "exports": {
+    ".": "./mod.ts"
+  },
+  "moduleGraph1": {
+    "/mod.ts": {
+      "dependencies": [{
+          "type": "static",
+          "kind": "import",
+          "specifier": "./a.ts",
+          "specifierRange": [[5, 6], [7, 8]],
+          "range": [[5, 0], [7, 8]]
+      }]
+    },
+    "/a.ts": {
+      "dependencies": [{
+          "type": "static",
+          "kind": "import",
+          "specifier": "./b.ts",
+          "specifierRange": [[13, 14], [15, 16]],
+          "range": [[13, 0], [15, 16]]
+      }, {
+          "type": "static",
+          "kind": "import",
+          "specifier": "jsr:@scope/b",
+          "specifierRange": [[5, 6], [7, 8]],
+          "range": [[5, 0], [7, 8]]
+      }]
+    },
+    "/b.ts": {
+      "dependencies": [{
+          "type": "static",
+          "kind": "import",
+          "specifier": "./c.ts",
+          "specifierRange": [[13, 14], [15, 16]],
+          "range": [[13, 0], [15, 16]]
+      }]
+    },
+    "/c.ts": {}
+  }
+}
+
+# https://jsr.io/@scope/b/meta.json
+{
+  "versions": {
+    "9.0.0": {}
+  }
+}
+
+# https://jsr.io/@scope/b/9.0.0_meta.json
+{
+  "exports": {
+    ".": "./mod.ts"
+  },
+  "moduleGraph1": {
+    "/mod.ts": {
+      "dependencies": [{
+        "type": "static",
+        "kind": "import",
+        "specifier": "./inner.ts",
+        "specifierRange": [[5, 6], [7, 8]],
+        "range": [[5, 0], [7, 8]]
+      }]
+    }
+  }
+}
+
+# mod.ts
+import 'jsr:@scope/a@^1.0';
+
+# cache:https://jsr.io/@scope/a/1.0.0/mod.ts
+import './a.ts';
+
+# cache:https://jsr.io/@scope/a/1.0.0/a.ts
+import './b.ts';
+
+# https://jsr.io/@scope/a/1.0.0/b.ts
+1; // will be ignored
+
+# cache:https://jsr.io/@scope/a/1.0.0/c.ts
+import 'jsr:@scope/b';
+
+# cache:https://jsr.io/@scope/b/9.0.0/mod.ts
+4;
+
+# output
+{
+  "roots": [
+    "file:///mod.ts"
+  ],
+  "modules": [
+    {
+      "kind": "esm",
+      "dependencies": [
+        {
+          "specifier": "jsr:@scope/a@^1.0",
+          "code": {
+            "specifier": "jsr:@scope/a@^1.0",
+            "resolutionMode": "import",
+            "span": {
+              "start": {
+                "line": 0,
+                "character": 7
+              },
+              "end": {
+                "line": 0,
+                "character": 26
+              }
+            }
+          }
+        }
+      ],
+      "size": 28,
+      "mediaType": "TypeScript",
+      "specifier": "file:///mod.ts"
+    },
+    {
+      "kind": "esm",
+      "dependencies": [
+        {
+          "specifier": "./b.ts",
+          "code": {
+            "specifier": "https://jsr.io/@scope/a/1.0.0/b.ts",
+            "resolutionMode": "import",
+            "span": {
+              "start": {
+                "line": 0,
+                "character": 7
+              },
+              "end": {
+                "line": 0,
+                "character": 15
+              }
+            }
+          }
+        }
+      ],
+      "size": 17,
+      "mediaType": "TypeScript",
+      "specifier": "https://jsr.io/@scope/a/1.0.0/a.ts"
+    },
+    {
+      "kind": "esm",
+      "dependencies": [
+        {
+          "specifier": "./c.ts",
+          "code": {
+            "specifier": "https://jsr.io/@scope/a/1.0.0/c.ts",
+            "resolutionMode": "import",
+            "span": {
+              "start": {
+                "line": 13,
+                "character": 14
+              },
+              "end": {
+                "line": 15,
+                "character": 16
+              }
+            }
+          }
+        }
+      ],
+      "size": 22,
+      "mediaType": "TypeScript",
+      "specifier": "https://jsr.io/@scope/a/1.0.0/b.ts"
+    },
+    {
+      "kind": "esm",
+      "dependencies": [
+        {
+          "specifier": "jsr:@scope/b",
+          "code": {
+            "specifier": "jsr:@scope/b",
+            "resolutionMode": "import",
+            "span": {
+              "start": {
+                "line": 0,
+                "character": 7
+              },
+              "end": {
+                "line": 0,
+                "character": 21
+              }
+            }
+          }
+        }
+      ],
+      "size": 23,
+      "mediaType": "TypeScript",
+      "specifier": "https://jsr.io/@scope/a/1.0.0/c.ts"
+    },
+    {
+      "kind": "esm",
+      "dependencies": [
+        {
+          "specifier": "./a.ts",
+          "code": {
+            "specifier": "https://jsr.io/@scope/a/1.0.0/a.ts",
+            "resolutionMode": "import",
+            "span": {
+              "start": {
+                "line": 0,
+                "character": 7
+              },
+              "end": {
+                "line": 0,
+                "character": 15
+              }
+            }
+          }
+        }
+      ],
+      "size": 17,
+      "mediaType": "TypeScript",
+      "specifier": "https://jsr.io/@scope/a/1.0.0/mod.ts"
+    },
+    {
+      "kind": "esm",
+      "size": 3,
+      "mediaType": "TypeScript",
+      "specifier": "https://jsr.io/@scope/b/9.0.0/mod.ts"
+    }
+  ],
+  "redirects": {
+    "jsr:@scope/a@^1.0": "https://jsr.io/@scope/a/1.0.0/mod.ts",
+    "jsr:@scope/b": "https://jsr.io/@scope/b/9.0.0/mod.ts"
+  },
+  "packages": {
+    "@scope/a@1": "@scope/a@1.0.0",
+    "@scope/b@*": "@scope/b@9.0.0"
+  }
+}
+
+jsr deps: {
+    "@scope/a@1.0.0": [
+        "jsr:@scope/b",
+    ],
+}
+
+Fast check https://jsr.io/@scope/a/1.0.0/mod.ts:
+  {}
+  <empty>

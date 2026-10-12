@@ -1,0 +1,126 @@
+codemonument/cliffy/1.0.0-rc.3
+-- deno.lock --
+{}
+===
+
+== FAST CHECK EMIT FAILED ==
+error[missing-explicit-return-type]: missing explicit return type in the public API
+  --> /table/cell.ts:71:14
+   | 
+71 |   public get unclosedAnsiRuns() {
+   |              ^^^^^^^^^^^^^^^^ this function is missing an explicit return type
+   | 
+   = hint: add an explicit return type to the function
+
+  info: all functions in the public API must have an explicit return type
+  docs: https://jsr.io/go/slow-type-missing-explicit-return-type
+
+
+error[missing-explicit-return-type]: missing explicit return type in the public API
+   --> /prompt/_generic_list.ts:186:17
+    | 
+186 |   protected get selectedOption() {
+    |                 ^^^^^^^^^^^^^^ this function is missing an explicit return type
+    | 
+    = hint: add an explicit return type to the function
+
+  info: all functions in the public API must have an explicit return type
+  docs: https://jsr.io/go/slow-type-missing-explicit-return-type
+
+
+error[missing-explicit-return-type]: missing explicit return type in the public API
+   --> /prompt/_generic_list.ts:449:13
+    | 
+449 |   protected getListItemIndent(option: TOption | TGroup) {
+    |             ^^^^^^^^^^^^^^^^^ this function is missing an explicit return type
+    | 
+    = hint: add an explicit return type to the function
+
+  info: all functions in the public API must have an explicit return type
+  docs: https://jsr.io/go/slow-type-missing-explicit-return-type
+
+
+error[missing-explicit-return-type]: missing explicit return type in the public API
+   --> /prompt/_generic_list.ts:459:13
+    | 
+459 |   protected getListItemPointer(option: TOption | TGroup, isSelected?: boolean) {
+    |             ^^^^^^^^^^^^^^^^^^ this function is missing an explicit return type
+    | 
+    = hint: add an explicit return type to the function
+
+  info: all functions in the public API must have an explicit return type
+  docs: https://jsr.io/go/slow-type-missing-explicit-return-type
+
+
+error[missing-explicit-return-type]: missing explicit return type in the public API
+   --> /prompt/_generic_list.ts:507:13
+    | 
+507 |   protected getBreadCrumb() {
+    |             ^^^^^^^^^^^^^ this function is missing an explicit return type
+    | 
+    = hint: add an explicit return type to the function
+
+  info: all functions in the public API must have an explicit return type
+  docs: https://jsr.io/go/slow-type-missing-explicit-return-type
+
+
+error[missing-explicit-return-type]: missing explicit return type in the public API
+   --> /prompt/_generic_list.ts:527:13
+    | 
+527 |   protected getListIndex(value?: TValue) {
+    |             ^^^^^^^^^^^^ this function is missing an explicit return type
+    | 
+    = hint: add an explicit return type to the function
+
+  info: all functions in the public API must have an explicit return type
+  docs: https://jsr.io/go/slow-type-missing-explicit-return-type
+
+
+error[missing-explicit-return-type]: missing explicit return type in the public API
+   --> /prompt/_generic_list.ts:541:13
+    | 
+541 |   protected getPageOffset(index: number) {
+    |             ^^^^^^^^^^^^^ this function is missing an explicit return type
+    | 
+    = hint: add an explicit return type to the function
+
+  info: all functions in the public API must have an explicit return type
+  docs: https://jsr.io/go/slow-type-missing-explicit-return-type
+
+
+error[missing-explicit-return-type]: missing explicit return type in the public API
+    --> /command/command.ts:2260:10
+     | 
+2260 |   public hasArguments() {
+     |          ^^^^^^^^^^^^ this function is missing an explicit return type
+     | 
+     = hint: add an explicit return type to the function
+
+  info: all functions in the public API must have an explicit return type
+  docs: https://jsr.io/go/slow-type-missing-explicit-return-type
+
+
+error[missing-explicit-return-type]: missing explicit return type in the public API
+    --> /command/command.ts:2283:10
+     | 
+2283 |   public getUsage() {
+     |          ^^^^^^^^ this function is missing an explicit return type
+     | 
+     = hint: add an explicit return type to the function
+
+  info: all functions in the public API must have an explicit return type
+  docs: https://jsr.io/go/slow-type-missing-explicit-return-type
+
+
+error[missing-explicit-return-type]: missing explicit return type in the public API
+    --> /command/command.ts:2764:10
+     | 
+2764 |   public getCompletions() {
+     |          ^^^^^^^^^^^^^^ this function is missing an explicit return type
+     | 
+     = hint: add an explicit return type to the function
+
+  info: all functions in the public API must have an explicit return type
+  docs: https://jsr.io/go/slow-type-missing-explicit-return-type
+
+

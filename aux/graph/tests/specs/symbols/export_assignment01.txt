@@ -1,0 +1,120 @@
+# mod.ts
+function test() {
+}
+
+// this will be treated as an export default
+export = test;
+
+# output
+file:///mod.ts: EsModuleInfo {
+    module_id: ModuleId(
+        0,
+    ),
+    specifier: "file:///mod.ts",
+    re_exports: [],
+    swc_id_to_symbol_id: {
+        (
+            "test",
+            #2,
+        ): 1,
+    },
+    symbols: {
+        0: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 0,
+            parent_id: None,
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "function test() {\n}\n\n// this will be treated as an export default\nexport = test;",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            0,
+                        ),
+                        end: SourcePos(
+                            80,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {
+                1,
+            },
+            exports: {
+                "default": 2,
+            },
+            members: {},
+        },
+        1: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 1,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "function test() {\n}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            0,
+                        ),
+                        end: SourcePos(
+                            19,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        2: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 2,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Target(
+                        (
+                            "test",
+                            #2,
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            75,
+                        ),
+                        end: SourcePos(
+                            79,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+    },
+}
+== export definitions ==
+[default]: file:///mod.ts:0..19
+  function test() {
+  }

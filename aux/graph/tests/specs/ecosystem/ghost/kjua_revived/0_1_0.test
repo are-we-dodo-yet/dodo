@@ -1,0 +1,36 @@
+ghost/kjua-revived/0.1.0
+-- deno.lock --
+{}
+
+===
+
+== FAST CHECK EMIT PASSED ==
+
+== TYPE CHECK FAILED ==
+-- stdout --
+
+-- stderr --
+TS2304 [ERROR]: Cannot find name 'SVGElement'.
+export const kjua = (inputOptions: Partial<KjuaOptions>): SVGElement | HTMLCanvasElement | HTMLImageElement =>({} as never);
+                                                          ~~~~~~~~~~
+    at file://<tmpdir>/src/kjua.ts:2:59
+
+TS2304 [ERROR]: Cannot find name 'HTMLCanvasElement'.
+export const kjua = (inputOptions: Partial<KjuaOptions>): SVGElement | HTMLCanvasElement | HTMLImageElement =>({} as never);
+                                                                       ~~~~~~~~~~~~~~~~~
+    at file://<tmpdir>/src/kjua.ts:2:72
+
+TS2304 [ERROR]: Cannot find name 'HTMLImageElement'.
+export const kjua = (inputOptions: Partial<KjuaOptions>): SVGElement | HTMLCanvasElement | HTMLImageElement =>({} as never);
+                                                                                           ~~~~~~~~~~~~~~~~
+    at file://<tmpdir>/src/kjua.ts:2:92
+
+TS2304 [ERROR]: Cannot find name 'HTMLImageElement'.
+  image: HTMLImageElement | null;
+         ~~~~~~~~~~~~~~~~
+    at file://<tmpdir>/src/lib/options.ts:21:10
+
+Found 4 errors.
+
+error: Type checking failed.
+

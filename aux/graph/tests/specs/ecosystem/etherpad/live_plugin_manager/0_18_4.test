@@ -1,0 +1,54 @@
+etherpad/live-plugin-manager/0.18.4
+-- deno.lock --
+{
+  "version": "3",
+  "remote": {}
+}
+
+===
+
+== FAST CHECK EMIT PASSED ==
+
+== TYPE CHECK FAILED ==
+-- stdout --
+
+-- stderr --
+TS1205 [ERROR]: Re-exporting a type when 'isolatedModules' is enabled requires using 'export type'.
+export { IPluginInfo } from "./src/PluginInfo.ts";
+         ~~~~~~~~~~~
+    at file://<tmpdir>/index.ts:2:10
+
+TS1205 [ERROR]: Re-exporting a type when 'isolatedModules' is enabled requires using 'export type'.
+export { PackageInfo, PackageJsonInfo } from "./src/PackageInfo.ts";
+         ~~~~~~~~~~~
+    at file://<tmpdir>/index.ts:3:10
+
+TS1205 [ERROR]: Re-exporting a type when 'isolatedModules' is enabled requires using 'export type'.
+export { PackageInfo, PackageJsonInfo } from "./src/PackageInfo.ts";
+                      ~~~~~~~~~~~~~~~
+    at file://<tmpdir>/index.ts:3:23
+
+TS1205 [ERROR]: Re-exporting a type when 'isolatedModules' is enabled requires using 'export type'.
+export { NpmRegistryConfig, NpmRegistryAuthBasic, NpmRegistryAuthToken } from "./src/NpmRegistryClient.ts";
+         ~~~~~~~~~~~~~~~~~
+    at file://<tmpdir>/index.ts:4:10
+
+TS1205 [ERROR]: Re-exporting a type when 'isolatedModules' is enabled requires using 'export type'.
+export { NpmRegistryConfig, NpmRegistryAuthBasic, NpmRegistryAuthToken } from "./src/NpmRegistryClient.ts";
+                            ~~~~~~~~~~~~~~~~~~~~
+    at file://<tmpdir>/index.ts:4:29
+
+TS1205 [ERROR]: Re-exporting a type when 'isolatedModules' is enabled requires using 'export type'.
+export { NpmRegistryConfig, NpmRegistryAuthBasic, NpmRegistryAuthToken } from "./src/NpmRegistryClient.ts";
+                                                  ~~~~~~~~~~~~~~~~~~~~
+    at file://<tmpdir>/index.ts:4:51
+
+TS1205 [ERROR]: Re-exporting a type when 'isolatedModules' is enabled requires using 'export type'.
+export { GithubAuth } from "./src/GithubRegistryClient.ts";
+         ~~~~~~~~~~
+    at file://<tmpdir>/index.ts:5:10
+
+Found 7 errors.
+
+error: Type checking failed.
+

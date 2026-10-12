@@ -1,0 +1,350 @@
+# mod.ts
+export { "someName" as "someOtherName" } from "./a.ts";
+
+# a.ts
+import { "some-name" as someName } from "./b.ts";
+
+export { someName as "someName" };
+
+# b.ts
+export { MyClass as "some-name" } from "./c.ts";
+
+# c.ts
+export class MyClass {}
+
+# output
+file:///a.ts: EsModuleInfo {
+    module_id: ModuleId(
+        1,
+    ),
+    specifier: "file:///a.ts",
+    re_exports: [],
+    swc_id_to_symbol_id: {
+        (
+            "someName",
+            #2,
+        ): 1,
+    },
+    symbols: {
+        0: Symbol {
+            module_id: ModuleId(
+                1,
+            ),
+            symbol_id: 0,
+            parent_id: None,
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "import { \"some-name\" as someName } from \"./b.ts\";\n\nexport { someName as \"someName\" };",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            0,
+                        ),
+                        end: SourcePos(
+                            85,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {
+                "someName": 2,
+            },
+            members: {},
+        },
+        1: Symbol {
+            module_id: ModuleId(
+                1,
+            ),
+            symbol_id: 1,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: FileRef(
+                        FileDep {
+                            name: Name(
+                                "some-name",
+                            ),
+                            specifier: "./b.ts",
+                        },
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            9,
+                        ),
+                        end: SourcePos(
+                            32,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        2: Symbol {
+            module_id: ModuleId(
+                1,
+            ),
+            symbol_id: 2,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Target(
+                        (
+                            "someName",
+                            #2,
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            60,
+                        ),
+                        end: SourcePos(
+                            82,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+    },
+}
+file:///b.ts: EsModuleInfo {
+    module_id: ModuleId(
+        2,
+    ),
+    specifier: "file:///b.ts",
+    re_exports: [],
+    swc_id_to_symbol_id: {},
+    symbols: {
+        0: Symbol {
+            module_id: ModuleId(
+                2,
+            ),
+            symbol_id: 0,
+            parent_id: None,
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "export { MyClass as \"some-name\" } from \"./c.ts\";",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            0,
+                        ),
+                        end: SourcePos(
+                            48,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {
+                "some-name": 1,
+            },
+            members: {},
+        },
+        1: Symbol {
+            module_id: ModuleId(
+                2,
+            ),
+            symbol_id: 1,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: FileRef(
+                        FileDep {
+                            name: Name(
+                                "MyClass",
+                            ),
+                            specifier: "./c.ts",
+                        },
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            9,
+                        ),
+                        end: SourcePos(
+                            31,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+    },
+}
+file:///c.ts: EsModuleInfo {
+    module_id: ModuleId(
+        3,
+    ),
+    specifier: "file:///c.ts",
+    re_exports: [],
+    swc_id_to_symbol_id: {
+        (
+            "MyClass",
+            #2,
+        ): 1,
+    },
+    symbols: {
+        0: Symbol {
+            module_id: ModuleId(
+                3,
+            ),
+            symbol_id: 0,
+            parent_id: None,
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "export class MyClass {}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            0,
+                        ),
+                        end: SourcePos(
+                            23,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {
+                1,
+            },
+            exports: {
+                "MyClass": 1,
+            },
+            members: {},
+        },
+        1: Symbol {
+            module_id: ModuleId(
+                3,
+            ),
+            symbol_id: 1,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "export class MyClass {}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            0,
+                        ),
+                        end: SourcePos(
+                            23,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+    },
+}
+file:///mod.ts: EsModuleInfo {
+    module_id: ModuleId(
+        0,
+    ),
+    specifier: "file:///mod.ts",
+    re_exports: [],
+    swc_id_to_symbol_id: {},
+    symbols: {
+        0: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 0,
+            parent_id: None,
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "export { \"someName\" as \"someOtherName\" } from \"./a.ts\";",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            0,
+                        ),
+                        end: SourcePos(
+                            55,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {
+                "someOtherName": 1,
+            },
+            members: {},
+        },
+        1: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 1,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: FileRef(
+                        FileDep {
+                            name: Name(
+                                "someName",
+                            ),
+                            specifier: "./a.ts",
+                        },
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            9,
+                        ),
+                        end: SourcePos(
+                            38,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+    },
+}
+== export definitions ==
+[someOtherName]: file:///c.ts:0..23
+  export class MyClass {}

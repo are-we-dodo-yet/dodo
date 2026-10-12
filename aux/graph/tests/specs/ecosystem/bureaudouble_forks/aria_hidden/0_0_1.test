@@ -1,0 +1,64 @@
+bureaudouble-forks/aria-hidden/0.0.1
+-- deno.lock --
+{
+  "version": "3",
+  "remote": {}
+}
+
+===
+
+== FAST CHECK EMIT PASSED ==
+
+== TYPE CHECK FAILED ==
+-- stdout --
+
+-- stderr --
+TS2304 [ERROR]: Cannot find name 'Element'.
+ */ export const hideOthers = (originalTarget: Element | Element[], parentNode?: HTMLElement, markerName?: string): Undo =>({} as never);
+                                               ~~~~~~~
+    at file://<tmpdir>/src/index.ts:8:48
+
+TS2304 [ERROR]: Cannot find name 'Element'.
+ */ export const hideOthers = (originalTarget: Element | Element[], parentNode?: HTMLElement, markerName?: string): Undo =>({} as never);
+                                                         ~~~~~~~
+    at file://<tmpdir>/src/index.ts:8:58
+
+TS2304 [ERROR]: Cannot find name 'HTMLElement'.
+ */ export const hideOthers = (originalTarget: Element | Element[], parentNode?: HTMLElement, markerName?: string): Undo =>({} as never);
+                                                                                 ~~~~~~~~~~~
+    at file://<tmpdir>/src/index.ts:8:82
+
+TS2304 [ERROR]: Cannot find name 'Element'.
+ */ export const inertOthers = (originalTarget: Element | Element[], parentNode?: HTMLElement, markerName?: string): Undo =>({} as never);
+                                                ~~~~~~~
+    at file://<tmpdir>/src/index.ts:15:49
+
+TS2304 [ERROR]: Cannot find name 'Element'.
+ */ export const inertOthers = (originalTarget: Element | Element[], parentNode?: HTMLElement, markerName?: string): Undo =>({} as never);
+                                                          ~~~~~~~
+    at file://<tmpdir>/src/index.ts:15:59
+
+TS2304 [ERROR]: Cannot find name 'HTMLElement'.
+ */ export const inertOthers = (originalTarget: Element | Element[], parentNode?: HTMLElement, markerName?: string): Undo =>({} as never);
+                                                                                  ~~~~~~~~~~~
+    at file://<tmpdir>/src/index.ts:15:83
+
+TS2304 [ERROR]: Cannot find name 'Element'.
+ */ export const suppressOthers = (originalTarget: Element | Element[], parentNode?: HTMLElement, markerName?: string): Undo =>({} as never);
+                                                   ~~~~~~~
+    at file://<tmpdir>/src/index.ts:25:52
+
+TS2304 [ERROR]: Cannot find name 'Element'.
+ */ export const suppressOthers = (originalTarget: Element | Element[], parentNode?: HTMLElement, markerName?: string): Undo =>({} as never);
+                                                             ~~~~~~~
+    at file://<tmpdir>/src/index.ts:25:62
+
+TS2304 [ERROR]: Cannot find name 'HTMLElement'.
+ */ export const suppressOthers = (originalTarget: Element | Element[], parentNode?: HTMLElement, markerName?: string): Undo =>({} as never);
+                                                                                     ~~~~~~~~~~~
+    at file://<tmpdir>/src/index.ts:25:86
+
+Found 9 errors.
+
+error: Type checking failed.
+

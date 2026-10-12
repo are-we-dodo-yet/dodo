@@ -1,0 +1,19 @@
+custom-ui/utils/0.1.0
+-- deno.lock --
+{}
+
+===
+
+== FAST CHECK EMIT PASSED ==
+
+== TYPE CHECK FAILED ==
+-- stdout --
+
+-- stderr --
+TS2304 [ERROR]: Cannot find name 'HTMLElement'.
+export function isHTMLElement(elem: any): elem is HTMLElement {
+                                                  ~~~~~~~~~~~
+    at file://<tmpdir>/src/is/dom.ts:9:51
+
+error: Type checking failed.
+

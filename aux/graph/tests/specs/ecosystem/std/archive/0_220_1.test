@@ -1,0 +1,32 @@
+std/archive/0.220.1
+-- deno.lock --
+{
+  "version": "3",
+  "packages": {
+    "specifiers": {
+      "jsr:@std/io@^0.220.1": "jsr:@std/io@0.220.1"
+    },
+    "jsr": {
+      "@std/io@0.220.1": {
+        "integrity": "c14c3237cfc73dd8086ac82673212939f8c49f0803d6da68eea32249caffdd67"
+      }
+    }
+  },
+  "remote": {}
+}
+
+===
+
+== FAST CHECK EMIT PASSED ==
+
+== TYPE CHECK FAILED ==
+-- stdout --
+
+-- stderr --
+TS2694 [ERROR]: Namespace 'Deno' has no exported member 'Seeker'.
+  /** Constructs a new instance. */ constructor(meta: TarMetaWithLinkName, header: TarHeader, reader: Reader | (Reader & Deno.Seeker)){}
+                                                                                                                              ~~~~~~
+    at file://<tmpdir>/untar.ts:16:127
+
+error: Type checking failed.
+

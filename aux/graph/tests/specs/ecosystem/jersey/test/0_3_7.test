@@ -1,0 +1,39 @@
+jersey/test/0.3.7
+-- deno.lock --
+{
+  "version": "3",
+  "packages": {
+    "specifiers": {
+      "jsr:@lucsoft/web-bson@^0.3.1": "jsr:@lucsoft/web-bson@0.3.1"
+    },
+    "jsr": {
+      "@lucsoft/web-bson@0.3.1": {
+        "integrity": "dccad36fe5cc68286a4d3fe1993f7e7a81df0970c5946a5894dae9173adafe60"
+      }
+    }
+  },
+  "remote": {}
+}
+
+===
+
+== FAST CHECK EMIT PASSED ==
+
+== TYPE CHECK FAILED ==
+-- stdout --
+
+-- stderr --
+TS2694 [ERROR]: Namespace 'Deno' has no exported member 'Reader'.
+type Socket = Deno.Reader & Deno.Writer;
+                   ~~~~~~
+    at file://<tmpdir>/src/protocol/protocol.ts:2:20
+
+TS2694 [ERROR]: Namespace 'Deno' has no exported member 'Writer'.
+type Socket = Deno.Reader & Deno.Writer;
+                                 ~~~~~~
+    at file://<tmpdir>/src/protocol/protocol.ts:2:34
+
+Found 2 errors.
+
+error: Type checking failed.
+

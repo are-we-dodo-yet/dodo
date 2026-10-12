@@ -1,0 +1,22 @@
+lightbery/dynamic-cli/1.0.4
+-- deno.lock --
+{
+  "version": "3",
+  "remote": {}
+}
+
+===
+
+== FAST CHECK EMIT PASSED ==
+
+== TYPE CHECK FAILED ==
+-- stdout --
+
+-- stderr --
+TS1205 [ERROR]: Re-exporting a type when 'isolatedModules' is enabled requires using 'export type'.
+export { DynamicCLI, Component, TextColor, BackgroundColor };
+                     ~~~~~~~~~
+    at file://<tmpdir>/DynamicCLI.ts:89:22
+
+error: Type checking failed.
+

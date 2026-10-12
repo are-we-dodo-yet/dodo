@@ -1,0 +1,92 @@
+# mod.ts
+export function isPrime(x: number): boolean {
+  // ...
+}
+
+// we just ignore this because this causes typescript to
+// export this module as a "mathLib" global
+export as namespace mathLib;
+
+# output
+file:///mod.ts: EsModuleInfo {
+    module_id: ModuleId(
+        0,
+    ),
+    specifier: "file:///mod.ts",
+    re_exports: [],
+    swc_id_to_symbol_id: {
+        (
+            "isPrime",
+            #2,
+        ): 1,
+    },
+    symbols: {
+        0: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 0,
+            parent_id: None,
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "export function isPrime(x: number): boolean {\n  // ...\n}\n\n// we just ignore this because this causes typescript to\n// export this module as a \"mathLib\" global\nexport as namespace mathLib;",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            0,
+                        ),
+                        end: SourcePos(
+                            187,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {
+                1,
+            },
+            exports: {
+                "isPrime": 1,
+            },
+            members: {},
+        },
+        1: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 1,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "export function isPrime(x: number): boolean {\n  // ...\n}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            0,
+                        ),
+                        end: SourcePos(
+                            56,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+    },
+}
+== export definitions ==
+[isPrime]: file:///mod.ts:0..56
+  export function isPrime(x: number): boolean {
+    // ...
+  }

@@ -1,0 +1,22 @@
+codehz/mtproto/0.5.2
+-- deno.lock --
+{
+  "version": "3",
+  "remote": {}
+}
+
+===
+
+== FAST CHECK EMIT PASSED ==
+
+== TYPE CHECK FAILED ==
+-- stdout --
+
+-- stderr --
+TS2694 [ERROR]: Namespace 'Deno' has no exported member 'Closer'.
+export interface Transport extends Deno.Closer {
+                                        ~~~~~~
+    at file://<tmpdir>/types.ts:13:41
+
+error: Type checking failed.
+

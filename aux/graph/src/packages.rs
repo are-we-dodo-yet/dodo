@@ -1,0 +1,594 @@
+// Copyright 2018-2024 the Deno authors. MIT license.
+
+use std::collections::BTreeMap;
+use std::collections::BTreeSet;
+use std::collections::HashMap;
+use std::collections::HashSet;
+
+use deno_semver::StackString;
+use deno_semver::Version;
+use deno_semver::VersionReq;
+use deno_semver::WILDCARD_VERSION_REQ;
+use deno_semver::jsr::JsrDepPackageReq;
+use deno_semver::package::PackageName;
+use deno_semver::package::PackageNv;
+use deno_semver::package::PackageReq;
+use serde::Deserialize;
+use serde::Serialize;
+
+use crate::analysis::ModuleInfo;
+use crate::analysis::module_graph_1_to_2;
+use crate::graph::JsrPackageReqNotFoundError;
+
+#[derive(Debug, Default, Clone, Copy, Serialize, Deserialize)]
+pub struct NewestDependencyDate(pub chrono::DateTime<chrono::Utc>);
+
+impl std::fmt::Display for NewestDependencyDate {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    write!(f, "{}", self.0)
+  }
+}
+
+impl NewestDependencyDate {
+  pub fn matches(&self, date: chrono::DateTime<chrono::Utc>) -> bool {
+    date < self.0
+  }
+}
+
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct NewestDependencyDateOptions {
+  /// Prevents installing packages newer than the specified date.
+  pub date: Option<NewestDependencyDate>,
+  /// JSR packages to exclude from the newest dependency date checks.
+  #[serde(default, skip_serializing_if = "BTreeSet::is_empty")]
+  pub exclude_jsr_pkgs: BTreeSet<PackageName>,
+  /// JSR package name prefixes to exclude from the newest dependency date
+  /// checks (e.g. `@scope/` from a `@scope/*` wildcard entry).
+  #[serde(default, skip_serializing_if = "Vec::is_empty")]
+  pub exclude_jsr_pkg_prefixes: Vec<PackageName>,
+}
+
+impl NewestDependencyDateOptions {
+  pub fn from_date(date: chrono::DateTime<chrono::Utc>) -> Self {
+    Self {
+      date: Some(NewestDependencyDate(date)),
+      exclude_jsr_pkgs: Default::default(),
+      exclude_jsr_pkg_prefixes: Default::default(),
+    }
+  }
+
+  pub fn get_for_package(
+    &self,
+    package_name: &PackageName,
+  ) -> Option<NewestDependencyDate> {
+    let date = self.date?;
+    if self.exclude_jsr_pkgs.contains(package_name)
+      || self
+        .exclude_jsr_pkg_prefixes
+        .iter()
+        .any(|prefix| package_name.starts_with(prefix.as_str()))
+    {
+      None
+    } else {
+      Some(date)
+    }
+  }
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct JsrPackageInfo {
+  pub versions: HashMap<Version, JsrPackageInfoVersion>,
+  pub latest: Option<Version>,
+}
+
+fn is_false(v: &bool) -> bool {
+  !v
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct JsrPackageInfoVersion {
+  #[serde(default, skip_serializing_if = "Option::is_none")]
+  pub created_at: Option<chrono::DateTime<chrono::Utc>>,
+  #[serde(default, skip_serializing_if = "is_false")]
+  pub yanked: bool,
+}
+
+impl JsrPackageInfoVersion {
+  pub fn matches_newest_dependency_date(
+    &self,
+    cutoff: NewestDependencyDate,
+  ) -> bool {
+    // assume versions not existing are really old
+    self
+      .created_at
+      .map(|created_at| cutoff.matches(created_at))
+      .unwrap_or(true)
+  }
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
+#[serde(rename_all = "camelCase")]
+pub struct JsrPackageVersionManifestEntry {
+  pub checksum: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone, Default)]
+pub struct JsrPackageVersionInfo {
+  // ensure the fields on here are resilient to change
+  #[serde(default)]
+  pub exports: serde_json::Value,
+  #[serde(rename = "moduleGraph1")]
+  pub module_graph_1: Option<serde_json::Value>,
+  #[serde(rename = "moduleGraph2")]
+  pub module_graph_2: Option<serde_json::Value>,
+  pub manifest: HashMap<String, JsrPackageVersionManifestEntry>,
+  /// This is a property that deno_cache_dir sets when copying from
+  /// the global to the local cache. If it's set, put this in the lockfile
+  /// instead of computing the checksum from the file bytes. This is necessary
+  /// because we store less data in the metadata files found in the vendor
+  /// directory than in the global cache and also someone may modify the vendored
+  /// files then regenerate the lockfile.
+  #[serde(rename = "lockfileChecksum")]
+  pub lockfile_checksum: Option<String>,
+}
+
+impl JsrPackageVersionInfo {
+  /// Resolves the provided export key.
+  ///
+  /// Note: This assumes the provided export name is normalized.
+  pub fn export(&self, export_name: &str) -> Option<&str> {
+    match &self.exports {
+      serde_json::Value::String(value) => {
+        if export_name == "." {
+          Some(value.as_str())
+        } else {
+          None
+        }
+      }
+      serde_json::Value::Object(map) => match map.get(export_name) {
+        Some(serde_json::Value::String(value)) => Some(value.as_str()),
+        _ => None,
+      },
+      _ => None,
+    }
+  }
+
+  /// Gets the key and values of the exports map.
+  pub fn exports(&self) -> Box<dyn Iterator<Item = (&str, &str)> + '_> {
+    match &self.exports {
+      serde_json::Value::String(value) => {
+        Box::new(std::iter::once((".", value.as_str())))
+      }
+      serde_json::Value::Object(map) => {
+        Box::new(map.iter().filter_map(|(key, value)| match value {
+          serde_json::Value::String(value) => {
+            Some((key.as_str(), value.as_str()))
+          }
+          _ => None,
+        }))
+      }
+      _ => Box::new(std::iter::empty()),
+    }
+  }
+
+  pub fn module_info(&self, specifier: &str) -> Option<ModuleInfo> {
+    if let Some(module_graph) = self.module_graph_2.as_ref() {
+      let module_graph = module_graph.as_object()?;
+      let module_info = module_graph.get(specifier)?;
+      serde_json::from_value(module_info.clone()).ok()
+    } else if let Some(module_graph) = self.module_graph_1.as_ref() {
+      let module_graph = module_graph.as_object()?;
+      let mut module_info = module_graph.get(specifier)?.clone();
+      module_graph_1_to_2(&mut module_info);
+      serde_json::from_value(module_info).ok()
+    } else {
+      None
+    }
+  }
+}
+
+#[derive(Debug, Clone)]
+struct PackageNvInfo {
+  /// Collection of exports used.
+  exports: BTreeMap<String, String>,
+  found_dependencies: HashSet<JsrDepPackageReq>,
+}
+
+#[derive(Debug, Clone, Default, Serialize)]
+pub struct PackageSpecifiers {
+  #[serde(flatten)]
+  package_reqs: BTreeMap<PackageReq, PackageNv>,
+  #[serde(skip_serializing)]
+  packages_by_name: HashMap<StackString, Vec<PackageNv>>,
+  #[serde(skip_serializing)]
+  packages: BTreeMap<PackageNv, PackageNvInfo>,
+  /// Cache for packages that have a referrer outside JSR.
+  #[serde(skip_serializing)]
+  top_level_packages: BTreeSet<PackageNv>,
+  #[serde(skip_serializing)]
+  used_yanked_packages: BTreeSet<PackageNv>,
+}
+
+impl PackageSpecifiers {
+  pub fn is_empty(&self) -> bool {
+    self.package_reqs.is_empty()
+  }
+
+  /// The total number of JSR packages found in the graph.
+  pub fn packages_len(&self) -> usize {
+    self.packages.len()
+  }
+
+  /// The total number of dependencies of jsr packages found in the graph.
+  pub fn package_deps_sum(&self) -> usize {
+    self
+      .packages
+      .iter()
+      .map(|p| p.1.found_dependencies.len())
+      .sum()
+  }
+
+  pub fn add_nv(&mut self, package_req: PackageReq, nv: PackageNv) {
+    let nvs = self
+      .packages_by_name
+      .entry(package_req.name.clone())
+      .or_default();
+    if !nvs.contains(&nv) {
+      nvs.push(nv.clone());
+    }
+    self.package_reqs.insert(package_req, nv.clone());
+  }
+
+  pub(crate) fn ensure_package(&mut self, nv: PackageNv) {
+    self.packages.entry(nv).or_insert_with(|| PackageNvInfo {
+      exports: Default::default(),
+      found_dependencies: Default::default(),
+    });
+  }
+
+  /// Gets the dependencies (package constraints) of JSR packages found in the graph.
+  pub fn packages_with_deps(
+    &self,
+  ) -> impl Iterator<Item = (&PackageNv, impl Iterator<Item = &JsrDepPackageReq>)>
+  {
+    self.packages.iter().map(|(nv, info)| {
+      let deps = info.found_dependencies.iter();
+      (nv, deps)
+    })
+  }
+
+  pub(crate) fn add_dependency(
+    &mut self,
+    nv: &PackageNv,
+    dep: JsrDepPackageReq,
+  ) {
+    self
+      .packages
+      .get_mut(nv)
+      .unwrap()
+      .found_dependencies
+      .insert(dep);
+  }
+
+  pub(crate) fn add_export(
+    &mut self,
+    nv: &PackageNv,
+    export: (String, String),
+  ) {
+    self
+      .packages
+      .get_mut(nv)
+      .unwrap()
+      .exports
+      .insert(export.0, export.1);
+  }
+
+  pub(crate) fn add_top_level_package(&mut self, nv: PackageNv) {
+    self.top_level_packages.insert(nv);
+  }
+
+  pub(crate) fn top_level_packages(&self) -> &BTreeSet<PackageNv> {
+    &self.top_level_packages
+  }
+
+  pub(crate) fn add_used_yanked_package(&mut self, nv: PackageNv) {
+    self.used_yanked_packages.insert(nv);
+  }
+
+  pub fn used_yanked_packages(&mut self) -> impl Iterator<Item = &PackageNv> {
+    self.used_yanked_packages.iter()
+  }
+
+  pub fn package_exports(
+    &self,
+    nv: &PackageNv,
+  ) -> Option<&BTreeMap<String, String>> {
+    self.packages.get(nv).map(|p| &p.exports)
+  }
+
+  pub fn versions_by_name(&self, name: &str) -> Option<&Vec<PackageNv>> {
+    self.packages_by_name.get(name)
+  }
+
+  pub fn mappings(&self) -> &BTreeMap<PackageReq, PackageNv> {
+    &self.package_reqs
+  }
+}
+
+pub struct JsrVersionResolverResolvedVersion<'a> {
+  pub is_yanked: bool,
+  pub version: &'a Version,
+}
+
+#[derive(Debug, Default, Clone)]
+pub struct JsrVersionResolver {
+  pub newest_dependency_date_options: NewestDependencyDateOptions,
+}
+
+impl JsrVersionResolver {
+  pub fn get_for_package<'a>(
+    &'a self,
+    package_name: &PackageName,
+    package_info: &'a JsrPackageInfo,
+  ) -> JsrPackageVersionResolver<'a> {
+    JsrPackageVersionResolver {
+      package_info,
+      newest_dependency_date: self
+        .newest_dependency_date_options
+        .get_for_package(package_name),
+    }
+  }
+}
+
+pub struct JsrPackageVersionResolver<'a> {
+  package_info: &'a JsrPackageInfo,
+  newest_dependency_date: Option<NewestDependencyDate>,
+}
+
+impl<'a> JsrPackageVersionResolver<'a> {
+  pub fn info(&self) -> &'a JsrPackageInfo {
+    self.package_info
+  }
+
+  pub fn resolve_version<'b>(
+    &'b self,
+    package_req: &PackageReq,
+    existing_versions: impl Iterator<Item = &'b Version>,
+    cached_versions: &HashSet<Version>,
+  ) -> Result<JsrVersionResolverResolvedVersion<'b>, JsrPackageReqNotFoundError>
+  {
+    let include_all_prereleases =
+      prerelease_fallback_applies(&package_req.version_req, self.package_info);
+
+    // 1. try to resolve with the list of existing versions
+    if let ResolveVersionResult::Some(version) = resolve_version(
+      ResolveVersionOptions {
+        version_req: &package_req.version_req,
+        // don't use this here because existing versions are ok to resolve to
+        newest_dependency_date: None,
+        include_all_prereleases,
+      },
+      existing_versions.map(|v| (v, None)),
+    ) {
+      let is_yanked = self
+        .package_info
+        .versions
+        .get(version)
+        .map(|i| i.yanked)
+        .unwrap_or(false);
+      return Ok(JsrVersionResolverResolvedVersion { is_yanked, version });
+    }
+
+    // 1.5. attempt to resolve with the versions whose version manifest is
+    // already cached (only populated when `prefer_cached_jsr_versions` is
+    // enabled). The placement of this step is important:
+    // - Step 1 must stay first so in-graph version unification still wins.
+    //   This matches online behavior when another package requirement
+    //   already selected a version in this graph.
+    // - This step must not be merged into step 1's iterator: if the graph
+    //   unified onto an older version, but a newer matching version is
+    //   also cached, chaining the two sets would resolve to the newer
+    //   version and diverge from what an online run resolves to.
+    // - Placing this before step 2 is strictly error-converting under
+    //   cached-only resolution: if step 2's best pick is cached, it equals
+    //   the best cached match here; if it's not cached, step 2's pick
+    //   would fail to load anyway.
+    // Yanked versions are excluded here, consistent with step 2 preceding
+    // step 3.
+    if !cached_versions.is_empty() {
+      let cached_unyanked_versions =
+        self.package_info.versions.iter().filter_map(|(v, i)| {
+          if !i.yanked && cached_versions.contains(v) {
+            Some((v, Some(i)))
+          } else {
+            None
+          }
+        });
+      if let ResolveVersionResult::Some(version) = resolve_version(
+        ResolveVersionOptions {
+          version_req: &package_req.version_req,
+          newest_dependency_date: self.newest_dependency_date,
+          include_all_prereleases,
+        },
+        cached_unyanked_versions,
+      ) {
+        return Ok(JsrVersionResolverResolvedVersion {
+          is_yanked: false,
+          version,
+        });
+      }
+    }
+
+    // 2. attempt to resolve with the unyanked versions
+    let mut any_had_higher_newest_dep_date_version = false;
+    let unyanked_versions = self
+      .package_info
+      .versions
+      .iter()
+      .filter_map(|(v, i)| if !i.yanked { Some((v, Some(i))) } else { None });
+    match resolve_version(
+      ResolveVersionOptions {
+        version_req: &package_req.version_req,
+        newest_dependency_date: self.newest_dependency_date,
+        include_all_prereleases,
+      },
+      unyanked_versions,
+    ) {
+      ResolveVersionResult::Some(version) => {
+        return Ok(JsrVersionResolverResolvedVersion {
+          is_yanked: false,
+          version,
+        });
+      }
+      ResolveVersionResult::None {
+        had_higher_date_version,
+      } => {
+        any_had_higher_newest_dep_date_version |= had_higher_date_version;
+      }
+    }
+
+    // 3. attempt to resolve with the the yanked versions
+    let yanked_versions = self
+      .package_info
+      .versions
+      .iter()
+      .filter_map(|(v, i)| if i.yanked { Some((v, Some(i))) } else { None });
+    match resolve_version(
+      ResolveVersionOptions {
+        version_req: &package_req.version_req,
+        newest_dependency_date: self.newest_dependency_date,
+        include_all_prereleases,
+      },
+      yanked_versions,
+    ) {
+      ResolveVersionResult::Some(version) => {
+        return Ok(JsrVersionResolverResolvedVersion {
+          is_yanked: true,
+          version,
+        });
+      }
+      ResolveVersionResult::None {
+        had_higher_date_version,
+      } => {
+        any_had_higher_newest_dep_date_version |= had_higher_date_version;
+      }
+    }
+
+    Err(JsrPackageReqNotFoundError {
+      req: package_req.clone(),
+      newest_dependency_date: any_had_higher_newest_dep_date_version
+        .then_some(self.newest_dependency_date)
+        .flatten(),
+    })
+  }
+
+  pub fn matches_newest_dependency_date(
+    &self,
+    version_info: &JsrPackageInfoVersion,
+  ) -> bool {
+    match self.newest_dependency_date {
+      Some(newest_dependency_date) => {
+        version_info.matches_newest_dependency_date(newest_dependency_date)
+      }
+      None => true,
+    }
+  }
+}
+
+pub struct ResolveVersionOptions<'a> {
+  pub version_req: &'a VersionReq,
+  pub newest_dependency_date: Option<NewestDependencyDate>,
+  /// When enabled, **every** pre-release version is a candidate, regardless of
+  /// whether `version_req` matches it.
+  ///
+  /// This deliberately bypasses the version requirement, so only enable it for
+  /// the case it exists for. Derive it with [`prerelease_fallback_applies`]
+  /// rather than setting it directly.
+  pub include_all_prereleases: bool,
+}
+
+/// Whether resolving `version_req` against `package_info` should additionally
+/// consider pre-release versions.
+///
+/// A `*` requirement never matches a pre-release version, so a package with no
+/// usable stable release — it only ever published pre-releases, or its stable
+/// releases were all yanked — could never be resolved by `jsr:@scope/pkg`.
+/// Mirror npm's behavior for such packages, where `*` resolves to the `latest`
+/// dist-tag even when that is a pre-release.
+pub fn prerelease_fallback_applies(
+  version_req: &VersionReq,
+  package_info: &JsrPackageInfo,
+) -> bool {
+  // `*`, `x`, `X` and an absent requirement all parse to the same wildcard
+  *version_req == *WILDCARD_VERSION_REQ
+    && !package_info
+      .versions
+      .iter()
+      .any(|(version, info)| version.pre.is_empty() && !info.yanked)
+}
+
+/// Whether `version` is a candidate for `version_req`, taking the pre-release
+/// fallback into account. `include_all_prereleases` must come from
+/// [`prerelease_fallback_applies`].
+pub fn version_matches(
+  version_req: &VersionReq,
+  version: &Version,
+  include_all_prereleases: bool,
+) -> bool {
+  version_req.matches(version)
+    || (include_all_prereleases && !version.pre.is_empty())
+}
+
+pub enum ResolveVersionResult<'a> {
+  Some(&'a Version),
+  None { had_higher_date_version: bool },
+}
+
+pub fn resolve_version<'a>(
+  options: ResolveVersionOptions<'_>,
+  versions: impl Iterator<Item = (&'a Version, Option<&'a JsrPackageInfoVersion>)>,
+) -> ResolveVersionResult<'a> {
+  let mut maybe_best_version: Option<&Version> = None;
+  let mut had_higher_date_version = false;
+  for (version, version_info) in versions {
+    if version_matches(
+      options.version_req,
+      version,
+      options.include_all_prereleases,
+    ) {
+      had_higher_date_version = true;
+      if matches_newest_dependency_date(
+        version_info,
+        options.newest_dependency_date,
+      ) {
+        let is_best_version = maybe_best_version
+          .as_ref()
+          .map(|best_version| (*best_version).cmp(version).is_lt())
+          .unwrap_or(true);
+        if is_best_version {
+          maybe_best_version = Some(version);
+        }
+      }
+    }
+  }
+  match maybe_best_version {
+    Some(version) => ResolveVersionResult::Some(version),
+    None => ResolveVersionResult::None {
+      had_higher_date_version,
+    },
+  }
+}
+
+fn matches_newest_dependency_date(
+  info: Option<&JsrPackageInfoVersion>,
+  newest_dependency_date: Option<NewestDependencyDate>,
+) -> bool {
+  info
+    .as_ref()
+    .and_then(|info| {
+      newest_dependency_date.map(|d| info.matches_newest_dependency_date(d))
+    })
+    .unwrap_or(true)
+}

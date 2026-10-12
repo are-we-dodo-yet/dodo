@@ -1,0 +1,45 @@
+hampus/itsdangerous/1.1.0
+-- deno.lock --
+{
+  "version": "3",
+  "packages": {
+    "specifiers": {
+      "npm:ts-mixer@^6.0.4": "npm:ts-mixer@6.0.4"
+    },
+    "npm": {
+      "ts-mixer@6.0.4": {
+        "integrity": "sha512-ufKpbmrugz5Aou4wcr5Wc1UUFWOLhq+Fm6qa6P0w0K5Qw2yhaUoiWszhCVuNQyNwrlGiscHOmqYoAox1PtvgjA==",
+        "dependencies": {}
+      }
+    }
+  },
+  "remote": {}
+}
+
+===
+
+== FAST CHECK EMIT PASSED ==
+
+== TYPE CHECK FAILED ==
+-- stdout --
+
+-- stderr --
+TS1205 [ERROR]: Re-exporting a type when 'isolatedModules' is enabled requires using 'export type'.
+export { DefaultSerializer, Serializer, SerializerOptions } from "./serializer.ts";
+         ~~~~~~~~~~~~~~~~~
+    at file://<tmpdir>/src/index.ts:3:10
+
+TS1205 [ERROR]: Re-exporting a type when 'isolatedModules' is enabled requires using 'export type'.
+export { DefaultSerializer, Serializer, SerializerOptions } from "./serializer.ts";
+                                        ~~~~~~~~~~~~~~~~~
+    at file://<tmpdir>/src/index.ts:3:41
+
+TS1205 [ERROR]: Re-exporting a type when 'isolatedModules' is enabled requires using 'export type'.
+export { HMACAlgorithm, KeyDerivation, NoneAlgorithm, Signer, SignerOptions, SigningAlgorithm } from "./signer.ts";
+                                                              ~~~~~~~~~~~~~
+    at file://<tmpdir>/src/index.ts:4:63
+
+Found 3 errors.
+
+error: Type checking failed.
+

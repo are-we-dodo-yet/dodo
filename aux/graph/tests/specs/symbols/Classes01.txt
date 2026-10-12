@@ -1,0 +1,1171 @@
+# mod.ts
+export class A {
+  b: B;
+  constructor(c: C) {
+  }
+}
+
+interface C {}
+
+class BBase {
+
+}
+
+interface IBase {
+}
+
+class B extends BBase implements IBase {
+  private constructor(prop: CtorProp) {}
+  prop: PropValue;
+  method(): ReturnValue {
+  }
+
+  method2(other: Param): void {
+  }
+
+  private asdf(private: PrivateParam): PrivateReturn {
+  }
+
+  private prop: PrivateProp;
+
+  methodOverload(param: OverloadParam): OverloadReturn;
+  methodOverload(param: PrivateImplementationParam): PrivateImplementationReturn {
+  }
+
+  #private: PrivateProp;
+  #privateMethod(private: PrivateParam): PrivateReturn {
+  }
+}
+
+class PropValue {}
+class ReturnValue {}
+class Param {}
+class PrivateParam {}
+class PrivateReturn {}
+class PrivateProp {}
+class CtorProp {}
+class OverloadParam {}
+class OverloadReturn {}
+class PrivateImplementationParam {}
+class PrivateImplementationReturn {}
+
+class ClassWithStatic {
+  static prop: string;
+}
+
+class ClassWithIndexSignatures {
+  static [value: string]: number;
+  [value: number]: string;
+  [value: string]: number;
+}
+
+# output
+file:///mod.ts: EsModuleInfo {
+    module_id: ModuleId(
+        0,
+    ),
+    specifier: "file:///mod.ts",
+    re_exports: [],
+    swc_id_to_symbol_id: {
+        (
+            "A",
+            #2,
+        ): 1,
+        (
+            "C",
+            #2,
+        ): 4,
+        (
+            "BBase",
+            #2,
+        ): 5,
+        (
+            "IBase",
+            #2,
+        ): 6,
+        (
+            "B",
+            #2,
+        ): 7,
+        (
+            "PropValue",
+            #2,
+        ): 14,
+        (
+            "ReturnValue",
+            #2,
+        ): 15,
+        (
+            "Param",
+            #2,
+        ): 16,
+        (
+            "PrivateParam",
+            #2,
+        ): 17,
+        (
+            "PrivateReturn",
+            #2,
+        ): 18,
+        (
+            "PrivateProp",
+            #2,
+        ): 19,
+        (
+            "CtorProp",
+            #2,
+        ): 20,
+        (
+            "OverloadParam",
+            #2,
+        ): 21,
+        (
+            "OverloadReturn",
+            #2,
+        ): 22,
+        (
+            "PrivateImplementationParam",
+            #2,
+        ): 23,
+        (
+            "PrivateImplementationReturn",
+            #2,
+        ): 24,
+        (
+            "ClassWithStatic",
+            #2,
+        ): 25,
+        (
+            "ClassWithIndexSignatures",
+            #2,
+        ): 27,
+    },
+    symbols: {
+        0: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 0,
+            parent_id: None,
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "export class A {\n  b: B;\n  constructor(c: C) {\n  }\n}\n\ninterface C {}\n\nclass BBase {\n\n}\n\ninterface IBase {\n}\n\nclass B extends BBase implements IBase {\n  private constructor(prop: CtorProp) {}\n  prop: PropValue;\n  method(): ReturnValue {\n  }\n\n  method2(other: Param): void {\n  }\n\n  private asdf(private: PrivateParam): PrivateReturn {\n  }\n\n  private prop: PrivateProp;\n\n  methodOverload(param: OverloadParam): OverloadReturn;\n  methodOverload(param: PrivateImplementationParam): PrivateImplementationReturn {\n  }\n\n  #private: PrivateProp;\n  #privateMethod(private: PrivateParam): PrivateReturn {\n  }\n}\n\nclass PropValue {}\nclass ReturnValue {}\nclass Param {}\nclass PrivateParam {}\nclass PrivateReturn {}\nclass PrivateProp {}\nclass CtorProp {}\nclass OverloadParam {}\nclass OverloadReturn {}\nclass PrivateImplementationParam {}\nclass PrivateImplementationReturn {}\n\nclass ClassWithStatic {\n  static prop: string;\n}\n\nclass ClassWithIndexSignatures {\n  static [value: string]: number;\n  [value: number]: string;\n  [value: string]: number;\n}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            0,
+                        ),
+                        end: SourcePos(
+                            1033,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {
+                1,
+                4,
+                5,
+                6,
+                7,
+                14,
+                15,
+                16,
+                17,
+                18,
+                19,
+                20,
+                21,
+                22,
+                23,
+                24,
+                25,
+                27,
+            },
+            exports: {
+                "A": 1,
+            },
+            members: {},
+        },
+        1: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 1,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "export class A {\n  b: B;\n  constructor(c: C) {\n  }\n}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            0,
+                        ),
+                        end: SourcePos(
+                            52,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {
+                3,
+            },
+            exports: {
+                "%%dg_ctor%%": 3,
+            },
+            members: {
+                2,
+            },
+        },
+        2: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 2,
+            parent_id: Some(
+                1,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "b: B;",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            19,
+                        ),
+                        end: SourcePos(
+                            24,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        3: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 3,
+            parent_id: Some(
+                1,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "constructor(c: C) {\n  }",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            27,
+                        ),
+                        end: SourcePos(
+                            50,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        4: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 4,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "interface C {}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            54,
+                        ),
+                        end: SourcePos(
+                            68,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        5: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 5,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "class BBase {\n\n}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            70,
+                        ),
+                        end: SourcePos(
+                            86,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        6: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 6,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "interface IBase {\n}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            88,
+                        ),
+                        end: SourcePos(
+                            107,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        7: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 7,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "class B extends BBase implements IBase {\n  private constructor(prop: CtorProp) {}\n  prop: PropValue;\n  method(): ReturnValue {\n  }\n\n  method2(other: Param): void {\n  }\n\n  private asdf(private: PrivateParam): PrivateReturn {\n  }\n\n  private prop: PrivateProp;\n\n  methodOverload(param: OverloadParam): OverloadReturn;\n  methodOverload(param: PrivateImplementationParam): PrivateImplementationReturn {\n  }\n\n  #private: PrivateProp;\n  #privateMethod(private: PrivateParam): PrivateReturn {\n  }\n}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            109,
+                        ),
+                        end: SourcePos(
+                            599,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {
+                8,
+            },
+            exports: {
+                "%%dg_ctor%%": 8,
+            },
+            members: {
+                9,
+                10,
+                11,
+                12,
+                13,
+            },
+        },
+        8: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 8,
+            parent_id: Some(
+                7,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "private constructor(prop: CtorProp) {}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            152,
+                        ),
+                        end: SourcePos(
+                            190,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        9: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 9,
+            parent_id: Some(
+                7,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "prop: PropValue;",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            193,
+                        ),
+                        end: SourcePos(
+                            209,
+                        ),
+                    },
+                    flags: 0,
+                },
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "private prop: PrivateProp;",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            340,
+                        ),
+                        end: SourcePos(
+                            366,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        10: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 10,
+            parent_id: Some(
+                7,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "method(): ReturnValue {\n  }",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            212,
+                        ),
+                        end: SourcePos(
+                            239,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        11: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 11,
+            parent_id: Some(
+                7,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "method2(other: Param): void {\n  }",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            243,
+                        ),
+                        end: SourcePos(
+                            276,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        12: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 12,
+            parent_id: Some(
+                7,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "private asdf(private: PrivateParam): PrivateReturn {\n  }",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            280,
+                        ),
+                        end: SourcePos(
+                            336,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        13: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 13,
+            parent_id: Some(
+                7,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "methodOverload(param: OverloadParam): OverloadReturn;",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            370,
+                        ),
+                        end: SourcePos(
+                            423,
+                        ),
+                    },
+                    flags: 0,
+                },
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "methodOverload(param: PrivateImplementationParam): PrivateImplementationReturn {\n  }",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            426,
+                        ),
+                        end: SourcePos(
+                            510,
+                        ),
+                    },
+                    flags: 1,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        14: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 14,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "class PropValue {}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            601,
+                        ),
+                        end: SourcePos(
+                            619,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        15: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 15,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "class ReturnValue {}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            620,
+                        ),
+                        end: SourcePos(
+                            640,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        16: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 16,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "class Param {}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            641,
+                        ),
+                        end: SourcePos(
+                            655,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        17: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 17,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "class PrivateParam {}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            656,
+                        ),
+                        end: SourcePos(
+                            677,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        18: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 18,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "class PrivateReturn {}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            678,
+                        ),
+                        end: SourcePos(
+                            700,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        19: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 19,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "class PrivateProp {}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            701,
+                        ),
+                        end: SourcePos(
+                            721,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        20: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 20,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "class CtorProp {}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            722,
+                        ),
+                        end: SourcePos(
+                            739,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        21: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 21,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "class OverloadParam {}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            740,
+                        ),
+                        end: SourcePos(
+                            762,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        22: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 22,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "class OverloadReturn {}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            763,
+                        ),
+                        end: SourcePos(
+                            786,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        23: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 23,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "class PrivateImplementationParam {}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            787,
+                        ),
+                        end: SourcePos(
+                            822,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        24: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 24,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "class PrivateImplementationReturn {}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            823,
+                        ),
+                        end: SourcePos(
+                            859,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        25: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 25,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "class ClassWithStatic {\n  static prop: string;\n}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            861,
+                        ),
+                        end: SourcePos(
+                            909,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {
+                26,
+            },
+            exports: {
+                "prop": 26,
+            },
+            members: {},
+        },
+        26: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 26,
+            parent_id: Some(
+                25,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "static prop: string;",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            887,
+                        ),
+                        end: SourcePos(
+                            907,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        27: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 27,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "class ClassWithIndexSignatures {\n  static [value: string]: number;\n  [value: number]: string;\n  [value: string]: number;\n}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            911,
+                        ),
+                        end: SourcePos(
+                            1033,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {
+                28,
+            },
+            exports: {
+                "%%dg_index%%": 28,
+            },
+            members: {
+                29,
+            },
+        },
+        28: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 28,
+            parent_id: Some(
+                27,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "static [value: string]: number;",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            946,
+                        ),
+                        end: SourcePos(
+                            977,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        29: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 29,
+            parent_id: Some(
+                27,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "[value: number]: string;",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            980,
+                        ),
+                        end: SourcePos(
+                            1004,
+                        ),
+                    },
+                    flags: 0,
+                },
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "[value: string]: number;",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            1007,
+                        ),
+                        end: SourcePos(
+                            1031,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+    },
+}
+== symbol deps (types and exprs) ==
+2:19..24 [Id(("B", #2))]
+3:27..50 [Id(("C", #2))]
+7:109..599 [Id(("BBase", #2)), Id(("IBase", #2))]
+8:152..190 [Id(("CtorProp", #2))]
+9:193..209 [Id(("PropValue", #2))]
+9:340..366 [Id(("PrivateProp", #2))]
+10:212..239 [Id(("ReturnValue", #2))]
+11:243..276 [Id(("Param", #2))]
+12:280..336 [Id(("PrivateParam", #2)), Id(("PrivateReturn", #2))]
+13:370..423 [Id(("OverloadParam", #2)), Id(("OverloadReturn", #2))]
+13:426..510 [Id(("PrivateImplementationParam", #2)), Id(("PrivateImplementationReturn", #2))]
+
+== symbol deps (types only) ==
+2:19..24 [Id(("B", #2))]
+3:27..50 [Id(("C", #2))]
+7:109..599 [Id(("BBase", #2)), Id(("IBase", #2))]
+8:152..190 [Id(("CtorProp", #2))]
+9:193..209 [Id(("PropValue", #2))]
+9:340..366 [Id(("PrivateProp", #2))]
+10:212..239 [Id(("ReturnValue", #2))]
+11:243..276 [Id(("Param", #2))]
+12:280..336 [Id(("PrivateParam", #2)), Id(("PrivateReturn", #2))]
+13:370..423 [Id(("OverloadParam", #2)), Id(("OverloadReturn", #2))]
+13:426..510 [Id(("PrivateImplementationParam", #2)), Id(("PrivateImplementationReturn", #2))]
+
+== export definitions ==
+[A]: file:///mod.ts:0..52
+  export class A {
+    b: B;
+  ...
+    }
+  }

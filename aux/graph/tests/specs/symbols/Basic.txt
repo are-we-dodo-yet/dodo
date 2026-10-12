@@ -1,0 +1,656 @@
+# mod.ts
+import { A, B, D } from "./a.ts";
+
+export const ExportA: typeof A = A;
+
+const test: B;
+export { D };
+
+# a.ts
+interface AInner {
+  prop: string;
+}
+
+interface AInnerUnused {
+  prop2: string;
+}
+
+export class A {
+  prop: AInner;
+}
+
+export type B = string;
+
+export default class C {
+};
+
+export type D = typeof C;
+
+# output
+file:///a.ts: EsModuleInfo {
+    module_id: ModuleId(
+        1,
+    ),
+    specifier: "file:///a.ts",
+    re_exports: [],
+    swc_id_to_symbol_id: {
+        (
+            "AInner",
+            #2,
+        ): 1,
+        (
+            "AInnerUnused",
+            #2,
+        ): 3,
+        (
+            "A",
+            #2,
+        ): 5,
+        (
+            "B",
+            #2,
+        ): 7,
+        (
+            "C",
+            #2,
+        ): 8,
+        (
+            "D",
+            #2,
+        ): 9,
+    },
+    symbols: {
+        0: Symbol {
+            module_id: ModuleId(
+                1,
+            ),
+            symbol_id: 0,
+            parent_id: None,
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "interface AInner {\n  prop: string;\n}\n\ninterface AInnerUnused {\n  prop2: string;\n}\n\nexport class A {\n  prop: AInner;\n}\n\nexport type B = string;\n\nexport default class C {\n};\n\nexport type D = typeof C;",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            0,
+                        ),
+                        end: SourcePos(
+                            198,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {
+                1,
+                3,
+                5,
+                7,
+                8,
+                9,
+            },
+            exports: {
+                "A": 5,
+                "B": 7,
+                "default": 8,
+                "D": 9,
+            },
+            members: {},
+        },
+        1: Symbol {
+            module_id: ModuleId(
+                1,
+            ),
+            symbol_id: 1,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "interface AInner {\n  prop: string;\n}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            0,
+                        ),
+                        end: SourcePos(
+                            36,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {
+                2,
+            },
+        },
+        2: Symbol {
+            module_id: ModuleId(
+                1,
+            ),
+            symbol_id: 2,
+            parent_id: Some(
+                1,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "prop: string;",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            21,
+                        ),
+                        end: SourcePos(
+                            34,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        3: Symbol {
+            module_id: ModuleId(
+                1,
+            ),
+            symbol_id: 3,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "interface AInnerUnused {\n  prop2: string;\n}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            38,
+                        ),
+                        end: SourcePos(
+                            81,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {
+                4,
+            },
+        },
+        4: Symbol {
+            module_id: ModuleId(
+                1,
+            ),
+            symbol_id: 4,
+            parent_id: Some(
+                3,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "prop2: string;",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            65,
+                        ),
+                        end: SourcePos(
+                            79,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        5: Symbol {
+            module_id: ModuleId(
+                1,
+            ),
+            symbol_id: 5,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "export class A {\n  prop: AInner;\n}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            83,
+                        ),
+                        end: SourcePos(
+                            117,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {
+                6,
+            },
+        },
+        6: Symbol {
+            module_id: ModuleId(
+                1,
+            ),
+            symbol_id: 6,
+            parent_id: Some(
+                5,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "prop: AInner;",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            102,
+                        ),
+                        end: SourcePos(
+                            115,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        7: Symbol {
+            module_id: ModuleId(
+                1,
+            ),
+            symbol_id: 7,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "export type B = string;",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            119,
+                        ),
+                        end: SourcePos(
+                            142,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        8: Symbol {
+            module_id: ModuleId(
+                1,
+            ),
+            symbol_id: 8,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "export default class C {\n}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            144,
+                        ),
+                        end: SourcePos(
+                            170,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        9: Symbol {
+            module_id: ModuleId(
+                1,
+            ),
+            symbol_id: 9,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "export type D = typeof C;",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            173,
+                        ),
+                        end: SourcePos(
+                            198,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+    },
+}
+== symbol deps (types and exprs) ==
+6:102..115 [Id(("AInner", #2))]
+9:173..198 [Id(("C", #2))]
+
+== symbol deps (types only) ==
+6:102..115 [Id(("AInner", #2))]
+9:173..198 [Id(("C", #2))]
+
+file:///mod.ts: EsModuleInfo {
+    module_id: ModuleId(
+        0,
+    ),
+    specifier: "file:///mod.ts",
+    re_exports: [],
+    swc_id_to_symbol_id: {
+        (
+            "A",
+            #2,
+        ): 1,
+        (
+            "B",
+            #2,
+        ): 2,
+        (
+            "D",
+            #2,
+        ): 3,
+        (
+            "ExportA",
+            #2,
+        ): 4,
+        (
+            "test",
+            #2,
+        ): 5,
+    },
+    symbols: {
+        0: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 0,
+            parent_id: None,
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "import { A, B, D } from \"./a.ts\";\n\nexport const ExportA: typeof A = A;\n\nconst test: B;\nexport { D };",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            0,
+                        ),
+                        end: SourcePos(
+                            100,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {
+                4,
+                5,
+            },
+            exports: {
+                "ExportA": 4,
+                "D": 6,
+            },
+            members: {},
+        },
+        1: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 1,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: FileRef(
+                        FileDep {
+                            name: Name(
+                                "A",
+                            ),
+                            specifier: "./a.ts",
+                        },
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            9,
+                        ),
+                        end: SourcePos(
+                            10,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        2: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 2,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: FileRef(
+                        FileDep {
+                            name: Name(
+                                "B",
+                            ),
+                            specifier: "./a.ts",
+                        },
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            12,
+                        ),
+                        end: SourcePos(
+                            13,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        3: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 3,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: FileRef(
+                        FileDep {
+                            name: Name(
+                                "D",
+                            ),
+                            specifier: "./a.ts",
+                        },
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            15,
+                        ),
+                        end: SourcePos(
+                            16,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        4: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 4,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "export const ExportA: typeof A = A;",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            48,
+                        ),
+                        end: SourcePos(
+                            69,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        5: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 5,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "test: const test: B;",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            78,
+                        ),
+                        end: SourcePos(
+                            85,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        6: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 6,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Target(
+                        (
+                            "D",
+                            #2,
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            96,
+                        ),
+                        end: SourcePos(
+                            97,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+    },
+}
+== symbol deps (types and exprs) ==
+4:48..69 [Id(("A", #2))]
+5:78..85 [Id(("B", #2))]
+
+== symbol deps (types only) ==
+4:48..69 [Id(("A", #2))]
+5:78..85 [Id(("B", #2))]
+
+== export definitions ==
+[ExportA]: file:///mod.ts:48..69
+  ExportA: typeof A = A
+[D]: file:///a.ts:173..198
+  export type D = typeof C;

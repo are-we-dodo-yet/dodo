@@ -1,0 +1,60 @@
+# https://jsr.io/@scope/a/meta.json
+{"versions": { "1.0.0": {} } }
+
+# https://jsr.io/@scope/a/1.0.0_meta.json
+{
+  "exports": {
+    ".": "./mod.ts"
+  }
+}
+# https://jsr.io/@scope/a/1.0.0/mod.ts
+export class Test {}
+
+# https://deno.land/example.ts
+HEADERS: {"location":"https://jsr.io/@scope/a/1.0.0/mod.ts"}
+
+# mod.ts
+import "https://deno.land/example.ts";
+
+# output
+{
+  "roots": [
+    "file:///mod.ts"
+  ],
+  "modules": [
+    {
+      "kind": "esm",
+      "dependencies": [
+        {
+          "specifier": "https://deno.land/example.ts",
+          "code": {
+            "specifier": "https://deno.land/example.ts",
+            "resolutionMode": "import",
+            "span": {
+              "start": {
+                "line": 0,
+                "character": 7
+              },
+              "end": {
+                "line": 0,
+                "character": 37
+              }
+            }
+          }
+        }
+      ],
+      "size": 39,
+      "mediaType": "TypeScript",
+      "specifier": "file:///mod.ts"
+    },
+    {
+      "kind": "esm",
+      "size": 21,
+      "mediaType": "TypeScript",
+      "specifier": "https://jsr.io/@scope/a/1.0.0/mod.ts"
+    }
+  ],
+  "redirects": {
+    "https://deno.land/example.ts": "https://jsr.io/@scope/a/1.0.0/mod.ts"
+  }
+}

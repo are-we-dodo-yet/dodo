@@ -1,0 +1,68 @@
+# https://jsr.io/@scope/a/meta.json
+{"versions": { "1.0.0": {} } }
+
+# https://jsr.io/@scope/a/1.0.0_meta.json
+{ "exports": { ".": "./mod.ts" } }
+
+# https://jsr.io/@scope/a/1.0.0/mod.ts
+export = 5;
+
+# mod.ts
+import 'jsr:@scope/a'
+
+# output
+{
+  "roots": [
+    "file:///mod.ts"
+  ],
+  "modules": [
+    {
+      "kind": "esm",
+      "dependencies": [
+        {
+          "specifier": "jsr:@scope/a",
+          "code": {
+            "specifier": "jsr:@scope/a",
+            "resolutionMode": "import",
+            "span": {
+              "start": {
+                "line": 0,
+                "character": 7
+              },
+              "end": {
+                "line": 0,
+                "character": 21
+              }
+            }
+          }
+        }
+      ],
+      "size": 22,
+      "mediaType": "TypeScript",
+      "specifier": "file:///mod.ts"
+    },
+    {
+      "kind": "esm",
+      "size": 12,
+      "mediaType": "TypeScript",
+      "specifier": "https://jsr.io/@scope/a/1.0.0/mod.ts"
+    }
+  ],
+  "redirects": {
+    "jsr:@scope/a": "https://jsr.io/@scope/a/1.0.0/mod.ts"
+  },
+  "packages": {
+    "@scope/a@*": "@scope/a@1.0.0"
+  }
+}
+
+Fast check https://jsr.io/@scope/a/1.0.0/mod.ts:
+  error[unsupported-ts-export-assignment]: export assignments are a Common JS feature, which are not supported in ES modules
+   --> https://jsr.io/@scope/a/1.0.0/mod.ts:1:1
+    |
+  1 | export = 5;
+    | ^^^^^^^^^^^
+    = hint: use an export statement instead
+
+    info: CommonJS features such as export assignments are not supported in ES modules
+    docs: https://jsr.io/go/slow-type-unsupported-ts-export-assignment

@@ -1,0 +1,34 @@
+cliffy/table/1.0.0-rc.4
+-- deno.lock --
+{
+  "version": "3",
+  "remote": {}
+}
+
+===
+
+== FAST CHECK EMIT PASSED ==
+
+== TYPE CHECK FAILED ==
+-- stdout --
+
+-- stderr --
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'T[]'.
+   */ public static from<T extends CellType | undefined>(cells: RowType<T>): Row<T> {
+                    ~~~~
+    at file://<tmpdir>/row.ts:31:21
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'TRow[]'.
+   */ public static from<TRow extends RowType>(rows: TableType<TRow>): Table<TRow> {
+                    ~~~~
+    at file://<tmpdir>/table.ts:42:21
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'TRow[]'.
+  /** Generate table string. */ public toString(): string {
+                                       ~~~~~~~~
+    at file://<tmpdir>/table.ts:105:40
+
+Found 3 errors.
+
+error: Type checking failed.
+

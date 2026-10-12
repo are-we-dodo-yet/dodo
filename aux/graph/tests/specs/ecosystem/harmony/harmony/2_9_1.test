@@ -1,0 +1,563 @@
+harmony/harmony/2.9.1
+-- deno.lock --
+{
+  "version": "3",
+  "packages": {
+    "specifiers": {
+      "jsr:@denosaurs/event@2.0.2": "jsr:@denosaurs/event@2.0.2",
+      "npm:redis@4.6.13": "npm:redis@4.6.13_@redis+client@1.5.14"
+    },
+    "jsr": {
+      "@denosaurs/event@2.0.2": {
+        "integrity": "3310ba1a9e94dd60ccb09c6084fc818cc1cd50e543c56ef0c6199f1b89073392"
+      }
+    },
+    "npm": {
+      "@redis/bloom@1.2.0_@redis+client@1.5.14": {
+        "integrity": "sha512-HG2DFjYKbpNmVXsa0keLHp/3leGJz1mjh09f2RLGGLQZzSHpkmZWuwJbAvo3QcRY8p80m5+ZdXZdYOSBLlp7Cg==",
+        "dependencies": {
+          "@redis/client": "@redis/client@1.5.14"
+        }
+      },
+      "@redis/client@1.5.14": {
+        "integrity": "sha512-YGn0GqsRBFUQxklhY7v562VMOP0DcmlrHHs3IV1mFE3cbxe31IITUkqhBcIhVSI/2JqtWAJXg5mjV4aU+zD0HA==",
+        "dependencies": {
+          "cluster-key-slot": "cluster-key-slot@1.1.2",
+          "generic-pool": "generic-pool@3.9.0",
+          "yallist": "yallist@4.0.0"
+        }
+      },
+      "@redis/graph@1.1.1_@redis+client@1.5.14": {
+        "integrity": "sha512-FEMTcTHZozZciLRl6GiiIB4zGm5z5F3F6a6FZCyrfxdKOhFlGkiAqlexWMBzCi4DcRoyiOsuLfW+cjlGWyExOw==",
+        "dependencies": {
+          "@redis/client": "@redis/client@1.5.14"
+        }
+      },
+      "@redis/json@1.0.6_@redis+client@1.5.14": {
+        "integrity": "sha512-rcZO3bfQbm2zPRpqo82XbW8zg4G/w4W3tI7X8Mqleq9goQjAGLL7q/1n1ZX4dXEAmORVZ4s1+uKLaUOg7LrUhw==",
+        "dependencies": {
+          "@redis/client": "@redis/client@1.5.14"
+        }
+      },
+      "@redis/search@1.1.6_@redis+client@1.5.14": {
+        "integrity": "sha512-mZXCxbTYKBQ3M2lZnEddwEAks0Kc7nauire8q20oA0oA/LoA+E/b5Y5KZn232ztPb1FkIGqo12vh3Lf+Vw5iTw==",
+        "dependencies": {
+          "@redis/client": "@redis/client@1.5.14"
+        }
+      },
+      "@redis/time-series@1.0.5_@redis+client@1.5.14": {
+        "integrity": "sha512-IFjIgTusQym2B5IZJG3XKr5llka7ey84fw/NOYqESP5WUfQs9zz1ww/9+qoz4ka/S6KcGBodzlCeZ5UImKbscg==",
+        "dependencies": {
+          "@redis/client": "@redis/client@1.5.14"
+        }
+      },
+      "cluster-key-slot@1.1.2": {
+        "integrity": "sha512-RMr0FhtfXemyinomL4hrWcYJxmX6deFdCxpJzhDttxgO1+bcCnkk+9drydLVDmAMG7NE6aN/fl4F7ucU/90gAA==",
+        "dependencies": {}
+      },
+      "generic-pool@3.9.0": {
+        "integrity": "sha512-hymDOu5B53XvN4QT9dBmZxPX4CWhBPPLguTZ9MMFeFa/Kg0xWVfylOVNlJji/E7yTZWFd/q9GO5TxDLq156D7g==",
+        "dependencies": {}
+      },
+      "redis@4.6.13_@redis+client@1.5.14": {
+        "integrity": "sha512-MHgkS4B+sPjCXpf+HfdetBwbRz6vCtsceTmw1pHNYJAsYxrfpOP6dz+piJWGos8wqG7qb3vj/Rrc5qOlmInUuA==",
+        "dependencies": {
+          "@redis/bloom": "@redis/bloom@1.2.0_@redis+client@1.5.14",
+          "@redis/client": "@redis/client@1.5.14",
+          "@redis/graph": "@redis/graph@1.1.1_@redis+client@1.5.14",
+          "@redis/json": "@redis/json@1.0.6_@redis+client@1.5.14",
+          "@redis/search": "@redis/search@1.1.6_@redis+client@1.5.14",
+          "@redis/time-series": "@redis/time-series@1.0.5_@redis+client@1.5.14"
+        }
+      },
+      "yallist@4.0.0": {
+        "integrity": "sha512-3wdGidZyq5PB084XLES5TpOSRA3wjXAlIWMhum2kRcv/41Sn2emQ0dycQW4uZXLejwKvg6EsvbdlVL+FYEct7A==",
+        "dependencies": {}
+      }
+    }
+  },
+  "remote": {}
+}
+
+===
+
+== FAST CHECK EMIT PASSED ==
+
+== TYPE CHECK FAILED ==
+-- stdout --
+
+-- stderr --
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'HarmonyEventEmitter<ClientEvents>'.
+  emit(event: keyof ClientEvents, ...args: any[]): Promise<void> {
+  ~~~~
+    at file://<tmpdir>/src/client/client.ts:142:3
+
+TS2694 [ERROR]: Namespace 'Deno' has no exported member 'Reader'.
+    body: Deno.Reader | Uint8Array;
+               ~~~~~~
+    at file://<tmpdir>/src/interactions/client.ts:110:16
+
+TS2694 [ERROR]: Namespace 'Deno' has no exported member 'Reader'.
+    body: Deno.Reader;
+               ~~~~~~
+    at file://<tmpdir>/src/interactions/client.ts:127:16
+
+TS2694 [ERROR]: Namespace 'Deno' has no exported member 'Reader'.
+    body: Deno.Reader;
+               ~~~~~~
+    at file://<tmpdir>/src/interactions/client.ts:133:16
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseChildManager<ThreadChannelPayload, ThreadChannel>'.
+  get(id: string): Promise<ThreadChannel | undefined> {
+  ~~~
+    at file://<tmpdir>/src/managers/channelThreads.ts:14:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseChildManager<ThreadChannelPayload, ThreadChannel>'.
+  /** Delete a Thread Channel */ delete(id: string | ThreadChannel): Promise<boolean> {
+                                 ~~~~~~
+    at file://<tmpdir>/src/managers/channelThreads.ts:17:34
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseChildManager<ThreadChannelPayload, ThreadChannel>'.
+  array(): Promise<ThreadChannel[]> {
+  ~~~~~
+    at file://<tmpdir>/src/managers/channelThreads.ts:20:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<ChannelPayload, Channel>'.
+  get<T extends Channel = Channel>(key: string): Promise<T | undefined> {
+  ~~~
+    at file://<tmpdir>/src/managers/channels.ts:21:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<ChannelPayload, Channel>'.
+  array(): Promise<Channel[]> {
+  ~~~~~
+    at file://<tmpdir>/src/managers/channels.ts:24:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<ChannelPayload, Channel>'.
+  /** Fetches a Channel by ID, cache it, resolve it */ fetch<T = Channel>(id: string): Promise<T> {
+                                                       ~~~~~
+    at file://<tmpdir>/src/managers/channels.ts:27:56
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<EmojiPayload, Emoji>'.
+  get(key: string): Promise<Emoji | undefined> {
+  ~~~
+    at file://<tmpdir>/src/managers/emojis.ts:10:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<EmojiPayload, Emoji>'.
+  /** Fetches an Emoji by Guild ID and Emoji ID, cache it and resolve it */ fetch(guildID: string, id: string): Promise<Emoji> {
+                                                                            ~~~~~
+    at file://<tmpdir>/src/managers/emojis.ts:13:77
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<EmojiPayload, Emoji>'.
+  /** Try to get Emoji from cache, if not found then fetch */ resolve(key: string, guild?: string | Guild): Promise<Emoji | undefined> {
+                                                              ~~~~~~~
+    at file://<tmpdir>/src/managers/emojis.ts:16:63
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseChildManager<VoiceStatePayload, VoiceState>'.
+  get(id: string): Promise<VoiceState | undefined> {
+  ~~~
+    at file://<tmpdir>/src/managers/guildChannelVoiceStates.ts:12:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseChildManager<VoiceStatePayload, VoiceState>'.
+  size(): Promise<number> {
+  ~~~~
+    at file://<tmpdir>/src/managers/guildChannelVoiceStates.ts:15:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseChildManager<VoiceStatePayload, VoiceState>'.
+  array(): Promise<VoiceState[]> {
+  ~~~~~
+    at file://<tmpdir>/src/managers/guildChannelVoiceStates.ts:18:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseChildManager<GuildChannelPayloads, GuildChannels>'.
+  get(id: string): Promise<GuildChannels | undefined> {
+  ~~~
+    at file://<tmpdir>/src/managers/guildChannels.ts:25:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseChildManager<GuildChannelPayloads, GuildChannels>'.
+  size(): Promise<number> {
+  ~~~~
+    at file://<tmpdir>/src/managers/guildChannels.ts:28:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseChildManager<GuildChannelPayloads, GuildChannels>'.
+  /** Delete a Guild Channel */ delete(id: string): Promise<boolean> {
+                                ~~~~~~
+    at file://<tmpdir>/src/managers/guildChannels.ts:31:33
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseChildManager<GuildChannelPayloads, GuildChannels>'.
+  array(): Promise<GuildChannels[]> {
+  ~~~~~
+    at file://<tmpdir>/src/managers/guildChannels.ts:34:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseChildManager<GuildChannelPayloads, GuildChannels>'.
+  keys(): Promise<string[]> {
+  ~~~~
+    at file://<tmpdir>/src/managers/guildChannels.ts:49:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseChildManager<EmojiPayload, Emoji>'.
+  get(id: string): Promise<Emoji | undefined> {
+  ~~~
+    at file://<tmpdir>/src/managers/guildEmojis.ts:13:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseChildManager<EmojiPayload, Emoji>'.
+  size(): Promise<number> {
+  ~~~~
+    at file://<tmpdir>/src/managers/guildEmojis.ts:16:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseChildManager<EmojiPayload, Emoji>'.
+  delete(id: string): Promise<boolean> {
+  ~~~~~~
+    at file://<tmpdir>/src/managers/guildEmojis.ts:19:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseChildManager<EmojiPayload, Emoji>'.
+  fetch(id: string): Promise<Emoji | undefined> {
+  ~~~~~
+    at file://<tmpdir>/src/managers/guildEmojis.ts:22:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseChildManager<EmojiPayload, Emoji>'.
+  array(): Promise<Emoji[]> {
+  ~~~~~
+    at file://<tmpdir>/src/managers/guildEmojis.ts:31:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseChildManager<EmojiPayload, Emoji>'.
+  keys(): Promise<string[]> {
+  ~~~~
+    at file://<tmpdir>/src/managers/guildEmojis.ts:37:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseChildManager<MessageStickerPayload, MessageSticker>'.
+  /** Fetches Guild Sticker from API */ fetch(id: string): Promise<MessageSticker> {
+                                        ~~~~~
+    at file://<tmpdir>/src/managers/guildStickers.ts:11:41
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseChildManager<MessageStickerPayload, MessageSticker>'.
+  /** Delete a Guild Sticker */ delete(id: string | MessageSticker, reason?: string): Promise<boolean> {
+                                ~~~~~~
+    at file://<tmpdir>/src/managers/guildStickers.ts:14:33
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseChildManager<MessageStickerPayload, MessageSticker>'.
+  /** Returns a list of IDs of all Stickers in this Guild */ keys(): Promise<string[]> {
+                                                             ~~~~
+    at file://<tmpdir>/src/managers/guildStickers.ts:26:62
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseChildManager<MessageStickerPayload, MessageSticker>'.
+  /** Returns an Array of all Stickers in this Guild */ array(): Promise<MessageSticker[]> {
+                                                        ~~~~~
+    at file://<tmpdir>/src/managers/guildStickers.ts:29:57
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<VoiceStatePayload, VoiceState>'.
+  /** Get a Voice State by User ID */ get(key: string): Promise<VoiceState | undefined> {
+                                      ~~~
+    at file://<tmpdir>/src/managers/guildVoiceStates.ts:14:39
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<VoiceStatePayload, VoiceState>'.
+  array(): Promise<VoiceState[]> {
+  ~~~~~
+    at file://<tmpdir>/src/managers/guildVoiceStates.ts:17:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<GuildPayload, Guild>'.
+  fetch(id: string): Promise<Guild> {
+  ~~~~~
+    at file://<tmpdir>/src/managers/guilds.ts:10:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<GuildPayload, Guild>'.
+  /** Sets a value to Cache */ set(key: string, value: GuildPayload): Promise<void> {
+                               ~~~
+    at file://<tmpdir>/src/managers/guilds.ts:28:32
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<GuildPayload, Guild>'.
+   */ delete(guild: Guild | string): Promise<Guild | undefined> {
+      ~~~~~~
+    at file://<tmpdir>/src/managers/guilds.ts:44:7
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<InvitePayload, Invite>'.
+  get(key: string): Promise<Invite | undefined> {
+  ~~~
+    at file://<tmpdir>/src/managers/invites.ts:23:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<InvitePayload, Invite>'.
+  /** Fetch an Invite */ fetch(id: string, withCounts?: boolean): Promise<Invite> {
+                         ~~~~~
+    at file://<tmpdir>/src/managers/invites.ts:26:26
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<InvitePayload, Invite>'.
+  /** Delete an Invite */ delete(invite: string | Invite): Promise<boolean> {
+                          ~~~~~~
+    at file://<tmpdir>/src/managers/invites.ts:32:27
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseChildManager<RolePayload, Role>'.
+  get(id: string): Promise<Role | undefined> {
+  ~~~
+    at file://<tmpdir>/src/managers/memberRoles.ts:13:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseChildManager<RolePayload, Role>'.
+  size(): Promise<number> {
+  ~~~~
+    at file://<tmpdir>/src/managers/memberRoles.ts:16:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseChildManager<RolePayload, Role>'.
+  array(): Promise<Role[]> {
+  ~~~~~
+    at file://<tmpdir>/src/managers/memberRoles.ts:19:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<MemberPayload, Member>'.
+  get(key: string): Promise<Member | undefined> {
+  ~~~
+    at file://<tmpdir>/src/managers/members.ts:11:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<MemberPayload, Member>'.
+  set(id: string, payload: MemberPayload): Promise<void> {
+  ~~~
+    at file://<tmpdir>/src/managers/members.ts:14:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<MemberPayload, Member>'.
+  array(): Promise<Member[]> {
+  ~~~~~
+    at file://<tmpdir>/src/managers/members.ts:17:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<MemberPayload, Member>'.
+  /** Fetch a Guild Member */ fetch(id: string): Promise<Member> {
+                              ~~~~~
+    at file://<tmpdir>/src/managers/members.ts:20:31
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<Reaction, MessageReaction>'.
+  get(id: string): Promise<MessageReaction | undefined> {
+  ~~~
+    at file://<tmpdir>/src/managers/messageReactions.ts:16:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<Reaction, MessageReaction>'.
+  set(key: string, value: Reaction): Promise<void> {
+  ~~~
+    at file://<tmpdir>/src/managers/messageReactions.ts:19:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<Reaction, MessageReaction>'.
+  array(): Promise<MessageReaction[]> {
+  ~~~~~
+    at file://<tmpdir>/src/managers/messageReactions.ts:22:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<Reaction, MessageReaction>'.
+  flush(): Promise<void> {
+  ~~~~~
+    at file://<tmpdir>/src/managers/messageReactions.ts:25:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<MessagePayload, Message>'.
+  get(key: string): Promise<Message | undefined> {
+  ~~~
+    at file://<tmpdir>/src/managers/messages.ts:11:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<MessagePayload, Message>'.
+  set(key: string, value: MessagePayload): Promise<void> {
+  ~~~
+    at file://<tmpdir>/src/managers/messages.ts:14:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<MessagePayload, Message>'.
+  array(): Promise<Message[]> {
+  ~~~~~
+    at file://<tmpdir>/src/managers/messages.ts:17:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<MessagePayload, Message>'.
+  fetch(id: string): Promise<Message> {
+  ~~~~~
+    at file://<tmpdir>/src/managers/messages.ts:20:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<PresenceUpdatePayload, Presence>'.
+  get(id: string): Promise<Presence | undefined> {
+  ~~~
+    at file://<tmpdir>/src/managers/presences.ts:11:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<PresenceUpdatePayload, Presence>'.
+  set(id: string, payload: PresenceUpdatePayload): Promise<void> {
+  ~~~
+    at file://<tmpdir>/src/managers/presences.ts:14:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<PresenceUpdatePayload, Presence>'.
+  fetch(id: string): Promise<Presence | undefined> {
+  ~~~~~
+    at file://<tmpdir>/src/managers/presences.ts:17:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<PresenceUpdatePayload, Presence>'.
+  array(): Promise<Presence[]> {
+  ~~~~~
+    at file://<tmpdir>/src/managers/presences.ts:20:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<RolePayload, Role>'.
+  get(key: string): Promise<Role | undefined> {
+  ~~~
+    at file://<tmpdir>/src/managers/roles.ts:22:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<RolePayload, Role>'.
+  array(): Promise<Role[]> {
+  ~~~~~
+    at file://<tmpdir>/src/managers/roles.ts:25:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<RolePayload, Role>'.
+  /** Delete a Guild Role */ delete(role: Role | string): Promise<Role | undefined> {
+                             ~~~~~~
+    at file://<tmpdir>/src/managers/roles.ts:34:30
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<MessageStickerPayload, MessageSticker>'.
+  /** Delete a Guild Sticker */ delete(guild: string | Guild, id: string | MessageSticker, reason?: string): Promise<boolean> {
+                                ~~~~~~
+    at file://<tmpdir>/src/managers/stickers.ts:13:33
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<MessageStickerPayload, MessageSticker>'.
+  /** Fetches a Sticker */ fetch(sticker: MessageSticker | string): Promise<MessageSticker> {
+                           ~~~~~
+    at file://<tmpdir>/src/managers/stickers.ts:16:28
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<ThreadMemberPayload, ThreadMember>'.
+  get(id: string): Promise<ThreadMember | undefined> {
+  ~~~
+    at file://<tmpdir>/src/managers/threadMembers.ts:11:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<ThreadMemberPayload, ThreadMember>'.
+  /** Delete a Thread */ delete(id: string | ThreadChannel): Promise<boolean> {
+                         ~~~~~~
+    at file://<tmpdir>/src/managers/threadMembers.ts:14:26
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<ThreadMemberPayload, ThreadMember>'.
+  array(): Promise<ThreadMember[]> {
+  ~~~~~
+    at file://<tmpdir>/src/managers/threadMembers.ts:17:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseChildManager<ThreadChannelPayload, ThreadChannel>'.
+  set(id: string, data: ThreadChannelPayload & {
+  ~~~
+    at file://<tmpdir>/src/managers/threads.ts:10:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseChildManager<ThreadChannelPayload, ThreadChannel>'.
+  get(id: string): Promise<ThreadChannel | undefined> {
+  ~~~
+    at file://<tmpdir>/src/managers/threads.ts:15:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseChildManager<ThreadChannelPayload, ThreadChannel>'.
+  array(): Promise<ThreadChannel[]> {
+  ~~~~~
+    at file://<tmpdir>/src/managers/threads.ts:18:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BaseManager<UserPayload, User>'.
+  fetch(id: string): Promise<User> {
+  ~~~~~
+    at file://<tmpdir>/src/managers/users.ts:9:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'SnowflakeBase'.
+  toString(): string {
+  ~~~~~~~~
+    at file://<tmpdir>/src/structures/channel.ts:29:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'Channel'.
+  readFromData(data: GuildChannelPayloads): void {}
+  ~~~~~~~~~~~~
+    at file://<tmpdir>/src/structures/channel.ts:88:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'TextChannel'.
+  readFromData(data: DMChannelPayload): void {}
+  ~~~~~~~~~~~~
+    at file://<tmpdir>/src/structures/dmChannel.ts:10:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'Base'.
+  toString(): string {
+  ~~~~~~~~
+    at file://<tmpdir>/src/structures/emoji.ts:28:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'Channel'.
+  readFromData(data: GroupDMChannelPayload): void {}
+  ~~~~~~~~~~~~
+    at file://<tmpdir>/src/structures/groupChannel.ts:11:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'GuildChannel'.
+  readFromData(data: GuildCategoryChannelPayload): void {}
+  ~~~~~~~~~~~~
+    at file://<tmpdir>/src/structures/guildCategoryChannel.ts:4:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'GuildChannel'.
+  edit(options?: ModifyGuildCategoryChannelOption): Promise<CategoryChannel> {
+  ~~~~
+    at file://<tmpdir>/src/structures/guildCategoryChannel.ts:5:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'GuildThreadAvailableChannel'.
+  readFromData(data: GuildForumChannelPayload): void {}
+  ~~~~~~~~~~~~
+    at file://<tmpdir>/src/structures/guildForumChannel.ts:32:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'GuildThreadAvailableChannel'.
+  edit(options?: ModifyGuildForumChannelOption): Promise<GuildForumChannel> {
+  ~~~~
+    at file://<tmpdir>/src/structures/guildForumChannel.ts:33:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'TextChannel & GuildChannel'.
+  readFromData(data: GuildTextBasedChannelPayload): void {}
+  ~~~~~~~~~~~~
+    at file://<tmpdir>/src/structures/guildTextChannel.ts:13:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'TextChannel & GuildChannel'.
+  /** Edit the Guild Text Channel */ edit(options?: ModifyGuildTextBasedChannelOption): Promise<GuildTextBasedChannel> {
+                                     ~~~~
+    at file://<tmpdir>/src/structures/guildTextChannel.ts:14:38
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'GuildChannel'.
+  readFromData(data: GuildThreadAvailableChannelPayload): void {}
+  ~~~~~~~~~~~~
+    at file://<tmpdir>/src/structures/guildThreadAvailableChannel.ts:24:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'GuildChannel'.
+  /** Edit the Guild Text Channel */ edit(options?: ModifyGuildThreadAvailableChannelOption): Promise<GuildThreadAvailableChannel> {
+                                     ~~~~
+    at file://<tmpdir>/src/structures/guildThreadAvailableChannel.ts:25:38
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'TextChannel & GuildChannel'.
+  readFromData(data: GuildVoiceChannelPayload): void {}
+  ~~~~~~~~~~~~
+    at file://<tmpdir>/src/structures/guildVoiceChannel.ts:24:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'TextChannel & GuildChannel'.
+  edit(options?: ModifyVoiceChannelOption): Promise<VoiceChannel> {
+  ~~~~
+    at file://<tmpdir>/src/structures/guildVoiceChannel.ts:25:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'Base'.
+  toString(): string {
+  ~~~~~~~~
+    at file://<tmpdir>/src/structures/invite.ts:27:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'SnowflakeBase'.
+  toString(): string {
+  ~~~~~~~~
+    at file://<tmpdir>/src/structures/member.ts:37:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'Channel'.
+  readFromData(data: TextChannelPayload): void {}
+  ~~~~~~~~~~~~
+    at file://<tmpdir>/src/structures/textChannel.ts:20:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'GuildTextBasedChannel'.
+  readFromData(data: ThreadChannelPayload): this {
+  ~~~~~~~~~~~~
+    at file://<tmpdir>/src/structures/threadChannel.ts:66:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'GuildTextBasedChannel'.
+  /** Edit the Guild Thread Channel */ edit(options: {
+                                       ~~~~
+    at file://<tmpdir>/src/structures/threadChannel.ts:69:40
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'SnowflakeBase'.
+  toString(): string {
+  ~~~~~~~~
+    at file://<tmpdir>/src/structures/user.ts:50:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'Map<K, V>'.
+  /** Set a key to value in Collection */ set(key: K, value: V): this {
+                                          ~~~
+    at file://<tmpdir>/src/utils/collection.ts:2:43
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BitField'.
+  any(permission: PermissionResolvable, checkAdmin?: boolean): boolean {
+  ~~~
+    at file://<tmpdir>/src/utils/permissions.ts:9:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'BitField'.
+  has(permission: PermissionResolvable, checkAdmin?: boolean): boolean {
+  ~~~
+    at file://<tmpdir>/src/utils/permissions.ts:12:3
+
+Found 94 errors.
+
+error: Type checking failed.
+

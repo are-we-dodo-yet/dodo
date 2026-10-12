@@ -1,0 +1,94 @@
+poolifier/poolifier/3.1.26
+-- deno.lock --
+{
+  "version": "3",
+  "remote": {}
+}
+
+===
+
+== FAST CHECK EMIT PASSED ==
+
+== TYPE CHECK FAILED ==
+-- stdout --
+
+-- stderr --
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'T[]'.
+  /** @inheritDoc */ public push(...items: T[]): number {
+                            ~~~~
+    at file://<tmpdir>/src/circular-array.ts:11:29
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'T[]'.
+  /** @inheritDoc */ public unshift(...items: T[]): number {
+                            ~~~~~~~
+    at file://<tmpdir>/src/circular-array.ts:14:29
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'T[]'.
+  /** @inheritDoc */ public concat(...items: Array<T | ConcatArray<T>>): CircularArray<T> {
+                            ~~~~~~
+    at file://<tmpdir>/src/circular-array.ts:17:29
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'T[]'.
+  /** @inheritDoc */ public splice(start: number, deleteCount?: number, ...items: T[]): CircularArray<T> {
+                            ~~~~~~
+    at file://<tmpdir>/src/circular-array.ts:20:29
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'FixedClusterPool<Data, Response>'.
+  /** @inheritDoc */ protected shallCreateDynamicWorker(): boolean {
+                               ~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://<tmpdir>/src/pools/cluster/dynamic.ts:24:32
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'FixedClusterPool<Data, Response>'.
+  /** @inheritDoc */ protected checkAndEmitDynamicWorkerCreationEvents(): void {}
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://<tmpdir>/src/pools/cluster/dynamic.ts:27:32
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'FixedClusterPool<Data, Response>'.
+  /** @inheritDoc */ protected get type(): PoolType {
+                                   ~~~~
+    at file://<tmpdir>/src/pools/cluster/dynamic.ts:28:36
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'FixedClusterPool<Data, Response>'.
+  /** @inheritDoc */ protected get busy(): boolean {
+                                   ~~~~
+    at file://<tmpdir>/src/pools/cluster/dynamic.ts:31:36
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'AbstractPool<Worker, Data, Response>'.
+  /** @inheritDoc */ protected setupHook(): void {}
+                               ~~~~~~~~~
+    at file://<tmpdir>/src/pools/cluster/fixed.ts:26:32
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'FixedThreadPool<Data, Response>'.
+  /** @inheritDoc */ protected shallCreateDynamicWorker(): boolean {
+                               ~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://<tmpdir>/src/pools/thread/dynamic.ts:24:32
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'FixedThreadPool<Data, Response>'.
+  /** @inheritDoc */ protected checkAndEmitDynamicWorkerCreationEvents(): void {}
+                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    at file://<tmpdir>/src/pools/thread/dynamic.ts:27:32
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'FixedThreadPool<Data, Response>'.
+  /** @inheritDoc */ protected get type(): PoolType {
+                                   ~~~~
+    at file://<tmpdir>/src/pools/thread/dynamic.ts:28:36
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'FixedThreadPool<Data, Response>'.
+  /** @inheritDoc */ protected get busy(): boolean {
+                                   ~~~~
+    at file://<tmpdir>/src/pools/thread/dynamic.ts:31:36
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'AbstractWorker<MessagePort, Data, Response>'.
+  /** @inheritDoc */ protected handleKillMessage(message: MessageValue<Data>): void {}
+                               ~~~~~~~~~~~~~~~~~
+    at file://<tmpdir>/src/worker/thread-worker.ts:32:32
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'AbstractWorker<MessagePort, Data, Response>'.
+   */ protected handleError(error: Error | string): string {
+                ~~~~~~~~~~~
+    at file://<tmpdir>/src/worker/thread-worker.ts:40:17
+
+Found 15 errors.
+
+error: Type checking failed.
+

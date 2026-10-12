@@ -1,0 +1,32 @@
+core/match/0.1.5
+-- deno.lock --
+{
+  "version": "3",
+  "packages": {
+    "specifiers": {
+      "npm:ts-toolbelt@9.6.0": "npm:ts-toolbelt@9.6.0"
+    },
+    "npm": {
+      "ts-toolbelt@9.6.0": {
+        "integrity": "sha512-nsZd8ZeNUzukXPlJmTBwUAuABDe/9qtVDelJeT/qW0ow3ZS3BsQJtNkan1802aM9Uf68/Y8ljw86Hu0h5IUW3w==",
+        "dependencies": {}
+      }
+    }
+  },
+  "remote": {}
+}
+
+===
+
+== FAST CHECK EMIT FAILED ==
+error[unsupported-expando-property]: expando property referencing 'greedy' conflicts with 'placeholder.greedy'
+   --> /mod.ts:107:22
+    | 
+107 | placeholder.greedy = greedy;
+    |                      ^^^^^^
+    = hint: rename 'greedy' to something else to avoid conflicts or create a temporary variable with a different name to use in the expando property reference
+
+  info: expando properties get converted to a namespace and the reference conflicts with a namespace export
+  docs: https://jsr.io/go/slow-type-unsupported-expando-property
+
+

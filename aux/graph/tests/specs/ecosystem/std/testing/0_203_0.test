@@ -1,0 +1,91 @@
+std/testing/0.203.0
+-- deno.lock --
+{
+  "version": "3",
+  "packages": {
+    "specifiers": {
+      "jsr:@std/assert@^0.203.0": "jsr:@std/assert@0.203.0",
+      "jsr:@std/async@^0.203.0": "jsr:@std/async@0.203.0",
+      "jsr:@std/fmt@^0.203.0": "jsr:@std/fmt@0.203.0"
+    },
+    "jsr": {
+      "@std/assert@0.203.0": {
+        "integrity": "3d041a46e3272fc1ffbd52736bb506224ca238ad495da560b842391e10e89902",
+        "dependencies": [
+          "jsr:@std/fmt@^0.203.0"
+        ]
+      },
+      "@std/async@0.203.0": {
+        "integrity": "ea5e083617074f75dc13b9ca9254be374a7e049823fce3ac4ddc4f10be1cdbe0"
+      },
+      "@std/fmt@0.203.0": {
+        "integrity": "f5d0edfc0b83e761fe37a1d549f4a2a40d7a257a0a3994ac2ec357e84b22cdf6"
+      }
+    }
+  },
+  "remote": {}
+}
+
+===
+
+== FAST CHECK EMIT FAILED ==
+error[missing-explicit-return-type]: missing explicit return type in the public API
+   --> /bdd.ts:497:11
+    | 
+497 | it.only = function itOnly<T>(...args: ItArgs<T>) {
+    |           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    | 
+498 |   const options = itDefinition(...args);
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    | 
+499 |   return it({
+    | ^^^^^^^^^^^^^
+    | 
+500 |     ...options,
+    | ^^^^^^^^^^^^^^^
+    | 
+501 |     only: true,
+    | ^^^^^^^^^^^^^^^
+    | 
+502 |   });
+    | ^^^^^
+    | 
+503 | };
+    | ^ this function is missing an explicit return type
+    | 
+    = hint: add an explicit return type to the function
+
+  info: all functions in the public API must have an explicit return type
+  docs: https://jsr.io/go/slow-type-missing-explicit-return-type
+
+
+error[missing-explicit-return-type]: missing explicit return type in the public API
+   --> /bdd.ts:505:13
+    | 
+505 | it.ignore = function itIgnore<T>(...args: ItArgs<T>) {
+    |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    | 
+506 |   const options = itDefinition(...args);
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    | 
+507 |   return it({
+    | ^^^^^^^^^^^^^
+    | 
+508 |     ...options,
+    | ^^^^^^^^^^^^^^^
+    | 
+509 |     ignore: true,
+    | ^^^^^^^^^^^^^^^^^
+    | 
+510 |   });
+    | ^^^^^
+    | 
+511 | };
+    | ^ this function is missing an explicit return type
+    | 
+    = hint: add an explicit return type to the function
+
+  info: all functions in the public API must have an explicit return type
+  docs: https://jsr.io/go/slow-type-missing-explicit-return-type
+
+

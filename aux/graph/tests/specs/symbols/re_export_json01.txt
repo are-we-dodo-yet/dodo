@@ -1,0 +1,207 @@
+# mod.ts
+import other from "./non_public.json" with { type: 'json' };
+export { default as configFile } from './bar.json' assert { type: 'json' };
+
+console.log(other);
+
+# bar.json
+{
+  "test": 5
+}
+
+# non_public.json
+{}
+
+# output
+file:///bar.json: JsonModuleInfo {
+    module_id: ModuleId(
+        1,
+    ),
+    specifier: "file:///bar.json",
+    module_symbol: Symbol {
+        module_id: ModuleId(
+            1,
+        ),
+        symbol_id: 0,
+        parent_id: None,
+        decls: [
+            SymbolDecl {
+                kind: Definition(
+                    SymbolNode(
+                        "<json>",
+                    ),
+                ),
+                range: SourceRange {
+                    start: SourcePos(
+                        0,
+                    ),
+                    end: SourcePos(
+                        15,
+                    ),
+                },
+                flags: 0,
+            },
+        ],
+        child_ids: {
+            1,
+        },
+        exports: {
+            "default": 1,
+        },
+        members: {},
+    },
+}
+file:///mod.ts: EsModuleInfo {
+    module_id: ModuleId(
+        0,
+    ),
+    specifier: "file:///mod.ts",
+    re_exports: [],
+    swc_id_to_symbol_id: {
+        (
+            "other",
+            #2,
+        ): 1,
+    },
+    symbols: {
+        0: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 0,
+            parent_id: None,
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "import other from \"./non_public.json\" with { type: 'json' };\nexport { default as configFile } from './bar.json' assert { type: 'json' };\n\nconsole.log(other);",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            0,
+                        ),
+                        end: SourcePos(
+                            157,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {
+                "configFile": 2,
+            },
+            members: {},
+        },
+        1: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 1,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: FileRef(
+                        FileDep {
+                            name: Name(
+                                "default",
+                            ),
+                            specifier: "./non_public.json",
+                        },
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            7,
+                        ),
+                        end: SourcePos(
+                            12,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        2: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 2,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: FileRef(
+                        FileDep {
+                            name: Name(
+                                "default",
+                            ),
+                            specifier: "./bar.json",
+                        },
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            70,
+                        ),
+                        end: SourcePos(
+                            91,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+    },
+}
+file:///non_public.json: JsonModuleInfo {
+    module_id: ModuleId(
+        2,
+    ),
+    specifier: "file:///non_public.json",
+    module_symbol: Symbol {
+        module_id: ModuleId(
+            2,
+        ),
+        symbol_id: 0,
+        parent_id: None,
+        decls: [
+            SymbolDecl {
+                kind: Definition(
+                    SymbolNode(
+                        "<json>",
+                    ),
+                ),
+                range: SourceRange {
+                    start: SourcePos(
+                        0,
+                    ),
+                    end: SourcePos(
+                        2,
+                    ),
+                },
+                flags: 0,
+            },
+        ],
+        child_ids: {
+            1,
+        },
+        exports: {
+            "default": 1,
+        },
+        members: {},
+    },
+}
+== export definitions ==
+[configFile]: file:///bar.json:0..15
+  {
+    "test": 5
+  }

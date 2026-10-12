@@ -1,0 +1,23 @@
+gamedev/objecs/0.1.7
+-- deno.lock --
+{
+  "version": "3",
+  "packages": {
+    "specifiers": {
+      "npm:type-fest@^4.10.3": "npm:type-fest@4.18.2"
+    },
+    "npm": {
+      "type-fest@4.18.2": {
+        "integrity": "sha512-+suCYpfJLAe4OXS6+PPXjW3urOS4IoP9waSiLuXfLgqZODKw/aWwASvzqE886wA0kQgGy0mIWyhd87VpqIy6Xg==",
+        "dependencies": {}
+      }
+    }
+  },
+  "remote": {}
+}
+
+===
+
+== FAST CHECK EMIT PASSED ==
+
+== TYPE CHECK PASSED ==

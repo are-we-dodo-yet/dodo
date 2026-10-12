@@ -1,0 +1,22 @@
+aralroca/diff-dom-streaming/0.1.0
+-- deno.lock --
+{
+  "version": "3",
+  "remote": {}
+}
+
+===
+
+== FAST CHECK EMIT PASSED ==
+
+== TYPE CHECK FAILED ==
+-- stdout --
+
+-- stderr --
+TS2304 [ERROR]: Cannot find name 'Node'.
+export default function diff(oldNode: Node, reader: ReadableStreamDefaultReader): Promise<void> {
+                                      ~~~~
+    at file://<tmpdir>/src/index.ts:1:39
+
+error: Type checking failed.
+

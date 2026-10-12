@@ -1,0 +1,22 @@
+ns/ha/0.1.2
+-- deno.lock --
+{
+  "version": "3",
+  "remote": {}
+}
+
+===
+
+== FAST CHECK EMIT PASSED ==
+
+== TYPE CHECK FAILED ==
+-- stdout --
+
+-- stderr --
+TS2304 [ERROR]: Cannot find name 'HTMLElement'.
+   */ target?: HTMLElement;
+               ~~~~~~~~~~~
+    at file://<tmpdir>/mod.ts:14:16
+
+error: Type checking failed.
+

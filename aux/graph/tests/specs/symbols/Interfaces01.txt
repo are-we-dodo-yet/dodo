@@ -1,0 +1,491 @@
+# mod.ts
+interface A {
+}
+
+export interface Main extends Extends {
+  prop: Prop;
+  method(method: Param): Return;
+  [key: string]: SignatureValueType;
+}
+
+interface Extends {}
+interface Prop {}
+interface Param {}
+interface Return {}
+interface SignatureValueType {
+  other: B;
+}
+
+interface B {
+}
+
+# output
+file:///mod.ts: EsModuleInfo {
+    module_id: ModuleId(
+        0,
+    ),
+    specifier: "file:///mod.ts",
+    re_exports: [],
+    swc_id_to_symbol_id: {
+        (
+            "A",
+            #2,
+        ): 1,
+        (
+            "Main",
+            #2,
+        ): 2,
+        (
+            "Extends",
+            #2,
+        ): 6,
+        (
+            "Prop",
+            #2,
+        ): 7,
+        (
+            "Param",
+            #2,
+        ): 8,
+        (
+            "Return",
+            #2,
+        ): 9,
+        (
+            "SignatureValueType",
+            #2,
+        ): 10,
+        (
+            "B",
+            #2,
+        ): 12,
+    },
+    symbols: {
+        0: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 0,
+            parent_id: None,
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "interface A {\n}\n\nexport interface Main extends Extends {\n  prop: Prop;\n  method(method: Param): Return;\n  [key: string]: SignatureValueType;\n}\n\ninterface Extends {}\ninterface Prop {}\ninterface Param {}\ninterface Return {}\ninterface SignatureValueType {\n  other: B;\n}\n\ninterface B {\n}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            0,
+                        ),
+                        end: SourcePos(
+                            283,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {
+                1,
+                2,
+                6,
+                7,
+                8,
+                9,
+                10,
+                12,
+            },
+            exports: {
+                "Main": 2,
+            },
+            members: {},
+        },
+        1: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 1,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "interface A {\n}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            0,
+                        ),
+                        end: SourcePos(
+                            15,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        2: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 2,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "export interface Main extends Extends {\n  prop: Prop;\n  method(method: Param): Return;\n  [key: string]: SignatureValueType;\n}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            17,
+                        ),
+                        end: SourcePos(
+                            142,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {
+                3,
+                4,
+                5,
+            },
+        },
+        3: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 3,
+            parent_id: Some(
+                2,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "prop: Prop;",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            59,
+                        ),
+                        end: SourcePos(
+                            70,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        4: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 4,
+            parent_id: Some(
+                2,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "method(method: Param): Return;",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            73,
+                        ),
+                        end: SourcePos(
+                            103,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        5: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 5,
+            parent_id: Some(
+                2,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "[key: string]: SignatureValueType;",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            106,
+                        ),
+                        end: SourcePos(
+                            140,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        6: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 6,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "interface Extends {}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            144,
+                        ),
+                        end: SourcePos(
+                            164,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        7: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 7,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "interface Prop {}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            165,
+                        ),
+                        end: SourcePos(
+                            182,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        8: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 8,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "interface Param {}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            183,
+                        ),
+                        end: SourcePos(
+                            201,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        9: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 9,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "interface Return {}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            202,
+                        ),
+                        end: SourcePos(
+                            221,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        10: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 10,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "interface SignatureValueType {\n  other: B;\n}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            222,
+                        ),
+                        end: SourcePos(
+                            266,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {
+                11,
+            },
+        },
+        11: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 11,
+            parent_id: Some(
+                10,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "other: B;",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            255,
+                        ),
+                        end: SourcePos(
+                            264,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        12: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 12,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "interface B {\n}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            268,
+                        ),
+                        end: SourcePos(
+                            283,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+    },
+}
+== symbol deps (types and exprs) ==
+2:17..142 [Id(("Extends", #2))]
+3:59..70 [Id(("Prop", #2))]
+4:73..103 [Id(("Param", #2)), Id(("Return", #2))]
+5:106..140 [Id(("SignatureValueType", #2))]
+11:255..264 [Id(("B", #2))]
+
+== symbol deps (types only) ==
+2:17..142 [Id(("Extends", #2))]
+3:59..70 [Id(("Prop", #2))]
+4:73..103 [Id(("Param", #2)), Id(("Return", #2))]
+5:106..140 [Id(("SignatureValueType", #2))]
+11:255..264 [Id(("B", #2))]
+
+== export definitions ==
+[Main]: file:///mod.ts:17..142
+  export interface Main extends Extends {
+    prop: Prop;
+  ...
+    [key: string]: SignatureValueType;
+  }

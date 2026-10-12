@@ -1,0 +1,22 @@
+sftsrv/structured-html/0.0.3
+-- deno.lock --
+{
+  "version": "3",
+  "remote": {}
+}
+
+===
+
+== FAST CHECK EMIT PASSED ==
+
+== TYPE CHECK FAILED ==
+-- stdout --
+
+-- stderr --
+TS2304 [ERROR]: Cannot find name 'Element'.
+ */ export const convertHtmlToStructuredContent = (html: Element): EditorContent =>({} as never);
+                                                         ~~~~~~~
+    at file://<tmpdir>/src/index.ts:7:58
+
+error: Type checking failed.
+

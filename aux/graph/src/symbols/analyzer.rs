@@ -1,0 +1,3121 @@
+// Copyright 2018-2024 the Deno authors. MIT license.
+
+use std::borrow::Cow;
+use std::cell::Cell;
+use std::cell::Ref;
+use std::cell::RefCell;
+use std::hash::Hash;
+
+use deno_ast::MediaType;
+use deno_ast::ModuleSpecifier;
+use deno_ast::ParsedSource;
+use deno_ast::SourceRange;
+use deno_ast::SourceRangedForSpanned;
+use deno_ast::SourceTextInfo;
+use deno_ast::swc::ast::*;
+use deno_ast::swc::atoms::Atom;
+use deno_ast::swc::utils::find_pat_ids;
+use deno_ast::swc::utils::is_valid_ident;
+use indexmap::IndexMap;
+use indexmap::IndexSet;
+
+use crate::JsModule;
+use crate::JsonModule;
+use crate::ModuleGraph;
+use crate::ast::EsParser;
+use crate::ast::ParseOptions;
+use crate::graph::WasmModule;
+
+use super::ResolvedSymbolDepEntry;
+use super::SymbolNodeDep;
+use super::collections::AdditiveOnlyIndexMap;
+use super::collections::AdditiveOnlyIndexMapForCopyValues;
+use super::collections::AdditiveOnlyMap;
+use super::collections::AdditiveOnlyMapForCopyValues;
+use super::cross_module;
+use super::cross_module::Definition;
+use super::cross_module::DefinitionOrUnresolved;
+use super::cross_module::DefinitionPathNode;
+use super::cross_module::ModuleExports;
+use super::dep_analyzer::ResolveDepsMode;
+use super::swc_helpers::ts_entity_name_to_parts;
+
+/// The root symbol from which module symbols can be retrieved.
+///
+/// Building the symbols for modules is lazy.
+pub struct RootSymbol<'a> {
+  module_graph: &'a ModuleGraph,
+  parser: &'a dyn EsParser,
+  specifiers_to_ids: AdditiveOnlyMapForCopyValues<ModuleSpecifier, ModuleId>,
+  ids_to_modules: AdditiveOnlyMap<ModuleId, ModuleInfo>,
+}
+
+impl<'a> RootSymbol<'a> {
+  pub fn new(module_graph: &'a ModuleGraph, parser: &'a dyn EsParser) -> Self {
+    Self {
+      module_graph,
+      parser,
+      specifiers_to_ids: Default::default(),
+      ids_to_modules: Default::default(),
+    }
+  }
+
+  /// Checks if a specifier has been analyzed before.
+  ///
+  /// This does not lazily analyze the module.
+  pub fn has_analyzed(&self, specifier: &ModuleSpecifier) -> bool {
+    self.specifiers_to_ids.contains_key(specifier)
+  }
+
+  /// Gets a module from the provided specifier. This will lazily analyze
+  /// the module if it has not already been analyzed.
+  pub fn module_from_specifier(
+    &self,
+    specifier: &ModuleSpecifier,
+  ) -> Option<ModuleInfoRef<'_>> {
+    if let Some(module_id) = self.specifiers_to_ids.get(specifier) {
+      let module_symbol = self.ids_to_modules.get(&module_id).unwrap();
+      return Some(module_symbol.as_ref());
+    }
+
+    let graph_module = self.module_graph.get(specifier)?;
+
+    match graph_module {
+      crate::Module::Js(js_module) => js_module
+        .maybe_types_dependency
+        .as_ref()
+        .and_then(|types| {
+          types.dependency.maybe_specifier().and_then(|specifier| {
+            // shouldn't happen, but prevent circular loops
+            if specifier != &js_module.specifier {
+              self.module_from_specifier(specifier)
+            } else {
+              None
+            }
+          })
+        })
+        .or_else(|| self.analyze_js_module(js_module)),
+      crate::Module::Json(json_module) => {
+        Some(self.analyze_json_module(json_module))
+      }
+      crate::Module::Wasm(wasm_module) => self.analyze_wasm_module(wasm_module),
+      crate::Module::Npm(_)
+      | crate::Module::Node(_)
+      | crate::Module::External(_) => None,
+    }
+  }
+
+  pub fn module_from_id(
+    &self,
+    module_id: ModuleId,
+  ) -> Option<ModuleInfoRef<'_>> {
+    self.ids_to_modules.get(&module_id).map(|s| s.as_ref())
+  }
+
+  /// Goes to the definitions of the specified symbol.
+  pub fn go_to_definitions<'b>(
+    &'b self,
+    module: ModuleInfoRef<'b>,
+    symbol: &'b Symbol,
+  ) -> impl Iterator<Item = Definition<'b>> {
+    self
+      .find_definition_paths(module, symbol)
+      .into_iter()
+      .flat_map(|d| d.into_definitions())
+  }
+
+  /// Goes to the definitions of the specified symbol.
+  pub fn go_to_definitions_or_unresolveds<'b>(
+    &'b self,
+    module: ModuleInfoRef<'b>,
+    symbol: &'b Symbol,
+  ) -> impl Iterator<Item = DefinitionOrUnresolved<'b>> {
+    self
+      .find_definition_paths(module, symbol)
+      .into_iter()
+      .flat_map(|d| d.into_definitions_or_unresolveds())
+  }
+
+  /// Finds the graph paths to the definition of the specified symbol.
+  pub fn find_definition_paths<'b>(
+    &'b self,
+    module: ModuleInfoRef<'b>,
+    symbol: &'b Symbol,
+  ) -> Vec<DefinitionPathNode<'b>> {
+    debug_assert_eq!(symbol.module_id(), module.module_id());
+    super::cross_module::find_definition_paths(
+      self.module_graph,
+      module,
+      symbol,
+      &|specifier| self.module_from_specifier(specifier),
+    )
+  }
+
+  pub fn resolve_symbol_dep<'b>(
+    &'b self,
+    module: ModuleInfoRef<'b>,
+    dep: &SymbolNodeDep,
+  ) -> Vec<ResolvedSymbolDepEntry<'b>> {
+    super::cross_module::resolve_symbol_dep(
+      self.module_graph,
+      module,
+      dep,
+      &|specifier| self.module_from_specifier(specifier),
+    )
+  }
+
+  fn analyze_js_module(
+    &self,
+    script_module: &JsModule,
+  ) -> Option<ModuleInfoRef<'_>> {
+    let Ok(source) = self.parsed_source(script_module) else {
+      return None;
+    };
+    Some(self.build_raw_es_module_info(&script_module.specifier, &source))
+  }
+
+  fn analyze_json_module(&self, json_module: &JsonModule) -> ModuleInfoRef<'_> {
+    let specifier = &json_module.specifier;
+    // it's not ideal having to use SourceTextInfo here, but it makes
+    // it easier to interop with ParsedSource
+    let source_text_info = SourceTextInfo::new(json_module.source.text.clone());
+    let range = source_text_info.range();
+    let module_id = ModuleId(self.ids_to_modules.len() as u32);
+    let decls = {
+      let range = {
+        let source = source_text_info.text_str();
+        let start_whitespace_len = source.len() - source.trim_start().len();
+        let end_whitespace_len = source.len() - source.trim_end().len();
+        SourceRange::new(
+          range.start + start_whitespace_len,
+          range.end - end_whitespace_len,
+        )
+      };
+      Vec::from([SymbolDecl::new(
+        SymbolDeclKind::Definition(SymbolNode(SymbolNodeInner::Json)),
+        range,
+      )])
+    };
+    let module_symbol = JsonModuleInfo {
+      specifier: specifier.clone(),
+      module_id,
+      module_symbol: Symbol {
+        module_id,
+        symbol_id: SymbolId(0),
+        parent_id: None,
+        exports: IndexMap::from([("default".to_string(), SymbolId(1))]),
+        child_ids: IndexSet::from([SymbolId(1)]),
+        decls: decls.clone(),
+        members: Default::default(),
+      },
+      default_symbol: Symbol {
+        module_id,
+        symbol_id: SymbolId(1),
+        parent_id: Some(SymbolId(0)),
+        decls,
+        child_ids: Default::default(),
+        exports: Default::default(),
+        members: Default::default(),
+      },
+      source_text_info,
+    };
+    self.finalize_insert(ModuleInfo::Json(Box::new(module_symbol)))
+  }
+
+  fn analyze_wasm_module(
+    &self,
+    wasm_module: &WasmModule,
+  ) -> Option<ModuleInfoRef<'_>> {
+    let maybe_parsed_source = self.parser.parse_program(ParseOptions {
+      specifier: &wasm_module.specifier,
+      source: wasm_module.source_dts.clone(),
+      media_type: MediaType::Dmts,
+      scope_analysis: true,
+    });
+    let Ok(source) = maybe_parsed_source else {
+      return None;
+    };
+    Some(self.build_raw_es_module_info(&wasm_module.specifier, &source))
+  }
+
+  fn build_raw_es_module_info(
+    &self,
+    specifier: &ModuleSpecifier,
+    source: &ParsedSource,
+  ) -> ModuleInfoRef<'_> {
+    let program = source.program();
+
+    let module_id = ModuleId(self.ids_to_modules.len() as u32);
+    let builder = ModuleBuilder::new(module_id);
+    let filler = SymbolFiller {
+      source,
+      builder: &builder,
+    };
+    filler.fill(program.as_ref());
+    let module_symbol = EsModuleInfo {
+      specifier: specifier.clone(),
+      module_id,
+      source: source.clone(),
+      re_exports: builder.re_exports.take(),
+      swc_id_to_symbol_id: builder.swc_id_to_symbol_id.take(),
+      symbols: builder
+        .symbols
+        .take()
+        .into_iter()
+        .map(|(k, v)| (k, v.0.into_inner()))
+        .collect(),
+    };
+    self.finalize_insert(ModuleInfo::Esm(module_symbol))
+  }
+
+  fn finalize_insert(&self, module: ModuleInfo) -> ModuleInfoRef<'_> {
+    self
+      .specifiers_to_ids
+      .insert(module.specifier().clone(), module.module_id());
+    let module_id = module.module_id();
+    self.ids_to_modules.insert(module_id, module);
+    self.ids_to_modules.get(&module_id).unwrap().as_ref()
+  }
+
+  fn parsed_source(
+    &self,
+    graph_module: &JsModule,
+  ) -> Result<ParsedSource, deno_ast::ParseDiagnostic> {
+    self.parser.parse_program(ParseOptions {
+      specifier: &graph_module.specifier,
+      source: graph_module.source.text.clone(),
+      media_type: graph_module.media_type,
+      scope_analysis: true,
+    })
+  }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum FileDepName {
+  Star,
+  Name(String),
+}
+
+impl FileDepName {
+  pub fn maybe_name(&self) -> Option<&str> {
+    match self {
+      FileDepName::Name(name) => Some(name.as_str()),
+      FileDepName::Star => None,
+    }
+  }
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub struct FileDep {
+  pub name: FileDepName,
+  pub specifier: String,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Ord, PartialOrd)]
+pub struct ModuleId(u32);
+
+impl std::fmt::Display for ModuleId {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    write!(f, "{}", self.0)
+  }
+}
+
+#[derive(Default, Copy, Clone, Eq, PartialEq, Hash, Ord, PartialOrd)]
+pub struct SymbolId(u32);
+
+impl std::fmt::Debug for SymbolId {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    // for less verbose debugging
+    write!(f, "{}", self.0)
+  }
+}
+
+#[derive(Clone)]
+pub struct NodeRefBox<T> {
+  // the parsed source needs to be kept alive for the duration of the value
+  source: ParsedSource,
+  value: *const T,
+}
+
+impl<T> std::fmt::Debug for NodeRefBox<T> {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    f.debug_struct("DeclRef")
+      .field("value", &"<omitted>")
+      .finish()
+  }
+}
+
+impl<T> NodeRefBox<T> {
+  /// WARNING: Ensure that T is a reference inside ParsedSource. Otherwise
+  /// this is entirely unsafe.
+  fn unsafe_new(parsed_source: &ParsedSource, value: &T) -> Self {
+    Self {
+      source: parsed_source.clone(),
+      value: value as *const _,
+    }
+  }
+
+  fn value(&self) -> &T {
+    // SAFETY: This is safe because the parsed source is kept alive for the
+    // duration of this struct and the reference is within the parsed source.
+    unsafe { &*self.value }
+  }
+
+  fn source(&self) -> &ParsedSource {
+    &self.source
+  }
+}
+
+#[derive(Clone)]
+pub struct SymbolNode(SymbolNodeInner);
+
+impl std::fmt::Debug for SymbolNode {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    f.debug_tuple("SymbolNode")
+      .field(&match &self.0 {
+        SymbolNodeInner::Json => "<json>".to_string(),
+        SymbolNodeInner::Module(d) => {
+          d.value().text_fast(d.source.text_info_lazy()).to_string()
+        }
+        SymbolNodeInner::ClassDecl(d) => {
+          d.value().text_fast(d.source.text_info_lazy()).to_string()
+        }
+        SymbolNodeInner::ExportDecl(d, _) => {
+          d.value().text_fast(d.source.text_info_lazy()).to_string()
+        }
+        SymbolNodeInner::ExportDefaultDecl(d) => {
+          d.value().text_fast(d.source.text_info_lazy()).to_string()
+        }
+        SymbolNodeInner::ExportDefaultExpr(d) => {
+          d.value().text_fast(d.source.text_info_lazy()).to_string()
+        }
+        SymbolNodeInner::FnDecl(d) => {
+          d.value().text_fast(d.source.text_info_lazy()).to_string()
+        }
+        SymbolNodeInner::TsEnum(d) => {
+          d.value().text_fast(d.source.text_info_lazy()).to_string()
+        }
+        SymbolNodeInner::TsNamespace(d) => {
+          d.value().text_fast(d.source.text_info_lazy()).to_string()
+        }
+        SymbolNodeInner::TsTypeAlias(d) => {
+          d.value().text_fast(d.source.text_info_lazy()).to_string()
+        }
+        SymbolNodeInner::TsInterface(d) => {
+          d.value().text_fast(d.source.text_info_lazy()).to_string()
+        }
+        SymbolNodeInner::Var(d, _, ident) => {
+          format!(
+            "{}: {}",
+            ident.sym,
+            d.value().text_fast(d.source.text_info_lazy())
+          )
+        }
+        SymbolNodeInner::UsingVar(d, _, ident) => {
+          format!(
+            "{}: {}",
+            ident.sym,
+            d.value().text_fast(d.source.text_info_lazy())
+          )
+        }
+        SymbolNodeInner::AutoAccessor(d) => {
+          d.value().text_fast(d.source.text_info_lazy()).to_string()
+        }
+        SymbolNodeInner::ClassMethod(d) => {
+          d.value().text_fast(d.source.text_info_lazy()).to_string()
+        }
+        SymbolNodeInner::ClassProp(d) => {
+          d.value().text_fast(d.source.text_info_lazy()).to_string()
+        }
+        SymbolNodeInner::ClassParamProp(d) => {
+          d.value().text_fast(d.source.text_info_lazy()).to_string()
+        }
+        SymbolNodeInner::Constructor(d) => {
+          d.value().text_fast(d.source.text_info_lazy()).to_string()
+        }
+        SymbolNodeInner::ExpandoProperty(d) => {
+          d.value().text_fast(d.source.text_info_lazy()).to_string()
+        }
+        SymbolNodeInner::TsIndexSignature(d) => {
+          d.value().text_fast(d.source.text_info_lazy()).to_string()
+        }
+        SymbolNodeInner::TsCallSignatureDecl(d) => {
+          d.value().text_fast(d.source.text_info_lazy()).to_string()
+        }
+        SymbolNodeInner::TsConstructSignatureDecl(d) => {
+          d.value().text_fast(d.source.text_info_lazy()).to_string()
+        }
+        SymbolNodeInner::TsPropertySignature(d) => {
+          d.value().text_fast(d.source.text_info_lazy()).to_string()
+        }
+        SymbolNodeInner::TsGetterSignature(d) => {
+          d.value().text_fast(d.source.text_info_lazy()).to_string()
+        }
+        SymbolNodeInner::TsSetterSignature(d) => {
+          d.value().text_fast(d.source.text_info_lazy()).to_string()
+        }
+        SymbolNodeInner::TsMethodSignature(d) => {
+          d.value().text_fast(d.source.text_info_lazy()).to_string()
+        }
+      })
+      .finish()
+  }
+}
+
+impl SymbolNode {
+  pub fn maybe_name(&self) -> Option<Cow<'_, str>> {
+    self.maybe_ref().and_then(|r| r.maybe_name())
+  }
+
+  pub fn maybe_ref(&self) -> Option<SymbolNodeRef<'_>> {
+    self.maybe_ref_and_source().map(|(n, _)| n)
+  }
+
+  pub fn maybe_ref_and_source(
+    &self,
+  ) -> Option<(SymbolNodeRef<'_>, &ParsedSource)> {
+    match &self.0 {
+      SymbolNodeInner::Json => None,
+      SymbolNodeInner::Module(n) => {
+        Some((SymbolNodeRef::Module(n.value()), n.source()))
+      }
+      SymbolNodeInner::ClassDecl(n) => {
+        Some((SymbolNodeRef::ClassDecl(n.value()), n.source()))
+      }
+      SymbolNodeInner::ExportDecl(export_decl, inner) => Some((
+        SymbolNodeRef::ExportDecl(
+          export_decl.value(),
+          match inner {
+            SymbolNodeInnerExportDecl::Class(n) => {
+              ExportDeclRef::Class(n.value())
+            }
+            SymbolNodeInnerExportDecl::Fn(n) => ExportDeclRef::Fn(n.value()),
+            SymbolNodeInnerExportDecl::Var(decl, declarator, id) => {
+              ExportDeclRef::Var(decl.value(), declarator.value(), id)
+            }
+            SymbolNodeInnerExportDecl::TsEnum(n) => {
+              ExportDeclRef::TsEnum(n.value())
+            }
+            SymbolNodeInnerExportDecl::TsInterface(n) => {
+              ExportDeclRef::TsInterface(n.value())
+            }
+            SymbolNodeInnerExportDecl::TsNamespace(n) => {
+              ExportDeclRef::TsModule(n.value())
+            }
+            SymbolNodeInnerExportDecl::TsTypeAlias(n) => {
+              ExportDeclRef::TsTypeAlias(n.value())
+            }
+          },
+        ),
+        export_decl.source(),
+      )),
+      SymbolNodeInner::ExportDefaultDecl(n) => {
+        Some((SymbolNodeRef::ExportDefaultDecl(n.value()), n.source()))
+      }
+      SymbolNodeInner::ExportDefaultExpr(n) => {
+        Some((SymbolNodeRef::ExportDefaultExpr(n.value()), n.source()))
+      }
+      SymbolNodeInner::FnDecl(n) => {
+        Some((SymbolNodeRef::FnDecl(n.value()), n.source()))
+      }
+      SymbolNodeInner::TsEnum(n) => {
+        Some((SymbolNodeRef::TsEnum(n.value()), n.source()))
+      }
+      SymbolNodeInner::TsNamespace(n) => {
+        Some((SymbolNodeRef::TsNamespace(n.value()), n.source()))
+      }
+      SymbolNodeInner::TsTypeAlias(n) => {
+        Some((SymbolNodeRef::TsTypeAlias(n.value()), n.source()))
+      }
+      SymbolNodeInner::TsInterface(n) => {
+        Some((SymbolNodeRef::TsInterface(n.value()), n.source()))
+      }
+      SymbolNodeInner::Var(decl, declarator, ident) => Some((
+        SymbolNodeRef::Var(decl.value(), declarator.value(), ident),
+        decl.source(),
+      )),
+      SymbolNodeInner::UsingVar(decl, declarator, ident) => Some((
+        SymbolNodeRef::UsingVar(decl.value(), declarator.value(), ident),
+        decl.source(),
+      )),
+      SymbolNodeInner::AutoAccessor(n) => {
+        Some((SymbolNodeRef::AutoAccessor(n.value()), n.source()))
+      }
+      SymbolNodeInner::ClassMethod(n) => {
+        Some((SymbolNodeRef::ClassMethod(n.value()), n.source()))
+      }
+      SymbolNodeInner::ClassProp(n) => {
+        Some((SymbolNodeRef::ClassProp(n.value()), n.source()))
+      }
+      SymbolNodeInner::ClassParamProp(n) => {
+        Some((SymbolNodeRef::ClassParamProp(n.value()), n.source()))
+      }
+      SymbolNodeInner::Constructor(n) => {
+        Some((SymbolNodeRef::Constructor(n.value()), n.source()))
+      }
+      SymbolNodeInner::ExpandoProperty(n) => Some((
+        SymbolNodeRef::ExpandoProperty(ExpandoPropertyRef(n.value())),
+        n.source(),
+      )),
+      SymbolNodeInner::TsIndexSignature(n) => {
+        Some((SymbolNodeRef::TsIndexSignature(n.value()), n.source()))
+      }
+      SymbolNodeInner::TsCallSignatureDecl(n) => {
+        Some((SymbolNodeRef::TsCallSignatureDecl(n.value()), n.source()))
+      }
+      SymbolNodeInner::TsConstructSignatureDecl(n) => Some((
+        SymbolNodeRef::TsConstructSignatureDecl(n.value()),
+        n.source(),
+      )),
+      SymbolNodeInner::TsPropertySignature(n) => {
+        Some((SymbolNodeRef::TsPropertySignature(n.value()), n.source()))
+      }
+      SymbolNodeInner::TsGetterSignature(n) => {
+        Some((SymbolNodeRef::TsGetterSignature(n.value()), n.source()))
+      }
+      SymbolNodeInner::TsSetterSignature(n) => {
+        Some((SymbolNodeRef::TsSetterSignature(n.value()), n.source()))
+      }
+      SymbolNodeInner::TsMethodSignature(n) => {
+        Some((SymbolNodeRef::TsMethodSignature(n.value()), n.source()))
+      }
+    }
+  }
+}
+
+#[derive(Debug, Clone)]
+enum SymbolNodeInnerExportDecl {
+  Class(NodeRefBox<ClassDecl>),
+  Fn(NodeRefBox<FnDecl>),
+  Var(NodeRefBox<VarDecl>, NodeRefBox<VarDeclarator>, Ident),
+  TsEnum(NodeRefBox<TsEnumDecl>),
+  TsInterface(NodeRefBox<TsInterfaceDecl>),
+  TsNamespace(NodeRefBox<TsModuleDecl>),
+  TsTypeAlias(NodeRefBox<TsTypeAliasDecl>),
+}
+
+#[derive(Debug, Clone)]
+enum SymbolNodeInner {
+  Json,
+  Module(NodeRefBox<Program>),
+  ClassDecl(NodeRefBox<ClassDecl>),
+  ExportDecl(NodeRefBox<ExportDecl>, SymbolNodeInnerExportDecl),
+  ExportDefaultDecl(NodeRefBox<ExportDefaultDecl>),
+  ExportDefaultExpr(NodeRefBox<ExportDefaultExpr>),
+  FnDecl(NodeRefBox<FnDecl>),
+  TsEnum(NodeRefBox<TsEnumDecl>),
+  TsNamespace(NodeRefBox<TsModuleDecl>),
+  TsTypeAlias(NodeRefBox<TsTypeAliasDecl>),
+  TsInterface(NodeRefBox<TsInterfaceDecl>),
+  Var(NodeRefBox<VarDecl>, NodeRefBox<VarDeclarator>, Ident),
+  UsingVar(NodeRefBox<UsingDecl>, NodeRefBox<VarDeclarator>, Ident),
+  AutoAccessor(NodeRefBox<AutoAccessor>),
+  ClassMethod(NodeRefBox<ClassMethod>),
+  ClassProp(NodeRefBox<ClassProp>),
+  ClassParamProp(NodeRefBox<TsParamProp>),
+  Constructor(NodeRefBox<Constructor>),
+  ExpandoProperty(NodeRefBox<AssignExpr>),
+  TsIndexSignature(NodeRefBox<TsIndexSignature>),
+  TsCallSignatureDecl(NodeRefBox<TsCallSignatureDecl>),
+  TsConstructSignatureDecl(NodeRefBox<TsConstructSignatureDecl>),
+  TsPropertySignature(NodeRefBox<TsPropertySignature>),
+  TsGetterSignature(NodeRefBox<TsGetterSignature>),
+  TsSetterSignature(NodeRefBox<TsSetterSignature>),
+  TsMethodSignature(NodeRefBox<TsMethodSignature>),
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum ExportDeclRef<'a> {
+  Class(&'a ClassDecl),
+  Fn(&'a FnDecl),
+  Var(&'a VarDecl, &'a VarDeclarator, &'a Ident),
+  TsEnum(&'a TsEnumDecl),
+  TsInterface(&'a TsInterfaceDecl),
+  TsModule(&'a TsModuleDecl),
+  TsTypeAlias(&'a TsTypeAliasDecl),
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum SymbolNodeRef<'a> {
+  Module(&'a Program),
+  ExportDecl(&'a ExportDecl, ExportDeclRef<'a>),
+  ExportDefaultDecl(&'a ExportDefaultDecl),
+  ExportDefaultExpr(&'a ExportDefaultExpr),
+  ClassDecl(&'a ClassDecl),
+  FnDecl(&'a FnDecl),
+  TsEnum(&'a TsEnumDecl),
+  TsInterface(&'a TsInterfaceDecl),
+  TsNamespace(&'a TsModuleDecl),
+  TsTypeAlias(&'a TsTypeAliasDecl),
+  Var(&'a VarDecl, &'a VarDeclarator, &'a Ident),
+  UsingVar(&'a UsingDecl, &'a VarDeclarator, &'a Ident),
+  // members
+  AutoAccessor(&'a AutoAccessor),
+  ClassMethod(&'a ClassMethod),
+  ClassProp(&'a ClassProp),
+  ClassParamProp(&'a TsParamProp),
+  Constructor(&'a Constructor),
+  ExpandoProperty(ExpandoPropertyRef<'a>),
+  TsIndexSignature(&'a TsIndexSignature),
+  TsCallSignatureDecl(&'a TsCallSignatureDecl),
+  TsConstructSignatureDecl(&'a TsConstructSignatureDecl),
+  TsPropertySignature(&'a TsPropertySignature),
+  TsGetterSignature(&'a TsGetterSignature),
+  TsSetterSignature(&'a TsSetterSignature),
+  TsMethodSignature(&'a TsMethodSignature),
+}
+
+impl<'a> SymbolNodeRef<'a> {
+  /// The local name of the node, if it has a name.
+  pub fn maybe_name(&self) -> Option<Cow<'a, str>> {
+    fn ts_module_name_to_string(module_name: &TsModuleName) -> Option<&str> {
+      match module_name {
+        TsModuleName::Ident(ident) => Some(&ident.sym),
+        TsModuleName::Str(str) => str.value.as_str(),
+      }
+    }
+
+    fn maybe_key_name(key: &Key) -> Option<Cow<'_, str>> {
+      match key {
+        Key::Private(n) => Some(Cow::Owned(format!("#{}", n.name))),
+        Key::Public(n) => maybe_prop_name(n),
+      }
+    }
+
+    fn maybe_prop_name(prop_name: &PropName) -> Option<Cow<'_, str>> {
+      match prop_name {
+        PropName::Ident(n) => Some(Cow::Borrowed(&n.sym)),
+        PropName::Str(n) => n.value.as_str().map(Cow::Borrowed),
+        PropName::Num(n) => Some(Cow::Owned(n.value.to_string())),
+        PropName::Computed(prop_name) => maybe_expr(&prop_name.expr),
+        PropName::BigInt(_) => None,
+      }
+    }
+
+    fn maybe_param_prop_name(param: &TsParamPropParam) -> Option<Cow<'_, str>> {
+      match param {
+        TsParamPropParam::Ident(ident) => Some(Cow::Borrowed(&ident.sym)),
+        TsParamPropParam::Assign(assign_pat) => match &*assign_pat.left {
+          Pat::Ident(ident) => Some(Cow::Borrowed(&ident.sym)),
+          Pat::Array(_)
+          | Pat::Rest(_)
+          | Pat::Object(_)
+          | Pat::Assign(_)
+          | Pat::Invalid(_)
+          | Pat::Expr(_) => unreachable!(),
+        },
+      }
+    }
+
+    fn maybe_expr(expr: &Expr) -> Option<Cow<'_, str>> {
+      match expr {
+        Expr::Ident(n) => Some(Cow::Borrowed(&n.sym)),
+        Expr::Lit(n) => match n {
+          Lit::Str(n) => n.value.as_str().map(Cow::Borrowed),
+          Lit::Num(n) => Some(Cow::Owned(n.value.to_string())),
+          Lit::BigInt(n) => Some(Cow::Owned(n.value.to_string())),
+          _ => None,
+        },
+        _ => None,
+      }
+    }
+
+    match self {
+      Self::Module(_) => None,
+      Self::ClassDecl(n) => Some(Cow::Borrowed(&n.ident.sym)),
+      Self::ExportDecl(_, n) => match n {
+        ExportDeclRef::Class(n) => Some(Cow::Borrowed(&n.ident.sym)),
+        ExportDeclRef::Fn(n) => Some(Cow::Borrowed(&n.ident.sym)),
+        ExportDeclRef::Var(_, _, ident) => Some(Cow::Borrowed(&ident.sym)),
+        ExportDeclRef::TsEnum(n) => Some(Cow::Borrowed(&n.id.sym)),
+        ExportDeclRef::TsInterface(n) => Some(Cow::Borrowed(&n.id.sym)),
+        ExportDeclRef::TsModule(n) => {
+          ts_module_name_to_string(&n.id).map(Cow::Borrowed)
+        }
+        ExportDeclRef::TsTypeAlias(n) => Some(Cow::Borrowed(&n.id.sym)),
+      },
+      Self::ExportDefaultDecl(n) => match &n.decl {
+        DefaultDecl::Class(n) => Some(Cow::Borrowed(&n.ident.as_ref()?.sym)),
+        DefaultDecl::Fn(n) => Some(Cow::Borrowed(&n.ident.as_ref()?.sym)),
+        DefaultDecl::TsInterfaceDecl(n) => Some(Cow::Borrowed(&n.id.sym)),
+      },
+      Self::ExportDefaultExpr(_) => None,
+      Self::FnDecl(n) => Some(Cow::Borrowed(&n.ident.sym)),
+      Self::TsEnum(n) => Some(Cow::Borrowed(&n.id.sym)),
+      Self::TsInterface(n) => Some(Cow::Borrowed(&n.id.sym)),
+      Self::TsNamespace(n) => {
+        ts_module_name_to_string(&n.id).map(Cow::Borrowed)
+      }
+      Self::TsTypeAlias(n) => Some(Cow::Borrowed(&n.id.sym)),
+      Self::Var(_, _, ident) => Some(Cow::Borrowed(&ident.sym)),
+      Self::UsingVar(_, _, ident) => Some(Cow::Borrowed(&ident.sym)),
+      Self::AutoAccessor(n) => maybe_key_name(&n.key),
+      Self::ClassMethod(n) => maybe_prop_name(&n.key),
+      Self::ClassProp(n) => maybe_prop_name(&n.key),
+      Self::ClassParamProp(n) => maybe_param_prop_name(&n.param),
+      Self::ExpandoProperty(n) => Some(Cow::Borrowed(n.prop_name())),
+      Self::TsPropertySignature(n) => maybe_expr(&n.key),
+      Self::TsGetterSignature(n) => maybe_expr(&n.key),
+      Self::TsSetterSignature(n) => maybe_expr(&n.key),
+      Self::TsMethodSignature(n) => maybe_expr(&n.key),
+      // These are unique enough names to avoid collisions with user code.
+      // They allow having these as exports and resolving them.
+      Self::Constructor(_) => Some(Cow::Borrowed("%%dg_ctor%%")),
+      Self::TsIndexSignature(_) => Some(Cow::Borrowed("%%dg_index%%")),
+      Self::TsCallSignatureDecl(_) => Some(Cow::Borrowed("%%dg_call%%")),
+      Self::TsConstructSignatureDecl(_) => {
+        Some(Cow::Borrowed("%%dg_construct%%"))
+      }
+    }
+  }
+
+  // todo(dsherret): rename to is_class_decl
+
+  /// If the node is a class.
+  pub fn is_class(&self) -> bool {
+    matches!(
+      self,
+      Self::ClassDecl(_)
+        | Self::ExportDecl(_, ExportDeclRef::Class(_))
+        | Self::ExportDefaultDecl(ExportDefaultDecl {
+          decl: DefaultDecl::Class(_),
+          ..
+        })
+    )
+  }
+
+  /// If the node is a function.
+  pub fn is_function(&self) -> bool {
+    matches!(
+      self,
+      Self::FnDecl(_)
+        | Self::ExportDecl(_, ExportDeclRef::Fn(_))
+        | Self::ExportDefaultDecl(ExportDefaultDecl {
+          decl: DefaultDecl::Fn(_),
+          ..
+        })
+    )
+  }
+
+  /// If the node is an interface.
+  pub fn is_interface(&self) -> bool {
+    matches!(
+      self,
+      Self::TsInterface(_)
+        | Self::ExportDecl(_, ExportDeclRef::TsInterface(_))
+        | Self::ExportDefaultDecl(ExportDefaultDecl {
+          decl: DefaultDecl::TsInterfaceDecl(_),
+          ..
+        })
+    )
+  }
+
+  /// If the node is a typescript namespace.
+  pub fn is_ts_namespace(&self) -> bool {
+    matches!(
+      self,
+      Self::TsNamespace(_) | Self::ExportDecl(_, ExportDeclRef::TsModule(_))
+    )
+  }
+
+  /// If the node is a variable.
+  pub fn is_var(&self) -> bool {
+    matches!(
+      self,
+      Self::Var(..) | Self::ExportDecl(_, ExportDeclRef::Var(..))
+    )
+  }
+
+  /// If the node is a contructor.
+  pub fn is_ctor(&self) -> bool {
+    matches!(self, Self::Constructor(_))
+  }
+
+  /// If the node has a body.
+  pub fn has_body(&self) -> bool {
+    match self {
+      SymbolNodeRef::FnDecl(n) => n.function.body.is_some(),
+      SymbolNodeRef::TsNamespace(n) => n.body.is_some(),
+      SymbolNodeRef::AutoAccessor(_) => todo!(),
+      SymbolNodeRef::ClassMethod(m) => m.function.body.is_some(),
+      SymbolNodeRef::Constructor(n) => n.body.is_some(),
+      SymbolNodeRef::ExportDefaultDecl(n) => match &n.decl {
+        DefaultDecl::Fn(n) => n.function.body.is_some(),
+        DefaultDecl::Class(_) | DefaultDecl::TsInterfaceDecl(_) => true,
+      },
+      SymbolNodeRef::ExportDecl(_, decl) => match decl {
+        ExportDeclRef::TsModule(n) => n.body.is_some(),
+        ExportDeclRef::Fn(n) => n.function.body.is_some(),
+        ExportDeclRef::Class(_)
+        | ExportDeclRef::TsEnum(_)
+        | ExportDeclRef::TsInterface(_) => true,
+        ExportDeclRef::TsTypeAlias(_) | ExportDeclRef::Var(..) => false,
+      },
+      SymbolNodeRef::Module(_)
+      | SymbolNodeRef::ClassDecl(_)
+      | SymbolNodeRef::TsEnum(_)
+      | SymbolNodeRef::TsInterface(_) => true,
+      SymbolNodeRef::TsTypeAlias(_)
+      | SymbolNodeRef::ExportDefaultExpr(_)
+      | SymbolNodeRef::Var(..)
+      | SymbolNodeRef::UsingVar(..)
+      | SymbolNodeRef::ClassProp(_)
+      | SymbolNodeRef::ClassParamProp(_)
+      | SymbolNodeRef::ExpandoProperty(..)
+      | SymbolNodeRef::TsIndexSignature(_)
+      | SymbolNodeRef::TsCallSignatureDecl(_)
+      | SymbolNodeRef::TsConstructSignatureDecl(_)
+      | SymbolNodeRef::TsPropertySignature(_)
+      | SymbolNodeRef::TsGetterSignature(_)
+      | SymbolNodeRef::TsSetterSignature(_)
+      | SymbolNodeRef::TsMethodSignature(_) => false,
+    }
+  }
+
+  /// If the node is a declaration that can be found in a module.
+  pub fn is_module(&self) -> bool {
+    matches!(self, SymbolNodeRef::Module(_))
+  }
+
+  pub fn has_export_keyword(&self) -> bool {
+    match self {
+      SymbolNodeRef::ExportDecl(..)
+      | SymbolNodeRef::ExportDefaultDecl(_)
+      | SymbolNodeRef::ExportDefaultExpr(_) => true,
+      SymbolNodeRef::Module(_)
+      | SymbolNodeRef::ClassDecl(_)
+      | SymbolNodeRef::FnDecl(_)
+      | SymbolNodeRef::TsEnum(_)
+      | SymbolNodeRef::TsInterface(_)
+      | SymbolNodeRef::TsNamespace(_)
+      | SymbolNodeRef::TsTypeAlias(_)
+      | SymbolNodeRef::Var(..)
+      | SymbolNodeRef::UsingVar(..)
+      | SymbolNodeRef::AutoAccessor(_)
+      | SymbolNodeRef::ClassMethod(_)
+      | SymbolNodeRef::ClassProp(_)
+      | SymbolNodeRef::ClassParamProp(_)
+      | SymbolNodeRef::Constructor(_)
+      | SymbolNodeRef::ExpandoProperty(_)
+      | SymbolNodeRef::TsIndexSignature(_)
+      | SymbolNodeRef::TsCallSignatureDecl(_)
+      | SymbolNodeRef::TsConstructSignatureDecl(_)
+      | SymbolNodeRef::TsPropertySignature(_)
+      | SymbolNodeRef::TsGetterSignature(_)
+      | SymbolNodeRef::TsSetterSignature(_)
+      | SymbolNodeRef::TsMethodSignature(_) => false,
+    }
+  }
+
+  /// If the node is a declaration that can be found in a module.
+  pub fn is_decl(&self) -> bool {
+    match self {
+      SymbolNodeRef::Module(_) => false,
+      SymbolNodeRef::ClassDecl(_)
+      | SymbolNodeRef::ExportDecl(..)
+      | SymbolNodeRef::ExportDefaultDecl(_)
+      | SymbolNodeRef::ExportDefaultExpr(_)
+      | SymbolNodeRef::FnDecl(_)
+      | SymbolNodeRef::TsEnum(_)
+      | SymbolNodeRef::TsInterface(_)
+      | SymbolNodeRef::TsNamespace(_)
+      | SymbolNodeRef::TsTypeAlias(_)
+      | SymbolNodeRef::Var(..)
+      | SymbolNodeRef::UsingVar(..) => true,
+      SymbolNodeRef::AutoAccessor(_)
+      | SymbolNodeRef::ClassMethod(_)
+      | SymbolNodeRef::ClassProp(_)
+      | SymbolNodeRef::ClassParamProp(_)
+      | SymbolNodeRef::Constructor(_)
+      | SymbolNodeRef::ExpandoProperty(..)
+      | SymbolNodeRef::TsIndexSignature(_)
+      | SymbolNodeRef::TsCallSignatureDecl(_)
+      | SymbolNodeRef::TsConstructSignatureDecl(_)
+      | SymbolNodeRef::TsPropertySignature(_)
+      | SymbolNodeRef::TsGetterSignature(_)
+      | SymbolNodeRef::TsSetterSignature(_)
+      | SymbolNodeRef::TsMethodSignature(_) => false,
+    }
+  }
+
+  /// If the node is a member found in a class or interface.
+  pub fn is_member(&self) -> bool {
+    match self {
+      SymbolNodeRef::Module(_)
+      | SymbolNodeRef::ClassDecl(_)
+      | SymbolNodeRef::ExportDecl(..)
+      | SymbolNodeRef::ExportDefaultDecl(_)
+      | SymbolNodeRef::ExportDefaultExpr(_)
+      | SymbolNodeRef::FnDecl(_)
+      | SymbolNodeRef::TsEnum(_)
+      | SymbolNodeRef::TsInterface(_)
+      | SymbolNodeRef::TsNamespace(_)
+      | SymbolNodeRef::TsTypeAlias(_)
+      | SymbolNodeRef::Var(..)
+      | SymbolNodeRef::UsingVar(..) => false,
+      SymbolNodeRef::AutoAccessor(_)
+      | SymbolNodeRef::ClassMethod(_)
+      | SymbolNodeRef::ClassProp(_)
+      | SymbolNodeRef::ClassParamProp(_)
+      | SymbolNodeRef::Constructor(_)
+      | SymbolNodeRef::ExpandoProperty(..)
+      | SymbolNodeRef::TsIndexSignature(_)
+      | SymbolNodeRef::TsCallSignatureDecl(_)
+      | SymbolNodeRef::TsConstructSignatureDecl(_)
+      | SymbolNodeRef::TsPropertySignature(_)
+      | SymbolNodeRef::TsGetterSignature(_)
+      | SymbolNodeRef::TsSetterSignature(_)
+      | SymbolNodeRef::TsMethodSignature(_) => true,
+    }
+  }
+
+  /// If the node is a private member.
+  pub fn is_private_member(&self) -> bool {
+    match self {
+      SymbolNodeRef::Module(_)
+      | SymbolNodeRef::ClassDecl(_)
+      | SymbolNodeRef::ExportDecl(..)
+      | SymbolNodeRef::ExportDefaultDecl(_)
+      | SymbolNodeRef::ExportDefaultExpr(_)
+      | SymbolNodeRef::FnDecl(_)
+      | SymbolNodeRef::TsEnum(_)
+      | SymbolNodeRef::TsInterface(_)
+      | SymbolNodeRef::TsNamespace(_)
+      | SymbolNodeRef::TsTypeAlias(_)
+      | SymbolNodeRef::Var(..)
+      | SymbolNodeRef::UsingVar(..) => false,
+      SymbolNodeRef::AutoAccessor(n) => {
+        n.accessibility == Some(Accessibility::Private)
+          || match &n.key {
+            Key::Private(_) => true,
+            Key::Public(_) => false,
+          }
+      }
+      SymbolNodeRef::ClassMethod(n) => {
+        n.accessibility == Some(Accessibility::Private)
+      }
+      SymbolNodeRef::ClassProp(n) => {
+        n.accessibility == Some(Accessibility::Private)
+      }
+      SymbolNodeRef::ClassParamProp(n) => {
+        n.accessibility == Some(Accessibility::Private)
+      }
+      SymbolNodeRef::Constructor(n) => {
+        n.accessibility == Some(Accessibility::Private)
+      }
+      SymbolNodeRef::ExpandoProperty(..)
+      | SymbolNodeRef::TsIndexSignature(_)
+      | SymbolNodeRef::TsCallSignatureDecl(_)
+      | SymbolNodeRef::TsConstructSignatureDecl(_)
+      | SymbolNodeRef::TsPropertySignature(_)
+      | SymbolNodeRef::TsGetterSignature(_)
+      | SymbolNodeRef::TsSetterSignature(_)
+      | SymbolNodeRef::TsMethodSignature(_) => false,
+    }
+  }
+
+  pub fn deps(&self, mode: ResolveDepsMode) -> Vec<SymbolNodeDep> {
+    super::dep_analyzer::resolve_deps(*self, mode)
+  }
+
+  pub fn deps_with_namespace(
+    &self,
+    mode: ResolveDepsMode,
+  ) -> Vec<(SymbolNodeDep, super::dep_analyzer::ReferenceNamespace)> {
+    super::dep_analyzer::resolve_deps_with_namespace(*self, mode)
+  }
+
+  /// Whether this declaration introduces a binding in the value namespace
+  /// and/or the type namespace, returned as `(value, type)`.
+  ///
+  /// A value and a type that share a name (e.g. a private `const Role` and an
+  /// exported `type Role`) are merged into a single symbol. This is used by
+  /// fast check to avoid pulling a private value declaration into the public
+  /// API when only the type is exported (and vice versa).
+  pub fn namespaces(&self) -> (bool, bool) {
+    match self {
+      SymbolNodeRef::Var(..)
+      | SymbolNodeRef::UsingVar(..)
+      | SymbolNodeRef::FnDecl(_)
+      | SymbolNodeRef::ExportDefaultExpr(_)
+      | SymbolNodeRef::ExpandoProperty(_) => (true, false),
+      SymbolNodeRef::TsInterface(_) | SymbolNodeRef::TsTypeAlias(_) => {
+        (false, true)
+      }
+      SymbolNodeRef::ClassDecl(_)
+      | SymbolNodeRef::TsEnum(_)
+      | SymbolNodeRef::TsNamespace(_) => (true, true),
+      SymbolNodeRef::ExportDecl(_, inner) => match inner {
+        ExportDeclRef::Fn(_) | ExportDeclRef::Var(..) => (true, false),
+        ExportDeclRef::TsInterface(_) | ExportDeclRef::TsTypeAlias(_) => {
+          (false, true)
+        }
+        ExportDeclRef::Class(_)
+        | ExportDeclRef::TsEnum(_)
+        | ExportDeclRef::TsModule(_) => (true, true),
+      },
+      SymbolNodeRef::ExportDefaultDecl(n) => match &n.decl {
+        DefaultDecl::Fn(_) => (true, false),
+        DefaultDecl::TsInterfaceDecl(_) => (false, true),
+        DefaultDecl::Class(_) => (true, true),
+      },
+      // the module itself and class/interface members aren't subject to
+      // value/type namespace filtering, so conservatively treat them as both
+      SymbolNodeRef::Module(_)
+      | SymbolNodeRef::AutoAccessor(_)
+      | SymbolNodeRef::ClassMethod(_)
+      | SymbolNodeRef::ClassProp(_)
+      | SymbolNodeRef::ClassParamProp(_)
+      | SymbolNodeRef::Constructor(_)
+      | SymbolNodeRef::TsIndexSignature(_)
+      | SymbolNodeRef::TsCallSignatureDecl(_)
+      | SymbolNodeRef::TsConstructSignatureDecl(_)
+      | SymbolNodeRef::TsPropertySignature(_)
+      | SymbolNodeRef::TsGetterSignature(_)
+      | SymbolNodeRef::TsSetterSignature(_)
+      | SymbolNodeRef::TsMethodSignature(_) => (true, true),
+    }
+  }
+}
+
+/// An "expando property" is a property that's assigned to a declaration
+/// in order to add properties.
+///
+/// ```ts
+/// function myFunction() {}
+/// myFunction.myProperty = 123;
+/// ```
+#[derive(Debug, Clone, Copy)]
+pub struct ExpandoPropertyRef<'a>(&'a AssignExpr);
+
+impl<'a> ExpandoPropertyRef<'a> {
+  /// Assignment expressions provided here must be in one of these forms:
+  /// * obj.prop = expr;
+  /// * obj["prop"] = expr;
+  pub fn maybe_new(expr: &'a AssignExpr) -> Option<Self> {
+    if Self::is_valid(expr) {
+      Some(Self(expr))
+    } else {
+      None
+    }
+  }
+
+  fn is_valid(expr: &AssignExpr) -> bool {
+    expr.op == AssignOp::Assign
+      && Self::maybe_obj_ident(expr).is_some()
+      && match Self::maybe_prop_name(expr) {
+        Some(prop_name) => is_valid_ident(prop_name),
+        None => false,
+      }
+  }
+
+  fn maybe_member_expr(expr: &AssignExpr) -> Option<&MemberExpr> {
+    match &expr.left {
+      AssignTarget::Simple(SimpleAssignTarget::Member(member)) => Some(member),
+      _ => None,
+    }
+  }
+
+  fn maybe_obj_ident(expr: &AssignExpr) -> Option<&Ident> {
+    match &*Self::maybe_member_expr(expr)?.obj {
+      Expr::Ident(ident) => Some(ident),
+      _ => None,
+    }
+  }
+
+  fn maybe_prop_name(expr: &AssignExpr) -> Option<&Atom> {
+    match &Self::maybe_member_expr(expr)?.prop {
+      MemberProp::Ident(ident) => Some(&ident.sym),
+      MemberProp::Computed(prop_name) => match &*prop_name.expr {
+        Expr::Lit(Lit::Str(str)) => str.value.as_atom(),
+        _ => None,
+      },
+      _ => None,
+    }
+  }
+
+  /// The inner assignment expression.
+  pub fn inner(&self) -> &'a AssignExpr {
+    self.0
+  }
+
+  pub fn member_expr(&self) -> &'a MemberExpr {
+    // these were verified in the constructor, so we can unwrap here
+    Self::maybe_member_expr(self.0).unwrap()
+  }
+
+  pub fn obj_ident(&self) -> &'a Ident {
+    Self::maybe_obj_ident(self.0).unwrap()
+  }
+
+  pub fn prop_name(&self) -> &'a Atom {
+    Self::maybe_prop_name(self.0).unwrap()
+  }
+
+  pub fn prop_name_range(&self) -> SourceRange {
+    Self::maybe_member_expr(self.0).unwrap().prop.range()
+  }
+
+  pub fn assignment(&self) -> &'a Expr {
+    &self.0.right
+  }
+}
+
+#[derive(Debug, Clone)]
+pub enum SymbolDeclKind {
+  Target(Id),
+  QualifiedTarget(Id, Vec<String>),
+  FileRef(FileDep),
+  Definition(SymbolNode),
+}
+
+impl SymbolDeclKind {
+  pub fn is_definition(&self) -> bool {
+    matches!(self, Self::Definition(_))
+  }
+
+  pub fn maybe_node_and_source(
+    &self,
+  ) -> Option<(SymbolNodeRef<'_>, &ParsedSource)> {
+    match self {
+      SymbolDeclKind::Definition(node) => node.maybe_ref_and_source(),
+      _ => None,
+    }
+  }
+}
+
+mod symbol_decl_flags {
+  const FLAG_HAS_OVERLOADS: u8 = 1 << 0;
+
+  #[derive(Default, Clone, Copy)]
+  pub struct SymbolDeclFlags(u8);
+
+  impl std::fmt::Debug for SymbolDeclFlags {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+      write!(f, "{}", self.0)
+    }
+  }
+
+  impl SymbolDeclFlags {
+    pub fn has_overloads(&self) -> bool {
+      self.0 & FLAG_HAS_OVERLOADS != 0
+    }
+
+    pub(crate) fn set_has_overloads(&mut self) {
+      self.0 |= FLAG_HAS_OVERLOADS;
+    }
+  }
+}
+
+#[derive(Debug, Clone)]
+pub struct SymbolDecl {
+  pub kind: SymbolDeclKind,
+  pub range: SourceRange,
+  flags: symbol_decl_flags::SymbolDeclFlags,
+}
+
+impl SymbolDecl {
+  pub(crate) fn new(kind: SymbolDeclKind, range: SourceRange) -> Self {
+    Self {
+      kind,
+      range,
+      flags: Default::default(),
+    }
+  }
+  pub fn maybe_source(&self) -> Option<&ParsedSource> {
+    self.maybe_node_and_source().map(|n| n.1)
+  }
+
+  pub fn maybe_node(&self) -> Option<SymbolNodeRef<'_>> {
+    self.maybe_node_and_source().map(|n| n.0)
+  }
+
+  pub fn maybe_node_and_source(
+    &self,
+  ) -> Option<(SymbolNodeRef<'_>, &ParsedSource)> {
+    self.kind.maybe_node_and_source()
+  }
+
+  /// The local name of the decl, if it has a name or node.
+  pub fn maybe_name(&self) -> Option<Cow<'_, str>> {
+    self.maybe_node().and_then(|n| n.maybe_name())
+  }
+
+  pub fn deps(&self, mode: ResolveDepsMode) -> Vec<SymbolNodeDep> {
+    match self.maybe_node() {
+      Some(node) => node.deps(mode),
+      None => Vec::new(),
+    }
+  }
+
+  pub fn has_overloads(&self) -> bool {
+    self.flags.has_overloads()
+  }
+
+  /// Whether this declaration introduces a binding in the value namespace
+  /// and/or the type namespace, returned as `(value, type)`. Declarations
+  /// that aren't a [`SymbolDeclKind::Definition`] (e.g. re-export aliases)
+  /// conservatively return `(true, true)`.
+  pub fn namespaces(&self) -> (bool, bool) {
+    self
+      .maybe_node()
+      .map(|n| n.namespaces())
+      .unwrap_or((true, true))
+  }
+
+  pub fn is_class(&self) -> bool {
+    self.maybe_node().map(|n| n.is_class()).unwrap_or(false)
+  }
+
+  pub fn is_var(&self) -> bool {
+    self.maybe_node().map(|n| n.is_var()).unwrap_or(false)
+  }
+
+  pub fn is_ctor(&self) -> bool {
+    self.maybe_node().map(|n| n.is_ctor()).unwrap_or(false)
+  }
+
+  pub fn is_function(&self) -> bool {
+    self.maybe_node().map(|n| n.is_function()).unwrap_or(false)
+  }
+
+  pub fn is_interface(&self) -> bool {
+    self.maybe_node().map(|n| n.is_interface()).unwrap_or(false)
+  }
+
+  pub fn has_body(&self) -> bool {
+    self.maybe_node().map(|n| n.has_body()).unwrap_or(false)
+  }
+}
+
+#[derive(Debug, Clone)]
+pub struct Symbol {
+  module_id: ModuleId,
+  symbol_id: SymbolId,
+  parent_id: Option<SymbolId>,
+  decls: Vec<SymbolDecl>,
+  /// The child declarations of module declarations.
+  child_ids: IndexSet<SymbolId>,
+  exports: IndexMap<String, SymbolId>,
+  /// Members
+  members: IndexSet<SymbolId>,
+}
+
+impl Symbol {
+  pub fn new(
+    module_id: ModuleId,
+    symbol_id: SymbolId,
+    parent_id: Option<SymbolId>,
+  ) -> Self {
+    Symbol {
+      module_id,
+      symbol_id,
+      parent_id,
+      decls: Default::default(),
+      child_ids: Default::default(),
+      exports: Default::default(),
+      members: Default::default(),
+    }
+  }
+
+  /// A unique identifier of the symbol, which consists of the module id and symbol id.
+  pub fn unique_id(&self) -> UniqueSymbolId {
+    UniqueSymbolId::new(self.module_id, self.symbol_id)
+  }
+
+  /// Module id of where the symbol is located.
+  pub fn module_id(&self) -> ModuleId {
+    self.module_id
+  }
+
+  /// Symbol id within the module.
+  ///
+  /// This is module specific. If you need a global identifier, then use unique_id().
+  pub fn symbol_id(&self) -> SymbolId {
+    self.symbol_id
+  }
+
+  /// Gets the symbol's parent id.
+  pub fn parent_id(&self) -> Option<SymbolId> {
+    self.parent_id
+  }
+
+  /// Gets the symbol's parent's unique symbol id.
+  pub fn parent_unique_id(&self) -> Option<UniqueSymbolId> {
+    self
+      .parent_id
+      .map(|id| UniqueSymbolId::new(self.module_id, id))
+  }
+
+  /// The local name of the symbol if it has one.
+  pub fn maybe_name(&self) -> Option<Cow<'_, str>> {
+    self.decls.first().and_then(|d| d.maybe_name())
+  }
+
+  /// Export of the symbol by name.
+  pub fn export(&self, name: &str) -> Option<SymbolId> {
+    self.exports.get(name).copied()
+  }
+
+  /// Map of exports
+  pub fn exports(&self) -> &IndexMap<String, SymbolId> {
+    &self.exports
+  }
+
+  /// Identifiers of namespace children (ex. functions, interface found in a namespace).
+  pub fn child_ids(&self) -> impl Iterator<Item = SymbolId> + '_ {
+    self.child_ids.iter().copied()
+  }
+
+  /// The symbol's associated declarations. A symbol can represent many declarations
+  /// if they have the same name via declaration merging or if they are overloads.
+  pub fn decls(&self) -> &[SymbolDecl] {
+    &self.decls
+  }
+
+  /// Gets a set of the members.
+  ///
+  /// * For interfaces this is all the children.
+  /// * For classes this is the instance members. The static members are
+  ///   available as the children.
+  pub fn members(&self) -> &IndexSet<SymbolId> {
+    &self.members
+  }
+
+  /// Gets if this symbol represents a file dependency.
+  pub fn file_dep(&self) -> Option<&FileDep> {
+    for dep in self.decls() {
+      if let SymbolDeclKind::FileRef(file_ref) = &dep.kind {
+        return Some(file_ref);
+      }
+    }
+    None
+  }
+
+  /// If the symbol is a declaration that can be found in a module.
+  pub fn is_module(&self) -> bool {
+    self
+      .decls()
+      .first()
+      .and_then(|d| d.maybe_node())
+      .map(|n| n.is_module())
+      .unwrap_or(false)
+  }
+
+  /// If the symbol is a declaration that can be found in a module.
+  pub fn is_decl(&self) -> bool {
+    self
+      .decls()
+      .first()
+      .and_then(|d| d.maybe_node())
+      .map(|n| n.is_decl())
+      .unwrap_or(false)
+  }
+
+  /// If the symbol is a member found in a class or interface.
+  pub fn is_member(&self) -> bool {
+    self
+      .decls()
+      .first()
+      .and_then(|d| d.maybe_node())
+      .map(|n| n.is_member())
+      .unwrap_or(false)
+  }
+
+  /// If the symbol is a private member.
+  pub fn is_private_member(&self) -> bool {
+    self
+      .decls()
+      .first()
+      .and_then(|d| d.maybe_node())
+      .map(|n| n.is_private_member())
+      .unwrap_or(false)
+  }
+}
+
+/// A unique identifier for a symbol, which consists of the module id and symbol id.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, PartialOrd, Ord)]
+pub struct UniqueSymbolId {
+  pub module_id: ModuleId,
+  pub symbol_id: SymbolId,
+}
+
+impl UniqueSymbolId {
+  pub fn new(module_id: ModuleId, symbol_id: SymbolId) -> Self {
+    Self {
+      module_id,
+      symbol_id,
+    }
+  }
+}
+
+#[derive(Debug, Clone, Copy)]
+pub enum ModuleInfoRef<'a> {
+  Json(&'a JsonModuleInfo),
+  Esm(&'a EsModuleInfo),
+}
+
+impl<'a> ModuleInfoRef<'a> {
+  pub fn json(&self) -> Option<&'a JsonModuleInfo> {
+    match self {
+      Self::Json(json) => Some(json),
+      Self::Esm(_) => None,
+    }
+  }
+
+  pub fn esm(&self) -> Option<&'a EsModuleInfo> {
+    match self {
+      Self::Json(_) => None,
+      Self::Esm(esm) => Some(esm),
+    }
+  }
+
+  pub fn module_id(&self) -> ModuleId {
+    match self {
+      Self::Json(m) => m.module_id,
+      Self::Esm(m) => m.module_id,
+    }
+  }
+
+  pub fn text_info(&self) -> &'a SourceTextInfo {
+    match self {
+      Self::Json(m) => &m.source_text_info,
+      Self::Esm(m) => m.source.text_info_lazy(),
+    }
+  }
+
+  pub fn text(&self) -> &'a str {
+    match self {
+      ModuleInfoRef::Json(m) => m.source_text_info.text_str(),
+      ModuleInfoRef::Esm(m) => m.source.text().as_ref(),
+    }
+  }
+
+  pub fn module_symbol(&self) -> &'a Symbol {
+    match self {
+      Self::Json(m) => &m.module_symbol,
+      Self::Esm(m) => m.module_symbol(),
+    }
+  }
+
+  pub fn specifier(&self) -> &'a ModuleSpecifier {
+    match self {
+      Self::Json(m) => &m.specifier,
+      Self::Esm(m) => &m.specifier,
+    }
+  }
+
+  pub fn symbols(&self) -> Box<dyn Iterator<Item = &'a Symbol> + 'a> {
+    match self {
+      Self::Json(m) => Box::new(m.symbols()),
+      Self::Esm(m) => Box::new(m.symbols()),
+    }
+  }
+
+  pub fn symbol(&self, id: SymbolId) -> Option<&'a Symbol> {
+    match self {
+      Self::Json(m) => m.symbol(id),
+      Self::Esm(m) => m.symbol(id),
+    }
+  }
+
+  pub fn exports(&self, root_symbol: &'a RootSymbol) -> ModuleExports<'a> {
+    cross_module::exports_and_re_exports(
+      root_symbol.module_graph,
+      *self,
+      &|specifier| root_symbol.module_from_specifier(specifier),
+    )
+  }
+
+  pub fn re_export_all_nodes(
+    &self,
+  ) -> Option<impl Iterator<Item = &'a ExportAll> + use<'a>> {
+    match self {
+      Self::Json(_) => None,
+      Self::Esm(m) => Some(m.re_exports.iter().map(|n| n.value())),
+    }
+  }
+
+  pub(crate) fn re_export_all_specifiers(
+    &self,
+  ) -> Option<impl Iterator<Item = &'a str> + use<'a>> {
+    match self {
+      Self::Json(_) => None,
+      Self::Esm(m) => Some(
+        m.re_exports
+          .iter()
+          .flat_map(|e| e.value().src.value.as_str()),
+      ),
+    }
+  }
+
+  pub fn fully_qualified_symbol_name(&self, symbol: &Symbol) -> Option<String> {
+    debug_assert_eq!(symbol.module_id(), self.module_id());
+    let mut text = String::new();
+    let mut last: Option<&Symbol> = None;
+    let mut next = Some(symbol);
+    while let Some(symbol) = next {
+      if symbol.parent_id().is_none() {
+        break; // ignore the source file
+      }
+      if !text.is_empty() {
+        let prop_was_member = last
+          .map(|l| symbol.members().contains(&l.symbol_id()))
+          .unwrap_or(false);
+        let part_name = symbol.maybe_name()?;
+        let prop_was_class_member = prop_was_member
+          && symbol
+            .decls()
+            .first()
+            .map(|d| d.is_class())
+            .unwrap_or(false);
+        text = if prop_was_class_member {
+          format!("{}.prototype.{}", part_name, text)
+        } else if prop_was_member {
+          // not the best, but good enough
+          format!("{}[\"{}\"]", part_name, text.replace('"', "\\\""))
+        } else {
+          format!("{}.{}", part_name, text)
+        };
+      } else {
+        text = symbol.maybe_name()?.to_string();
+      }
+      last = next;
+      next = symbol.parent_id().and_then(|id| self.symbol(id));
+    }
+    if text.is_empty() { None } else { Some(text) }
+  }
+}
+
+/// Holds information about the module like symbols and re-exports.
+#[derive(Debug, Clone)]
+#[allow(clippy::large_enum_variant)] // ok because EsModuleInfo is way more common
+pub enum ModuleInfo {
+  Json(Box<JsonModuleInfo>),
+  Esm(EsModuleInfo),
+}
+
+impl ModuleInfo {
+  pub fn json(&self) -> Option<&JsonModuleInfo> {
+    match self {
+      Self::Json(json) => Some(json),
+      Self::Esm(_) => None,
+    }
+  }
+
+  pub fn esm(&self) -> Option<&EsModuleInfo> {
+    match self {
+      Self::Json(_) => None,
+      Self::Esm(esm) => Some(esm),
+    }
+  }
+
+  pub fn as_ref(&self) -> ModuleInfoRef<'_> {
+    match self {
+      ModuleInfo::Json(m) => (**m).as_ref(),
+      ModuleInfo::Esm(m) => m.as_ref(),
+    }
+  }
+
+  pub fn module_id(&self) -> ModuleId {
+    match self {
+      Self::Json(m) => m.module_id,
+      Self::Esm(m) => m.module_id,
+    }
+  }
+
+  pub fn specifier(&self) -> &ModuleSpecifier {
+    self.as_ref().specifier()
+  }
+
+  pub fn symbols(&self) -> Box<dyn Iterator<Item = &Symbol> + '_> {
+    self.as_ref().symbols()
+  }
+
+  pub fn symbol(&self, id: SymbolId) -> Option<&Symbol> {
+    self.as_ref().symbol(id)
+  }
+}
+
+#[derive(Clone)]
+pub struct JsonModuleInfo {
+  module_id: ModuleId,
+  specifier: ModuleSpecifier,
+  source_text_info: SourceTextInfo,
+  module_symbol: Symbol,
+  default_symbol: Symbol,
+}
+
+impl std::fmt::Debug for JsonModuleInfo {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    f.debug_struct("JsonModuleInfo")
+      .field("module_id", &self.module_id)
+      .field("specifier", &self.specifier.as_str())
+      .field("module_symbol", &self.module_symbol)
+      .finish()
+  }
+}
+
+impl JsonModuleInfo {
+  pub fn as_ref(&self) -> ModuleInfoRef<'_> {
+    ModuleInfoRef::Json(self)
+  }
+
+  pub fn specifier(&self) -> &ModuleSpecifier {
+    &self.specifier
+  }
+
+  pub fn text_info(&self) -> &SourceTextInfo {
+    &self.source_text_info
+  }
+
+  pub fn symbols(&self) -> impl Iterator<Item = &Symbol> {
+    std::iter::once(&self.module_symbol)
+      .chain(std::iter::once(&self.default_symbol))
+  }
+
+  pub fn symbol(&self, id: SymbolId) -> Option<&Symbol> {
+    match id.0 {
+      0 => Some(&self.module_symbol),
+      1 => Some(&self.default_symbol),
+      _ => {
+        debug_assert!(false, "invalid symbol id");
+        None
+      }
+    }
+  }
+}
+
+#[derive(Clone)]
+pub struct EsModuleInfo {
+  module_id: ModuleId,
+  specifier: ModuleSpecifier,
+  source: ParsedSource,
+  /// The re-export specifiers.
+  re_exports: Vec<NodeRefBox<ExportAll>>,
+  // note: not all symbol ids have an swc id. For example, default exports
+  swc_id_to_symbol_id: IndexMap<Id, SymbolId>,
+  symbols: IndexMap<SymbolId, Symbol>,
+}
+
+impl std::fmt::Debug for EsModuleInfo {
+  fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+    f.debug_struct("EsModuleInfo")
+      .field("module_id", &self.module_id)
+      .field("specifier", &self.specifier.as_str())
+      .field(
+        "re_exports",
+        &self
+          .re_exports
+          .iter()
+          .map(|e| e.value().src.value.to_string_lossy())
+          .collect::<Vec<_>>(),
+      )
+      .field("swc_id_to_symbol_id", &self.swc_id_to_symbol_id)
+      .field("symbols", &self.symbols)
+      .finish()
+  }
+}
+
+impl EsModuleInfo {
+  pub fn as_ref(&self) -> ModuleInfoRef<'_> {
+    ModuleInfoRef::Esm(self)
+  }
+
+  pub fn module_id(&self) -> ModuleId {
+    self.module_id
+  }
+
+  pub fn specifier(&self) -> &ModuleSpecifier {
+    &self.specifier
+  }
+
+  pub fn source(&self) -> &ParsedSource {
+    &self.source
+  }
+
+  pub fn exports<'a>(
+    &'a self,
+    root_symbol: &'a RootSymbol,
+  ) -> ModuleExports<'a> {
+    self.as_ref().exports(root_symbol)
+  }
+
+  pub fn module_symbol(&self) -> &Symbol {
+    self.symbol(SymbolId(0)).unwrap()
+  }
+
+  pub fn symbol_id_from_swc(&self, id: &Id) -> Option<SymbolId> {
+    self.swc_id_to_symbol_id.get(id).copied()
+  }
+
+  pub fn symbol_from_swc(&self, id: &Id) -> Option<&Symbol> {
+    let id = self.symbol_id_from_swc(id)?;
+    self.symbol(id)
+  }
+
+  pub fn symbols(&self) -> impl Iterator<Item = &Symbol> {
+    self.symbols.values()
+  }
+
+  pub fn symbol(&self, id: SymbolId) -> Option<&Symbol> {
+    self.symbols.get(&id)
+  }
+}
+
+struct SymbolMut(RefCell<Symbol>);
+
+impl SymbolMut {
+  pub fn new(symbol: Symbol) -> Self {
+    Self(RefCell::new(symbol))
+  }
+
+  pub fn add_decl(&self, mut symbol_decl: SymbolDecl) {
+    fn is_class_method(symbol_decl: &SymbolDecl) -> bool {
+      symbol_decl
+        .maybe_node()
+        .map(|node| {
+          matches!(
+            node,
+            SymbolNodeRef::ClassMethod(ClassMethod {
+              kind: MethodKind::Method,
+              ..
+            })
+          )
+        })
+        .unwrap_or(false)
+    }
+
+    let mut inner = self.0.borrow_mut();
+    // check if this is an implementation with overloads
+    if !inner.decls.is_empty()
+      && (symbol_decl.is_function()
+        || is_class_method(&symbol_decl)
+        || symbol_decl.is_ctor())
+      && symbol_decl.has_body()
+      && inner
+        .decls
+        .last()
+        .map(|d| {
+          d.is_function()
+            || is_class_method(&symbol_decl)
+            || symbol_decl.is_ctor()
+        })
+        .unwrap_or(false)
+    {
+      symbol_decl.flags.set_has_overloads();
+    }
+
+    inner.decls.push(symbol_decl);
+  }
+
+  pub fn symbol_id(&self) -> SymbolId {
+    self.0.borrow_mut().symbol_id
+  }
+
+  pub fn add_export(&self, name: String, symbol_id: SymbolId) {
+    self.0.borrow_mut().exports.insert(name, symbol_id);
+  }
+
+  pub fn export(&self, name: &str) -> Option<SymbolId> {
+    self.0.borrow().exports.get(name).copied()
+  }
+
+  pub fn add_child_id(&self, symbol_id: SymbolId) {
+    self.0.borrow_mut().child_ids.insert(symbol_id);
+  }
+
+  pub fn add_member(&self, symbol_id: SymbolId) {
+    self.0.borrow_mut().members.insert(symbol_id);
+  }
+
+  pub fn borrow_inner(&self) -> Ref<'_, Symbol> {
+    self.0.borrow()
+  }
+}
+
+struct ModuleBuilder {
+  module_id: ModuleId,
+  // todo(dsherret): make this not an IndexMap
+  swc_id_to_symbol_id: AdditiveOnlyIndexMapForCopyValues<Id, SymbolId>,
+  // todo(dsherret): make this not an IndexMap
+  symbols: AdditiveOnlyIndexMap<SymbolId, SymbolMut>,
+  next_symbol_id: Cell<SymbolId>,
+  re_exports: RefCell<Vec<NodeRefBox<ExportAll>>>,
+}
+
+impl ModuleBuilder {
+  pub fn new(module_id: ModuleId) -> Self {
+    Self {
+      module_id,
+      swc_id_to_symbol_id: Default::default(),
+      symbols: Default::default(),
+      next_symbol_id: Default::default(),
+      re_exports: Default::default(),
+    }
+  }
+
+  pub fn ensure_default_export_symbol(
+    &self,
+    module_symbol: &SymbolMut,
+    symbol_decl: SymbolDecl,
+  ) -> SymbolId {
+    if let Some(symbol_id) = module_symbol.export("default") {
+      let default_export_symbol = self.symbols.get(&symbol_id).unwrap();
+      default_export_symbol.add_decl(symbol_decl);
+      symbol_id
+    } else {
+      let symbol_id = self.get_next_symbol_id();
+      let symbol = SymbolMut::new(Symbol::new(
+        self.module_id,
+        symbol_id,
+        Some(module_symbol.symbol_id()),
+      ));
+      let should_add_child =
+        matches!(symbol_decl.kind, SymbolDeclKind::Definition(_));
+      symbol.add_decl(symbol_decl);
+      self.symbols.insert(symbol_id, symbol);
+      module_symbol.add_export("default".to_string(), symbol_id);
+      if should_add_child {
+        module_symbol.add_child_id(symbol_id);
+      }
+      symbol_id
+    }
+  }
+
+  pub fn create_new_symbol(&self, parent_id: SymbolId) -> &SymbolMut {
+    self.create_new_symbol_inner(Some(parent_id))
+  }
+
+  pub fn create_new_symbol_for_root(&self) -> &SymbolMut {
+    let symbol = self.create_new_symbol_inner(None);
+    debug_assert_eq!(symbol.symbol_id(), SymbolId(0));
+    symbol
+  }
+
+  fn create_new_symbol_inner(&self, parent_id: Option<SymbolId>) -> &SymbolMut {
+    let symbol_id = self.get_next_symbol_id();
+    self.symbols.insert(
+      symbol_id,
+      SymbolMut::new(Symbol::new(self.module_id, symbol_id, parent_id)),
+    );
+    self.symbols.get(&symbol_id).unwrap()
+  }
+
+  pub fn symbol_mut(&self, id: SymbolId) -> Option<&SymbolMut> {
+    self.symbols.get(&id)
+  }
+
+  pub fn get_symbol_from_swc_id(
+    &self,
+    id: Id,
+    symbol_decl: SymbolDecl,
+    parent_id: SymbolId,
+  ) -> &SymbolMut {
+    let symbol_id = self.ensure_symbol_for_swc_id(id, symbol_decl, parent_id);
+    self.symbols.get(&symbol_id).unwrap()
+  }
+
+  pub fn ensure_symbol_for_swc_id(
+    &self,
+    id: Id,
+    symbol_decl: SymbolDecl,
+    parent_id: SymbolId,
+  ) -> SymbolId {
+    match self.swc_id_to_symbol_id.get(&id) {
+      Some(symbol_id) => {
+        self.symbols.get(&symbol_id).unwrap().add_decl(symbol_decl);
+        symbol_id
+      }
+      None => {
+        let symbol_id = self.get_next_symbol_id();
+        self.swc_id_to_symbol_id.insert(id, symbol_id);
+        let symbol = SymbolMut::new(Symbol::new(
+          self.module_id,
+          symbol_id,
+          Some(parent_id),
+        ));
+        symbol.add_decl(symbol_decl);
+        self.symbols.insert(symbol_id, symbol);
+        symbol_id
+      }
+    }
+  }
+
+  fn get_next_symbol_id(&self) -> SymbolId {
+    let symbol_id = self.next_symbol_id.get();
+    self.next_symbol_id.set(SymbolId(symbol_id.0 + 1));
+    symbol_id
+  }
+
+  fn add_re_export(&self, export_all: NodeRefBox<ExportAll>) {
+    self.re_exports.borrow_mut().push(export_all)
+  }
+}
+
+struct SymbolFiller<'a> {
+  source: &'a ParsedSource,
+  builder: &'a ModuleBuilder,
+}
+
+impl SymbolFiller<'_> {
+  fn fill(&self, program: &Program) {
+    let module_symbol = self.builder.create_new_symbol_for_root();
+    module_symbol.add_decl(SymbolDecl::new(
+      SymbolDeclKind::Definition(SymbolNode(SymbolNodeInner::Module(
+        NodeRefBox::unsafe_new(self.source, program),
+      ))),
+      program.range(),
+    ));
+    match program {
+      Program::Module(module) => {
+        for module_item in &module.body {
+          self.fill_module_item(
+            module_item,
+            module_symbol,
+            self.source.media_type().is_declaration(),
+          );
+        }
+      }
+      Program::Script(script) => {
+        for stmt in &script.body {
+          self.fill_module_item_stmt(
+            stmt,
+            module_symbol,
+            self.source.media_type().is_declaration(),
+          );
+        }
+      }
+    }
+  }
+
+  fn fill_module_item(
+    &self,
+    module_item: &ModuleItem,
+    module_symbol: &SymbolMut,
+    is_ambient: bool,
+  ) {
+    match module_item {
+      ModuleItem::ModuleDecl(decl) => match decl {
+        ModuleDecl::Import(import_decl) => {
+          for specifier in &import_decl.specifiers {
+            match specifier {
+              ImportSpecifier::Named(n) => {
+                // Don't create a symbol to the exported name identifier
+                // because swc doesn't give that identifier its own ctxt,
+                // which means that `default` in cases like this will have
+                // the same ctxt:
+                //   import { default as a } from '...';
+                //   import { default as b } from '...';
+                let imported_name = n
+                  .imported
+                  .as_ref()
+                  .map(|n| match n {
+                    ModuleExportName::Ident(ident) => ident.sym.to_string(),
+                    ModuleExportName::Str(str) => {
+                      str.value.to_string_lossy().into_owned()
+                    }
+                  })
+                  .unwrap_or_else(|| n.local.sym.to_string());
+                self.builder.ensure_symbol_for_swc_id(
+                  n.local.to_id(),
+                  SymbolDecl::new(
+                    SymbolDeclKind::FileRef(FileDep {
+                      name: FileDepName::Name(imported_name),
+                      specifier: import_decl
+                        .src
+                        .value
+                        .to_string_lossy()
+                        .into_owned(),
+                    }),
+                    n.range(),
+                  ),
+                  module_symbol.symbol_id(),
+                );
+              }
+              ImportSpecifier::Default(n) => {
+                self.builder.ensure_symbol_for_swc_id(
+                  n.local.to_id(),
+                  SymbolDecl::new(
+                    SymbolDeclKind::FileRef(FileDep {
+                      name: FileDepName::Name("default".to_string()),
+                      specifier: import_decl
+                        .src
+                        .value
+                        .to_string_lossy()
+                        .into_owned(),
+                    }),
+                    n.range(),
+                  ),
+                  module_symbol.symbol_id(),
+                );
+              }
+              ImportSpecifier::Namespace(n) => {
+                self.builder.ensure_symbol_for_swc_id(
+                  n.local.to_id(),
+                  SymbolDecl::new(
+                    SymbolDeclKind::FileRef(FileDep {
+                      name: FileDepName::Star,
+                      specifier: import_decl
+                        .src
+                        .value
+                        .to_string_lossy()
+                        .into_owned(),
+                    }),
+                    n.range(),
+                  ),
+                  module_symbol.symbol_id(),
+                );
+              }
+            }
+          }
+        }
+        ModuleDecl::ExportDecl(export_decl) => match &export_decl.decl {
+          Decl::Class(n) => {
+            let symbol = self.builder.get_symbol_from_swc_id(
+              n.ident.to_id(),
+              SymbolDecl::new(
+                SymbolDeclKind::Definition(SymbolNode(
+                  SymbolNodeInner::ExportDecl(
+                    NodeRefBox::unsafe_new(self.source, export_decl),
+                    SymbolNodeInnerExportDecl::Class(NodeRefBox::unsafe_new(
+                      self.source,
+                      n,
+                    )),
+                  ),
+                )),
+                export_decl.range(),
+              ),
+              module_symbol.symbol_id(),
+            );
+            self.fill_class_decl(symbol, n);
+            let symbol_id = symbol.symbol_id();
+            module_symbol.add_export(n.ident.sym.to_string(), symbol_id);
+            module_symbol.add_child_id(symbol_id);
+          }
+          Decl::Fn(n) => {
+            let symbol_id = self.builder.ensure_symbol_for_swc_id(
+              n.ident.to_id(),
+              SymbolDecl::new(
+                SymbolDeclKind::Definition(SymbolNode(
+                  SymbolNodeInner::ExportDecl(
+                    NodeRefBox::unsafe_new(self.source, export_decl),
+                    SymbolNodeInnerExportDecl::Fn(NodeRefBox::unsafe_new(
+                      self.source,
+                      n,
+                    )),
+                  ),
+                )),
+                export_decl.range(),
+              ),
+              module_symbol.symbol_id(),
+            );
+            module_symbol.add_export(n.ident.sym.to_string(), symbol_id);
+            module_symbol.add_child_id(symbol_id);
+          }
+          Decl::Var(n) => {
+            for decl in &n.decls {
+              for ident in find_pat_ids::<_, Ident>(&decl.name) {
+                let export_name = ident.sym.to_string();
+                let id = ident.to_id();
+                let symbol_id = self.builder.ensure_symbol_for_swc_id(
+                  id.clone(),
+                  SymbolDecl::new(
+                    SymbolDeclKind::Definition(SymbolNode(
+                      SymbolNodeInner::ExportDecl(
+                        NodeRefBox::unsafe_new(self.source, export_decl),
+                        SymbolNodeInnerExportDecl::Var(
+                          NodeRefBox::unsafe_new(self.source, n),
+                          NodeRefBox::unsafe_new(self.source, decl),
+                          ident,
+                        ),
+                      ),
+                    )),
+                    decl.range(),
+                  ),
+                  module_symbol.symbol_id(),
+                );
+                module_symbol.add_child_id(symbol_id);
+                module_symbol.add_export(export_name, symbol_id);
+              }
+            }
+          }
+          Decl::TsInterface(n) => {
+            let symbol = self.builder.get_symbol_from_swc_id(
+              n.id.to_id(),
+              SymbolDecl::new(
+                SymbolDeclKind::Definition(SymbolNode(
+                  SymbolNodeInner::ExportDecl(
+                    NodeRefBox::unsafe_new(self.source, export_decl),
+                    SymbolNodeInnerExportDecl::TsInterface(
+                      NodeRefBox::unsafe_new(self.source, n),
+                    ),
+                  ),
+                )),
+                export_decl.range(),
+              ),
+              module_symbol.symbol_id(),
+            );
+            self.fill_ts_interface(symbol, n);
+            let symbol_id = symbol.symbol_id();
+            module_symbol.add_export(n.id.sym.to_string(), symbol_id);
+            module_symbol.add_child_id(symbol_id);
+          }
+          Decl::TsTypeAlias(n) => {
+            let symbol_id = self.builder.ensure_symbol_for_swc_id(
+              n.id.to_id(),
+              SymbolDecl::new(
+                SymbolDeclKind::Definition(SymbolNode(
+                  SymbolNodeInner::ExportDecl(
+                    NodeRefBox::unsafe_new(self.source, export_decl),
+                    SymbolNodeInnerExportDecl::TsTypeAlias(
+                      NodeRefBox::unsafe_new(self.source, n),
+                    ),
+                  ),
+                )),
+                export_decl.range(),
+              ),
+              module_symbol.symbol_id(),
+            );
+            module_symbol.add_export(n.id.sym.to_string(), symbol_id);
+            module_symbol.add_child_id(symbol_id);
+          }
+          Decl::TsEnum(n) => {
+            let symbol_id = self.builder.ensure_symbol_for_swc_id(
+              n.id.to_id(),
+              SymbolDecl::new(
+                SymbolDeclKind::Definition(SymbolNode(
+                  SymbolNodeInner::ExportDecl(
+                    NodeRefBox::unsafe_new(self.source, export_decl),
+                    SymbolNodeInnerExportDecl::TsEnum(NodeRefBox::unsafe_new(
+                      self.source,
+                      n,
+                    )),
+                  ),
+                )),
+                export_decl.range(),
+              ),
+              module_symbol.symbol_id(),
+            );
+            module_symbol.add_export(n.id.sym.to_string(), symbol_id);
+            module_symbol.add_child_id(symbol_id);
+          }
+          Decl::TsModule(n) => {
+            let maybe_symbol_id = self.fill_ts_module(
+              SymbolDecl::new(
+                SymbolDeclKind::Definition(SymbolNode(
+                  SymbolNodeInner::ExportDecl(
+                    NodeRefBox::unsafe_new(self.source, export_decl),
+                    SymbolNodeInnerExportDecl::TsNamespace(
+                      NodeRefBox::unsafe_new(self.source, n),
+                    ),
+                  ),
+                )),
+                export_decl.range(),
+              ),
+              n,
+              module_symbol,
+              is_ambient || n.declare,
+            );
+            if let Some(symbol_id) = maybe_symbol_id {
+              match &n.id {
+                TsModuleName::Ident(ident) => {
+                  module_symbol.add_export(ident.sym.to_string(), symbol_id);
+                  module_symbol.add_child_id(symbol_id);
+                }
+                TsModuleName::Str(_) => {}
+              }
+            }
+          }
+          Decl::Using(_) => {
+            unreachable!()
+          }
+        },
+        ModuleDecl::ExportNamed(n) => {
+          for specifier in &n.specifiers {
+            match specifier {
+              ExportSpecifier::Named(named) => {
+                match &n.src {
+                  Some(src) => {
+                    // we don't add the swc ids when there's a specifier because it might
+                    // conflict with a re-exported name in another module due to how swc
+                    // does its export analysis where all the identifiers in re-exports
+                    // have the same scope. Additionally, it makes it easier working
+                    // with ModuleExportName::Str
+                    let imported_name = match &named.orig {
+                      ModuleExportName::Ident(ident) => ident.sym.to_string(),
+                      ModuleExportName::Str(str) => {
+                        str.value.to_string_lossy().into_owned()
+                      }
+                    };
+                    let export_name = named
+                      .exported
+                      .as_ref()
+                      .map(|exported| match exported {
+                        ModuleExportName::Ident(ident) => ident.sym.to_string(),
+                        ModuleExportName::Str(str) => {
+                          str.value.to_string_lossy().into_owned()
+                        }
+                      })
+                      .unwrap_or_else(|| imported_name.clone());
+                    let symbol =
+                      self.builder.create_new_symbol(module_symbol.symbol_id());
+                    symbol.add_decl(SymbolDecl::new(
+                      SymbolDeclKind::FileRef(FileDep {
+                        name: FileDepName::Name(imported_name),
+                        specifier: src.value.to_string_lossy().into_owned(),
+                      }),
+                      named.range(),
+                    ));
+                    let symbol_id = symbol.symbol_id();
+                    module_symbol.add_export(export_name, symbol_id);
+                  }
+                  None => {
+                    let orig_ident = match &named.orig {
+                      ModuleExportName::Ident(ident) => ident,
+                      ModuleExportName::Str(_) => unreachable!(),
+                    };
+
+                    // note: don't associate identifier exports with the swc id because
+                    // we don't want the SymbolDeclKind appearing with the definition symbols
+                    if let Some(exported_name) = &named.exported {
+                      let exported_name = match exported_name {
+                        ModuleExportName::Ident(ident) => ident.sym.to_string(),
+                        ModuleExportName::Str(str) => {
+                          str.value.to_string_lossy().into_owned()
+                        }
+                      };
+                      let orig_symbol = self
+                        .builder
+                        .create_new_symbol(module_symbol.symbol_id());
+                      orig_symbol.add_decl(SymbolDecl::new(
+                        SymbolDeclKind::Target(orig_ident.to_id()),
+                        named.range(),
+                      ));
+                      module_symbol
+                        .add_export(exported_name, orig_symbol.symbol_id());
+                    } else {
+                      let named_symbol = self
+                        .builder
+                        .create_new_symbol(module_symbol.symbol_id());
+                      named_symbol.add_decl(SymbolDecl::new(
+                        match &n.src {
+                          Some(src) => SymbolDeclKind::FileRef(FileDep {
+                            name: FileDepName::Name(orig_ident.sym.to_string()),
+                            specifier: src.value.to_string_lossy().into_owned(),
+                          }),
+                          None => SymbolDeclKind::Target(orig_ident.to_id()),
+                        },
+                        named.range(),
+                      ));
+                      module_symbol.add_export(
+                        orig_ident.sym.to_string(),
+                        named_symbol.symbol_id(),
+                      );
+                    }
+                  }
+                }
+              }
+              ExportSpecifier::Namespace(specifier) => {
+                if let Some(src) = &n.src {
+                  let name = match &specifier.name {
+                    ModuleExportName::Ident(ident) => ident.sym.to_string(),
+                    ModuleExportName::Str(str) => {
+                      str.value.to_string_lossy().into_owned()
+                    }
+                  };
+                  let symbol =
+                    self.builder.create_new_symbol(module_symbol.symbol_id());
+                  symbol.add_decl(SymbolDecl::new(
+                    SymbolDeclKind::FileRef(FileDep {
+                      name: FileDepName::Star,
+                      specifier: src.value.to_string_lossy().into_owned(),
+                    }),
+                    specifier.range(),
+                  ));
+                  let symbol_id = symbol.symbol_id();
+                  module_symbol.add_export(name, symbol_id);
+                } else {
+                  let name = match &specifier.name {
+                    ModuleExportName::Ident(ident) => ident,
+                    ModuleExportName::Str(_) => unreachable!(),
+                  };
+                  let symbol_kind = SymbolDeclKind::Target(name.to_id());
+                  let symbol_id = self
+                    .builder
+                    .get_symbol_from_swc_id(
+                      name.to_id(),
+                      SymbolDecl::new(symbol_kind.clone(), n.range()),
+                      module_symbol.symbol_id(),
+                    )
+                    .symbol_id();
+                  module_symbol.add_export(name.sym.to_string(), symbol_id);
+                }
+              }
+              // https://github.com/tc39/proposal-export-default-from
+              ExportSpecifier::Default(_) => {
+                unreachable!("export default from is stage 1")
+              }
+            }
+          }
+        }
+        ModuleDecl::ExportDefaultDecl(default_decl) => {
+          let default_export_symbol_id =
+            self.builder.ensure_default_export_symbol(
+              module_symbol,
+              SymbolDecl::new(
+                SymbolDeclKind::Definition(SymbolNode(
+                  SymbolNodeInner::ExportDefaultDecl(NodeRefBox::unsafe_new(
+                    self.source,
+                    default_decl,
+                  )),
+                )),
+                default_decl.range(),
+              ),
+            );
+          let maybe_ident = match &default_decl.decl {
+            DefaultDecl::Class(expr) => expr.ident.as_ref(),
+            DefaultDecl::Fn(expr) => expr.ident.as_ref(),
+            DefaultDecl::TsInterfaceDecl(decl) => Some(&decl.id),
+          };
+          if let Some(ident) = maybe_ident {
+            let id = ident.to_id();
+            self
+              .builder
+              .swc_id_to_symbol_id
+              .insert(id, default_export_symbol_id);
+          }
+
+          let symbol =
+            self.builder.symbol_mut(default_export_symbol_id).unwrap();
+          match &default_decl.decl {
+            DefaultDecl::Class(n) => {
+              self.fill_class(symbol, &n.class);
+            }
+            DefaultDecl::Fn(_) => {
+              // nothing to fill
+            }
+            DefaultDecl::TsInterfaceDecl(n) => {
+              self.fill_ts_interface(symbol, n)
+            }
+          }
+        }
+        ModuleDecl::ExportDefaultExpr(expr) => {
+          self.handle_export_default_expr(
+            module_symbol,
+            expr.range(),
+            &expr.expr,
+            Some(expr),
+          );
+        }
+        ModuleDecl::ExportAll(n) => {
+          self
+            .builder
+            .add_re_export(NodeRefBox::unsafe_new(self.source, n));
+        }
+        ModuleDecl::TsImportEquals(import_equals) => {
+          let symbol_id =
+            self.ensure_symbol_for_import_equals(import_equals, module_symbol);
+          if import_equals.is_export {
+            module_symbol
+              .add_export(import_equals.id.sym.to_string(), symbol_id);
+          }
+        }
+        ModuleDecl::TsExportAssignment(export_assignment) => {
+          self.handle_export_default_expr(
+            module_symbol,
+            export_assignment.range(),
+            &export_assignment.expr,
+            None,
+          );
+        }
+        ModuleDecl::TsNamespaceExport(_) => {
+          // ignore
+        }
+      },
+      ModuleItem::Stmt(stmt) => {
+        self.fill_module_item_stmt(stmt, module_symbol, is_ambient)
+      }
+    }
+  }
+
+  fn fill_module_item_stmt(
+    &self,
+    stmt: &Stmt,
+    module_symbol: &SymbolMut,
+    is_ambient: bool,
+  ) {
+    let decls_are_exports =
+      is_ambient && !module_symbol.borrow_inner().is_module();
+    match stmt {
+      Stmt::Block(_)
+      | Stmt::Empty(_)
+      | Stmt::Debugger(_)
+      | Stmt::With(_)
+      | Stmt::Return(_)
+      | Stmt::Labeled(_)
+      | Stmt::Break(_)
+      | Stmt::Continue(_)
+      | Stmt::If(_)
+      | Stmt::Switch(_)
+      | Stmt::Throw(_)
+      | Stmt::Try(_)
+      | Stmt::While(_)
+      | Stmt::DoWhile(_)
+      | Stmt::For(_)
+      | Stmt::ForIn(_)
+      | Stmt::ForOf(_) => {
+        // ignore
+      }
+      Stmt::Expr(n) => match &*n.expr {
+        Expr::Assign(assign_expr) => {
+          if let Some(expando_ref) = ExpandoPropertyRef::maybe_new(assign_expr)
+            && let Some(symbol_id) = self
+              .builder
+              .swc_id_to_symbol_id
+              .get(&expando_ref.obj_ident().to_id())
+          {
+            let symbol = self.builder.symbol_mut(symbol_id).unwrap();
+            // expando properties are only valid on a function
+            if symbol
+              .borrow_inner()
+              .decls()
+              .iter()
+              .any(|d| d.is_function())
+            {
+              self.create_symbol_member_or_export(
+                symbol,
+                SymbolNodeRef::ExpandoProperty(expando_ref),
+              );
+            }
+          }
+        }
+        _ => {
+          // ignore
+        }
+      },
+      Stmt::Decl(n) => {
+        match n {
+          Decl::Class(n) => {
+            let id = n.ident.to_id();
+            let symbol = self.builder.get_symbol_from_swc_id(
+              id,
+              SymbolDecl::new(
+                SymbolDeclKind::Definition(SymbolNode(
+                  SymbolNodeInner::ClassDecl(NodeRefBox::unsafe_new(
+                    self.source,
+                    n,
+                  )),
+                )),
+                n.range(),
+              ),
+              module_symbol.symbol_id(),
+            );
+            self.fill_class_decl(symbol, n);
+            let symbol_id = symbol.symbol_id();
+            module_symbol.add_child_id(symbol_id);
+            if decls_are_exports {
+              module_symbol.add_export(n.ident.sym.to_string(), symbol_id);
+            }
+          }
+          Decl::Fn(n) => {
+            let symbol_id = self.builder.ensure_symbol_for_swc_id(
+              n.ident.to_id(),
+              SymbolDecl::new(
+                SymbolDeclKind::Definition(SymbolNode(
+                  SymbolNodeInner::FnDecl(NodeRefBox::unsafe_new(
+                    self.source,
+                    n,
+                  )),
+                )),
+                n.range(),
+              ),
+              module_symbol.symbol_id(),
+            );
+            module_symbol.add_child_id(symbol_id);
+            if decls_are_exports {
+              module_symbol.add_export(n.ident.sym.to_string(), symbol_id);
+            }
+          }
+          Decl::Var(var_decl) => {
+            for decl in &var_decl.decls {
+              for ident in find_pat_ids::<_, Ident>(&decl.name) {
+                let export_name =
+                  decls_are_exports.then(|| ident.sym.to_string());
+                let symbol_id = self.builder.ensure_symbol_for_swc_id(
+                  ident.to_id(),
+                  SymbolDecl::new(
+                    SymbolDeclKind::Definition(SymbolNode(
+                      SymbolNodeInner::Var(
+                        NodeRefBox::unsafe_new(self.source, var_decl),
+                        NodeRefBox::unsafe_new(self.source, decl),
+                        ident,
+                      ),
+                    )),
+                    decl.range(),
+                  ),
+                  module_symbol.symbol_id(),
+                );
+                module_symbol.add_child_id(symbol_id);
+                if let Some(export_name) = export_name {
+                  module_symbol.add_export(export_name, symbol_id);
+                }
+              }
+            }
+          }
+          Decl::TsInterface(n) => {
+            let id = n.id.to_id();
+            let symbol = self.builder.get_symbol_from_swc_id(
+              id,
+              SymbolDecl::new(
+                SymbolDeclKind::Definition(SymbolNode(
+                  SymbolNodeInner::TsInterface(NodeRefBox::unsafe_new(
+                    self.source,
+                    n,
+                  )),
+                )),
+                n.range(),
+              ),
+              module_symbol.symbol_id(),
+            );
+            self.fill_ts_interface(symbol, n);
+            let symbol_id = symbol.symbol_id();
+            module_symbol.add_child_id(symbol_id);
+            if decls_are_exports {
+              module_symbol.add_export(n.id.sym.to_string(), symbol_id);
+            }
+          }
+          Decl::TsTypeAlias(n) => {
+            let symbol_id = self.builder.ensure_symbol_for_swc_id(
+              n.id.to_id(),
+              SymbolDecl::new(
+                SymbolDeclKind::Definition(SymbolNode(
+                  SymbolNodeInner::TsTypeAlias(NodeRefBox::unsafe_new(
+                    self.source,
+                    n,
+                  )),
+                )),
+                n.range(),
+              ),
+              module_symbol.symbol_id(),
+            );
+            module_symbol.add_child_id(symbol_id);
+            if decls_are_exports {
+              module_symbol.add_export(n.id.sym.to_string(), symbol_id);
+            }
+          }
+          Decl::TsEnum(n) => {
+            let symbol_id = self.builder.ensure_symbol_for_swc_id(
+              n.id.to_id(),
+              SymbolDecl::new(
+                SymbolDeclKind::Definition(SymbolNode(
+                  SymbolNodeInner::TsEnum(NodeRefBox::unsafe_new(
+                    self.source,
+                    n,
+                  )),
+                )),
+                n.range(),
+              ),
+              module_symbol.symbol_id(),
+            );
+            module_symbol.add_child_id(symbol_id);
+            if decls_are_exports {
+              module_symbol.add_export(n.id.sym.to_string(), symbol_id);
+            }
+          }
+          Decl::TsModule(n) => {
+            let symbol_id = self.fill_ts_module(
+              SymbolDecl::new(
+                SymbolDeclKind::Definition(SymbolNode(
+                  SymbolNodeInner::TsNamespace(NodeRefBox::unsafe_new(
+                    self.source,
+                    n,
+                  )),
+                )),
+                n.range(),
+              ),
+              n,
+              module_symbol,
+              is_ambient || n.declare,
+            );
+            if let Some(symbol_id) = symbol_id {
+              module_symbol.add_child_id(symbol_id);
+              if decls_are_exports {
+                match &n.id {
+                  TsModuleName::Ident(ident) => {
+                    module_symbol.add_export(ident.sym.to_string(), symbol_id);
+                  }
+                  TsModuleName::Str(_) => {}
+                }
+              }
+            }
+          }
+          Decl::Using(using_decl) => {
+            for decl in &using_decl.decls {
+              for ident in find_pat_ids::<_, Ident>(&decl.name) {
+                let export_name =
+                  decls_are_exports.then(|| ident.sym.to_string());
+                let symbol_id = self.builder.ensure_symbol_for_swc_id(
+                  ident.to_id(),
+                  SymbolDecl::new(
+                    SymbolDeclKind::Definition(SymbolNode(
+                      SymbolNodeInner::UsingVar(
+                        NodeRefBox::unsafe_new(self.source, using_decl),
+                        NodeRefBox::unsafe_new(self.source, decl),
+                        ident,
+                      ),
+                    )),
+                    decl.range(),
+                  ),
+                  module_symbol.symbol_id(),
+                );
+                module_symbol.add_child_id(symbol_id);
+                // should never happen
+                if let Some(export_name) = export_name {
+                  module_symbol.add_export(export_name, symbol_id);
+                }
+              }
+            }
+          }
+        };
+      }
+    }
+  }
+
+  fn handle_export_default_expr(
+    &self,
+    module_symbol: &SymbolMut,
+    default_export_range: SourceRange,
+    expr: &Expr,
+    maybe_parent: Option<&ExportDefaultExpr>,
+  ) {
+    match expr {
+      Expr::Ident(ident) => {
+        // note: don't associate identifier exports with the swc id because
+        // we don't want the SymbolDeclKind appearing with the definition symbols
+        self.builder.ensure_default_export_symbol(
+          module_symbol,
+          SymbolDecl::new(SymbolDeclKind::Target(ident.to_id()), ident.range()),
+        );
+      }
+      _ => {
+        let Some(parent) = maybe_parent else {
+          return;
+        };
+        self.builder.ensure_default_export_symbol(
+          module_symbol,
+          SymbolDecl::new(
+            SymbolDeclKind::Definition(SymbolNode(
+              SymbolNodeInner::ExportDefaultExpr(NodeRefBox::unsafe_new(
+                self.source,
+                parent,
+              )),
+            )),
+            default_export_range,
+          ),
+        );
+      }
+    }
+  }
+
+  fn ensure_symbol_for_import_equals(
+    &self,
+    import_equals: &TsImportEqualsDecl,
+    parent_symbol: &SymbolMut,
+  ) -> SymbolId {
+    let id = import_equals.id.to_id();
+    if let Some(symbol_id) = self.builder.swc_id_to_symbol_id.get(&id) {
+      return symbol_id;
+    }
+    match &import_equals.module_ref {
+      TsModuleRef::TsEntityName(entity_name) => {
+        let (leftmost_id, parts) = ts_entity_name_to_parts(entity_name);
+        self.builder.ensure_symbol_for_swc_id(
+          id,
+          SymbolDecl::new(
+            SymbolDeclKind::QualifiedTarget(leftmost_id, parts),
+            import_equals.range(),
+          ),
+          parent_symbol.symbol_id(),
+        )
+      }
+      TsModuleRef::TsExternalModuleRef(module_ref) => {
+        self.builder.ensure_symbol_for_swc_id(
+          id,
+          SymbolDecl::new(
+            SymbolDeclKind::FileRef(FileDep {
+              name: FileDepName::Name("default".to_string()),
+              specifier: module_ref.expr.value.to_string_lossy().to_string(),
+            }),
+            import_equals.range(),
+          ),
+          parent_symbol.symbol_id(),
+        )
+      }
+    }
+  }
+
+  fn fill_class_decl(&self, symbol: &SymbolMut, n: &ClassDecl) {
+    self.fill_class(symbol, &n.class);
+  }
+
+  fn fill_class(&self, symbol: &SymbolMut, n: &Class) {
+    self.fill_ts_class_members(symbol, &n.body);
+  }
+
+  fn fill_ts_interface(&self, symbol: &SymbolMut, n: &TsInterfaceDecl) {
+    for member in &n.body.body {
+      match member {
+        TsTypeElement::TsCallSignatureDecl(n) => {
+          self.create_symbol_member_or_export(
+            symbol,
+            SymbolNodeRef::TsCallSignatureDecl(n),
+          );
+        }
+        TsTypeElement::TsConstructSignatureDecl(n) => {
+          self.create_symbol_member_or_export(
+            symbol,
+            SymbolNodeRef::TsConstructSignatureDecl(n),
+          );
+        }
+        TsTypeElement::TsPropertySignature(n) => {
+          self.create_symbol_member_or_export(
+            symbol,
+            SymbolNodeRef::TsPropertySignature(n),
+          );
+        }
+        TsTypeElement::TsIndexSignature(n) => {
+          self.create_symbol_member_or_export(
+            symbol,
+            SymbolNodeRef::TsIndexSignature(n),
+          );
+        }
+        TsTypeElement::TsMethodSignature(n) => {
+          self.create_symbol_member_or_export(
+            symbol,
+            SymbolNodeRef::TsMethodSignature(n),
+          );
+        }
+        TsTypeElement::TsGetterSignature(n) => {
+          self.create_symbol_member_or_export(
+            symbol,
+            SymbolNodeRef::TsGetterSignature(n),
+          );
+        }
+        TsTypeElement::TsSetterSignature(n) => {
+          self.create_symbol_member_or_export(
+            symbol,
+            SymbolNodeRef::TsSetterSignature(n),
+          );
+        }
+      }
+    }
+  }
+
+  fn fill_ts_module(
+    &self,
+    symbol_decl: SymbolDecl,
+    n: &TsModuleDecl,
+    parent_symbol: &SymbolMut,
+    is_ambient: bool,
+  ) -> Option<SymbolId> {
+    let mut id = match &n.id {
+      TsModuleName::Ident(ident) => ident.to_id(),
+      TsModuleName::Str(_) => return None, // ignore for now
+    };
+    let mod_symbol = self.builder.get_symbol_from_swc_id(
+      id.clone(),
+      symbol_decl,
+      parent_symbol.symbol_id(),
+    );
+
+    // fill the exported declarations
+    if let Some(body) = &n.body {
+      let mut mod_symbol = mod_symbol;
+      let mut current = body;
+      let block = loop {
+        match current {
+          TsNamespaceBody::TsModuleBlock(block) => break block,
+          TsNamespaceBody::TsNamespaceDecl(decl) => {
+            let previous_symbol = mod_symbol;
+            id = decl.id.to_id();
+            mod_symbol = self.builder.get_symbol_from_swc_id(
+              id.clone(),
+              SymbolDecl::new(
+                SymbolDeclKind::Definition(SymbolNode(
+                  SymbolNodeInner::TsNamespace(NodeRefBox::unsafe_new(
+                    self.source,
+                    n,
+                  )),
+                )),
+                decl.range(),
+              ),
+              previous_symbol.symbol_id(),
+            );
+            previous_symbol
+              .add_export(id.0.to_string(), mod_symbol.symbol_id());
+            previous_symbol.add_child_id(mod_symbol.symbol_id());
+            current = &decl.body;
+          }
+        }
+      };
+
+      for item in &block.body {
+        self.fill_module_item(item, mod_symbol, is_ambient || n.declare);
+      }
+    }
+
+    Some(mod_symbol.symbol_id())
+  }
+
+  fn fill_ts_class_members(&self, symbol: &SymbolMut, members: &[ClassMember]) {
+    for member in members {
+      match member {
+        ClassMember::Constructor(ctor) => {
+          self.create_symbol_member_or_export(
+            symbol,
+            SymbolNodeRef::Constructor(ctor),
+          );
+          for param in &ctor.params {
+            if let ParamOrTsParamProp::TsParamProp(prop) = param {
+              self.create_symbol_member_or_export(
+                symbol,
+                SymbolNodeRef::ClassParamProp(prop),
+              );
+            }
+          }
+        }
+        ClassMember::Method(method) => {
+          self.create_symbol_member_or_export(
+            symbol,
+            SymbolNodeRef::ClassMethod(method),
+          );
+        }
+        ClassMember::PrivateMethod(_) => {
+          // todo(dsherret): add private methods
+        }
+        ClassMember::ClassProp(prop) => {
+          self.create_symbol_member_or_export(
+            symbol,
+            SymbolNodeRef::ClassProp(prop),
+          );
+        }
+        ClassMember::PrivateProp(_) => {
+          // todo(dsherret): add private properties
+        }
+        ClassMember::TsIndexSignature(signature) => {
+          self.create_symbol_member_or_export(
+            symbol,
+            SymbolNodeRef::TsIndexSignature(signature),
+          );
+        }
+        ClassMember::AutoAccessor(prop) => {
+          self.create_symbol_member_or_export(
+            symbol,
+            SymbolNodeRef::AutoAccessor(prop),
+          );
+        }
+        ClassMember::StaticBlock(_) | ClassMember::Empty(_) => {
+          // ignore
+        }
+      }
+    }
+  }
+
+  fn create_symbol_member_or_export<'b>(
+    &'b self,
+    parent_symbol: &'b SymbolMut,
+    node_ref: SymbolNodeRef,
+  ) -> &'b SymbolMut {
+    let (node_inner, is_static, source_range) = match node_ref {
+      SymbolNodeRef::AutoAccessor(n) => (
+        SymbolNodeInner::AutoAccessor(NodeRefBox::unsafe_new(self.source, n)),
+        n.is_static,
+        n.range(),
+      ),
+      SymbolNodeRef::ClassMethod(n) => (
+        SymbolNodeInner::ClassMethod(NodeRefBox::unsafe_new(self.source, n)),
+        n.is_static,
+        n.range(),
+      ),
+      SymbolNodeRef::ClassProp(n) => (
+        SymbolNodeInner::ClassProp(NodeRefBox::unsafe_new(self.source, n)),
+        n.is_static,
+        n.range(),
+      ),
+      SymbolNodeRef::ClassParamProp(n) => (
+        SymbolNodeInner::ClassParamProp(NodeRefBox::unsafe_new(self.source, n)),
+        /* is_static */ false,
+        n.range(),
+      ),
+      SymbolNodeRef::Constructor(n) => (
+        SymbolNodeInner::Constructor(NodeRefBox::unsafe_new(self.source, n)),
+        true,
+        n.range(),
+      ),
+      SymbolNodeRef::ExpandoProperty(n) => (
+        SymbolNodeInner::ExpandoProperty(NodeRefBox::unsafe_new(
+          self.source,
+          n.0,
+        )),
+        true,
+        n.0.range(),
+      ),
+      SymbolNodeRef::TsIndexSignature(n) => (
+        SymbolNodeInner::TsIndexSignature(NodeRefBox::unsafe_new(
+          self.source,
+          n,
+        )),
+        n.is_static,
+        n.range(),
+      ),
+      SymbolNodeRef::TsCallSignatureDecl(n) => (
+        SymbolNodeInner::TsCallSignatureDecl(NodeRefBox::unsafe_new(
+          self.source,
+          n,
+        )),
+        false,
+        n.range(),
+      ),
+      SymbolNodeRef::TsConstructSignatureDecl(n) => (
+        SymbolNodeInner::TsConstructSignatureDecl(NodeRefBox::unsafe_new(
+          self.source,
+          n,
+        )),
+        false,
+        n.range(),
+      ),
+      SymbolNodeRef::TsPropertySignature(n) => (
+        SymbolNodeInner::TsPropertySignature(NodeRefBox::unsafe_new(
+          self.source,
+          n,
+        )),
+        false,
+        n.range(),
+      ),
+      SymbolNodeRef::TsGetterSignature(n) => (
+        SymbolNodeInner::TsGetterSignature(NodeRefBox::unsafe_new(
+          self.source,
+          n,
+        )),
+        false,
+        n.range(),
+      ),
+      SymbolNodeRef::TsSetterSignature(n) => (
+        SymbolNodeInner::TsSetterSignature(NodeRefBox::unsafe_new(
+          self.source,
+          n,
+        )),
+        false,
+        n.range(),
+      ),
+      SymbolNodeRef::TsMethodSignature(n) => (
+        SymbolNodeInner::TsMethodSignature(NodeRefBox::unsafe_new(
+          self.source,
+          n,
+        )),
+        false,
+        n.range(),
+      ),
+      SymbolNodeRef::Module(_)
+      | SymbolNodeRef::ClassDecl(_)
+      | SymbolNodeRef::ExportDecl(..)
+      | SymbolNodeRef::ExportDefaultDecl(_)
+      | SymbolNodeRef::ExportDefaultExpr(_)
+      | SymbolNodeRef::FnDecl(_)
+      | SymbolNodeRef::TsEnum(_)
+      | SymbolNodeRef::TsInterface(_)
+      | SymbolNodeRef::TsNamespace(_)
+      | SymbolNodeRef::TsTypeAlias(_)
+      | SymbolNodeRef::Var(..)
+      | SymbolNodeRef::UsingVar(..) => unreachable!(),
+    };
+
+    let decl = SymbolDecl::new(
+      SymbolDeclKind::Definition(SymbolNode(node_inner)),
+      source_range,
+    );
+
+    let child_symbol =
+      if let Some(decl_name) = decl.maybe_name().map(|n| n.to_string()) {
+        // static members on a class are children and an export if they have a name
+        // while instance members are "members"
+        if is_static {
+          match parent_symbol.export(&decl_name) {
+            Some(symbol_id) => self.builder.symbol_mut(symbol_id).unwrap(),
+            None => {
+              if let Some(child_symbol) =
+                self.get_child_symbol_with_name(parent_symbol, &decl_name)
+              {
+                child_symbol
+              } else {
+                let child_symbol =
+                  self.builder.create_new_symbol(parent_symbol.symbol_id());
+                parent_symbol.add_export(decl_name, child_symbol.symbol_id());
+                parent_symbol.add_child_id(child_symbol.symbol_id());
+                child_symbol
+              }
+            }
+          }
+        } else if let Some(child_symbol) =
+          self.get_member_symbol_with_name(parent_symbol, &decl_name)
+        {
+          child_symbol
+        } else {
+          let child_symbol =
+            self.builder.create_new_symbol(parent_symbol.symbol_id());
+          parent_symbol.add_member(child_symbol.symbol_id());
+          child_symbol
+        }
+      } else if is_static {
+        let child_symbol =
+          self.builder.create_new_symbol(parent_symbol.symbol_id());
+        parent_symbol.add_child_id(child_symbol.symbol_id());
+        child_symbol
+      } else {
+        let child_symbol =
+          self.builder.create_new_symbol(parent_symbol.symbol_id());
+        parent_symbol.add_member(child_symbol.symbol_id());
+        child_symbol
+      };
+
+    child_symbol.add_decl(decl);
+    child_symbol
+  }
+
+  fn get_child_symbol_with_name<'b>(
+    &'b self,
+    parent_symbol: &'b SymbolMut,
+    searching_name: &str,
+  ) -> Option<&'b SymbolMut> {
+    let parent_symbol = parent_symbol.borrow_inner();
+    for child_id in parent_symbol.child_ids() {
+      let child_symbol_mut = self.builder.symbol_mut(child_id).unwrap();
+      let child_symbol = child_symbol_mut.borrow_inner();
+      if let Some(name) = child_symbol.maybe_name()
+        && name == searching_name
+      {
+        return Some(child_symbol_mut);
+      }
+    }
+    None
+  }
+
+  fn get_member_symbol_with_name<'b>(
+    &'b self,
+    parent_symbol: &'b SymbolMut,
+    searching_name: &str,
+  ) -> Option<&'b SymbolMut> {
+    let parent_symbol = parent_symbol.borrow_inner();
+    for member_id in parent_symbol.members() {
+      let child_symbol_mut = self.builder.symbol_mut(*member_id).unwrap();
+      let child_symbol = child_symbol_mut.borrow_inner();
+      if let Some(name) = child_symbol.maybe_name()
+        && name == searching_name
+      {
+        return Some(child_symbol_mut);
+      }
+    }
+    None
+  }
+}

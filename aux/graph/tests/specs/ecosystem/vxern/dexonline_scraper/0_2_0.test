@@ -1,0 +1,31 @@
+vxern/dexonline-scraper/0.2.0
+-- deno.lock --
+{}
+
+===
+
+== FAST CHECK EMIT PASSED ==
+
+== TYPE CHECK FAILED ==
+-- stdout --
+
+-- stderr --
+TS1205 [ERROR]: Re-exporting a type when 'isolatedModules' is enabled requires using 'export type'.
+export { DictionaryFlags, MatchingModes, Synthesis, Inflection, Links, Expressions, Selectors, copyrightedDictionaries };
+                          ~~~~~~~~~~~~~
+    at file://<tmpdir>/src/index.ts:37:27
+
+TS2305 [ERROR]: Module '"file:<global_npm_dir>/cheerio/1.2.0/dist/esm/index.d.ts"' has no exported member 'Element'.
+import { Cheerio, CheerioAPI, Element } from "npm:cheerio@^1.0.0-rc.12";
+                              ~~~~~~~
+    at file://<tmpdir>/src/tabs/inflection.ts:1:31
+
+TS2305 [ERROR]: Module '"file:<global_npm_dir>/cheerio/1.2.0/dist/esm/index.d.ts"' has no exported member 'Element'.
+import { Cheerio, CheerioAPI, Element } from "npm:cheerio@^1.0.0-rc.12";
+                              ~~~~~~~
+    at file://<tmpdir>/src/tabs/synthesis.ts:1:31
+
+Found 3 errors.
+
+error: Type checking failed.
+

@@ -1,0 +1,39 @@
+pup/plugin-web-interface/1.0.1
+-- deno.lock --
+{
+  "version": "3",
+  "packages": {
+    "specifiers": {
+      "jsr:@pup/plugin@^1.0.0": "jsr:@pup/plugin@1.0.1"
+    },
+    "jsr": {
+      "@pup/plugin@1.0.1": {
+        "integrity": "0ba5cfb8ea009c4b02736077bf60243e67604634b5aa4c6c23a51b67e3bed1f9"
+      }
+    }
+  },
+  "remote": {}
+}
+
+===
+
+== FAST CHECK EMIT PASSED ==
+
+== TYPE CHECK FAILED ==
+-- stdout --
+
+-- stderr --
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'PluginImplementation'.
+  public meta = {
+         ~~~~
+    at file://<tmpdir>/mod.ts:3:10
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'PluginImplementation'.
+  public cleanup(): Promise<boolean> {
+         ~~~~~~~
+    at file://<tmpdir>/mod.ts:20:10
+
+Found 2 errors.
+
+error: Type checking failed.
+

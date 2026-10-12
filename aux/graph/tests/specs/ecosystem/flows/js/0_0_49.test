@@ -1,0 +1,66 @@
+flows/js/0.0.49
+-- deno.lock --
+{}
+===
+
+== FAST CHECK EMIT FAILED ==
+error[missing-explicit-return-type]: missing explicit return type in the public API
+   --> /src/core/validation.ts:198:3
+    | 
+198 |   (value: unknown) => {
+    |   ^^^^^^^^^^^^^^^^^^^^^
+    | 
+199 |     try {
+    | ^^^^^^^^^
+    | 
+200 |       assert(value, struct);
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    | 
+201 |       return { valid: true };
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    | 
+202 |     } catch (e) {
+    | ^^^^^^^^^^^^^^^^^
+    | 
+203 |       const error = e as StructError;
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    | 
+204 |       return { error, valid: false };
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    | 
+205 |     }
+    | ^^^^^
+    | 
+206 |   };
+    | ^^^ this function is missing an explicit return type
+    | 
+    = hint: add an explicit return type to the function
+
+  info: all functions in the public API must have an explicit return type
+  docs: https://jsr.io/go/slow-type-missing-explicit-return-type
+
+
+error[missing-explicit-type]: missing explicit type in the public API
+   --> /src/core/validation.ts:210:14
+    | 
+210 | export const validateFlowsOptions = validateStruct(OptionsStruct);
+    |              ^^^^^^^^^^^^^^^^^^^^ this symbol is missing an explicit type
+    | 
+    = hint: add an explicit type annotation to the symbol
+
+  info: all symbols in the public API must have an explicit type
+  docs: https://jsr.io/go/slow-type-missing-explicit-type
+
+
+error[missing-explicit-type]: missing explicit type in the public API
+   --> /src/core/validation.ts:214:14
+    | 
+214 | export const validateFlow = validateStruct(FlowStruct);
+    |              ^^^^^^^^^^^^ this symbol is missing an explicit type
+    | 
+    = hint: add an explicit type annotation to the symbol
+
+  info: all symbols in the public API must have an explicit type
+  docs: https://jsr.io/go/slow-type-missing-explicit-type
+
+

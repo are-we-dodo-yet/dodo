@@ -1,0 +1,22 @@
+olets/tailwindcss-fluid-font-size/1.0.0
+-- deno.lock --
+{
+  "version": "3",
+  "remote": {}
+}
+
+===
+
+== FAST CHECK EMIT PASSED ==
+
+== TYPE CHECK FAILED ==
+-- stdout --
+
+-- stderr --
+TS2304 [ERROR]: Cannot find name 'PluginWithOptions'.
+const fluidFontSize: PluginWithOptions = {} as never;
+                     ~~~~~~~~~~~~~~~~~
+    at file://<tmpdir>/src/index.ts:1:22
+
+error: Type checking failed.
+

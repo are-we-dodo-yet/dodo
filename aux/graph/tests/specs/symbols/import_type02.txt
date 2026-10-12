@@ -1,0 +1,244 @@
+# mod.ts
+export type Test = typeof import("./a.ts");
+
+# a.ts
+export interface Test {
+  prop: string;
+}
+
+// should be public because import types will include the default exports
+export default function test() {
+}
+
+# output
+file:///a.ts: EsModuleInfo {
+    module_id: ModuleId(
+        1,
+    ),
+    specifier: "file:///a.ts",
+    re_exports: [],
+    swc_id_to_symbol_id: {
+        (
+            "Test",
+            #2,
+        ): 1,
+        (
+            "test",
+            #2,
+        ): 3,
+    },
+    symbols: {
+        0: Symbol {
+            module_id: ModuleId(
+                1,
+            ),
+            symbol_id: 0,
+            parent_id: None,
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "export interface Test {\n  prop: string;\n}\n\n// should be public because import types will include the default exports\nexport default function test() {\n}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            0,
+                        ),
+                        end: SourcePos(
+                            151,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {
+                1,
+                3,
+            },
+            exports: {
+                "Test": 1,
+                "default": 3,
+            },
+            members: {},
+        },
+        1: Symbol {
+            module_id: ModuleId(
+                1,
+            ),
+            symbol_id: 1,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "export interface Test {\n  prop: string;\n}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            0,
+                        ),
+                        end: SourcePos(
+                            41,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {
+                2,
+            },
+        },
+        2: Symbol {
+            module_id: ModuleId(
+                1,
+            ),
+            symbol_id: 2,
+            parent_id: Some(
+                1,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "prop: string;",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            26,
+                        ),
+                        end: SourcePos(
+                            39,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+        3: Symbol {
+            module_id: ModuleId(
+                1,
+            ),
+            symbol_id: 3,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "export default function test() {\n}",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            117,
+                        ),
+                        end: SourcePos(
+                            151,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+    },
+}
+file:///mod.ts: EsModuleInfo {
+    module_id: ModuleId(
+        0,
+    ),
+    specifier: "file:///mod.ts",
+    re_exports: [],
+    swc_id_to_symbol_id: {
+        (
+            "Test",
+            #2,
+        ): 1,
+    },
+    symbols: {
+        0: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 0,
+            parent_id: None,
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "export type Test = typeof import(\"./a.ts\");",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            0,
+                        ),
+                        end: SourcePos(
+                            43,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {
+                1,
+            },
+            exports: {
+                "Test": 1,
+            },
+            members: {},
+        },
+        1: Symbol {
+            module_id: ModuleId(
+                0,
+            ),
+            symbol_id: 1,
+            parent_id: Some(
+                0,
+            ),
+            decls: [
+                SymbolDecl {
+                    kind: Definition(
+                        SymbolNode(
+                            "export type Test = typeof import(\"./a.ts\");",
+                        ),
+                    ),
+                    range: SourceRange {
+                        start: SourcePos(
+                            0,
+                        ),
+                        end: SourcePos(
+                            43,
+                        ),
+                    },
+                    flags: 0,
+                },
+            ],
+            child_ids: {},
+            exports: {},
+            members: {},
+        },
+    },
+}
+== symbol deps (types and exprs) ==
+1:0..43 [ImportType("./a.ts", [])]
+
+== symbol deps (types only) ==
+1:0..43 [ImportType("./a.ts", [])]
+
+== export definitions ==
+[Test]: file:///mod.ts:0..43
+  export type Test = typeof import("./a.ts");

@@ -1,0 +1,80 @@
+oak/acorn/0.5.1-alpha.1
+-- deno.lock --
+{
+  "version": "3",
+  "packages": {
+    "specifiers": {
+      "jsr:@oak/commons@0.7": "jsr:@oak/commons@0.7.0",
+      "jsr:@std/assert@^0.218.2": "jsr:@std/assert@0.218.2",
+      "jsr:@std/crypto@0.218": "jsr:@std/crypto@0.218.2",
+      "jsr:@std/encoding@^0.218.2": "jsr:@std/encoding@0.218.2",
+      "jsr:@std/http@0.218": "jsr:@std/http@0.218.2"
+    },
+    "jsr": {
+      "@oak/commons@0.7.0": {
+        "integrity": "4bd889b3dc9ddac1b602034d88c137f06de7078775961b51081beb5f175c120b"
+      },
+      "@std/assert@0.218.2": {
+        "integrity": "7f0a5a1a8cf86607cd6c2c030584096e1ffad27fc9271429a8cb48cfbdee5eaf"
+      },
+      "@std/crypto@0.218.2": {
+        "integrity": "8c5031a3a1c3ac3bed3c0d4bed2fe7e7faedcb673bbfa0edd10570c8452f5cd2",
+        "dependencies": [
+          "jsr:@std/assert@^0.218.2",
+          "jsr:@std/encoding@^0.218.2"
+        ]
+      },
+      "@std/encoding@0.218.2": {
+        "integrity": "da55a763c29bf0dbf06fd286430b358266eb99c28789d89fe9a3e28edecb8d8e"
+      },
+      "@std/http@0.218.2": {
+        "integrity": "54223b62702e665b9dab6373ea2e51235e093ef47228d21cfa0469ee5ac75c9b",
+        "dependencies": [
+          "jsr:@std/assert@^0.218.2"
+        ]
+      }
+    }
+  },
+  "remote": {}
+}
+
+===
+
+== FAST CHECK EMIT PASSED ==
+
+== TYPE CHECK FAILED ==
+-- stdout --
+
+-- stderr --
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'EventTarget'.
+  addEventListener(type: "error", listener: RouterErrorEventListenerOrEventListenerObject | null, options?: boolean | AddEventListenerOptions): void;
+  ~~~~~~~~~~~~~~~~
+    at file://<tmpdir>/router.ts:475:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'EventTarget'.
+  addEventListener(type: "handled", listener: HandledEventListenerOrEventListenerObject | null, options?: boolean | AddEventListenerOptions): void;
+  ~~~~~~~~~~~~~~~~
+    at file://<tmpdir>/router.ts:476:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'EventTarget'.
+    at file://<tmpdir>/router.ts:477:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'EventTarget'.
+  addEventListener(type: "notfound", listener: NotFoundEventListenerOrEventListenerObject | null, options?: boolean | AddEventListenerOptions): void;
+  ~~~~~~~~~~~~~~~~
+    at file://<tmpdir>/router.ts:478:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'EventTarget'.
+  addEventListener(type: "request", listener: RouterRequestListenerOrEventListenerObject | null, options?: boolean | AddEventListenerOptions): void;
+  ~~~~~~~~~~~~~~~~
+    at file://<tmpdir>/router.ts:479:3
+
+TS4114 [ERROR]: This member must have an 'override' modifier because it overrides a member in the base class 'EventTarget'.
+  addEventListener(param0?: any, param1?: any, param2?: any): any {
+  ~~~~~~~~~~~~~~~~
+    at file://<tmpdir>/router.ts:480:3
+
+Found 6 errors.
+
+error: Type checking failed.
+

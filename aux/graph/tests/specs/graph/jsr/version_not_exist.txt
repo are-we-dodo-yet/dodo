@@ -1,0 +1,48 @@
+# https://jsr.io/@scope/a/meta.json
+{
+  "versions": {
+    "1.0.0": {}
+  }
+}
+
+# mod.ts
+import 'jsr:@scope/a@1.0.1/mod.ts';
+
+# output
+{
+  "roots": [
+    "file:///mod.ts"
+  ],
+  "modules": [
+    {
+      "kind": "esm",
+      "dependencies": [
+        {
+          "specifier": "jsr:@scope/a@1.0.1/mod.ts",
+          "code": {
+            "specifier": "jsr:@scope/a@1.0.1/mod.ts",
+            "resolutionMode": "import",
+            "span": {
+              "start": {
+                "line": 0,
+                "character": 7
+              },
+              "end": {
+                "line": 0,
+                "character": 34
+              }
+            }
+          }
+        }
+      ],
+      "size": 36,
+      "mediaType": "TypeScript",
+      "specifier": "file:///mod.ts"
+    },
+    {
+      "specifier": "jsr:@scope/a@1.0.1/mod.ts",
+      "error": "Could not find version of '@scope/a' that matches specified version constraint '1.0.1'"
+    }
+  ],
+  "redirects": {}
+}

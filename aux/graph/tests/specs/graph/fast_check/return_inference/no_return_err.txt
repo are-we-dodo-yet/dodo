@@ -1,0 +1,84 @@
+~~ {"workspaceFastCheck":true} ~~
+# workspace_members
+[
+  {
+    "base": "file:///",
+    "name": "@scope/a",
+    "version": "1.0.0",
+    "exports": {
+      ".": "./mod.ts"
+    }
+  }
+]
+
+# mod.ts
+declare function exit(): never;
+
+export const a = () => {
+  exit();
+}
+
+export const b = function() {
+  exit();
+}
+
+// This can be inferred for function declarations.
+
+// This can be inferred for class declarations.
+
+// TODO: we don't support this at all
+// export const e = {
+//   e() {
+//     exit();
+//   }
+// };
+
+// TODO: we don't support this at all
+// export const f = class {
+//   f() {
+//     exit();
+//   }
+// };
+
+
+# output
+{
+  "roots": [
+    "file:///mod.ts"
+  ],
+  "modules": [
+    {
+      "kind": "esm",
+      "size": 421,
+      "mediaType": "TypeScript",
+      "specifier": "file:///mod.ts"
+    }
+  ],
+  "redirects": {}
+}
+
+Fast check file:///mod.ts:
+  error[missing-explicit-return-type]: missing explicit return type in the public API
+   --> /mod.ts:3:14
+    |
+  3 | export const a = () => {
+    |              ^ this function is missing an explicit return type
+    |
+    = hint: add an explicit return type of 'void' or 'never' to the function
+
+    info: all functions in the public API must have an explicit return type
+    info: function expressions without a return statement can have a return type of either 'void' or 'never'
+    info: this function has no return statements, so a return type could not be inferred automatically
+    docs: https://jsr.io/go/slow-type-missing-explicit-return-type
+  error[missing-explicit-return-type]: missing explicit return type in the public API
+   --> /mod.ts:7:14
+    |
+  7 | export const b = function() {
+    |              ^ this function is missing an explicit return type
+    |
+    = hint: add an explicit return type of 'void' or 'never' to the function
+
+    info: all functions in the public API must have an explicit return type
+    info: function expressions without a return statement can have a return type of either 'void' or 'never'
+    info: this function has no return statements, so a return type could not be inferred automatically
+    docs: https://jsr.io/go/slow-type-missing-explicit-return-type

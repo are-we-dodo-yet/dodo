@@ -1,0 +1,44 @@
+# mod.ts
+import "./file.cjs";
+
+# file.cjs
+export class Test {}
+
+# output
+{
+  "roots": [
+    "file:///mod.ts"
+  ],
+  "modules": [
+    {
+      "specifier": "file:///file.cjs",
+      "error": "SyntaxError: 'import', and 'export' cannot be used outside of module code\n  |\n1 | export class Test {}\n  | ~~~~~~\n    at file:///file.cjs:1:1"
+    },
+    {
+      "kind": "esm",
+      "dependencies": [
+        {
+          "specifier": "./file.cjs",
+          "code": {
+            "specifier": "file:///file.cjs",
+            "resolutionMode": "import",
+            "span": {
+              "start": {
+                "line": 0,
+                "character": 7
+              },
+              "end": {
+                "line": 0,
+                "character": 19
+              }
+            }
+          }
+        }
+      ],
+      "size": 21,
+      "mediaType": "TypeScript",
+      "specifier": "file:///mod.ts"
+    }
+  ],
+  "redirects": {}
+}
