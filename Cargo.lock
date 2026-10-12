@@ -1228,6 +1228,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "console_error_panic_hook"
+version = "0.1.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a06aeb73f470f66dcdbf7223caeebb85984942f22f1adb2a088cf9668146bbbc"
+dependencies = [
+ "cfg-if",
+ "wasm-bindgen",
+]
+
+[[package]]
 name = "console_static_text"
 version = "0.8.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1925,7 +1935,7 @@ dependencies = [
  "deno_doc",
  "deno_dotenv",
  "deno_error",
- "deno_graph",
+ "deno_graph 0.111.0",
  "deno_lib",
  "deno_lint",
  "deno_lockfile",
@@ -2384,7 +2394,7 @@ dependencies = [
  "cfg-if",
  "comrak",
  "deno_ast",
- "deno_graph",
+ "deno_graph 0.111.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "deno_path_util",
  "deno_terminal",
  "handlebars",
@@ -2539,6 +2549,46 @@ dependencies = [
 [[package]]
 name = "deno_graph"
 version = "0.111.0"
+dependencies = [
+ "async-trait",
+ "bincode",
+ "boxed_error",
+ "capacity_builder",
+ "chrono",
+ "data-url",
+ "deno_ast",
+ "deno_error",
+ "deno_media_type 0.4.0",
+ "deno_path_util",
+ "deno_semver",
+ "deno_terminal",
+ "deno_unsync",
+ "env_logger",
+ "file_test_runner 0.7.4",
+ "futures",
+ "indexmap",
+ "log",
+ "monch",
+ "once_cell",
+ "parking_lot",
+ "pretty_assertions",
+ "regex",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "sha2",
+ "sys_traits",
+ "tempfile",
+ "thiserror 2.0.12",
+ "tokio",
+ "twox-hash 1.6.3",
+ "url",
+ "wasm_dep_analyzer",
+]
+
+[[package]]
+name = "deno_graph"
+version = "0.111.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "74d39f55639b6bffe4e886d2ea33724606729d3ec9c8e05a48952a56c1cef961"
 dependencies = [
@@ -2565,9 +2615,27 @@ dependencies = [
  "sha2",
  "sys_traits",
  "thiserror 2.0.12",
- "twox-hash 1.6.3",
  "url",
  "wasm_dep_analyzer",
+]
+
+[[package]]
+name = "deno_graph_wasm"
+version = "0.0.0"
+dependencies = [
+ "console_error_panic_hook",
+ "deno_error",
+ "deno_graph 0.111.0",
+ "futures",
+ "js-sys",
+ "pretty_assertions",
+ "serde",
+ "serde-wasm-bindgen",
+ "serde_json",
+ "sys_traits",
+ "thiserror 2.0.12",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
 ]
 
 [[package]]
@@ -2770,7 +2838,7 @@ dependencies = [
  "async-executor",
  "async-trait",
  "deno_semver",
- "file_test_runner",
+ "file_test_runner 0.12.1",
  "futures",
  "futures-lite",
  "pretty_assertions",
@@ -3080,7 +3148,7 @@ dependencies = [
  "deno_cache_dir",
  "deno_config",
  "deno_error",
- "deno_graph",
+ "deno_graph 0.111.0",
  "deno_lockfile",
  "deno_npm",
  "deno_npm_cache",
@@ -3283,7 +3351,7 @@ dependencies = [
  "deno_cache_dir",
  "deno_config",
  "deno_error",
- "deno_graph",
+ "deno_graph 0.111.0",
  "deno_lockfile",
  "deno_maybe_sync",
  "deno_media_type 0.4.0",
@@ -4484,7 +4552,10 @@ version = "0.11.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dcaee3d8e3cfc3fd92428d477bc97fc29ec8716d180c0d74c643bb26166660e0"
 dependencies = [
+ "anstream",
+ "anstyle",
  "env_filter",
+ "humantime",
  "log",
 ]
 
@@ -4541,7 +4612,7 @@ dependencies = [
  "async-trait",
  "deno_ast",
  "deno_error",
- "deno_graph",
+ "deno_graph 0.111.0",
  "deno_npm",
  "deno_semver",
  "futures",
@@ -4690,6 +4761,20 @@ name = "fiat-crypto"
 version = "0.2.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c007b1ae3abe1cb6f85a16305acd418b7ca6343b953633fee2b76d8f108b830f"
+
+[[package]]
+name = "file_test_runner"
+version = "0.7.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ac2caabcee5e340653bc5758089ddcb02a31d0756b0aefc950e7158d9b9b9804"
+dependencies = [
+ "anyhow",
+ "crossbeam-channel",
+ "deno_terminal",
+ "parking_lot",
+ "regex",
+ "thiserror 2.0.12",
+]
 
 [[package]]
 name = "file_test_runner"
@@ -5573,6 +5658,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "df3b46402a9d5adb4c86a0cf463f42e19994e3ee891101b1841f30a545cb49a9"
 
 [[package]]
+name = "humantime"
+version = "2.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "15cdd26707701c53297e2fa6afb323d55fbc1d0810c3aec078ae3ef0424c3c15"
+
+[[package]]
 name = "hybrid-array"
 version = "0.4.7"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6109,7 +6200,7 @@ dependencies = [
  "deno_tower_lsp",
  "deno_unsync",
  "fastwebsockets 0.8.1",
- "file_test_runner",
+ "file_test_runner 0.12.1",
  "futures",
  "hickory-proto",
  "hickory-server",
@@ -7045,7 +7136,7 @@ version = "0.0.0"
 dependencies = [
  "chrono",
  "deno_terminal",
- "file_test_runner",
+ "file_test_runner 0.12.1",
  "jsonc-parser",
  "regex",
  "serde",
@@ -7062,7 +7153,7 @@ dependencies = [
  "boxed_error",
  "capacity_builder",
  "deno_error",
- "deno_graph",
+ "deno_graph 0.111.0",
  "deno_maybe_sync",
  "deno_media_type 0.4.0",
  "deno_package_json",
@@ -8580,6 +8671,7 @@ dependencies = [
  "async-compression",
  "base64 0.22.1",
  "bytes",
+ "encoding_rs",
  "futures-core",
  "futures-util",
  "h2",
@@ -9583,7 +9675,7 @@ name = "specs_tests"
 version = "0.0.0"
 dependencies = [
  "anyhow",
- "file_test_runner",
+ "file_test_runner 0.12.1",
  "serde",
  "serde_json",
  "test_util",
@@ -10397,7 +10489,7 @@ dependencies = [
  "console_static_text",
  "crossterm",
  "deno_path_util",
- "file_test_runner",
+ "file_test_runner 0.12.1",
  "fluent-uri",
  "indexmap",
  "inventory",
@@ -11116,7 +11208,7 @@ checksum = "40789245bbff5f31eb773c9ac4ee5c4e15eab9640d975e124d6ce4c34a6410d7"
 name = "unit_node_tests"
 version = "0.0.0"
 dependencies = [
- "file_test_runner",
+ "file_test_runner 0.12.1",
  "test_util",
 ]
 
@@ -11124,7 +11216,7 @@ dependencies = [
 name = "unit_tests"
 version = "0.0.0"
 dependencies = [
- "file_test_runner",
+ "file_test_runner 0.12.1",
  "test_util",
 ]
 
@@ -11403,14 +11495,12 @@ dependencies = [
 
 [[package]]
 name = "wasm-bindgen-futures"
-version = "0.4.42"
+version = "0.4.72"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "76bc14366121efc8dbb487ab05bcc9d346b3b5ec0eaa76e46594cabbe51762c0"
+checksum = "9473dbd2991ae90b6291c3c32c30c6187ac49aa32f9905d1cce280ec1e110b0f"
 dependencies = [
- "cfg-if",
  "js-sys",
  "wasm-bindgen",
- "web-sys",
 ]
 
 [[package]]
