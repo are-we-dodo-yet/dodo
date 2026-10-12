@@ -96,7 +96,6 @@ license = "MIT"
 repository = "https://github.com/denoland/deno"
 
 [workspace.dependencies]
-deno_ast = { version = "=0.53.3", features = ["transpiling"] }
 deno_core_icudata = "0.77.0"
 deno_doc = "=0.207.0"
 deno_error = "=0.7.1"
@@ -148,6 +147,7 @@ denort_helper = { version = "0.57.0", path = "./ext/rt_helper" }
 # auxes
 deno_media_type = { version = "0.4.0", path = "./aux/media_type", features = ["module_specifier"] }
 deno_graph = { version = "0.111.0", path = "./aux/graph", default-features = false }
+deno_ast = { version = "0.53.3", path = "./aux/ast", features = ["transpiling"] }
 
 # workspace libraries
 deno_bench_util = { version = "0.253.0", path = "./tests/bench_util" }

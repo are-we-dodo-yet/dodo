@@ -32,11 +32,12 @@ view = ["dprint-swc-ext/view"]
 visit = ["swc_ecma_visit", "swc_visit", "swc_macros_common"]
 
 [dependencies]
+deno_media_type.workspace = true
+deno_terminal.workspace = true
+deno_error.workspace = true
+
 base64 = { version = "0.22.1", optional = true }
 capacity_builder = "0.5.0"
-deno_media_type = "0.4.0"
-deno_terminal = "0.2.2"
-deno_error = "0.7.0"
 
 dprint-swc-ext = "0.26.0"
 percent-encoding = "2.3.1"
