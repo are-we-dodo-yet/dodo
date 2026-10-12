@@ -16,7 +16,7 @@ required-features = ["comrak"]
 
 [dependencies]
 deno_ast.workspace = true
-deno_graph.workspace = true
+deno_graph = { workspace = true, features = ["symbols"] }
 deno_terminal.workspace = true
 deno_path_util.workspace = true
 anyhow.workspace = true

@@ -84,10 +84,10 @@ members = [
   "aux/media_type",
   "aux/graph",
   "aux/doc",
-  "aux/doc_wasm",
   "aux/lint",
 
-  "aux-js/graph"
+  "aux-js/graph",
+  "aux-js/doc",
 ]
 # tests/sqlite_extension is excluded because it requires rusqlite's "loadable_extension"
 # feature, which is incompatible with the "session" feature used by the rest of the workspace.

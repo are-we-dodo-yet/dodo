@@ -4,7 +4,7 @@ import {
   doc as _doc,
   docnodes_v1_to_v2 as _docnodesV1ToV2,
   generate_html as _generateHtml,
-} from "./deno_doc_wasm.js";
+} from "./lib/deno_doc_wasm.js";
 import type { Document, Location } from "./types.d.ts";
 import type { Page } from "./html_types.d.ts";
 import { createCache } from "@deno/cache-dir";
