@@ -840,15 +840,16 @@ fn limit_child_cpus() {
   static ALLOWED_CPUS: std::sync::LazyLock<Vec<usize>> =
     // SAFETY: cpu_set_t is plain data and outlives the libc calls using it.
     std::sync::LazyLock::new(|| unsafe {
-      let mut set: libc::cpu_set_t = std::mem::zeroed();
-      if libc::sched_getaffinity(0, std::mem::size_of_val(&set), &mut set) != 0
-      {
-        return Vec::new();
-      }
-      (0..libc::CPU_SETSIZE as usize)
-        .filter(|&cpu| libc::CPU_ISSET(cpu, &set))
-        .collect()
-    });
+        let mut set: libc::cpu_set_t = std::mem::zeroed();
+        if libc::sched_getaffinity(0, std::mem::size_of_val(&set), &mut set)
+          != 0
+        {
+          return Vec::new();
+        }
+        (0..libc::CPU_SETSIZE as usize)
+          .filter(|&cpu| libc::CPU_ISSET(cpu, &set))
+          .collect()
+      });
   static NEXT_WINDOW: AtomicUsize = AtomicUsize::new(0);
 
   if ALLOWED_CPUS.len() <= CPUS_PER_TEST {

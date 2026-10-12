@@ -4752,12 +4752,18 @@
       "linux": false,
       "reason": "AggregateError"
     },
-    "internet/test-net-autoselectfamily-events-failure.js": {},
+    "internet/test-net-autoselectfamily-events-failure.js": {
+      "env": {
+        "NODE_TEST_INET6_IP": "::1",
+        "NODE_TEST_INET4_IP": "127.0.0.1"
+      }
+    },
     "internet/test-net-autoselectfamily-events-timeout.js": {},
     "internet/test-net-autoselectfamily-timeout-close.js": {
       "windows": false,
       "darwin": false,
-      "reason": "times out"
+      "reason": "times out",
+      "env": { "NODE_TEST_INET_HOST": "localhost" }
     },
     "internet/test-net-connect-timeout.js": {},
     "internet/test-net-connect-unref.js": {},
