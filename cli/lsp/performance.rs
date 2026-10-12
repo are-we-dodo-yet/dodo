@@ -270,11 +270,11 @@ impl Performance {
 
   /// Creates a performance mark which will be measured against on drop. Use
   /// like this:
-  /// ```rust
+  /// ```rust,ignore
   /// let _mark = self.performance.measure_scope("foo");
   /// ```
   /// Don't use like this:
-  /// ```rust
+  /// ```rust,ignore
   /// // ❌
   /// let _ = self.performance.measure_scope("foo");
   /// ```

@@ -166,7 +166,7 @@ pub fn matches_pattern_or_exact_path(
 /// could be used for module specifier string literal of local modules,
 /// or local file path to display `non-ASCII` characters correctly
 /// # Examples
-/// ```
+/// ```ignore
 /// use crate::util::path::to_percent_decoded_str;
 ///
 /// let str = to_percent_decoded_str("file:///Users/path/to/%F0%9F%A6%95.ts");
