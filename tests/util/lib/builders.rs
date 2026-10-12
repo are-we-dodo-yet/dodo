@@ -487,6 +487,7 @@ pub struct TestCommandBuilder {
   split_output: bool,
   show_output: bool,
   timeout: Option<std::time::Duration>,
+  disable_core_files: bool,
 }
 
 impl TestCommandBuilder {
@@ -508,7 +509,13 @@ impl TestCommandBuilder {
       args_vec: Default::default(),
       show_output: false,
       timeout: None,
+      disable_core_files: false,
     }
+  }
+
+  pub fn disable_core_files(mut self) -> Self {
+    self.disable_core_files = true;
+    self
   }
 
   pub fn name(mut self, name: impl AsRef<OsStr>) -> Self {
@@ -895,6 +902,24 @@ impl TestCommandBuilder {
     let envs = self.build_envs(&cwd);
     command.envs(envs);
     command.stdin(Stdio::piped());
+    #[cfg(unix)]
+    if self.disable_core_files {
+      use std::os::unix::process::CommandExt;
+      // SAFETY: the hook only calls setrlimit, which is async-signal-safe.
+      unsafe {
+        command.pre_exec(|| {
+          let limit = libc::rlimit {
+            rlim_cur: 0,
+            rlim_max: 0,
+          };
+          if libc::setrlimit(libc::RLIMIT_CORE, &limit) == 0 {
+            Ok(())
+          } else {
+            Err(std::io::Error::last_os_error())
+          }
+        });
+      }
+    }
     command
   }
 

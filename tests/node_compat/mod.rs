@@ -617,6 +617,7 @@ struct TestSetup {
   args: Vec<String>,
   env_vars: HashMap<String, String>,
   timeout: Duration,
+  disable_core_files: bool,
 }
 
 impl TestSetup {
@@ -691,6 +692,7 @@ impl TestSetup {
       args,
       env_vars,
       timeout,
+      disable_core_files: data.test_path.starts_with("abort/"),
     }
   }
 
@@ -702,6 +704,9 @@ impl TestSetup {
     }
     for (key, value) in &self.env_vars {
       cmd = cmd.env(key, value);
+    }
+    if self.disable_core_files {
+      cmd = cmd.disable_core_files();
     }
 
     let child = cmd.piped_output().spawn().unwrap();
