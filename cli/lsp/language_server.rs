@@ -118,7 +118,6 @@ use crate::lsp::lint::get_deno_lint_code_actions;
 use crate::lsp::logging::init_log_file;
 use crate::sys::CliSys;
 use crate::tools::fmt::format_file;
-use crate::tools::fmt::format_parsed_source;
 use crate::tools::upgrade::check_for_upgrades_for_lsp;
 use crate::tools::upgrade::upgrade_check_enabled;
 use crate::util::env::resolve_cwd;
@@ -1926,11 +1925,12 @@ impl Inner {
           .as_ref()
           .and_then(|d| d.parsed_source.as_ref())
         {
-          Some(Ok(parsed_source)) => {
-            format_parsed_source(parsed_source, &fmt_options, &unstable_options)
-          }
+          // FIXME: This requires coordination with dhserret regarding dprint-plugin-typescript using deno ast.
+          // Some(Ok(parsed_source)) => {
+          //   format_parsed_source(parsed_source, &fmt_options, &unstable_options)
+          // }
           Some(Err(err)) => Err(anyhow!("{:#}", err)),
-          None => {
+          None | Some(Ok(_)) => {
             let ext = document.open().and_then(|d| {
               d.language_id.as_extension().map(|s| s.to_string())
             });

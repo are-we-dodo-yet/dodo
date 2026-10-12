@@ -20,7 +20,6 @@ use std::sync::atomic::AtomicUsize;
 use std::sync::atomic::Ordering;
 
 use async_trait::async_trait;
-use deno_ast::ParsedSource;
 use deno_config::deno_json::NewLineKind;
 use deno_config::glob::FileCollector;
 use deno_config::glob::FilePatterns;
@@ -849,18 +848,6 @@ pub fn format_file(
     }
     None => None,
   })
-}
-
-pub fn format_parsed_source(
-  parsed_source: &ParsedSource,
-  fmt_options: &FmtOptionsConfig,
-  unstable_options: &UnstableFmtOptions,
-) -> Result<Option<String>, AnyError> {
-  dprint_plugin_typescript::format_parsed_source(
-    parsed_source,
-    &get_resolved_typescript_config(fmt_options),
-    Some(&create_external_formatter_for_typescript(unstable_options)),
-  )
 }
 
 #[async_trait]
