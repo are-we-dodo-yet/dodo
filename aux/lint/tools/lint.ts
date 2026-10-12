@@ -1,0 +1,27 @@
+#!/usr/bin/env -S deno run --allow-run
+// Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
+const release = Deno.args.includes("--release");
+console.log("clippy");
+
+const mode = release ? ["--release"] : [];
+const clippy = [
+  "clippy",
+  "--all-targets",
+  "--all-features",
+  ...mode,
+  "--locked",
+  "--",
+  "-D",
+  "clippy::all",
+];
+
+const p1 = new Deno.Command("cargo", {
+  args: clippy,
+  stdin: "null",
+});
+
+const o1 = await p1.output();
+
+if (o1.code !== 0) {
+  throw new Error(`Failed: ${clippy.join(" ")}`);
+}
