@@ -66,7 +66,7 @@ fn main() {
       }),
       filter_override: None,
     },
-    RunOptions { parallel: true },
+    RunOptions::default(),
     |test| {
       if test.name.starts_with("specs::graph") {
         TestResult::from_maybe_panic(AssertUnwindSafe(|| {
@@ -79,6 +79,7 @@ fn main() {
       } else {
         TestResult::Failed {
           output: format!("Unknown test kind: {}", test.name).into_bytes(),
+          duration: None,
         }
       }
     },

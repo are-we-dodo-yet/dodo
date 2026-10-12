@@ -1,5 +1,7 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
+#![cfg(target_arch = "wasm32")]
+
 use anyhow::anyhow;
 use anyhow::Context;
 use deno_doc::html::UrlResolveKind;

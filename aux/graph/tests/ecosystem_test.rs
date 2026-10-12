@@ -20,6 +20,7 @@ use deno_graph::source::LoadResponse;
 use deno_graph::source::NullFileSystem;
 use deno_semver::StackString;
 use deno_semver::package::PackageNv;
+use file_test_runner::Parallelism;
 use file_test_runner::RunOptions;
 use file_test_runner::TestResult;
 use file_test_runner::collection::CollectedCategoryOrTest;
@@ -131,7 +132,8 @@ fn main() {
   file_test_runner::run_tests(
     &category,
     RunOptions {
-      parallel: std::env::var("CI").is_err(),
+      parallelism: Parallelism::from_bool(std::env::var_os("CI").is_none()),
+      ..RunOptions::default()
     },
     run_test,
   )

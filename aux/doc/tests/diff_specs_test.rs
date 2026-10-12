@@ -24,7 +24,7 @@ fn main() {
       strategy: Box::new(TestPerFileCollectionStrategy { file_pattern: None }),
       filter_override: None,
     },
-    RunOptions { parallel: true },
+    RunOptions::default(),
     |test| {
       TestResult::from_maybe_panic(AssertUnwindSafe(|| {
         run_test(test);
