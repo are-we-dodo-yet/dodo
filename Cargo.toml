@@ -83,10 +83,11 @@ members = [
 
   "aux/media_type",
   "aux/graph",
-  "aux/graph_wasm",
   "aux/doc",
   "aux/doc_wasm",
   "aux/lint",
+
+  "aux-js/graph"
 ]
 # tests/sqlite_extension is excluded because it requires rusqlite's "loadable_extension"
 # feature, which is incompatible with the "session" feature used by the rest of the workspace.
@@ -100,7 +101,7 @@ repository = "https://github.com/denoland/deno"
 
 [workspace.dependencies]
 deno_core_icudata = "0.77.0"
-deno_error = "0.7.1"
+deno_error = "0.7.3"
 deno_native_certs = "0.3.0"
 deno_path_util = "=0.6.4"
 deno_semver = "=0.10.1"

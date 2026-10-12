@@ -18,7 +18,7 @@
  * @module
  */
 
-import * as wasm from "./deno_graph_wasm.js";
+import * as wasm from "./lib/deno_graph_wasm.js";
 import { load as defaultLoad } from "./loader.ts";
 import type {
   CacheInfo,
