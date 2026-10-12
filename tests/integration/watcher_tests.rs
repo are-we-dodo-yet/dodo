@@ -1,5 +1,7 @@
 // Copyright 2018-2026 the Deno authors. MIT license.
 
+use std::io::Read;
+
 use test_util as util;
 use test_util::TempDir;
 use test_util::assert_contains;
@@ -8,6 +10,7 @@ use test_util::eprintln;
 use test_util::http_server;
 use test_util::test;
 use tokio::io::AsyncBufReadExt;
+use tokio::io::AsyncWriteExt;
 use util::DenoChild;
 use util::assert_not_contains;
 
@@ -202,26 +205,34 @@ fn check_alive_then_kill(mut child: DenoChild) {
   child.kill().unwrap();
 }
 
+fn read_in_background(
+  mut pipe: impl Read + Send + 'static,
+) -> tokio::io::BufReader<tokio::io::DuplexStream> {
+  let (reader, mut writer) = tokio::io::duplex(usize::MAX);
+  let handle = tokio::runtime::Handle::current();
+  std::thread::spawn(move || {
+    let mut buf = [0; 8192];
+    while let Ok(n @ 1..) = pipe.read(&mut buf) {
+      if handle.block_on(writer.write_all(&buf[..n])).is_err() {
+        break;
+      }
+    }
+  });
+  tokio::io::BufReader::new(reader)
+}
+
 fn child_lines(
   child: &mut std::process::Child,
 ) -> (
-  LoggingLines<tokio::io::BufReader<tokio::process::ChildStdout>>,
-  LoggingLines<tokio::io::BufReader<tokio::process::ChildStderr>>,
+  LoggingLines<tokio::io::BufReader<tokio::io::DuplexStream>>,
+  LoggingLines<tokio::io::BufReader<tokio::io::DuplexStream>>,
 ) {
   let stdout_lines = LoggingLines {
-    lines: tokio::io::BufReader::new(
-      tokio::process::ChildStdout::from_std(child.stdout.take().unwrap())
-        .unwrap(),
-    )
-    .lines(),
+    lines: read_in_background(child.stdout.take().unwrap()).lines(),
     stream_name: "STDOUT".to_string(),
   };
   let stderr_lines = LoggingLines {
-    lines: tokio::io::BufReader::new(
-      tokio::process::ChildStderr::from_std(child.stderr.take().unwrap())
-        .unwrap(),
-    )
-    .lines(),
+    lines: read_in_background(child.stderr.take().unwrap()).lines(),
     stream_name: "STDERR".to_string(),
   };
   (stdout_lines, stderr_lines)
