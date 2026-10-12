@@ -1,11 +1,6 @@
-/target
 /js/deno_doc_wasm.wasm
 /js/deno_doc_wasm.d.ts
 /js/deno_doc_wasm.js
 /js/deno_doc_wasm.internal.js
 /js/LICENSE
-.vscode
-.claude
-/.idea
-.DS_Store
 /generated_docs/

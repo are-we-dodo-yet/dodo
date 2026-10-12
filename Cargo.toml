@@ -84,6 +84,8 @@ members = [
   "aux/media_type",
   "aux/graph",
   "aux/graph_wasm",
+  "aux/doc",
+  "aux/doc_wasm",
 ]
 # tests/sqlite_extension is excluded because it requires rusqlite's "loadable_extension"
 # feature, which is incompatible with the "session" feature used by the rest of the workspace.
@@ -97,7 +99,6 @@ repository = "https://github.com/denoland/deno"
 
 [workspace.dependencies]
 deno_core_icudata = "0.77.0"
-deno_doc = "=0.207.0"
 deno_error = "=0.7.1"
 deno_lint = "=0.84.1"
 deno_native_certs = "0.3.0"
@@ -148,6 +149,7 @@ denort_helper = { version = "0.57.0", path = "./ext/rt_helper" }
 deno_media_type = { version = "0.4.0", path = "./aux/media_type", features = ["module_specifier"] }
 deno_graph = { version = "0.111.0", path = "./aux/graph", default-features = false }
 deno_ast = { version = "0.53.3", path = "./aux/ast", features = ["transpiling"] }
+deno_doc = { version = "0.209.0", path = "./aux/doc", default-features = false }
 
 # workspace libraries
 deno_bench_util = { version = "0.253.0", path = "./tests/bench_util" }
@@ -478,6 +480,12 @@ junction = "=1.2.0"
 win32job = "=2.0.3"
 windows-sys = { version = "0.59.0", features = ["Win32_Foundation", "Win32_Media", "Win32_Storage_FileSystem", "Win32_System_IO", "Win32_System_WindowsProgramming", "Wdk", "Wdk_System", "Wdk_System_SystemInformation", "Win32_Security", "Win32_System_Pipes", "Wdk_Storage_FileSystem", "Win32_System_Registry", "Win32_System_Kernel", "Win32_System_Threading", "Win32_UI", "Win32_UI_Shell"] }
 winres = "=0.1.12"
+
+# web-sys, pinned as required by deno-wasmbuild
+wasm-bindgen = "=0.2.108"
+js-sys = "=0.3.85"
+serde-wasm-bindgen = "0.6.5"
+wasm-bindgen-futures = "0.4.58"
 
 # NB: the `bench` and `release` profiles must remain EXACTLY the same.
 [profile.release]

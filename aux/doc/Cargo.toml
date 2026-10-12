@@ -7,19 +7,6 @@ authors = ["the Deno authors"]
 license = "MIT"
 repository = "https://github.com/denoland/deno_doc"
 
-[workspace]
-members = ["lib"]
-
-[workspace.dependencies]
-deno_graph = { version = "0.111.0", default-features = false, features = [
-  "swc",
-  "symbols",
-] }
-deno_ast = { version = "0.53.2" }
-import_map = "0.25.0"
-serde = { version = "1.0.204", features = ["derive"] }
-serde_json = { version = "1.0.122", features = ["preserve_order"] }
-
 [lib]
 name = "deno_doc"
 
@@ -28,11 +15,13 @@ name = "ddoc"
 required-features = ["comrak"]
 
 [dependencies]
-anyhow = "1.0.86"
-cfg-if = "1.0.0"
 deno_ast.workspace = true
 deno_graph.workspace = true
-deno_terminal = "0.2.3"
+deno_terminal.workspace = true
+deno_path_util.workspace = true
+
+anyhow = "1.0.86"
+cfg-if = "1.0.0"
 indexmap = "2.3.0"
 lazy_static = "1.5.0"
 regex = "1.10.6"
@@ -40,7 +29,6 @@ serde.workspace = true
 serde_json.workspace = true
 termcolor = "1.4.1"
 itoa = "1.0.14"
-deno_path_util = "0.6.4"
 similar = "2"
 
 html-escape = { version = "0.2.13" }
@@ -63,9 +51,9 @@ markup5ever_rcdom = "0.3.0"
 [target.'cfg(all(target_arch = "wasm32", not(target_os = "emscripten")))'.dependencies]
 url = "2.4.1"
 percent-encoding = "2.3.1"
-wasm-bindgen = "0.2.92"
-js-sys = "0.3.69"
-serde-wasm-bindgen = "=0.5.0"
+wasm-bindgen.workspace = true
+js-sys.workspace = true
+serde-wasm-bindgen.workspace = true
 
 [features]
 default = ["rust", "comrak"]
