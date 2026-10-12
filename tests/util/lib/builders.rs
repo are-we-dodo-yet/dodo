@@ -1022,6 +1022,12 @@ impl TestCommandBuilder {
         nodejs_org_mirror_unset_url(),
       );
     }
+    if !envs.contains_key("GIT_CONFIG_GLOBAL") {
+      envs.insert("GIT_CONFIG_GLOBAL".to_string(), "/dev/null".to_string());
+    }
+    if !envs.contains_key("GIT_CONFIG_NOSYSTEM") {
+      envs.insert("GIT_CONFIG_NOSYSTEM".to_string(), "1".to_string());
+    }
     if !envs.contains_key("PATH") {
       let path = std::env::var_os("PATH").unwrap_or_default();
       let path = std::env::split_paths(&path);
