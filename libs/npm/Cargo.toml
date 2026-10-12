@@ -35,11 +35,11 @@ serde = { workspace = true, features = ["derive", "rc"] }
 serde_json = { workspace = true, features = ["preserve_order"] }
 thiserror.workspace = true
 url.workspace = true
-wide = "0.7.32"
+wide.workspace = true
 
 [dev-dependencies]
-divan = "0.1.17"
-hex = "0.4.3"
+divan.workspace = true
+hex.workspace = true
 paste.workspace = true
 pretty_assertions.workspace = true
 reqwest.workspace = true

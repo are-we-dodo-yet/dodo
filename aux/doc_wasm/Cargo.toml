@@ -17,14 +17,12 @@ crate-type = ["cdylib"]
 deno_graph = { workspace = true }
 deno_doc = { workspace = true, default-features = false }
 deno_error = { workspace = true, features = ["url"] }
-
-anyhow = "1.0.103"
+anyhow.workspace = true
 import_map.workspace = true
 serde.workspace = true
 serde_json.workspace = true
-indexmap = "2.14.0"
-
-console_error_panic_hook = "0.1.7"
+indexmap.workspace = true
+console_error_panic_hook.workspace = true
 
 js-sys.workspace = true
 serde-wasm-bindgen.workspace = true
@@ -32,4 +30,4 @@ wasm-bindgen.workspace = true
 wasm-bindgen-futures.workspace = true
 
 [dev-dependencies]
-pretty_assertions = "1.4.0"
+pretty_assertions.workspace = true

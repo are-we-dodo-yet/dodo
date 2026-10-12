@@ -42,7 +42,7 @@ deno_path_util.workspace = true
 deno_unsync = { workspace = true, features = ["tokio"] }
 futures.workspace = true
 indexmap.workspace = true
-inventory = "0.3.21"
+inventory.workspace = true
 libc.workspace = true
 num-bigint.workspace = true
 parking_lot.workspace = true
@@ -60,7 +60,7 @@ tokio.workspace = true
 url.workspace = true
 uuid.workspace = true
 v8.workspace = true
-wasm_dep_analyzer = "0.4.0"
+wasm_dep_analyzer.workspace = true
 
 [target.'cfg(windows)'.dependencies]
 windows-sys.workspace = true
@@ -73,7 +73,7 @@ paste.workspace = true
 pretty_assertions.workspace = true
 rstest.workspace = true
 twox-hash.workspace = true
-unicycle = "0.10.2"
+unicycle.workspace = true
 
 [[bench]]
 name = "ops_sync"

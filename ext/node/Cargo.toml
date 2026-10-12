@@ -44,7 +44,7 @@ hdrhistogram.workspace = true
 idna.workspace = true
 ipnet.workspace = true
 libc.workspace = true
-libnghttp2 = "1.68.0"
+libnghttp2.workspace = true
 libz-sys.workspace = true
 log.workspace = true
 node_resolver.workspace = true
@@ -68,7 +68,7 @@ errno = "0.3.10"
 nix = { workspace = true, features = ["user"] }
 
 [build-dependencies]
-cc = "1"
+cc.workspace = true
 
 [target.'cfg(windows)'.dependencies]
 windows-sys = { workspace = true, features = ["Win32_Networking_WinSock", "Win32_NetworkManagement_IpHelper", "Win32_System_Console", "Win32_System_ProcessStatus", "Win32_System_SystemInformation", "Win32_System_Threading"] }

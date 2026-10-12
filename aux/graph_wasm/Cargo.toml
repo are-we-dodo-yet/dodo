@@ -15,12 +15,11 @@ crate-type = ["cdylib"]
 
 [dependencies]
 deno_graph = { workspace = true, features = ["swc"], default-features = false }
-
-console_error_panic_hook = "0.1.7"
-futures = "0.3.17"
+console_error_panic_hook.workspace = true
+futures.workspace = true
 js-sys.workspace = true
-serde = { version = "1.0.130", features = ["derive", "rc"] }
-serde_json = { version = "1.0.67", features = ["preserve_order"] }
+serde = { workspace = true, features = ["derive", "rc"] }
+serde_json = { workspace = true, features = ["preserve_order"] }
 serde-wasm-bindgen.workspace = true
 sys_traits = { workspace = true, features = ["real", "wasm"] }
 wasm-bindgen.workspace = true
@@ -29,4 +28,4 @@ thiserror.workspace = true
 deno_error.workspace = true
 
 [dev-dependencies]
-pretty_assertions = "1.0.0"
+pretty_assertions.workspace = true

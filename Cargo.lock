@@ -1680,32 +1680,6 @@ dependencies = [
 
 [[package]]
 name = "criterion"
-version = "0.5.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f2b12d017a929603d80db1831cd3a24082f8137ce19c69e6447f54f5fc8d692f"
-dependencies = [
- "anes",
- "cast",
- "ciborium",
- "clap",
- "criterion-plot 0.5.0",
- "is-terminal",
- "itertools 0.10.5",
- "num-traits",
- "once_cell",
- "oorandom",
- "plotters",
- "rayon",
- "regex",
- "serde",
- "serde_derive",
- "serde_json",
- "tinytemplate",
- "walkdir",
-]
-
-[[package]]
-name = "criterion"
 version = "0.8.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "950046b2aa2492f9a536f5f4f9a3de7b9e2476e575e05bd6c333371add4d98f3"
@@ -1715,7 +1689,7 @@ dependencies = [
  "cast",
  "ciborium",
  "clap",
- "criterion-plot 0.8.2",
+ "criterion-plot",
  "futures",
  "itertools 0.13.0",
  "num-traits",
@@ -1728,16 +1702,6 @@ dependencies = [
  "serde_json",
  "tinytemplate",
  "walkdir",
-]
-
-[[package]]
-name = "criterion-plot"
-version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6b50826342786a51a89e2da3a28f1c32b06e387201bc2d19791f622c673706b1"
-dependencies = [
- "cast",
- "itertools 0.10.5",
 ]
 
 [[package]]
@@ -2073,7 +2037,7 @@ dependencies = [
  "anyhow",
  "deno_core",
  "deno_core_testing",
- "fastwebsockets 0.10.0",
+ "fastwebsockets",
  "http",
  "http-body-util",
  "hyper",
@@ -2177,7 +2141,7 @@ dependencies = [
  "chrono",
  "color-print",
  "console_static_text",
- "criterion 0.5.1",
+ "criterion",
  "crossterm",
  "dashmap",
  "deno_ast 0.53.3",
@@ -2223,7 +2187,7 @@ dependencies = [
  "esbuild_client",
  "eszip",
  "faster-hex",
- "fastwebsockets 0.8.1",
+ "fastwebsockets",
  "flate2",
  "fluent-uri",
  "glob",
@@ -2295,10 +2259,10 @@ dependencies = [
  "tracing",
  "tracing-opentelemetry",
  "tracing-subscriber",
- "twox-hash 2.1.5",
+ "twox-hash",
  "typed-arena",
  "unicode-general-category",
- "unicode-width 0.1.14",
+ "unicode-width 0.2.2",
  "uuid",
  "walkdir",
  "wasm_dep_analyzer",
@@ -2488,7 +2452,7 @@ dependencies = [
 name = "deno_cli_parser"
 version = "0.9.0"
 dependencies = [
- "criterion 0.5.1",
+ "criterion",
  "deno_bundle_runtime",
  "deno_config",
  "deno_core",
@@ -2542,7 +2506,7 @@ dependencies = [
  "boxed_error",
  "bytes",
  "cooked-waker",
- "criterion 0.5.1",
+ "criterion",
  "deno_ast 0.53.3",
  "deno_core_icudata",
  "deno_error",
@@ -2570,7 +2534,7 @@ dependencies = [
  "sys_traits",
  "thiserror 2.0.21",
  "tokio",
- "twox-hash 2.1.5",
+ "twox-hash",
  "unicycle",
  "url",
  "uuid",
@@ -2677,12 +2641,12 @@ dependencies = [
  "clap",
  "comrak",
  "console_static_text",
- "criterion 0.8.2",
+ "criterion",
  "deno_ast 0.53.3",
  "deno_graph",
  "deno_path_util",
  "deno_terminal",
- "file_test_runner 0.7.4",
+ "file_test_runner",
  "futures",
  "handlebars",
  "html-escape",
@@ -2876,7 +2840,7 @@ dependencies = [
  "deno_terminal",
  "deno_unsync",
  "env_logger",
- "file_test_runner 0.7.4",
+ "file_test_runner",
  "futures",
  "indexmap",
  "log",
@@ -2893,7 +2857,7 @@ dependencies = [
  "tempfile",
  "thiserror 2.0.21",
  "tokio",
- "twox-hash 1.6.3",
+ "twox-hash",
  "url",
  "wasm_dep_analyzer",
 ]
@@ -2960,7 +2924,7 @@ dependencies = [
 name = "deno_http_h1"
 version = "0.10.0"
 dependencies = [
- "criterion 0.5.1",
+ "criterion",
  "httparse",
  "memchr",
  "thiserror 2.0.21",
@@ -2986,7 +2950,7 @@ version = "0.33.0"
 dependencies = [
  "deno_core",
  "deno_error",
- "fastwebsockets 0.8.1",
+ "fastwebsockets",
  "http",
  "http-body-util",
  "hyper",
@@ -3087,7 +3051,7 @@ dependencies = [
  "serde_json",
  "sys_traits",
  "thiserror 2.0.21",
- "twox-hash 2.1.5",
+ "twox-hash",
  "url",
 ]
 
@@ -3114,7 +3078,7 @@ dependencies = [
  "async-executor",
  "async-trait",
  "deno_semver",
- "file_test_runner 0.12.1",
+ "file_test_runner",
  "futures",
  "futures-lite",
  "pretty_assertions",
@@ -3448,7 +3412,7 @@ dependencies = [
  "test_util",
  "thiserror 2.0.21",
  "tokio",
- "twox-hash 2.1.5",
+ "twox-hash",
  "url",
  "windows-sys 0.59.0",
 ]
@@ -3655,7 +3619,7 @@ dependencies = [
  "sys_traits",
  "test_util",
  "thiserror 2.0.21",
- "twox-hash 2.1.5",
+ "twox-hash",
  "url",
  "yaml_parser",
 ]
@@ -3707,7 +3671,7 @@ dependencies = [
  "ed25519-dalek",
  "encoding_rs",
  "faster-hex",
- "fastwebsockets 0.8.1",
+ "fastwebsockets",
  "http",
  "http-body-util",
  "hyper",
@@ -3730,7 +3694,7 @@ dependencies = [
  "thiserror 2.0.21",
  "tokio",
  "tokio-metrics",
- "twox-hash 2.1.5",
+ "twox-hash",
  "unicode-normalization",
  "uuid",
  "windows-sys 0.59.0",
@@ -3986,7 +3950,7 @@ dependencies = [
  "deno_net",
  "deno_permissions",
  "deno_tls",
- "fastwebsockets 0.8.1",
+ "fastwebsockets",
  "h2",
  "http",
  "http-body-util",
@@ -4161,7 +4125,7 @@ dependencies = [
  "sys_traits",
  "tempfile",
  "thiserror 2.0.21",
- "twox-hash 2.1.5",
+ "twox-hash",
 ]
 
 [[package]]
@@ -4824,10 +4788,7 @@ version = "0.11.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "dcaee3d8e3cfc3fd92428d477bc97fc29ec8716d180c0d74c643bb26166660e0"
 dependencies = [
- "anstream 0.6.21",
- "anstyle",
  "env_filter",
- "humantime",
  "log",
 ]
 
@@ -4962,26 +4923,6 @@ checksum = "da7c62ceae207dd37ea5b845da6a0696c799f85e97da1ab5b7910be3c1c80223"
 
 [[package]]
 name = "fastwebsockets"
-version = "0.8.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9dac026e15fb7e44d768880b868a0fd5bd30ffdee272e88b3060f657a5a72947"
-dependencies = [
- "base64 0.21.7",
- "bytes",
- "http-body-util",
- "hyper",
- "hyper-util",
- "pin-project",
- "rand 0.8.5",
- "sha1",
- "simdutf8",
- "thiserror 1.0.69",
- "tokio",
- "utf-8",
-]
-
-[[package]]
-name = "fastwebsockets"
 version = "0.10.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "305d3ba574508e27190906d11707dad683e0494e6b85eae9b044cb2734a5e422"
@@ -5062,20 +5003,6 @@ name = "fiat-crypto"
 version = "0.2.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "28dea519a9695b9977216879a3ebfddf92f1c08c05d984f8996aecd6ecdc811d"
-
-[[package]]
-name = "file_test_runner"
-version = "0.7.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ac2caabcee5e340653bc5758089ddcb02a31d0756b0aefc950e7158d9b9b9804"
-dependencies = [
- "anyhow",
- "crossbeam-channel",
- "deno_terminal",
- "parking_lot",
- "regex",
- "thiserror 2.0.21",
-]
 
 [[package]]
 name = "file_test_runner"
@@ -5971,12 +5898,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "df3b46402a9d5adb4c86a0cf463f42e19994e3ee891101b1841f30a545cb49a9"
 
 [[package]]
-name = "humantime"
-version = "2.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "15cdd26707701c53297e2fa6afb323d55fbc1d0810c3aec078ae3ef0424c3c15"
-
-[[package]]
 name = "hybrid-array"
 version = "0.4.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6408,8 +6329,8 @@ dependencies = [
  "deno_semver",
  "deno_tower_lsp",
  "deno_unsync",
- "fastwebsockets 0.8.1",
- "file_test_runner 0.12.1",
+ "fastwebsockets",
+ "file_test_runner",
  "futures",
  "hickory-proto",
  "hickory-server",
@@ -6492,17 +6413,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "is-terminal"
-version = "0.4.17"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3640c1c38b8e4e43584d8df18be5fc6b0aa314ce6ebf51b53313d4306cca8e46"
-dependencies = [
- "hermit-abi",
- "libc",
- "windows-sys 0.61.2",
-]
-
-[[package]]
 name = "is-wsl"
 version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -6517,15 +6427,6 @@ name = "is_terminal_polyfill"
 version = "1.70.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "a6cb138bb79a146c1bd460005623e142ef0181e3d0219cb493e02f7d08a35695"
-
-[[package]]
-name = "itertools"
-version = "0.10.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b0fd2260e829bddf4cb6ea802289de2f86d6a7a690192fbe91b3f46e0f2c8473"
-dependencies = [
- "either",
-]
 
 [[package]]
 name = "itertools"
@@ -7409,7 +7310,7 @@ version = "0.0.0"
 dependencies = [
  "chrono",
  "deno_terminal",
- "file_test_runner 0.12.1",
+ "file_test_runner",
  "jsonc-parser",
  "regex",
  "serde",
@@ -10058,7 +9959,7 @@ name = "specs_tests"
 version = "0.0.0"
 dependencies = [
  "anyhow",
- "file_test_runner 0.12.1",
+ "file_test_runner",
  "serde",
  "serde_json",
  "test_util",
@@ -11239,7 +11140,7 @@ dependencies = [
  "deno_unsync",
  "denokv_proto",
  "faster-hex",
- "fastwebsockets 0.8.1",
+ "fastwebsockets",
  "flate2",
  "futures",
  "h2",
@@ -11275,7 +11176,7 @@ dependencies = [
  "console_static_text",
  "crossterm",
  "deno_path_util",
- "file_test_runner 0.12.1",
+ "file_test_runner",
  "fluent-uri",
  "indexmap",
  "inventory",
@@ -11297,7 +11198,7 @@ dependencies = [
  "tempfile",
  "termcolor",
  "test_macro",
- "twox-hash 2.1.5",
+ "twox-hash",
  "url",
  "win32job",
  "windows-sys 0.59.0",
@@ -11837,17 +11738,6 @@ dependencies = [
 
 [[package]]
 name = "twox-hash"
-version = "1.6.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "97fee6b57c6a41524a810daee9286c02d7752c4253064d0b05472833a438f675"
-dependencies = [
- "cfg-if",
- "rand 0.8.5",
- "static_assertions",
-]
-
-[[package]]
-name = "twox-hash"
 version = "2.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "86a801b3cea342a06d468c8710662aa29e5e05e4f5c0d62f00bbb7f2ad7941c2"
@@ -11961,7 +11851,7 @@ checksum = "40789245bbff5f31eb773c9ac4ee5c4e15eab9640d975e124d6ce4c34a6410d7"
 name = "unit_node_tests"
 version = "0.0.0"
 dependencies = [
- "file_test_runner 0.12.1",
+ "file_test_runner",
  "test_util",
 ]
 
@@ -11969,7 +11859,7 @@ dependencies = [
 name = "unit_tests"
 version = "0.0.0"
 dependencies = [
- "file_test_runner 0.12.1",
+ "file_test_runner",
  "test_util",
 ]
 

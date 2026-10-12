@@ -21,4 +21,4 @@ deno_core = { workspace = true, features = ["v8"] }
 deno_error.workspace = true
 deno_ops.workspace = true
 serde.workspace = true
-trybuild = "1.0.104"
+trybuild.workspace = true

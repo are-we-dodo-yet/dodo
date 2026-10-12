@@ -32,8 +32,8 @@ deno_lib.workspace = true
 deno_runtime.workspace = true
 deno_snapshots.workspace = true
 deno_terminal.workspace = true
-denort = { path = "../rt", default-features = false }
-laufey = "0.7.0"
+denort.workspace = true
+laufey.workspace = true
 libsui.workspace = true
 
 log = { workspace = true, features = ["serde"] }

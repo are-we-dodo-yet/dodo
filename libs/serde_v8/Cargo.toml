@@ -29,7 +29,7 @@ v8.workspace = true
 [dev-dependencies]
 serde_bytes.workspace = true
 serde_json.workspace = true
-serde_v8_utilities = { path = "./utilities", default-features = false }
+serde_v8_utilities.workspace = true
 
 [[example]]
 name = "basic"

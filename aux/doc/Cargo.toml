@@ -19,34 +19,32 @@ deno_ast.workspace = true
 deno_graph.workspace = true
 deno_terminal.workspace = true
 deno_path_util.workspace = true
-
-anyhow = "1.0.86"
-cfg-if = "1.0.0"
-indexmap = "2.3.0"
-lazy_static = "1.5.0"
-regex = "1.10.6"
+anyhow.workspace = true
+cfg-if.workspace = true
+indexmap.workspace = true
+lazy_static.workspace = true
+regex.workspace = true
 serde.workspace = true
 serde_json.workspace = true
-termcolor = "1.4.1"
-itoa = "1.0.14"
-similar = "2"
-
-html-escape = { version = "0.2.13" }
-handlebars = { version = "6.1", features = ["string_helpers"] }
-comrak = { version = "0.56.0", optional = true, default-features = false }
+termcolor.workspace = true
+itoa.workspace = true
+similar.workspace = true
+html-escape.workspace = true
+handlebars = { workspace = true, features = ["string_helpers"] }
+comrak = { workspace = true, optional = true }
 
 [dev-dependencies]
-anyhow = { version = "1.0.86" }
-clap = { version = "4", features = ["derive"] }
-console_static_text = "0.8.2"
-criterion = { version = "0.8.0", features = ["async_futures", "html_reports"] }
-file_test_runner = "0.7.2"
-futures = "0.3.30"
-tokio = { version = "1.39.2", features = ["full"] }
-pretty_assertions = "1.4.0"
-insta = { version = "1.39.0", features = ["json"] }
-html5ever = "0.27.0"
-markup5ever_rcdom = "0.3.0"
+anyhow.workspace = true
+clap = { workspace = true, features = ["derive"] }
+console_static_text.workspace = true
+criterion = { workspace = true, features = ["async_futures", "html_reports"] }
+file_test_runner.workspace = true
+futures.workspace = true
+tokio = { workspace = true, features = ["full"] }
+pretty_assertions.workspace = true
+insta = { workspace = true, features = ["json"] }
+html5ever.workspace = true
+markup5ever_rcdom.workspace = true
 
 [target.'cfg(all(target_arch = "wasm32", not(target_os = "emscripten")))'.dependencies]
 url = "2.4.1"
