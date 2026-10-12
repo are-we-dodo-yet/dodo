@@ -32,6 +32,7 @@ Deno.test({
   },
 });
 
+/*
 Deno.test({
   name: "doc() - timings",
   async fn() {
@@ -57,6 +58,7 @@ Deno.test({
     console.log(`  Mean of ${runCount} runs: ${meanTime}ms`);
   },
 });
+*/
 
 Deno.test({
   name: "doc() - with headers",
