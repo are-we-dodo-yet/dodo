@@ -162,6 +162,24 @@
               unset LIBCLANG_PATH
             else
               export LD_LIBRARY_PATH="${pkgs.lib.makeLibraryPath [ pkgs.vulkan-loader ]}''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+              export NIX_LD_LIBRARY_PATH="${pkgs.lib.makeLibraryPath (with pkgs; [
+                glib
+                nss
+                nspr
+                at-spi2-core
+                dbus
+                expat
+                libxkbcommon
+                alsa-lib
+                libgbm
+                libx11
+                libxcomposite
+                libxdamage
+                libxext
+                libxfixes
+                libxrandr
+                libxcb
+              ])}''${NIX_LD_LIBRARY_PATH:+:$NIX_LD_LIBRARY_PATH}"
             fi
           '';
         };
