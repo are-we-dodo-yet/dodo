@@ -1,0 +1,102 @@
+# mod.ts
+export interface Generic<T> {}
+export function f(): Generic<[string, number]> { return {}; }
+
+# diagnostics
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+ --> /mod.ts:1:18
+  | 
+1 | export interface Generic<T> {}
+  |                  ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+ --> /mod.ts:2:17
+  | 
+2 | export function f(): Generic<[string, number]> { return {}; }
+  |                 ^
+
+# output.txt
+Defined in file:///mod.ts:1:1
+
+function f(): Generic<[string, number]>
+
+Defined in file:///mod.ts:0:1
+
+interface Generic<T>
+
+
+
+# output.json
+{
+  "symbols": [
+    {
+      "name": "Generic",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 0,
+            "col": 0,
+            "byteIndex": 0
+          },
+          "declarationKind": "export",
+          "kind": "interface",
+          "def": {
+            "typeParams": [
+              {
+                "name": "T"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "f",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 1,
+            "col": 0,
+            "byteIndex": 31
+          },
+          "declarationKind": "export",
+          "kind": "function",
+          "def": {
+            "params": [],
+            "returnType": {
+              "repr": "Generic",
+              "kind": "typeRef",
+              "value": {
+                "typeParams": [
+                  {
+                    "kind": "tuple",
+                    "value": [
+                      {
+                        "repr": "string",
+                        "kind": "keyword",
+                        "value": "string"
+                      },
+                      {
+                        "repr": "number",
+                        "kind": "keyword",
+                        "value": "number"
+                      }
+                    ]
+                  }
+                ],
+                "typeName": "Generic",
+                "resolution": {
+                  "kind": "local"
+                }
+              }
+            },
+            "hasBody": true
+          }
+        }
+      ]
+    }
+  ]
+}

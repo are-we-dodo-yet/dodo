@@ -1,0 +1,111 @@
+# mod.ts
+export namespace Test {
+  export class Other extends YesDiagnostic {
+
+  }
+
+  class Private implements NoDiagnostic {}
+}
+
+class YesDiagnostic {}
+interface NoDiagnostic {}
+
+# diagnostics
+error[private-type-ref]: public type 'Test.Other' references private type 'YesDiagnostic'
+ --> /mod.ts:2:3
+  | 
+2 |   export class Other extends YesDiagnostic {
+  |   ^
+  = hint: make the referenced type public or remove the reference
+  | 
+9 | class YesDiagnostic {}
+  | - this is the referenced type
+  | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+ --> /mod.ts:1:18
+  | 
+1 | export namespace Test {
+  |                  ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+ --> /mod.ts:2:16
+  | 
+2 |   export class Other extends YesDiagnostic {
+  |                ^
+
+# output.txt
+Defined in file:///mod.ts:8:1
+
+private class YesDiagnostic
+
+
+Defined in file:///mod.ts:0:1
+
+namespace Test
+
+  class Other extends YesDiagnostic
+
+
+# output.json
+{
+  "symbols": [
+    {
+      "name": "Test",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 0,
+            "col": 0,
+            "byteIndex": 0
+          },
+          "declarationKind": "export",
+          "kind": "namespace",
+          "def": {
+            "elements": [
+              {
+                "name": "Other",
+                "declarations": [
+                  {
+                    "location": {
+                      "filename": "file:///mod.ts",
+                      "line": 1,
+                      "col": 2,
+                      "byteIndex": 26
+                    },
+                    "declarationKind": "export",
+                    "kind": "class",
+                    "def": {
+                      "extends": "YesDiagnostic"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "YesDiagnostic",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 8,
+            "col": 0,
+            "byteIndex": 121
+          },
+          "declarationKind": "private",
+          "kind": "class",
+          "def": {}
+        }
+      ]
+    }
+  ]
+}

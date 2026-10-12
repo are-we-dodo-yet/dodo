@@ -1,0 +1,143 @@
+# mod.ts
+/**
+ * a is a function
+ *
+ * @param {string} b some doc
+ * @param [c=1] additional doc
+ * @param [d] more doc
+ * @returns {string} returning doc
+ * @throws {number} throw doc
+ * @since 1.0.0
+ * @experimental
+ * @internal
+ */
+export function a(b, c, d) {}
+
+# output.txt
+Defined in file:///mod.ts:12:1
+
+function a(b, c, d): void
+  a is a function
+
+  @param {string} b
+      some doc
+
+  @param [1] c
+      additional doc
+
+  @param [?] d
+      more doc
+
+  @return {string}
+      returning doc
+
+  @throws {number}
+      throw doc
+
+  @since
+      1.0.0
+
+  @experimental
+  @internal
+
+
+# output.json
+{
+  "symbols": [
+    {
+      "name": "a",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 12,
+            "col": 0,
+            "byteIndex": 225
+          },
+          "declarationKind": "export",
+          "jsDoc": {
+            "doc": "a is a function\n",
+            "tags": [
+              {
+                "kind": "param",
+                "name": "b",
+                "tsType": {
+                  "repr": "string",
+                  "kind": "keyword",
+                  "value": "string"
+                },
+                "doc": "some doc"
+              },
+              {
+                "kind": "param",
+                "name": "c",
+                "default": "1",
+                "doc": "additional doc"
+              },
+              {
+                "kind": "param",
+                "name": "d",
+                "optional": true,
+                "doc": "more doc"
+              },
+              {
+                "kind": "return",
+                "tsType": {
+                  "repr": "string",
+                  "kind": "keyword",
+                  "value": "string"
+                },
+                "doc": "returning doc"
+              },
+              {
+                "kind": "throws",
+                "tsType": {
+                  "repr": "number",
+                  "kind": "keyword",
+                  "value": "number"
+                },
+                "doc": "throw doc"
+              },
+              {
+                "kind": "since",
+                "doc": "1.0.0"
+              },
+              {
+                "kind": "experimental"
+              },
+              {
+                "kind": "internal"
+              }
+            ]
+          },
+          "kind": "function",
+          "def": {
+            "params": [
+              {
+                "kind": "identifier",
+                "name": "b",
+                "optional": false
+              },
+              {
+                "kind": "identifier",
+                "name": "c",
+                "optional": false
+              },
+              {
+                "kind": "identifier",
+                "name": "d",
+                "optional": false
+              }
+            ],
+            "returnType": {
+              "repr": "void",
+              "kind": "keyword",
+              "value": "void"
+            },
+            "hasBody": true
+          }
+        }
+      ]
+    }
+  ]
+}

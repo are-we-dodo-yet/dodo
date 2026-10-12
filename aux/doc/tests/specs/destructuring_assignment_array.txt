@@ -1,0 +1,310 @@
+# mod.ts
+const array = ["a", "b"];
+
+const [a1, b1] = array;
+const [a2, , b2] = array;
+const [a3 = "foo", b3] = array;
+const [a4, b4, ...rest4] = array;
+const [a5, , b5, ...rest5] = array;
+
+# output.txt
+Defined in file:///mod.ts:2:8
+
+private const a1
+
+Defined in file:///mod.ts:3:8
+
+private const a2
+
+Defined in file:///mod.ts:4:8
+
+private const a3
+
+Defined in file:///mod.ts:5:8
+
+private const a4
+
+Defined in file:///mod.ts:6:8
+
+private const a5
+
+Defined in file:///mod.ts:0:7
+
+private const array: string[]
+
+Defined in file:///mod.ts:2:12
+
+private const b1
+
+Defined in file:///mod.ts:3:14
+
+private const b2
+
+Defined in file:///mod.ts:4:20
+
+private const b3
+
+Defined in file:///mod.ts:5:12
+
+private const b4
+
+Defined in file:///mod.ts:6:14
+
+private const b5
+
+Defined in file:///mod.ts:5:19
+
+private const rest4
+
+Defined in file:///mod.ts:6:21
+
+private const rest5
+
+
+# output.json
+{
+  "symbols": [
+    {
+      "name": "array",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 0,
+            "col": 6,
+            "byteIndex": 6
+          },
+          "declarationKind": "private",
+          "kind": "variable",
+          "def": {
+            "tsType": {
+              "kind": "array",
+              "value": {
+                "repr": "string",
+                "kind": "keyword",
+                "value": "string"
+              }
+            },
+            "kind": "const"
+          }
+        }
+      ]
+    },
+    {
+      "name": "a1",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 2,
+            "col": 7,
+            "byteIndex": 34
+          },
+          "declarationKind": "private",
+          "kind": "variable",
+          "def": {
+            "kind": "const"
+          }
+        }
+      ]
+    },
+    {
+      "name": "b1",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 2,
+            "col": 11,
+            "byteIndex": 38
+          },
+          "declarationKind": "private",
+          "kind": "variable",
+          "def": {
+            "kind": "const"
+          }
+        }
+      ]
+    },
+    {
+      "name": "a2",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 3,
+            "col": 7,
+            "byteIndex": 58
+          },
+          "declarationKind": "private",
+          "kind": "variable",
+          "def": {
+            "kind": "const"
+          }
+        }
+      ]
+    },
+    {
+      "name": "b2",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 3,
+            "col": 13,
+            "byteIndex": 64
+          },
+          "declarationKind": "private",
+          "kind": "variable",
+          "def": {
+            "kind": "const"
+          }
+        }
+      ]
+    },
+    {
+      "name": "a3",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 4,
+            "col": 7,
+            "byteIndex": 84
+          },
+          "declarationKind": "private",
+          "kind": "variable",
+          "def": {
+            "kind": "const"
+          }
+        }
+      ]
+    },
+    {
+      "name": "b3",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 4,
+            "col": 19,
+            "byteIndex": 96
+          },
+          "declarationKind": "private",
+          "kind": "variable",
+          "def": {
+            "kind": "const"
+          }
+        }
+      ]
+    },
+    {
+      "name": "a4",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 5,
+            "col": 7,
+            "byteIndex": 116
+          },
+          "declarationKind": "private",
+          "kind": "variable",
+          "def": {
+            "kind": "const"
+          }
+        }
+      ]
+    },
+    {
+      "name": "b4",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 5,
+            "col": 11,
+            "byteIndex": 120
+          },
+          "declarationKind": "private",
+          "kind": "variable",
+          "def": {
+            "kind": "const"
+          }
+        }
+      ]
+    },
+    {
+      "name": "rest4",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 5,
+            "col": 18,
+            "byteIndex": 127
+          },
+          "declarationKind": "private",
+          "kind": "variable",
+          "def": {
+            "kind": "const"
+          }
+        }
+      ]
+    },
+    {
+      "name": "a5",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 6,
+            "col": 7,
+            "byteIndex": 150
+          },
+          "declarationKind": "private",
+          "kind": "variable",
+          "def": {
+            "kind": "const"
+          }
+        }
+      ]
+    },
+    {
+      "name": "b5",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 6,
+            "col": 13,
+            "byteIndex": 156
+          },
+          "declarationKind": "private",
+          "kind": "variable",
+          "def": {
+            "kind": "const"
+          }
+        }
+      ]
+    },
+    {
+      "name": "rest5",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 6,
+            "col": 20,
+            "byteIndex": 163
+          },
+          "declarationKind": "private",
+          "kind": "variable",
+          "def": {
+            "kind": "const"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+# mod.ts
+export type A<T> = T
+
+# diagnostics
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+ --> /mod.ts:1:13
+  | 
+1 | export type A<T> = T
+  |             ^
+
+# output.txt
+Defined in file:///mod.ts:0:1
+
+type A<T> = T
+
+
+# output.json
+{
+  "symbols": [
+    {
+      "name": "A",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 0,
+            "col": 0,
+            "byteIndex": 0
+          },
+          "declarationKind": "export",
+          "kind": "typeAlias",
+          "def": {
+            "tsType": {
+              "repr": "T",
+              "kind": "typeRef",
+              "value": {
+                "typeName": "T",
+                "resolution": {
+                  "kind": "typeParam",
+                  "declaringName": "A",
+                  "declaringKind": "typeAlias"
+                }
+              }
+            },
+            "typeParams": [
+              {
+                "name": "T"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

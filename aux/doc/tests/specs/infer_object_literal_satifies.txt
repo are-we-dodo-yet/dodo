@@ -1,0 +1,204 @@
+# mod.ts
+export type Colors = "red" | "green" | "blue";
+
+// Ensure that we have exactly the keys from 'Colors'.
+export const favoriteColors = {
+    "red": "yes",
+    "green": false,
+    "blue": "kinda",
+    "platypus": false
+//  ~~~~~~~~~~ error - "platypus" was never listed in 'Colors'.
+} satisfies Record<Colors, unknown>;
+
+export const g: boolean = favoriteColors.green;
+
+# diagnostics
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+ --> /mod.ts:1:13
+  | 
+1 | export type Colors = "red" | "green" | "blue";
+  |             ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+ --> /mod.ts:4:14
+  | 
+4 | export const favoriteColors = {
+  |              ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /mod.ts:12:14
+   | 
+12 | export const g: boolean = favoriteColors.green;
+   |              ^
+
+# output.txt
+Defined in file:///mod.ts:3:14
+
+const favoriteColors: { red: string; green: boolean; blue: string; platypus: boolean; }
+
+Defined in file:///mod.ts:11:14
+
+const g: boolean
+
+Defined in file:///mod.ts:0:1
+
+type Colors = "red" | "green" | "blue"
+
+
+# output.json
+{
+  "symbols": [
+    {
+      "name": "Colors",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 0,
+            "col": 0,
+            "byteIndex": 0
+          },
+          "declarationKind": "export",
+          "kind": "typeAlias",
+          "def": {
+            "tsType": {
+              "kind": "union",
+              "value": [
+                {
+                  "repr": "red",
+                  "kind": "literal",
+                  "value": {
+                    "kind": "string",
+                    "string": "red"
+                  }
+                },
+                {
+                  "repr": "green",
+                  "kind": "literal",
+                  "value": {
+                    "kind": "string",
+                    "string": "green"
+                  }
+                },
+                {
+                  "repr": "blue",
+                  "kind": "literal",
+                  "value": {
+                    "kind": "string",
+                    "string": "blue"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "favoriteColors",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 3,
+            "col": 13,
+            "byteIndex": 116
+          },
+          "declarationKind": "export",
+          "kind": "variable",
+          "def": {
+            "tsType": {
+              "kind": "typeLiteral",
+              "value": {
+                "properties": [
+                  {
+                    "name": "red",
+                    "location": {
+                      "filename": "file:///mod.ts",
+                      "line": 4,
+                      "col": 4,
+                      "byteIndex": 139
+                    },
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  },
+                  {
+                    "name": "green",
+                    "location": {
+                      "filename": "file:///mod.ts",
+                      "line": 5,
+                      "col": 4,
+                      "byteIndex": 157
+                    },
+                    "tsType": {
+                      "repr": "boolean",
+                      "kind": "keyword",
+                      "value": "boolean"
+                    }
+                  },
+                  {
+                    "name": "blue",
+                    "location": {
+                      "filename": "file:///mod.ts",
+                      "line": 6,
+                      "col": 4,
+                      "byteIndex": 177
+                    },
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  },
+                  {
+                    "name": "platypus",
+                    "location": {
+                      "filename": "file:///mod.ts",
+                      "line": 7,
+                      "col": 4,
+                      "byteIndex": 198
+                    },
+                    "tsType": {
+                      "repr": "boolean",
+                      "kind": "keyword",
+                      "value": "boolean"
+                    }
+                  }
+                ]
+              }
+            },
+            "kind": "const"
+          }
+        }
+      ]
+    },
+    {
+      "name": "g",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 11,
+            "col": 13,
+            "byteIndex": 331
+          },
+          "declarationKind": "export",
+          "kind": "variable",
+          "def": {
+            "tsType": {
+              "repr": "boolean",
+              "kind": "keyword",
+              "value": "boolean"
+            },
+            "kind": "const"
+          }
+        }
+      ]
+    }
+  ]
+}

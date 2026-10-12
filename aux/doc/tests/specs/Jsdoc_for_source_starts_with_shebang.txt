@@ -1,0 +1,125 @@
+# mod.ts
+#!/usr/bin/env -S deno run --allow-net --allow-read
+/**
+ This module provides simple examples of a class, an interface, and a function.
+ * @module MyModule
+ */
+
+/**
+ * A is a simple class.
+ */
+export class A {}
+
+/**
+ * B is a simple interface.
+ */
+export interface B {}
+
+/**
+ * C is a function.
+ */
+export function C() {}
+
+# output.txt
+This module provides simple examples of a class, an interface, and a function.
+@module
+    MyModule
+
+
+Defined in file:///mod.ts:19:1
+
+function C(): void
+  C is a function.
+
+Defined in file:///mod.ts:9:1
+
+class A
+  A is a simple class.
+
+
+Defined in file:///mod.ts:14:1
+
+interface B
+  B is a simple interface.
+
+
+
+# output.json
+{
+  "module_doc": {
+    "doc": "This module provides simple examples of a class, an interface, and a function.",
+    "tags": [
+      {
+        "kind": "module",
+        "name": "MyModule"
+      }
+    ]
+  },
+  "symbols": [
+    {
+      "name": "A",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 9,
+            "col": 0,
+            "byteIndex": 193
+          },
+          "declarationKind": "export",
+          "jsDoc": {
+            "doc": "A is a simple class."
+          },
+          "kind": "class",
+          "def": {}
+        }
+      ]
+    },
+    {
+      "name": "B",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 14,
+            "col": 0,
+            "byteIndex": 248
+          },
+          "declarationKind": "export",
+          "jsDoc": {
+            "doc": "B is a simple interface."
+          },
+          "kind": "interface",
+          "def": {}
+        }
+      ]
+    },
+    {
+      "name": "C",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 19,
+            "col": 0,
+            "byteIndex": 299
+          },
+          "declarationKind": "export",
+          "jsDoc": {
+            "doc": "C is a function."
+          },
+          "kind": "function",
+          "def": {
+            "params": [],
+            "returnType": {
+              "repr": "void",
+              "kind": "keyword",
+              "value": "void"
+            },
+            "hasBody": true
+          }
+        }
+      ]
+    }
+  ]
+}

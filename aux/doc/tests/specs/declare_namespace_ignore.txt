@@ -1,0 +1,86 @@
+# mod.ts
+/** Namespace JSdoc */
+declare namespace RootNs {
+    const a: "a";
+
+    /** Nested namespace JSDoc
+     * @ignore
+     */
+    namespace NestedNs {
+      enum Foo {
+        a = 1,
+        b = 2,
+        c = 3,
+      }
+    }
+}
+
+# diagnostics
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+ --> /mod.ts:3:11
+  | 
+3 |     const a: "a";
+  |           ^
+
+# output.txt
+Defined in file:///mod.ts:1:1
+
+namespace RootNs
+  Namespace JSdoc
+
+  const a: "a"
+
+
+# output.json
+{
+  "symbols": [
+    {
+      "name": "RootNs",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 1,
+            "col": 0,
+            "byteIndex": 23
+          },
+          "declarationKind": "declare",
+          "jsDoc": {
+            "doc": "Namespace JSdoc"
+          },
+          "kind": "namespace",
+          "def": {
+            "elements": [
+              {
+                "name": "a",
+                "declarations": [
+                  {
+                    "location": {
+                      "filename": "file:///mod.ts",
+                      "line": 2,
+                      "col": 10,
+                      "byteIndex": 60
+                    },
+                    "declarationKind": "export",
+                    "kind": "variable",
+                    "def": {
+                      "tsType": {
+                        "repr": "a",
+                        "kind": "literal",
+                        "value": {
+                          "kind": "string",
+                          "string": "a"
+                        }
+                      },
+                      "kind": "const"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

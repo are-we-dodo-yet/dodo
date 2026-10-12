@@ -1,0 +1,269 @@
+# mod.ts
+// the internal tag will suppress diagnostics
+
+/** @internal */
+type PrivateType = string;
+
+/** @internal */
+export class MyClass {
+  // will ignore missing jsdocs on all these members
+  test;
+
+  method() {
+    return Math.random();
+  }
+
+  privateTypeUse: PrivateType;
+}
+
+/** Test */
+export class Other {
+  /** @internal */
+  test;
+
+  /** @internal */
+  method() {
+    return Math.random();
+  }
+}
+
+// also should work with @ignore
+
+/** @ignore */
+type OtherPrivateType = string;
+
+export type Test = OtherPrivateType;
+
+# diagnostics
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /mod.ts:34:13
+   | 
+34 | export type Test = OtherPrivateType;
+   |             ^
+
+# output.txt
+Defined in file:///mod.ts:6:1
+
+class MyClass
+
+  @internal
+
+  test
+  privateTypeUse: PrivateType
+  method()
+
+Defined in file:///mod.ts:18:1
+
+class Other
+  Test
+
+  test
+
+    @internal
+  method()
+
+    @internal
+
+Defined in file:///mod.ts:3:1
+
+private type PrivateType = string
+
+  @internal
+
+Defined in file:///mod.ts:33:1
+
+type Test = OtherPrivateType
+
+
+# output.json
+{
+  "symbols": [
+    {
+      "name": "MyClass",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 6,
+            "col": 0,
+            "byteIndex": 109
+          },
+          "declarationKind": "export",
+          "jsDoc": {
+            "tags": [
+              {
+                "kind": "internal"
+              }
+            ]
+          },
+          "kind": "class",
+          "def": {
+            "properties": [
+              {
+                "name": "test",
+                "location": {
+                  "filename": "file:///mod.ts",
+                  "line": 8,
+                  "col": 2,
+                  "byteIndex": 187
+                }
+              },
+              {
+                "tsType": {
+                  "repr": "PrivateType",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeName": "PrivateType",
+                    "resolution": {
+                      "kind": "local"
+                    }
+                  }
+                },
+                "name": "privateTypeUse",
+                "location": {
+                  "filename": "file:///mod.ts",
+                  "line": 14,
+                  "col": 2,
+                  "byteIndex": 240
+                }
+              }
+            ],
+            "methods": [
+              {
+                "name": "method",
+                "kind": "method",
+                "functionDef": {
+                  "params": [],
+                  "hasBody": true
+                },
+                "location": {
+                  "filename": "file:///mod.ts",
+                  "line": 10,
+                  "col": 2,
+                  "byteIndex": 196
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Other",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 18,
+            "col": 0,
+            "byteIndex": 284
+          },
+          "declarationKind": "export",
+          "jsDoc": {
+            "doc": "Test"
+          },
+          "kind": "class",
+          "def": {
+            "properties": [
+              {
+                "jsDoc": {
+                  "tags": [
+                    {
+                      "kind": "internal"
+                    }
+                  ]
+                },
+                "name": "test",
+                "location": {
+                  "filename": "file:///mod.ts",
+                  "line": 20,
+                  "col": 2,
+                  "byteIndex": 326
+                }
+              }
+            ],
+            "methods": [
+              {
+                "jsDoc": {
+                  "tags": [
+                    {
+                      "kind": "internal"
+                    }
+                  ]
+                },
+                "name": "method",
+                "kind": "method",
+                "functionDef": {
+                  "params": [],
+                  "hasBody": true
+                },
+                "location": {
+                  "filename": "file:///mod.ts",
+                  "line": 23,
+                  "col": 2,
+                  "byteIndex": 354
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Test",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 33,
+            "col": 0,
+            "byteIndex": 480
+          },
+          "declarationKind": "export",
+          "kind": "typeAlias",
+          "def": {
+            "tsType": {
+              "repr": "OtherPrivateType",
+              "kind": "typeRef",
+              "value": {
+                "typeName": "OtherPrivateType",
+                "resolution": {
+                  "kind": "local"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "PrivateType",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 3,
+            "col": 0,
+            "byteIndex": 64
+          },
+          "declarationKind": "private",
+          "jsDoc": {
+            "tags": [
+              {
+                "kind": "internal"
+              }
+            ]
+          },
+          "kind": "typeAlias",
+          "def": {
+            "tsType": {
+              "repr": "string",
+              "kind": "keyword",
+              "value": "string"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

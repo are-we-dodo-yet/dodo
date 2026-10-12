@@ -1,0 +1,81 @@
+# mod.ts
+export class C {
+  isSomething(): this is Something {}
+}
+
+# diagnostics
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+ --> /mod.ts:1:14
+  | 
+1 | export class C {
+  |              ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+ --> /mod.ts:2:3
+  | 
+2 |   isSomething(): this is Something {}
+  |   ^
+
+# output.txt
+Defined in file:///mod.ts:0:1
+
+class C
+
+  isSomething(): this is Something
+
+
+# output.json
+{
+  "symbols": [
+    {
+      "name": "C",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 0,
+            "col": 0,
+            "byteIndex": 0
+          },
+          "declarationKind": "export",
+          "kind": "class",
+          "def": {
+            "methods": [
+              {
+                "name": "isSomething",
+                "kind": "method",
+                "functionDef": {
+                  "params": [],
+                  "returnType": {
+                    "repr": "this is Something",
+                    "kind": "typePredicate",
+                    "value": {
+                      "param": {
+                        "type": "this"
+                      },
+                      "type": {
+                        "repr": "Something",
+                        "kind": "typeRef",
+                        "value": {
+                          "typeName": "Something"
+                        }
+                      }
+                    }
+                  },
+                  "hasBody": true
+                },
+                "location": {
+                  "filename": "file:///mod.ts",
+                  "line": 1,
+                  "col": 2,
+                  "byteIndex": 19
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

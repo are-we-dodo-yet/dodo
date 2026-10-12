@@ -1,0 +1,143 @@
+# mod.ts
+namespace Test {
+  export class Other {}
+}
+
+export interface Output {
+  other: Test.Other;
+}
+
+# diagnostics
+error[private-type-ref]: public type 'Output["other"]' references private type 'Test'
+ --> /mod.ts:6:3
+  | 
+6 |   other: Test.Other;
+  |   ^
+  = hint: make the referenced type public or remove the reference
+  | 
+1 | namespace Test {
+  | - this is the referenced type
+  | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'Output["other"]' references private type 'Test.Other'
+ --> /mod.ts:6:3
+  | 
+6 |   other: Test.Other;
+  |   ^
+  = hint: make the referenced type public or remove the reference
+  | 
+2 |   export class Other {}
+  |   - this is the referenced type
+  | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+ --> /mod.ts:5:18
+  | 
+5 | export interface Output {
+  |                  ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+ --> /mod.ts:6:3
+  | 
+6 |   other: Test.Other;
+  |   ^
+
+# output.txt
+Defined in file:///mod.ts:4:1
+
+interface Output
+
+  other: Test.Other
+
+Defined in file:///mod.ts:0:1
+
+private namespace Test
+
+  class Other
+
+
+# output.json
+{
+  "symbols": [
+    {
+      "name": "Output",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 4,
+            "col": 0,
+            "byteIndex": 44
+          },
+          "declarationKind": "export",
+          "kind": "interface",
+          "def": {
+            "properties": [
+              {
+                "name": "other",
+                "location": {
+                  "filename": "file:///mod.ts",
+                  "line": 5,
+                  "col": 2,
+                  "byteIndex": 72
+                },
+                "tsType": {
+                  "repr": "Test.Other",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeName": "Test.Other",
+                    "resolution": {
+                      "kind": "local"
+                    }
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Test",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 0,
+            "col": 0,
+            "byteIndex": 0
+          },
+          "declarationKind": "private",
+          "kind": "namespace",
+          "def": {
+            "elements": [
+              {
+                "name": "Other",
+                "declarations": [
+                  {
+                    "location": {
+                      "filename": "file:///mod.ts",
+                      "line": 1,
+                      "col": 2,
+                      "byteIndex": 19
+                    },
+                    "declarationKind": "export",
+                    "kind": "class",
+                    "def": {}
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

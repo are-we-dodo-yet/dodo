@@ -1,0 +1,115 @@
+# mod.ts
+/**
+ * A is a class
+ *
+ * Nothing more
+ */
+export class A {}
+/**
+ * B is an interface
+ *
+ * Should be
+ */
+export interface B {}
+/**
+ * C is a function
+ *
+ * Summarised
+ */
+export function C() {}
+
+# output.txt
+Defined in file:///mod.ts:17:1
+
+function C(): void
+  C is a function
+
+  Summarised
+
+Defined in file:///mod.ts:5:1
+
+class A
+  A is a class
+
+  Nothing more
+
+
+Defined in file:///mod.ts:11:1
+
+interface B
+  B is an interface
+
+  Should be
+
+
+
+# output.json
+{
+  "symbols": [
+    {
+      "name": "A",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 5,
+            "col": 0,
+            "byteIndex": 43
+          },
+          "declarationKind": "export",
+          "jsDoc": {
+            "doc": "A is a class\n\nNothing more"
+          },
+          "kind": "class",
+          "def": {}
+        }
+      ]
+    },
+    {
+      "name": "B",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 11,
+            "col": 0,
+            "byteIndex": 106
+          },
+          "declarationKind": "export",
+          "jsDoc": {
+            "doc": "B is an interface\n\nShould be"
+          },
+          "kind": "interface",
+          "def": {}
+        }
+      ]
+    },
+    {
+      "name": "C",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 17,
+            "col": 0,
+            "byteIndex": 172
+          },
+          "declarationKind": "export",
+          "jsDoc": {
+            "doc": "C is a function\n\nSummarised"
+          },
+          "kind": "function",
+          "def": {
+            "params": [],
+            "returnType": {
+              "repr": "void",
+              "kind": "keyword",
+              "value": "void"
+            },
+            "hasBody": true
+          }
+        }
+      ]
+    }
+  ]
+}

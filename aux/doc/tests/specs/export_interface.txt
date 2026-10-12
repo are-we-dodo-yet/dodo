@@ -1,0 +1,227 @@
+# mod.ts
+interface Foo {
+}
+interface Bar {
+}
+/**
+ * Interface js doc
+ */
+export interface Reader extends Foo, Bar {
+    /** Read n bytes */
+    read?(buf: Uint8Array, something: unknown): Promise<number>
+    /** Test */
+    [key: string]: number;
+}
+
+# diagnostics
+error[private-type-ref]: public type 'Reader' references private type 'Foo'
+ --> /mod.ts:8:1
+  | 
+8 | export interface Reader extends Foo, Bar {
+  | ^
+  = hint: make the referenced type public or remove the reference
+  | 
+1 | interface Foo {
+  | - this is the referenced type
+  | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'Reader' references private type 'Bar'
+ --> /mod.ts:8:1
+  | 
+8 | export interface Reader extends Foo, Bar {
+  | ^
+  = hint: make the referenced type public or remove the reference
+  | 
+3 | interface Bar {
+  | - this is the referenced type
+  | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+# output.txt
+Defined in file:///mod.ts:2:1
+
+private interface Bar
+
+
+Defined in file:///mod.ts:0:1
+
+private interface Foo
+
+
+Defined in file:///mod.ts:7:1
+
+interface Reader extends Foo, Bar
+  Interface js doc
+
+  read?(buf: Uint8Array, something: unknown): Promise<number>
+    Read n bytes
+  [key: string]: number
+
+
+# output.json
+{
+  "symbols": [
+    {
+      "name": "Reader",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 7,
+            "col": 0,
+            "byteIndex": 64
+          },
+          "declarationKind": "export",
+          "jsDoc": {
+            "doc": "Interface js doc"
+          },
+          "kind": "interface",
+          "def": {
+            "extends": [
+              {
+                "repr": "Foo",
+                "kind": "typeRef",
+                "value": {
+                  "typeName": "Foo",
+                  "resolution": {
+                    "kind": "local"
+                  }
+                }
+              },
+              {
+                "repr": "Bar",
+                "kind": "typeRef",
+                "value": {
+                  "typeName": "Bar",
+                  "resolution": {
+                    "kind": "local"
+                  }
+                }
+              }
+            ],
+            "methods": [
+              {
+                "name": "read",
+                "jsDoc": {
+                  "doc": "Read n bytes"
+                },
+                "kind": "method",
+                "location": {
+                  "filename": "file:///mod.ts",
+                  "line": 9,
+                  "col": 4,
+                  "byteIndex": 135
+                },
+                "params": [
+                  {
+                    "kind": "identifier",
+                    "name": "buf",
+                    "optional": false,
+                    "tsType": {
+                      "repr": "Uint8Array",
+                      "kind": "typeRef",
+                      "value": {
+                        "typeName": "Uint8Array"
+                      }
+                    }
+                  },
+                  {
+                    "kind": "identifier",
+                    "name": "something",
+                    "optional": false,
+                    "tsType": {
+                      "repr": "unknown",
+                      "kind": "keyword",
+                      "value": "unknown"
+                    }
+                  }
+                ],
+                "optional": true,
+                "returnType": {
+                  "repr": "Promise",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeParams": [
+                      {
+                        "repr": "number",
+                        "kind": "keyword",
+                        "value": "number"
+                      }
+                    ],
+                    "typeName": "Promise"
+                  }
+                }
+              }
+            ],
+            "indexSignatures": [
+              {
+                "jsDoc": {
+                  "doc": "Test"
+                },
+                "params": [
+                  {
+                    "kind": "identifier",
+                    "name": "key",
+                    "optional": false,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    }
+                  }
+                ],
+                "tsType": {
+                  "repr": "number",
+                  "kind": "keyword",
+                  "value": "number"
+                },
+                "location": {
+                  "filename": "file:///mod.ts",
+                  "line": 11,
+                  "col": 4,
+                  "byteIndex": 215
+                }
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Foo",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 0,
+            "col": 0,
+            "byteIndex": 0
+          },
+          "declarationKind": "private",
+          "kind": "interface",
+          "def": {}
+        }
+      ]
+    },
+    {
+      "name": "Bar",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 2,
+            "col": 0,
+            "byteIndex": 18
+          },
+          "declarationKind": "private",
+          "kind": "interface",
+          "def": {}
+        }
+      ]
+    }
+  ]
+}

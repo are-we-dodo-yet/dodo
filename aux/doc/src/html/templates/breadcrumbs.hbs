@@ -1,0 +1,39 @@
+<ul class="breadcrumbs">
+  <li>
+    <a href="{{root.href}}" class="contextLink">
+      {{~root.name~}}
+    </a>
+  </li>
+
+  {{~#if current_entrypoint~}}
+    <span class="text-black dark:text-white">{{~> icons/arrow ~}}</span>
+
+    {{~#if symbol~}}
+      <a href="{{current_entrypoint.href}}" class="contextLink">
+        {{~current_entrypoint.name~}}
+      </a>
+    {{~else~}}
+      {{~current_entrypoint.name~}}
+    {{~/if~}}
+  {{~/if~}}
+
+
+  {{~#if symbol~}}
+    <span class="text-black dark:text-white">{{~> icons/arrow ~}}</span>
+
+    <ul>
+      {{~#each symbol~}}
+        <li>
+          {{~#if @last~}}
+            {{~this.name~}}
+          {{~else~}}
+            <span>.</span>
+            <a href="{{this.href}}" class="contextLink">
+              {{~this.name~}}
+            </a>
+          {{~/if~}}
+        </li>
+      {{~/each~}}
+    </ul>
+  {{~/if~}}
+</ul>

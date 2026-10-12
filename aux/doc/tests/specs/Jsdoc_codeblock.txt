@@ -1,0 +1,192 @@
+# mod.ts
+/**
+ * A is a class
+ *
+ * ```ts
+ * const bar = "foo";
+ * console.log(bar);
+ * ```
+ *
+ * Nothing more
+ */
+export class A {}
+/**
+ * B is an interface
+ *
+ * ```ts
+ * # const bar = "foo";
+ * console.log(bar);
+ * ```
+ *
+ * Should be
+ */
+export interface B {}
+/**
+ * C is a function
+ *
+ * ```ts
+ * class Bar {
+ *   #foo = "something";
+ * }
+ * console.log(bar);
+ * ```
+ *
+ * Summarised
+ */
+export function C() {}
+/**
+ * D
+ *
+ * ```ts
+ * const bar = "foo";
+ * # console.log(bar);```
+ */
+export function D() {}
+
+# output.txt
+Defined in file:///mod.ts:34:1
+
+function C(): void
+  C is a function
+
+  ```ts
+  class Bar {
+    #foo = "something";
+  }
+  console.log(bar);
+  ```
+
+  Summarised
+
+Defined in file:///mod.ts:42:1
+
+function D(): void
+  D
+
+  ```ts
+  const bar = "foo";
+  ```
+
+Defined in file:///mod.ts:10:1
+
+class A
+  A is a class
+
+  ```ts
+  const bar = "foo";
+  console.log(bar);
+  ```
+
+  Nothing more
+
+
+Defined in file:///mod.ts:21:1
+
+interface B
+  B is an interface
+
+  ```ts
+  console.log(bar);
+  ```
+
+  Should be
+
+
+
+# output.json
+{
+  "symbols": [
+    {
+      "name": "A",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 10,
+            "col": 0,
+            "byteIndex": 105
+          },
+          "declarationKind": "export",
+          "jsDoc": {
+            "doc": "A is a class\n\n```ts\nconst bar = \"foo\";\nconsole.log(bar);\n```\n\nNothing more"
+          },
+          "kind": "class",
+          "def": {}
+        }
+      ]
+    },
+    {
+      "name": "B",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 21,
+            "col": 0,
+            "byteIndex": 232
+          },
+          "declarationKind": "export",
+          "jsDoc": {
+            "doc": "B is an interface\n\n```ts\nconsole.log(bar);\n```\n\nShould be"
+          },
+          "kind": "interface",
+          "def": {}
+        }
+      ]
+    },
+    {
+      "name": "C",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 34,
+            "col": 0,
+            "byteIndex": 383
+          },
+          "declarationKind": "export",
+          "jsDoc": {
+            "doc": "C is a function\n\n```ts\nclass Bar {\n  #foo = \"something\";\n}\nconsole.log(bar);\n```\n\nSummarised"
+          },
+          "kind": "function",
+          "def": {
+            "params": [],
+            "returnType": {
+              "repr": "void",
+              "kind": "keyword",
+              "value": "void"
+            },
+            "hasBody": true
+          }
+        }
+      ]
+    },
+    {
+      "name": "D",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 42,
+            "col": 0,
+            "byteIndex": 479
+          },
+          "declarationKind": "export",
+          "jsDoc": {
+            "doc": "D\n\n```ts\nconst bar = \"foo\";\n```"
+          },
+          "kind": "function",
+          "def": {
+            "params": [],
+            "returnType": {
+              "repr": "void",
+              "kind": "keyword",
+              "value": "void"
+            },
+            "hasBody": true
+          }
+        }
+      ]
+    }
+  ]
+}

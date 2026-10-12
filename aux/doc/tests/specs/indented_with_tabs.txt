@@ -1,0 +1,111 @@
+# mod.ts
+/**
+ * Line 1
+ *
+ * Line 2
+ *
+ * 	Indented
+ */
+export namespace Tabs {
+	/**
+	 * Line 1
+	 *
+	 * Line 2
+	 *
+	 * 	Indented
+	 */
+	export interface Tabs{
+		/**
+		 * Line 1
+		 *
+		 * Line 2
+		 *
+		 * 	Indented
+		 */
+		property: string;
+	}
+}
+# output.txt
+Defined in file:///mod.ts:7:1
+
+namespace Tabs
+  Line 1
+
+  Line 2
+
+      Indented
+
+  interface Tabs
+    Line 1
+
+    Line 2
+
+        Indented
+
+
+# output.json
+{
+  "symbols": [
+    {
+      "name": "Tabs",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 7,
+            "col": 0,
+            "byteIndex": 47
+          },
+          "declarationKind": "export",
+          "jsDoc": {
+            "doc": "Line 1\n\nLine 2\n\n\tIndented"
+          },
+          "kind": "namespace",
+          "def": {
+            "elements": [
+              {
+                "name": "Tabs",
+                "declarations": [
+                  {
+                    "location": {
+                      "filename": "file:///mod.ts",
+                      "line": 15,
+                      "col": 2,
+                      "byteIndex": 126
+                    },
+                    "declarationKind": "export",
+                    "jsDoc": {
+                      "doc": "Line 1\n\nLine 2\n\n\tIndented"
+                    },
+                    "kind": "interface",
+                    "def": {
+                      "properties": [
+                        {
+                          "name": "property",
+                          "jsDoc": {
+                            "doc": "Line 1\n\nLine 2\n\n\tIndented"
+                          },
+                          "location": {
+                            "filename": "file:///mod.ts",
+                            "line": 23,
+                            "col": 4,
+                            "byteIndex": 212
+                          },
+                          "tsType": {
+                            "repr": "string",
+                            "kind": "keyword",
+                            "value": "string"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

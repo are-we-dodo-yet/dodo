@@ -1,0 +1,152 @@
+# mod.ts
+// 插件描述文件 `pmimp.json`
+export interface 插件描述 {
+  pmim_version: string;
+  插件信息: {
+    名称: string;
+    描述: string;
+    版本: string;
+    URL: string;
+  };
+}
+
+# diagnostics
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+ --> /mod.ts:2:18
+  | 
+2 | export interface 插件描述 {
+  |                  ^^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+ --> /mod.ts:3:3
+  | 
+3 |   pmim_version: string;
+  |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+ --> /mod.ts:4:3
+  | 
+4 |   插件信息: {
+  |   ^^
+
+# output.txt
+Defined in file:///mod.ts:1:1
+
+interface 插件描述
+
+  pmim_version: string
+  插件信息: { 名称: string; 描述: string; 版本: string; URL: string; }
+
+
+# output.json
+{
+  "symbols": [
+    {
+      "name": "插件描述",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 1,
+            "col": 0,
+            "byteIndex": 35
+          },
+          "declarationKind": "export",
+          "kind": "interface",
+          "def": {
+            "properties": [
+              {
+                "name": "pmim_version",
+                "location": {
+                  "filename": "file:///mod.ts",
+                  "line": 2,
+                  "col": 2,
+                  "byteIndex": 69
+                },
+                "tsType": {
+                  "repr": "string",
+                  "kind": "keyword",
+                  "value": "string"
+                }
+              },
+              {
+                "name": "插件信息",
+                "location": {
+                  "filename": "file:///mod.ts",
+                  "line": 3,
+                  "col": 2,
+                  "byteIndex": 93
+                },
+                "tsType": {
+                  "kind": "typeLiteral",
+                  "value": {
+                    "properties": [
+                      {
+                        "name": "名称",
+                        "location": {
+                          "filename": "file:///mod.ts",
+                          "line": 4,
+                          "col": 4,
+                          "byteIndex": 113
+                        },
+                        "tsType": {
+                          "repr": "string",
+                          "kind": "keyword",
+                          "value": "string"
+                        }
+                      },
+                      {
+                        "name": "描述",
+                        "location": {
+                          "filename": "file:///mod.ts",
+                          "line": 5,
+                          "col": 4,
+                          "byteIndex": 133
+                        },
+                        "tsType": {
+                          "repr": "string",
+                          "kind": "keyword",
+                          "value": "string"
+                        }
+                      },
+                      {
+                        "name": "版本",
+                        "location": {
+                          "filename": "file:///mod.ts",
+                          "line": 6,
+                          "col": 4,
+                          "byteIndex": 153
+                        },
+                        "tsType": {
+                          "repr": "string",
+                          "kind": "keyword",
+                          "value": "string"
+                        }
+                      },
+                      {
+                        "name": "URL",
+                        "location": {
+                          "filename": "file:///mod.ts",
+                          "line": 7,
+                          "col": 4,
+                          "byteIndex": 173
+                        },
+                        "tsType": {
+                          "repr": "string",
+                          "kind": "keyword",
+                          "value": "string"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

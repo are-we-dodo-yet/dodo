@@ -1,0 +1,96 @@
+# mod.ts
+export type Flatten<T> = T extends Array<infer U> ? U : T;
+
+# diagnostics
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+ --> /mod.ts:1:13
+  | 
+1 | export type Flatten<T> = T extends Array<infer U> ? U : T;
+  |             ^
+
+# output.txt
+Defined in file:///mod.ts:0:1
+
+type Flatten<T> = T extends Array<infer U> ? U : T
+
+
+# output.json
+{
+  "symbols": [
+    {
+      "name": "Flatten",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 0,
+            "col": 0,
+            "byteIndex": 0
+          },
+          "declarationKind": "export",
+          "kind": "typeAlias",
+          "def": {
+            "tsType": {
+              "kind": "conditional",
+              "value": {
+                "checkType": {
+                  "repr": "T",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeName": "T",
+                    "resolution": {
+                      "kind": "typeParam",
+                      "declaringName": "Flatten",
+                      "declaringKind": "typeAlias"
+                    }
+                  }
+                },
+                "extendsType": {
+                  "repr": "Array",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeParams": [
+                      {
+                        "kind": "infer",
+                        "value": {
+                          "typeParam": {
+                            "name": "U"
+                          }
+                        }
+                      }
+                    ],
+                    "typeName": "Array"
+                  }
+                },
+                "trueType": {
+                  "repr": "U",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeName": "U"
+                  }
+                },
+                "falseType": {
+                  "repr": "T",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeName": "T",
+                    "resolution": {
+                      "kind": "typeParam",
+                      "declaringName": "Flatten",
+                      "declaringKind": "typeAlias"
+                    }
+                  }
+                }
+              }
+            },
+            "typeParams": [
+              {
+                "name": "T"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

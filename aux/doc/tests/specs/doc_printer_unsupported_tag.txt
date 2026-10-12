@@ -1,0 +1,65 @@
+# mod.ts
+/**
+ * @customtagone
+ * @customtagtwo value
+ */
+export function noop() {
+}
+
+# diagnostics
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+ --> /mod.ts:5:17
+  | 
+5 | export function noop() {
+  |                 ^
+
+# output.txt
+Defined in file:///mod.ts:4:1
+
+function noop(): void
+
+  @customtagone
+  @customtagtwo value
+
+
+# output.json
+{
+  "symbols": [
+    {
+      "name": "noop",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 4,
+            "col": 0,
+            "byteIndex": 48
+          },
+          "declarationKind": "export",
+          "jsDoc": {
+            "tags": [
+              {
+                "kind": "unsupported",
+                "value": "@customtagone"
+              },
+              {
+                "kind": "unsupported",
+                "value": "@customtagtwo value"
+              }
+            ]
+          },
+          "kind": "function",
+          "def": {
+            "params": [],
+            "returnType": {
+              "repr": "void",
+              "kind": "keyword",
+              "value": "void"
+            },
+            "hasBody": true
+          }
+        }
+      ]
+    }
+  ]
+}

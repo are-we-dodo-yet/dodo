@@ -1,0 +1,442 @@
+# mod.ts
+/** Something about fizzBuzz */
+export const fizzBuzz = "fizzBuzz";
+
+export const env: {
+  /** get doc */
+  get(key: string): string | undefined;
+
+  /** set doc */
+  set(key: string, value: string): void;
+}
+
+export const num = 100;
+export const bool = false;
+export const bigint = 123n;
+export const regex = /hello/;
+export const date = new Date();
+export const tpl1 = `foo`;
+export const tpl2 = `Value: ${num}`;
+/** @ignore */
+export const tpl3 = `Value: ${num}`;
+
+# diagnostics
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+ --> /mod.ts:4:14
+  | 
+4 | export const env: {
+  |              ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /mod.ts:12:14
+   | 
+12 | export const num = 100;
+   |              ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /mod.ts:13:14
+   | 
+13 | export const bool = false;
+   |              ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /mod.ts:14:14
+   | 
+14 | export const bigint = 123n;
+   |              ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /mod.ts:15:14
+   | 
+15 | export const regex = /hello/;
+   |              ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /mod.ts:16:14
+   | 
+16 | export const date = new Date();
+   |              ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /mod.ts:17:14
+   | 
+17 | export const tpl1 = `foo`;
+   |              ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /mod.ts:18:14
+   | 
+18 | export const tpl2 = `Value: ${num}`;
+   |              ^
+
+# output.txt
+Defined in file:///mod.ts:13:14
+
+const bigint: 123n
+
+Defined in file:///mod.ts:12:14
+
+const bool: false
+
+Defined in file:///mod.ts:15:14
+
+const date: Date
+
+Defined in file:///mod.ts:3:14
+
+const env: { get(key: string): string | undefined; set(key: string, value: string): void; }
+
+Defined in file:///mod.ts:1:14
+
+const fizzBuzz: "fizzBuzz"
+  Something about fizzBuzz
+
+Defined in file:///mod.ts:11:14
+
+const num: 100
+
+Defined in file:///mod.ts:14:14
+
+const regex: RegExp
+
+Defined in file:///mod.ts:16:14
+
+const tpl1: `foo`
+
+Defined in file:///mod.ts:17:14
+
+const tpl2: string
+
+
+# output.json
+{
+  "symbols": [
+    {
+      "name": "fizzBuzz",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 1,
+            "col": 13,
+            "byteIndex": 45
+          },
+          "declarationKind": "export",
+          "jsDoc": {
+            "doc": "Something about fizzBuzz"
+          },
+          "kind": "variable",
+          "def": {
+            "tsType": {
+              "repr": "fizzBuzz",
+              "kind": "literal",
+              "value": {
+                "kind": "string",
+                "string": "fizzBuzz"
+              }
+            },
+            "kind": "const"
+          }
+        }
+      ]
+    },
+    {
+      "name": "env",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 3,
+            "col": 13,
+            "byteIndex": 82
+          },
+          "declarationKind": "export",
+          "kind": "variable",
+          "def": {
+            "tsType": {
+              "kind": "typeLiteral",
+              "value": {
+                "methods": [
+                  {
+                    "name": "get",
+                    "jsDoc": {
+                      "doc": "get doc"
+                    },
+                    "kind": "method",
+                    "location": {
+                      "filename": "file:///mod.ts",
+                      "line": 5,
+                      "col": 2,
+                      "byteIndex": 108
+                    },
+                    "params": [
+                      {
+                        "kind": "identifier",
+                        "name": "key",
+                        "optional": false,
+                        "tsType": {
+                          "repr": "string",
+                          "kind": "keyword",
+                          "value": "string"
+                        }
+                      }
+                    ],
+                    "returnType": {
+                      "kind": "union",
+                      "value": [
+                        {
+                          "repr": "string",
+                          "kind": "keyword",
+                          "value": "string"
+                        },
+                        {
+                          "repr": "undefined",
+                          "kind": "keyword",
+                          "value": "undefined"
+                        }
+                      ]
+                    }
+                  },
+                  {
+                    "name": "set",
+                    "jsDoc": {
+                      "doc": "set doc"
+                    },
+                    "kind": "method",
+                    "location": {
+                      "filename": "file:///mod.ts",
+                      "line": 8,
+                      "col": 2,
+                      "byteIndex": 166
+                    },
+                    "params": [
+                      {
+                        "kind": "identifier",
+                        "name": "key",
+                        "optional": false,
+                        "tsType": {
+                          "repr": "string",
+                          "kind": "keyword",
+                          "value": "string"
+                        }
+                      },
+                      {
+                        "kind": "identifier",
+                        "name": "value",
+                        "optional": false,
+                        "tsType": {
+                          "repr": "string",
+                          "kind": "keyword",
+                          "value": "string"
+                        }
+                      }
+                    ],
+                    "returnType": {
+                      "repr": "void",
+                      "kind": "keyword",
+                      "value": "void"
+                    }
+                  }
+                ]
+              }
+            },
+            "kind": "const"
+          }
+        }
+      ]
+    },
+    {
+      "name": "num",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 11,
+            "col": 13,
+            "byteIndex": 221
+          },
+          "declarationKind": "export",
+          "kind": "variable",
+          "def": {
+            "tsType": {
+              "repr": "100",
+              "kind": "literal",
+              "value": {
+                "kind": "number",
+                "number": 100.0
+              }
+            },
+            "kind": "const"
+          }
+        }
+      ]
+    },
+    {
+      "name": "bool",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 12,
+            "col": 13,
+            "byteIndex": 245
+          },
+          "declarationKind": "export",
+          "kind": "variable",
+          "def": {
+            "tsType": {
+              "repr": "false",
+              "kind": "literal",
+              "value": {
+                "kind": "boolean",
+                "boolean": false
+              }
+            },
+            "kind": "const"
+          }
+        }
+      ]
+    },
+    {
+      "name": "bigint",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 13,
+            "col": 13,
+            "byteIndex": 272
+          },
+          "declarationKind": "export",
+          "kind": "variable",
+          "def": {
+            "tsType": {
+              "repr": "123",
+              "kind": "literal",
+              "value": {
+                "kind": "bigInt",
+                "string": "123"
+              }
+            },
+            "kind": "const"
+          }
+        }
+      ]
+    },
+    {
+      "name": "regex",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 14,
+            "col": 13,
+            "byteIndex": 300
+          },
+          "declarationKind": "export",
+          "kind": "variable",
+          "def": {
+            "tsType": {
+              "repr": "hello",
+              "kind": "typeRef",
+              "value": {
+                "typeName": "RegExp"
+              }
+            },
+            "kind": "const"
+          }
+        }
+      ]
+    },
+    {
+      "name": "date",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 15,
+            "col": 13,
+            "byteIndex": 330
+          },
+          "declarationKind": "export",
+          "kind": "variable",
+          "def": {
+            "tsType": {
+              "repr": "Date",
+              "kind": "typeRef",
+              "value": {
+                "typeName": "Date"
+              }
+            },
+            "kind": "const"
+          }
+        }
+      ]
+    },
+    {
+      "name": "tpl1",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 16,
+            "col": 13,
+            "byteIndex": 362
+          },
+          "declarationKind": "export",
+          "kind": "variable",
+          "def": {
+            "tsType": {
+              "repr": "foo",
+              "kind": "literal",
+              "value": {
+                "kind": "template",
+                "tsTypes": [
+                  {
+                    "repr": "foo",
+                    "kind": "literal",
+                    "value": {
+                      "kind": "string",
+                      "string": "foo"
+                    }
+                  }
+                ]
+              }
+            },
+            "kind": "const"
+          }
+        }
+      ]
+    },
+    {
+      "name": "tpl2",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 17,
+            "col": 13,
+            "byteIndex": 389
+          },
+          "declarationKind": "export",
+          "kind": "variable",
+          "def": {
+            "tsType": {
+              "repr": "string",
+              "kind": "keyword",
+              "value": "string"
+            },
+            "kind": "const"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,197 @@
+---
+source: tests/html_test.rs
+expression: module_docs
+---
+[
+  {
+    "deprecated": "<div class=\"markdown\"></div>",
+    "sections": {
+      "id": "module_doc",
+      "docs": "<div class=\"markdown\"><p>Some docs\nwith a line break</p>\n</div>",
+      "sections": []
+    }
+  },
+  {
+    "deprecated": null,
+    "sections": {
+      "id": "module_doc",
+      "docs": null,
+      "sections": [
+        {
+          "header": {
+            "title": "Functions",
+            "anchor": {
+              "id": "d_functions"
+            },
+            "href": null,
+            "doc": null
+          },
+          "content": {
+            "kind": "namespace_section",
+            "content": [
+              {
+                "anchor": {
+                  "id": "namespace_externalfunction"
+                },
+                "tags": [],
+                "doc_node_kind_ctx": [
+                  {
+                    "kind": "Function",
+                    "char": "f",
+                    "title": "Function",
+                    "title_lowercase": "function",
+                    "title_plural": "Functions"
+                  }
+                ],
+                "href": ".././d/~/externalFunction.html",
+                "name": "externalFunction",
+                "ty": {
+                  "ty": "(<span><span>_n<span class=\"td-op\">?</span><span>: <span class=\"td-kw\">number</span></span></span></span>)<span>: <span class=\"td-kw\">void</span></span>",
+                  "info": null
+                },
+                "docs": null,
+                "deprecated": false,
+                "subitems": []
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  {
+    "deprecated": null,
+    "sections": {
+      "id": "module_doc",
+      "docs": null,
+      "sections": [
+        {
+          "header": {
+            "title": "Functions",
+            "anchor": {
+              "id": "foo_functions"
+            },
+            "href": null,
+            "doc": null
+          },
+          "content": {
+            "kind": "namespace_section",
+            "content": [
+              {
+                "anchor": {
+                  "id": "namespace_x"
+                },
+                "tags": [],
+                "doc_node_kind_ctx": [
+                  {
+                    "kind": "Function",
+                    "char": "f",
+                    "title": "Function",
+                    "title_lowercase": "function",
+                    "title_plural": "Functions"
+                  }
+                ],
+                "href": ".././foo/~/x.html",
+                "name": "x",
+                "ty": {
+                  "ty": "(<span><span>_n<span class=\"td-op\">?</span><span>: <span class=\"td-kw\">number</span></span></span></span>)<span>: <span class=\"td-kw\">void</span></span>",
+                  "info": null
+                },
+                "docs": null,
+                "deprecated": false,
+                "subitems": []
+              }
+            ]
+          }
+        },
+        {
+          "header": {
+            "title": "Variables",
+            "anchor": {
+              "id": "foo_variables"
+            },
+            "href": null,
+            "doc": null
+          },
+          "content": {
+            "kind": "namespace_section",
+            "content": [
+              {
+                "anchor": {
+                  "id": "namespace_default"
+                },
+                "tags": [],
+                "doc_node_kind_ctx": [
+                  {
+                    "kind": "Variable",
+                    "char": "v",
+                    "title": "Variable",
+                    "title_lowercase": "variable",
+                    "title_plural": "Variables"
+                  }
+                ],
+                "href": ".././foo/~/default.html",
+                "name": "default",
+                "ty": {
+                  "ty": ": <span class=\"td-kw\">number</span>",
+                  "info": null
+                },
+                "docs": "<div class=\"markdown_summary\"><p>The default export item.</p>\n</div>",
+                "deprecated": false,
+                "subitems": []
+              }
+            ]
+          }
+        }
+      ]
+    }
+  },
+  {
+    "deprecated": null,
+    "sections": {
+      "id": "module_doc",
+      "docs": null,
+      "sections": [
+        {
+          "header": {
+            "title": "Functions",
+            "anchor": {
+              "id": "c_functions"
+            },
+            "href": null,
+            "doc": null
+          },
+          "content": {
+            "kind": "namespace_section",
+            "content": [
+              {
+                "anchor": {
+                  "id": "namespace_x"
+                },
+                "tags": [],
+                "doc_node_kind_ctx": [
+                  {
+                    "kind": "Function",
+                    "char": "f",
+                    "title": "Function",
+                    "title_lowercase": "function",
+                    "title_plural": "Functions"
+                  }
+                ],
+                "href": ".././c/~/x.html",
+                "name": "x",
+                "ty": {
+                  "ty": "(<span><span>_n<span class=\"td-op\">?</span><span>: <span class=\"td-kw\">number</span></span></span></span>)<span>: <span class=\"td-kw\">void</span></span>",
+                  "info": null
+                },
+                "docs": null,
+                "deprecated": false,
+                "subitems": []
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+]

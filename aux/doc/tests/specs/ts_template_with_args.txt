@@ -1,0 +1,68 @@
+# mod.ts
+export const tpl: `test${number}` = `test1`;
+
+# diagnostics
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+ --> /mod.ts:1:14
+  | 
+1 | export const tpl: `test${number}` = `test1`;
+  |              ^
+
+# output.txt
+Defined in file:///mod.ts:0:14
+
+const tpl: `test${number}`
+
+
+# output.json
+{
+  "symbols": [
+    {
+      "name": "tpl",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 0,
+            "col": 13,
+            "byteIndex": 13
+          },
+          "declarationKind": "export",
+          "kind": "variable",
+          "def": {
+            "tsType": {
+              "repr": "test${number}",
+              "kind": "literal",
+              "value": {
+                "kind": "template",
+                "tsTypes": [
+                  {
+                    "repr": "test",
+                    "kind": "literal",
+                    "value": {
+                      "kind": "string",
+                      "string": "test"
+                    }
+                  },
+                  {
+                    "repr": "number",
+                    "kind": "keyword",
+                    "value": "number"
+                  },
+                  {
+                    "kind": "literal",
+                    "value": {
+                      "kind": "string",
+                      "string": ""
+                    }
+                  }
+                ]
+              }
+            },
+            "kind": "const"
+          }
+        }
+      ]
+    }
+  ]
+}

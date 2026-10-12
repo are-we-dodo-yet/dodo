@@ -1,0 +1,45 @@
+# mod.ts
+declare function foo(): void;
+  export { foo as bar };
+
+# diagnostics
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+ --> /mod.ts:1:1
+  | 
+1 | declare function foo(): void;
+  | ^
+
+# output.txt
+Defined in file:///mod.ts:0:1
+
+function bar(): void
+
+
+# output.json
+{
+  "symbols": [
+    {
+      "name": "bar",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 0,
+            "col": 0,
+            "byteIndex": 0
+          },
+          "declarationKind": "export",
+          "kind": "function",
+          "def": {
+            "params": [],
+            "returnType": {
+              "repr": "void",
+              "kind": "keyword",
+              "value": "void"
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

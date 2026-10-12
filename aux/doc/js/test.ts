@@ -1,0 +1,186 @@
+// Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
+
+import { assert, assertEquals, assertRejects } from "@std/assert";
+import { doc, generateHtml, generateHtmlAsJSON } from "./mod.ts";
+
+Deno.test({
+  name: "doc()",
+  async fn() {
+    const records = await doc(
+      ["https://deno.land/std@0.104.0/fmt/colors.ts"],
+    );
+    const document = records["https://deno.land/std@0.104.0/fmt/colors.ts"];
+    assertEquals(document.symbols.length, 49);
+    const fnStripColor = document.symbols.find((n) =>
+      n.declarations.some((d) => d.kind === "function") &&
+      n.name === "stripColor"
+    );
+    assert(fnStripColor, "unable to locate specific node");
+    const decl = fnStripColor.declarations[0];
+    assert(decl.kind === "function");
+    assert(decl.def);
+    assertEquals(decl.def.params, [{
+      kind: "identifier",
+      name: "string",
+      optional: false,
+      tsType: {
+        repr: "string",
+        kind: "keyword",
+        value: "string",
+      },
+    }]);
+  },
+});
+
+Deno.test({
+  name: "doc() - timings",
+  async fn() {
+    const fixture = [new URL("../benches/fixtures/deno.d.ts", import.meta.url)
+      .toString()];
+
+    const start = Date.now();
+    await doc(fixture);
+    const end = Date.now();
+    console.log(`\n  First run: ${end - start}ms`);
+
+    const runCount = 10;
+    const time = [];
+
+    for (let i = 0; i < runCount; i++) {
+      const start = Date.now();
+      await doc(fixture);
+      const end = Date.now();
+      time.push(end - start);
+    }
+    const totalTime = time.reduce((p, c) => p += c, 0);
+    const meanTime = (totalTime / runCount).toFixed(0);
+    console.log(`  Mean of ${runCount} runs: ${meanTime}ms`);
+  },
+});
+
+Deno.test({
+  name: "doc() - with headers",
+  async fn() {
+    const documents = await doc(["https://example.com/a"], {
+      load(specifier) {
+        return Promise.resolve({
+          kind: "module",
+          specifier,
+          headers: {
+            "content-type": "application/typescript; charset=utf-8",
+          },
+          content: `declare interface A {
+            a: string;
+          }`,
+        });
+      },
+    });
+    assertEquals(Object.values(documents)[0].symbols.length, 1);
+  },
+});
+
+Deno.test({
+  name: "doc() - bad specifier",
+  async fn() {
+    await assertRejects(
+      async () => {
+        await doc(["./bad.ts"]);
+      },
+      Error,
+      "relative URL without a base",
+    );
+  },
+});
+
+Deno.test({
+  name: "doc() - with import map",
+  async fn() {
+    const records = await doc(["https://example.com/a.ts"], {
+      importMap: "https://example.com/import_map.json",
+      load(specifier) {
+        let content = "";
+        switch (specifier) {
+          case "https://example.com/import_map.json":
+            content = JSON.stringify({
+              imports: { "b": "https://example.com/b.ts" },
+            });
+            break;
+          case "https://example.com/a.ts":
+            content = `export { B } from "b";\n`;
+            break;
+          case "https://example.com/b.ts":
+            content = `export class B {
+              b: string;
+            }`;
+            break;
+        }
+        return Promise.resolve({
+          kind: "module",
+          specifier,
+          content,
+        });
+      },
+    });
+    const document = Object.values(records)[0];
+    assertEquals(document.symbols.length, 1);
+    assertEquals(document.symbols[0].declarations[0].kind, "class");
+    assertEquals(document.symbols[0].name, "B");
+  },
+});
+
+Deno.test({
+  name: "generateHtml()",
+  async fn() {
+    const entries = await doc(
+      ["https://deno.land/std@0.104.0/fmt/colors.ts"],
+    );
+
+    const files = await generateHtml({
+      ["file:///colors.ts"]: Object.values(entries)[0],
+    }, {
+      markdownRenderer(
+        md,
+        _titleOnly,
+        _filePath,
+        _anchorizer,
+      ) {
+        return md;
+      },
+      markdownStripper(md: string) {
+        return md;
+      },
+    });
+
+    // `Rgb` is not exported, but `rgb24`/`bgRgb24` take it, so it gets a page
+    // and one per property. `Code`, which nothing public mentions, does not.
+    assertEquals(Object.keys(files).length, 62);
+  },
+});
+
+Deno.test({
+  name: "generateHtmlAsJSON()",
+  async fn() {
+    const entries = await doc(
+      ["https://deno.land/std@0.104.0/fmt/colors.ts"],
+    );
+
+    const files = await generateHtmlAsJSON({
+      ["file:///colors.ts"]: Object.values(entries)[0],
+    }, {
+      markdownRenderer(
+        md,
+        _titleOnly,
+        _filePath,
+        _anchorizer,
+      ) {
+        return md;
+      },
+      markdownStripper(md: string) {
+        return md;
+      },
+    });
+
+    // same four extra pages as in generateHtml() above
+    assertEquals(Object.keys(files).length, 55);
+  },
+});

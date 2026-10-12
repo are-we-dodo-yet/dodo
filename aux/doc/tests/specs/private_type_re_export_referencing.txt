@@ -1,0 +1,165 @@
+# mod.ts
+export type { Data } from "./data.ts";
+
+# data.ts
+interface PrivateNotExported {
+}
+
+export interface PrivateExportedButNotFromModTs {
+}
+
+/** doc */
+export class Data {
+  /** doc */
+  prop: PrivateNotExported;
+  /** doc */
+  prop2: PrivateExportedButNotFromModTs;
+  /** @internal */
+  prop3: PrivateReferencedInInternal;
+  /** @ignore */
+  prop4: PrivateReferencedInIgnore;
+}
+
+interface PrivateReferencedInInternal {}
+interface PrivateReferencedInIgnore {}
+
+# diagnostics
+error[private-type-ref]: public type 'Data.prototype.prop' references private type 'PrivateNotExported'
+  --> /data.ts:10:3
+   | 
+10 |   prop: PrivateNotExported;
+   |   ^
+   = hint: make the referenced type public or remove the reference
+   | 
+ 1 | interface PrivateNotExported {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[private-type-ref]: public type 'Data.prototype.prop2' references private type 'PrivateExportedButNotFromModTs'
+  --> /data.ts:12:3
+   | 
+12 |   prop2: PrivateExportedButNotFromModTs;
+   |   ^
+   = hint: make the referenced type public or remove the reference
+   | 
+ 4 | export interface PrivateExportedButNotFromModTs {
+   | - this is the referenced type
+   | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+# output.txt
+Defined in file:///data.ts:7:1
+
+class Data
+  doc
+
+  prop: PrivateNotExported
+    doc
+  prop2: PrivateExportedButNotFromModTs
+    doc
+  prop3: PrivateReferencedInInternal
+
+    @internal
+
+
+# output.json
+{
+  "symbols": [
+    {
+      "name": "Data",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///data.ts",
+            "line": 7,
+            "col": 0,
+            "byteIndex": 98
+          },
+          "declarationKind": "export",
+          "jsDoc": {
+            "doc": "doc"
+          },
+          "kind": "class",
+          "def": {
+            "properties": [
+              {
+                "jsDoc": {
+                  "doc": "doc"
+                },
+                "tsType": {
+                  "repr": "PrivateNotExported",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeName": "PrivateNotExported",
+                    "resolution": {
+                      "kind": "local"
+                    }
+                  }
+                },
+                "name": "prop",
+                "location": {
+                  "filename": "file:///data.ts",
+                  "line": 9,
+                  "col": 2,
+                  "byteIndex": 133
+                }
+              },
+              {
+                "jsDoc": {
+                  "doc": "doc"
+                },
+                "tsType": {
+                  "repr": "PrivateExportedButNotFromModTs",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeName": "PrivateExportedButNotFromModTs",
+                    "resolution": {
+                      "kind": "local"
+                    }
+                  }
+                },
+                "name": "prop2",
+                "location": {
+                  "filename": "file:///data.ts",
+                  "line": 11,
+                  "col": 2,
+                  "byteIndex": 174
+                }
+              },
+              {
+                "jsDoc": {
+                  "tags": [
+                    {
+                      "kind": "internal"
+                    }
+                  ]
+                },
+                "tsType": {
+                  "repr": "PrivateReferencedInInternal",
+                  "kind": "typeRef",
+                  "value": {
+                    "typeName": "PrivateReferencedInInternal",
+                    "resolution": {
+                      "kind": "local"
+                    }
+                  }
+                },
+                "name": "prop3",
+                "location": {
+                  "filename": "file:///data.ts",
+                  "line": 13,
+                  "col": 2,
+                  "byteIndex": 234
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

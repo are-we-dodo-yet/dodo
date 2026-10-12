@@ -1,0 +1,220 @@
+# mod.ts
+/** Class doc */
+export class A {
+  /** @private */
+  p = false;
+
+  /**
+   * Some leading documentation here.
+   *
+   * @param {string} name some comment
+   * @param {string} a    some other comment that
+   *                      spans two lines
+   * @param {number} b    a number
+   */
+  constructor(name, a, b) {}
+
+  /**
+   * @returns {Promise<void>}
+   */
+  a() {}
+}
+
+# diagnostics
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+ --> /mod.ts:4:3
+  | 
+4 |   p = false;
+  |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /mod.ts:19:3
+   | 
+19 |   a() {}
+   |   ^
+
+# output.txt
+Defined in file:///mod.ts:1:1
+
+class A
+  Class doc
+
+  constructor(name, a, b)
+    Some leading documentation here.
+
+    @param {string} name
+        some comment
+
+    @param {string} a
+        some other comment that
+        spans two lines
+
+    @param {number} b
+        a number
+
+  p: boolean
+
+    @private
+  a(): void
+
+    @return {Promise<void>}
+
+
+# output.json
+{
+  "symbols": [
+    {
+      "name": "A",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 1,
+            "col": 0,
+            "byteIndex": 17
+          },
+          "declarationKind": "export",
+          "jsDoc": {
+            "doc": "Class doc"
+          },
+          "kind": "class",
+          "def": {
+            "constructors": [
+              {
+                "jsDoc": {
+                  "doc": "Some leading documentation here.\n",
+                  "tags": [
+                    {
+                      "kind": "param",
+                      "name": "name",
+                      "tsType": {
+                        "repr": "string",
+                        "kind": "keyword",
+                        "value": "string"
+                      },
+                      "doc": "some comment"
+                    },
+                    {
+                      "kind": "param",
+                      "name": "a",
+                      "tsType": {
+                        "repr": "string",
+                        "kind": "keyword",
+                        "value": "string"
+                      },
+                      "doc": "some other comment that\nspans two lines"
+                    },
+                    {
+                      "kind": "param",
+                      "name": "b",
+                      "tsType": {
+                        "repr": "number",
+                        "kind": "keyword",
+                        "value": "number"
+                      },
+                      "doc": "a number"
+                    }
+                  ]
+                },
+                "hasBody": true,
+                "name": "constructor",
+                "params": [
+                  {
+                    "kind": "identifier",
+                    "name": "name",
+                    "optional": false
+                  },
+                  {
+                    "kind": "identifier",
+                    "name": "a",
+                    "optional": false
+                  },
+                  {
+                    "kind": "identifier",
+                    "name": "b",
+                    "optional": false
+                  }
+                ],
+                "location": {
+                  "filename": "file:///mod.ts",
+                  "line": 13,
+                  "col": 2,
+                  "byteIndex": 289
+                }
+              }
+            ],
+            "properties": [
+              {
+                "jsDoc": {
+                  "tags": [
+                    {
+                      "kind": "private"
+                    }
+                  ]
+                },
+                "tsType": {
+                  "repr": "boolean",
+                  "kind": "keyword",
+                  "value": "boolean"
+                },
+                "name": "p",
+                "location": {
+                  "filename": "file:///mod.ts",
+                  "line": 3,
+                  "col": 2,
+                  "byteIndex": 54
+                }
+              }
+            ],
+            "methods": [
+              {
+                "jsDoc": {
+                  "tags": [
+                    {
+                      "kind": "return",
+                      "tsType": {
+                        "repr": "Promise<void>",
+                        "kind": "typeRef",
+                        "value": {
+                          "typeParams": [
+                            {
+                              "repr": "void",
+                              "kind": "keyword",
+                              "value": "void"
+                            }
+                          ],
+                          "typeName": "Promise",
+                          "resolution": {
+                            "kind": "typeParam"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                },
+                "name": "a",
+                "kind": "method",
+                "functionDef": {
+                  "params": [],
+                  "returnType": {
+                    "repr": "void",
+                    "kind": "keyword",
+                    "value": "void"
+                  },
+                  "hasBody": true
+                },
+                "location": {
+                  "filename": "file:///mod.ts",
+                  "line": 18,
+                  "col": 2,
+                  "byteIndex": 361
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

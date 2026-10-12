@@ -1,0 +1,196 @@
+# mod.ts
+@sealed
+export class A {
+  #x = "x";
+
+  @format("Hello, %s")
+  greeting: string;
+
+  @configurable(false)
+  get x() {
+    return this.#x;
+  }
+
+  @enumerable(false)
+  greet() {
+    return "hello";
+  }
+}
+
+# diagnostics
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+ --> /mod.ts:2:14
+  | 
+2 | export class A {
+  |              ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+ --> /mod.ts:6:3
+  | 
+6 |   greeting: string;
+  |   ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+ --> /mod.ts:9:7
+  | 
+9 |   get x() {
+  |       ^
+
+
+error[missing-return-type]: exported function is missing an explicit return type annotation
+ --> /mod.ts:9:7
+  | 
+9 |   get x() {
+  |       ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+  --> /mod.ts:14:3
+   | 
+14 |   greet() {
+   |   ^
+
+
+error[missing-return-type]: exported function is missing an explicit return type annotation
+  --> /mod.ts:14:3
+   | 
+14 |   greet() {
+   |   ^
+
+# output.txt
+Defined in file:///mod.ts:1:1
+
+@sealed
+class A
+
+  @format("Hello, %s")
+  greeting: string
+  @configurable(false)
+  get x()
+  @enumerable(false)
+  greet()
+
+
+# output.json
+{
+  "symbols": [
+    {
+      "name": "A",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 1,
+            "col": 0,
+            "byteIndex": 8
+          },
+          "declarationKind": "export",
+          "kind": "class",
+          "def": {
+            "properties": [
+              {
+                "tsType": {
+                  "repr": "string",
+                  "kind": "keyword",
+                  "value": "string"
+                },
+                "decorators": [
+                  {
+                    "name": "format",
+                    "args": [
+                      "\"Hello, %s\""
+                    ],
+                    "location": {
+                      "filename": "file:///mod.ts",
+                      "line": 4,
+                      "col": 3,
+                      "byteIndex": 41
+                    }
+                  }
+                ],
+                "name": "greeting",
+                "location": {
+                  "filename": "file:///mod.ts",
+                  "line": 4,
+                  "col": 2,
+                  "byteIndex": 40
+                }
+              }
+            ],
+            "methods": [
+              {
+                "name": "x",
+                "kind": "getter",
+                "functionDef": {
+                  "params": [],
+                  "hasBody": true,
+                  "decorators": [
+                    {
+                      "name": "configurable",
+                      "args": [
+                        "false"
+                      ],
+                      "location": {
+                        "filename": "file:///mod.ts",
+                        "line": 7,
+                        "col": 3,
+                        "byteIndex": 85
+                      }
+                    }
+                  ]
+                },
+                "location": {
+                  "filename": "file:///mod.ts",
+                  "line": 7,
+                  "col": 2,
+                  "byteIndex": 84
+                }
+              },
+              {
+                "name": "greet",
+                "kind": "method",
+                "functionDef": {
+                  "params": [],
+                  "hasBody": true,
+                  "decorators": [
+                    {
+                      "name": "enumerable",
+                      "args": [
+                        "false"
+                      ],
+                      "location": {
+                        "filename": "file:///mod.ts",
+                        "line": 12,
+                        "col": 3,
+                        "byteIndex": 145
+                      }
+                    }
+                  ]
+                },
+                "location": {
+                  "filename": "file:///mod.ts",
+                  "line": 12,
+                  "col": 2,
+                  "byteIndex": 144
+                }
+              }
+            ],
+            "decorators": [
+              {
+                "name": "sealed",
+                "location": {
+                  "filename": "file:///mod.ts",
+                  "line": 0,
+                  "col": 1,
+                  "byteIndex": 1
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

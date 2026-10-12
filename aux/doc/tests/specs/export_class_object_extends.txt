@@ -1,0 +1,95 @@
+# mod.ts
+class Foo {}
+const obj = { Foo }
+
+export class Bar extends obj.Foo {}
+
+# diagnostics
+error[private-type-ref]: public type 'Bar' references private type 'obj'
+ --> /mod.ts:4:1
+  | 
+4 | export class Bar extends obj.Foo {}
+  | ^
+  = hint: make the referenced type public or remove the reference
+  | 
+2 | const obj = { Foo }
+  |       - this is the referenced type
+  | 
+
+  info: to ensure documentation is complete all types that are exposed in the public API must be public
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+ --> /mod.ts:4:14
+  | 
+4 | export class Bar extends obj.Foo {}
+  |              ^
+
+# output.txt
+Defined in file:///mod.ts:1:7
+
+private const obj: { Foo; }
+
+Defined in file:///mod.ts:3:1
+
+class Bar extends obj.Foo
+
+
+
+# output.json
+{
+  "symbols": [
+    {
+      "name": "Bar",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 3,
+            "col": 0,
+            "byteIndex": 34
+          },
+          "declarationKind": "export",
+          "kind": "class",
+          "def": {
+            "extends": "obj.Foo"
+          }
+        }
+      ]
+    },
+    {
+      "name": "obj",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 1,
+            "col": 6,
+            "byteIndex": 19
+          },
+          "declarationKind": "private",
+          "kind": "variable",
+          "def": {
+            "tsType": {
+              "kind": "typeLiteral",
+              "value": {
+                "properties": [
+                  {
+                    "name": "Foo",
+                    "location": {
+                      "filename": "file:///mod.ts",
+                      "line": 1,
+                      "col": 14,
+                      "byteIndex": 27
+                    }
+                  }
+                ]
+              }
+            },
+            "kind": "const"
+          }
+        }
+      ]
+    }
+  ]
+}

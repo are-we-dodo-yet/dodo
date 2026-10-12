@@ -1,0 +1,98 @@
+# mod.ts
+export class A {
+  constructor(public readonly name: string, private private: number, public override public: boolean) {}
+}
+
+# diagnostics
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+ --> /mod.ts:1:14
+  | 
+1 | export class A {
+  |              ^
+
+
+error[missing-jsdoc]: exported symbol is missing JSDoc documentation
+ --> /mod.ts:2:3
+  | 
+2 |   constructor(public readonly name: string, private private: number, public override public: boolean) {}
+  |   ^
+
+# output.txt
+Defined in file:///mod.ts:0:1
+
+class A
+
+  constructor(public readonly name: string, private private: number, override public public: boolean)
+
+
+# output.json
+{
+  "symbols": [
+    {
+      "name": "A",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 0,
+            "col": 0,
+            "byteIndex": 0
+          },
+          "declarationKind": "export",
+          "kind": "class",
+          "def": {
+            "constructors": [
+              {
+                "hasBody": true,
+                "name": "constructor",
+                "params": [
+                  {
+                    "accessibility": "public",
+                    "kind": "identifier",
+                    "name": "name",
+                    "optional": false,
+                    "tsType": {
+                      "repr": "string",
+                      "kind": "keyword",
+                      "value": "string"
+                    },
+                    "readonly": true
+                  },
+                  {
+                    "accessibility": "private",
+                    "kind": "identifier",
+                    "name": "private",
+                    "optional": false,
+                    "tsType": {
+                      "repr": "number",
+                      "kind": "keyword",
+                      "value": "number"
+                    }
+                  },
+                  {
+                    "accessibility": "public",
+                    "isOverride": true,
+                    "kind": "identifier",
+                    "name": "public",
+                    "optional": false,
+                    "tsType": {
+                      "repr": "boolean",
+                      "kind": "keyword",
+                      "value": "boolean"
+                    }
+                  }
+                ],
+                "location": {
+                  "filename": "file:///mod.ts",
+                  "line": 1,
+                  "col": 2,
+                  "byteIndex": 19
+                }
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

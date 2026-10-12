@@ -1,0 +1,144 @@
+# mod.ts
+/**
+* @module foo
+*/
+
+/**
+* Hello there, this is a multiline JSdoc.
+*
+* It has many lines
+*
+* Or not that many?
+*/
+export function foo(a: string, b?: number, cb: (...cbArgs: unknown[]) => void, ...args: unknown[]): void {
+    /**
+     * @todo document all the things.
+     */
+    console.log("Hello world");
+}
+# output.txt
+@module
+    foo
+
+
+Defined in file:///mod.ts:11:1
+
+function foo(a: string, b?: number, cb: (...cbArgs: unknown[]) => void, ...args: unknown[]): void
+  Hello there, this is a multiline JSdoc.
+
+  It has many lines
+
+  Or not that many?
+
+
+# output.json
+{
+  "module_doc": {
+    "tags": [
+      {
+        "kind": "module",
+        "name": "foo"
+      }
+    ]
+  },
+  "symbols": [
+    {
+      "name": "foo",
+      "declarations": [
+        {
+          "location": {
+            "filename": "file:///mod.ts",
+            "line": 11,
+            "col": 0,
+            "byteIndex": 115
+          },
+          "declarationKind": "export",
+          "jsDoc": {
+            "doc": "Hello there, this is a multiline JSdoc.\n\nIt has many lines\n\nOr not that many?"
+          },
+          "kind": "function",
+          "def": {
+            "params": [
+              {
+                "kind": "identifier",
+                "name": "a",
+                "optional": false,
+                "tsType": {
+                  "repr": "string",
+                  "kind": "keyword",
+                  "value": "string"
+                }
+              },
+              {
+                "kind": "identifier",
+                "name": "b",
+                "optional": true,
+                "tsType": {
+                  "repr": "number",
+                  "kind": "keyword",
+                  "value": "number"
+                }
+              },
+              {
+                "kind": "identifier",
+                "name": "cb",
+                "optional": false,
+                "tsType": {
+                  "kind": "fnOrConstructor",
+                  "value": {
+                    "constructor": false,
+                    "tsType": {
+                      "repr": "void",
+                      "kind": "keyword",
+                      "value": "void"
+                    },
+                    "params": [
+                      {
+                        "kind": "rest",
+                        "arg": {
+                          "kind": "identifier",
+                          "name": "cbArgs",
+                          "optional": false
+                        },
+                        "tsType": {
+                          "kind": "array",
+                          "value": {
+                            "repr": "unknown",
+                            "kind": "keyword",
+                            "value": "unknown"
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "kind": "rest",
+                "arg": {
+                  "kind": "identifier",
+                  "name": "args",
+                  "optional": false
+                },
+                "tsType": {
+                  "kind": "array",
+                  "value": {
+                    "repr": "unknown",
+                    "kind": "keyword",
+                    "value": "unknown"
+                  }
+                }
+              }
+            ],
+            "returnType": {
+              "repr": "void",
+              "kind": "keyword",
+              "value": "void"
+            },
+            "hasBody": true
+          }
+        }
+      ]
+    }
+  ]
+}
