@@ -85,6 +85,7 @@ pub struct ContextState {
   pub(crate) js_drain_next_tick_and_macrotasks_cb:
     RefCell<Option<v8::Global<v8::Function>>>,
   pub(crate) js_handle_rejections_cb: RefCell<Option<v8::Global<v8::Function>>>,
+  pub(crate) js_report_exception_cb: RefCell<Option<v8::Global<v8::Function>>>,
   pub(crate) run_immediate_callbacks_cb:
     RefCell<Option<v8::Global<v8::Function>>>,
   pub(crate) js_wasm_streaming_cb: RefCell<Option<v8::Global<v8::Function>>>,
@@ -209,6 +210,7 @@ impl ContextState {
       js_process_timers_cb: Default::default(),
       js_drain_next_tick_and_macrotasks_cb: Default::default(),
       js_handle_rejections_cb: Default::default(),
+      js_report_exception_cb: Default::default(),
       run_immediate_callbacks_cb: Default::default(),
       js_wasm_streaming_cb: Default::default(),
       wasm_instance_fn: Default::default(),
@@ -352,6 +354,7 @@ impl JsRealmInner {
       &mut *state.js_drain_next_tick_and_macrotasks_cb.borrow_mut(),
     );
     std::mem::take(&mut *state.js_handle_rejections_cb.borrow_mut());
+    std::mem::take(&mut *state.js_report_exception_cb.borrow_mut());
     std::mem::take(&mut *state.run_immediate_callbacks_cb.borrow_mut());
     std::mem::take(&mut *state.js_wasm_streaming_cb.borrow_mut());
 

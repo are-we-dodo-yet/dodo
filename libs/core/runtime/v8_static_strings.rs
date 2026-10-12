@@ -30,6 +30,7 @@ v8_static_strings!(
   PROCESS_TIMERS = "__processTimers",
   DRAIN_NEXT_TICK_AND_MACROTASKS = "__drainNextTickAndMacrotasks",
   HANDLE_REJECTIONS = "__handleRejections",
+  REPORT_EXCEPTION = "__reportException",
   SET_TICK_INFO = "__setTickInfo",
   SET_IMMEDIATE_INFO = "__setImmediateInfo",
   RUN_IMMEDIATE_CALLBACKS = "runImmediateCallbacks",

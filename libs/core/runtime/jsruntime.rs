@@ -1688,6 +1688,7 @@ impl JsRuntime {
       process_timers_cb,
       drain_next_tick_and_macrotasks_cb,
       handle_rejections_cb,
+      report_exception_cb,
       build_custom_error_cb,
       error_constructors,
       run_immediate_callbacks_cb,
@@ -1727,6 +1728,12 @@ impl JsRuntime {
         core_obj,
         HANDLE_REJECTIONS,
         "Deno.core.__handleRejections",
+      );
+      let report_exception_cb: v8::Local<v8::Function> = bindings::get(
+        scope,
+        core_obj,
+        REPORT_EXCEPTION,
+        "Deno.core.__reportException",
       );
       let build_custom_error_cb: v8::Local<v8::Function> = bindings::get(
         scope,
@@ -1880,6 +1887,7 @@ impl JsRuntime {
         v8::Global::new(scope, process_timers_cb),
         v8::Global::new(scope, drain_next_tick_and_macrotasks_cb),
         v8::Global::new(scope, handle_rejections_cb),
+        v8::Global::new(scope, report_exception_cb),
         v8::Global::new(scope, build_custom_error_cb),
         v8::Global::new(scope, error_constructors),
         v8::Global::new(scope, run_immediate_callbacks_cb),
@@ -1906,6 +1914,10 @@ impl JsRuntime {
       .js_handle_rejections_cb
       .borrow_mut()
       .replace(handle_rejections_cb);
+    state_rc
+      .js_report_exception_cb
+      .borrow_mut()
+      .replace(report_exception_cb);
     state_rc
       .exception_state
       .js_build_custom_error_cb
@@ -2609,10 +2621,26 @@ impl JsRuntime {
         .event_loop_phases
         .borrow_mut()
         .drain_v8_close_callbacks();
+      v8::tc_scope!(let tc_scope, scope);
       for cb in v8_cbs {
-        (cb.callback)(scope);
+        (cb.callback)(tc_scope);
+        if let Some(exception) = tc_scope.exception() {
+          tc_scope.reset();
+          let report_exception_cb = context_state.js_report_exception_cb.borrow();
+          let report_exception_fn =
+            report_exception_cb.as_ref().unwrap().open(tc_scope);
+          let undefined: v8::Local<v8::Value> = v8::undefined(tc_scope).into();
+          report_exception_fn.call(tc_scope, undefined, &[exception]);
+        }
+        if let Some(exception) = tc_scope.exception() {
+          exception_to_err_result::<()>(tc_scope, exception, false, true)?;
+        }
+        if tc_scope.has_terminated() || tc_scope.is_execution_terminating() {
+          break;
+        }
       }
     }
+    exception_state.check_exception_condition(scope)?;
     // libuv close callbacks may call into JS; flush microtasks if present.
     if has_uv
       || !context_state
