@@ -114,7 +114,7 @@ const fn op_cppgc_object() -> ::deno_core::_ops::OpDecl {
                         let mut scope = scope.init();
                         deno_core::_ops::throw_error_one_byte(
                             &mut scope,
-                            "expected Path { leading_colon: None, segments: [PathSegment { ident: Ident(Wrap), arguments: PathArguments::None }] }",
+                            "expected Wrap",
                         );
                         return unsafe { std::mem::zeroed() };
                     }
@@ -529,7 +529,7 @@ const fn op_use_cppgc_object() -> ::deno_core::_ops::OpDecl {
                         let mut scope = scope.init();
                         deno_core::_ops::throw_error_one_byte(
                             &mut scope,
-                            "expected Path { leading_colon: None, segments: [PathSegment { ident: Ident(Wrap), arguments: PathArguments::None }] }",
+                            "expected Wrap",
                         );
                         return unsafe { std::mem::zeroed() };
                     }
@@ -770,7 +770,7 @@ const fn op_use_cppgc_object_option() -> ::deno_core::_ops::OpDecl {
                         let mut scope = scope.init();
                         deno_core::_ops::throw_error_one_byte(
                             &mut scope,
-                            "expected Path { leading_colon: None, segments: [PathSegment { ident: Ident(Wrap), arguments: PathArguments::None }] }",
+                            "expected Wrap",
                         );
                         return unsafe { std::mem::zeroed() };
                     }

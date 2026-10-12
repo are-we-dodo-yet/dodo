@@ -1963,10 +1963,28 @@ mod tests {
   #![allow(clippy::disallowed_methods, reason = "test code")]
   #![allow(clippy::print_stdout, reason = "test code")]
 
+  use proc_macro2::Group;
+  use proc_macro2::TokenTree;
   use syn::ItemFn;
   use syn::parse_str;
 
   use super::*;
+
+  fn call_site_tokens(tokens: TokenStream) -> TokenStream {
+    tokens
+      .into_iter()
+      .map(|mut tree| {
+        if let TokenTree::Group(group) = &tree {
+          tree = TokenTree::Group(Group::new(
+            group.delimiter(),
+            call_site_tokens(group.stream()),
+          ));
+        }
+        tree.set_span(Span::call_site());
+        tree
+      })
+      .collect()
+  }
 
   // We can't test pattern args :/
   // https://github.com/rust-lang/rfcs/issues/2688
@@ -2063,7 +2081,9 @@ mod tests {
 
         let op = stringify!($f);
         // Parse the provided macro input as an ItemFn
-        let item_fn = parse_str::<ItemFn>(op)
+        let item_fn = parse_str::<TokenStream>(op)
+          .map(call_site_tokens)
+          .and_then(syn::parse2::<ItemFn>)
           .unwrap_or_else(|_| panic!("Failed to parse {op} as a ItemFn"));
         let attrs = item_fn.attrs;
         let error = parse_signature(attrs, item_fn.sig)

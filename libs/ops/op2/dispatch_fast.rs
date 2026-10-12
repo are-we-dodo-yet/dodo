@@ -846,12 +846,11 @@ fn map_v8_fastcall_arg_to_arg(
       v8_to_arg(v8, &arg_ident, arg, throw_type_error, extract_intermediate)?
     }
     Arg::CppGcResource(_, ty) => {
-      let ty = syn::parse_str::<syn::Path>(ty)
-        .map_err(|_| "failed to reparse type")?;
-
       *needs_fast_isolate = true;
       let throw_exception =
-        throw_type_error(generator_state, format!("expected {ty:?}"));
+        throw_type_error(generator_state, format!("expected {ty}"));
+      let ty = syn::parse_str::<syn::Path>(ty)
+        .map_err(|_| "failed to reparse type")?;
       gs_quote!(generator_state(scope, try_unwrap_cppgc) => {
         let Some(#arg_ident) = deno_core::_ops::#try_unwrap_cppgc::<#ty>(&mut #scope, #arg_ident) else {
           #throw_exception
