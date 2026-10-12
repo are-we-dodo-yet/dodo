@@ -8,6 +8,7 @@
 /.idea/
 /.vs/
 /.vscode/
+/.direnv/
 gclient_config.py_entries
 /target/
 /std/hash/_wasm/target
