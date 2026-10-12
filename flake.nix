@@ -23,10 +23,10 @@
 
         rustToolchain = pkgs.rust-bin.fromRustupToolchainFile ./rust-toolchain.toml;
 
-        cargoToml = builtins.fromTOML (builtins.readFile ./cli/Cargo.toml);
+        cargoToml = fromTOML (builtins.readFile ./cli/Cargo.toml);
         denoVersion = cargoToml.package.version;
 
-        cargoLock = builtins.fromTOML (builtins.readFile ./Cargo.lock);
+        cargoLock = fromTOML (builtins.readFile ./Cargo.lock);
         rustyV8Version = (builtins.head (builtins.filter (p: p.name == "v8") cargoLock.package)).version;
         rustyV8Targets = {
           "x86_64-linux" = "x86_64-unknown-linux-gnu";
@@ -125,6 +125,8 @@
             cmake
             protobuf
             openssl
+            nodejs_22
+            python3
           ] ++ lib.optionals stdenv.isLinux [
             glib
           ];
