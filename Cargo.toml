@@ -80,6 +80,8 @@ members = [
   "tests/util/server",
   "tests/util/test_macro",
   "tools/bsdiff_helper",
+
+  "aux/media_type",
 ]
 # tests/sqlite_extension is excluded because it requires rusqlite's "loadable_extension"
 # feature, which is incompatible with the "session" feature used by the rest of the workspace.
@@ -98,7 +100,6 @@ deno_doc = "=0.207.0"
 deno_error = "=0.7.1"
 deno_graph = { version = "=0.111.0", default-features = false }
 deno_lint = "=0.84.1"
-deno_media_type = { version = "=0.4.0", features = ["module_specifier"] }
 deno_native_certs = "0.3.0"
 deno_path_util = "=0.6.4"
 deno_semver = "=0.10.1"
@@ -142,6 +143,9 @@ deno_webidl = { version = "0.259.0", path = "./ext/webidl" }
 deno_websocket = { version = "0.264.0", path = "./ext/websocket" }
 deno_webstorage = { version = "0.254.0", path = "./ext/webstorage" }
 denort_helper = { version = "0.57.0", path = "./ext/rt_helper" }
+
+# auxes
+deno_media_type = { version = "0.4.0", path = "./aux/media_type", features = ["module_specifier"] }
 
 # workspace libraries
 deno_bench_util = { version = "0.253.0", path = "./tests/bench_util" }
