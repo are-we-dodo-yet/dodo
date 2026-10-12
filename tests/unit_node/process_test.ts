@@ -695,7 +695,7 @@ Deno.test({
       listener.close();
     });
 
-    const shell = "/bin/bash";
+    const shell = "bash";
     const cmd =
       `"${Deno.execPath()}" run ${scriptPath} < /dev/tcp/127.0.0.1/9000`;
     const args = ["-c", cmd];

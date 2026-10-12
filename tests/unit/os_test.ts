@@ -240,16 +240,16 @@ Deno.test(
 );
 
 Deno.test(
-  { permissions: { run: [Deno.execPath()], read: true } },
+  { permissions: { run: [Deno.execPath()], read: true, env: true } },
   // See https://github.com/denoland/deno/issues/16527
   async function hostnameWithoutOtherNetworkUsages() {
     const { stdout } = await new Deno.Command(Deno.execPath(), {
       args: ["eval", "-p", "Deno.hostname()"],
-      env: {
-        LD_PRELOAD: "",
-        LD_LIBRARY_PATH: "",
-        DYLD_FALLBACK_LIBRARY_PATH: "",
-      },
+      env: Object.fromEntries(
+        Object.keys(Deno.env.toObject())
+          .filter((key) => /^(LD_|DYLD_)/i.test(key))
+          .map((key) => [key, ""]),
+      ),
     }).output();
     const hostname = new TextDecoder().decode(stdout).trim();
     assert(hostname.length > 0);

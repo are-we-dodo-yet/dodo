@@ -1969,7 +1969,7 @@ Deno.test({
       // We use bash + printf so the raw byte reaches the kernel as-is;
       // passing a Buffer path through Deno's fs APIs would lossily
       // decode it to U+FFFD before the file was created.
-      const cmd = new Deno.Command("/bin/bash", {
+      const cmd = new Deno.Command("bash", {
         args: ["-c", `touch "$(printf '\\xe9')"`],
         cwd: tmp,
       });

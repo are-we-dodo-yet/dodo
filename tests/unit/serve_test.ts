@@ -5998,7 +5998,7 @@ Deno.test(
       },
     );
     await promise;
-    const e = await execCode3("/usr/bin/sh", [
+    const e = await execCode3("sh", [
       "-c",
       `curl --stderr - -N --compressed --no-progress-meter http://localhost:${servePort}`,
     ]);
