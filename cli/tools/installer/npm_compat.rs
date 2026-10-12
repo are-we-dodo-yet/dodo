@@ -300,6 +300,7 @@ pub async fn setup_npm_compat(
   manage_root_tsconfig: bool,
   type_check_remote: bool,
 ) -> Result<Vec<InstalledJsrPackage>, AnyError> {
+  crate::tsc::tsconfig_gen::ensure_deno_dir(project_root)?;
   let deno_json = read_deno_json(project_root)?;
   let deno_compiler_options = deno_json
     .as_ref()

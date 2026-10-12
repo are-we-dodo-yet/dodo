@@ -155,6 +155,16 @@ pub struct GeneratedTsConfig {
   pub tsconfig_path: PathBuf,
 }
 
+pub fn ensure_deno_dir(project_root: &Path) -> std::io::Result<PathBuf> {
+  let deno_dir = project_root.join(".deno");
+  std::fs::create_dir_all(&deno_dir)?;
+  // `.deno/` is a generated cache (materialized types, per-package projects).
+  // Mark it ignored so gitignore-respecting tooling - `deno publish`, git,
+  // formatters - skips it rather than treating it as project source.
+  std::fs::write(deno_dir.join(".gitignore"), "*\n")?;
+  Ok(deno_dir)
+}
+
 /// Generate `.deno/tsconfig.json` and Deno type definitions for use with
 /// stock TypeScript tooling.
 ///
@@ -237,12 +247,7 @@ pub fn generate_tsconfig(
   );
 
   // Write to .deno/tsconfig.json
-  let deno_dir = project_root.join(".deno");
-  std::fs::create_dir_all(&deno_dir)?;
-  // `.deno/` is a generated cache (materialized types, per-package projects).
-  // Mark it ignored so gitignore-respecting tooling - `deno publish`, git,
-  // formatters - skips it rather than treating it as project source.
-  std::fs::write(deno_dir.join(".gitignore"), "*\n")?;
+  let deno_dir = ensure_deno_dir(project_root)?;
   let tsconfig_path = deno_dir.join("tsconfig.json");
   let content = serde_json::to_string_pretty(&tsconfig)
     .expect("failed to serialize tsconfig");
