@@ -1,24 +1,44 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::program_ref;
-use super::{Context, LintRule};
-use crate::swc_util::StringRepr;
-use crate::tags::{self, Tags};
-use crate::Program;
-use crate::ProgramRef;
-use deno_ast::swc::ast::{
-  ArrowExpr, BlockStmtOrExpr, CallExpr, Callee, ClassMethod, Expr,
-  ExprOrSpread, FnDecl, FnExpr, GetterProp, MemberExpr, MemberProp, MethodKind,
-  MethodProp, ObjectLit, OptCall, OptChainBase, PrivateMethod, Prop, PropName,
-  PropOrSpread, ReturnStmt,
-};
-use deno_ast::swc::ecma_visit::noop_visit_type;
-use deno_ast::swc::ecma_visit::Visit;
-use deno_ast::swc::ecma_visit::VisitWith;
+use std::collections::BTreeMap;
+
 use deno_ast::SourceRange;
 use deno_ast::SourceRangedForSpanned;
+use deno_ast::swc::ast::ArrowExpr;
+use deno_ast::swc::ast::BlockStmtOrExpr;
+use deno_ast::swc::ast::CallExpr;
+use deno_ast::swc::ast::Callee;
+use deno_ast::swc::ast::ClassMethod;
+use deno_ast::swc::ast::Expr;
+use deno_ast::swc::ast::ExprOrSpread;
+use deno_ast::swc::ast::FnDecl;
+use deno_ast::swc::ast::FnExpr;
+use deno_ast::swc::ast::GetterProp;
+use deno_ast::swc::ast::MemberExpr;
+use deno_ast::swc::ast::MemberProp;
+use deno_ast::swc::ast::MethodKind;
+use deno_ast::swc::ast::MethodProp;
+use deno_ast::swc::ast::ObjectLit;
+use deno_ast::swc::ast::OptCall;
+use deno_ast::swc::ast::OptChainBase;
+use deno_ast::swc::ast::PrivateMethod;
+use deno_ast::swc::ast::Prop;
+use deno_ast::swc::ast::PropName;
+use deno_ast::swc::ast::PropOrSpread;
+use deno_ast::swc::ast::ReturnStmt;
+use deno_ast::swc::ecma_visit::Visit;
+use deno_ast::swc::ecma_visit::VisitWith;
+use deno_ast::swc::ecma_visit::noop_visit_type;
 use derive_more::Display;
-use std::collections::BTreeMap;
+
+use super::Context;
+use super::LintRule;
+use super::program_ref;
+use crate::Program;
+use crate::ProgramRef;
+use crate::swc_util::StringRepr;
+use crate::tags::Tags;
+use crate::tags::{self};
 
 #[derive(Debug)]
 pub struct GetterReturn;

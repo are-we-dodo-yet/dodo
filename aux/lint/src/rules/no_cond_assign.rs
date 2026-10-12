@@ -1,12 +1,22 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::{Context, LintRule};
-use crate::handler::{Handler, Traverse};
-use crate::tags::{self, Tags};
-use crate::Program;
-use deno_ast::view::{CondExpr, DoWhileStmt, Expr, ForStmt, IfStmt, WhileStmt};
-use deno_ast::{SourceRange, SourceRanged};
+use deno_ast::SourceRange;
+use deno_ast::SourceRanged;
+use deno_ast::view::CondExpr;
+use deno_ast::view::DoWhileStmt;
+use deno_ast::view::Expr;
+use deno_ast::view::ForStmt;
+use deno_ast::view::IfStmt;
+use deno_ast::view::WhileStmt;
 use derive_more::Display;
+
+use super::Context;
+use super::LintRule;
+use crate::Program;
+use crate::handler::Handler;
+use crate::handler::Traverse;
+use crate::tags::Tags;
+use crate::tags::{self};
 
 #[derive(Debug)]
 pub struct NoCondAssign;

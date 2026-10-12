@@ -1,12 +1,12 @@
 [package]
 name = "deno_doc_wasm"
 version = "0.0.0"
+authors = ["the Deno authors"]
+documentation = "https://docs.rs/deno_doc"
 edition = "2021"
 homepage = "https://deno.land/"
-repository = "https://github.com/denoland/deno_doc"
-documentation = "https://docs.rs/deno_doc"
-authors = ["the Deno authors"]
 license = "MIT"
+repository = "https://github.com/denoland/deno_doc"
 
 [lib]
 name = "deno_doc_wasm"
@@ -14,15 +14,15 @@ path = "lib.rs"
 crate-type = ["cdylib"]
 
 [dependencies]
-deno_graph = { workspace = true }
+anyhow.workspace = true
+console_error_panic_hook.workspace = true
 deno_doc = { workspace = true, default-features = false }
 deno_error = { workspace = true, features = ["url"] }
-anyhow.workspace = true
+deno_graph = { workspace = true }
 import_map.workspace = true
+indexmap.workspace = true
 serde.workspace = true
 serde_json.workspace = true
-indexmap.workspace = true
-console_error_panic_hook.workspace = true
 
 js-sys.workspace = true
 serde-wasm-bindgen.workspace = true

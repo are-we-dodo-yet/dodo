@@ -1,3 +1,7 @@
+use std::ops::Deref;
+
+use indexmap::IndexSet;
+
 use super::render_context::RenderContext;
 use super::types::render_type_def_colon;
 use super::types::with_trailing_comma;
@@ -11,8 +15,6 @@ use crate::js_doc::JsDoc;
 use crate::js_doc::JsDocTag;
 use crate::params::ParamDef;
 use crate::params::ParamPatternDef;
-use indexmap::IndexSet;
-use std::ops::Deref;
 
 /// Builds one [`DocEntryCtx`] per parameter, pairing each with the `@param`
 /// documentation `js_doc` carries for it.

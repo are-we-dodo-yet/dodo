@@ -1,13 +1,19 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::{Context, LintRule};
-use crate::handler::{Handler, Traverse};
-use crate::tags::{self, Tags};
-use crate::Program;
-use deno_ast::view::TsEntityName;
-use deno_ast::{view as ast_view, SourceRanged};
-use if_chain::if_chain;
 use std::convert::TryFrom;
+
+use deno_ast::SourceRanged;
+use deno_ast::view as ast_view;
+use deno_ast::view::TsEntityName;
+use if_chain::if_chain;
+
+use super::Context;
+use super::LintRule;
+use crate::Program;
+use crate::handler::Handler;
+use crate::handler::Traverse;
+use crate::tags::Tags;
+use crate::tags::{self};
 
 #[derive(Debug)]
 pub struct BanTypes;
@@ -30,10 +36,18 @@ impl BannedType {
   fn as_message(&self) -> &'static str {
     use BannedType::*;
     match *self {
-      String | Boolean | Number | Symbol | BigInt => "The corresponding lower-case primitive should be used",
-      Function => "This provides no type safety because it represents all functions and classes",
-      CapitalObject => "This type may be different from what you expect it to be",
-      EmptyObjectLiteral => "`{}` doesn't mean an empty object, but means any types other than `null` and `undefined`",
+      String | Boolean | Number | Symbol | BigInt => {
+        "The corresponding lower-case primitive should be used"
+      }
+      Function => {
+        "This provides no type safety because it represents all functions and classes"
+      }
+      CapitalObject => {
+        "This type may be different from what you expect it to be"
+      }
+      EmptyObjectLiteral => {
+        "`{}` doesn't mean an empty object, but means any types other than `null` and `undefined`"
+      }
     }
   }
 

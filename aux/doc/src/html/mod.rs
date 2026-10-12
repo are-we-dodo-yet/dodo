@@ -1,5 +1,9 @@
-use crate::Symbol;
-use crate::node::DeclarationDef;
+use std::borrow::Cow;
+use std::cmp::Ordering;
+use std::collections::HashMap;
+use std::path::PathBuf;
+use std::sync::Arc;
+
 use deno_ast::ModuleSpecifier;
 use handlebars::Handlebars;
 use handlebars::handlebars_helper;
@@ -7,11 +11,9 @@ use indexmap::IndexMap;
 use indexmap::IndexSet;
 use serde::Deserialize;
 use serde::Serialize;
-use std::borrow::Cow;
-use std::cmp::Ordering;
-use std::collections::HashMap;
-use std::path::PathBuf;
-use std::sync::Arc;
+
+use crate::Symbol;
+use crate::node::DeclarationDef;
 
 pub mod diff;
 pub mod jsdoc;
@@ -28,9 +30,6 @@ pub mod util;
 #[cfg(feature = "comrak")]
 pub mod comrak;
 
-use crate::html::pages::SymbolPage;
-use crate::js_doc::JsDocTag;
-use crate::parser::ParseOutput;
 pub use diff::DiffIndex;
 pub use diff::DiffStatus;
 pub use pages::generate_symbol_pages_for_module;
@@ -55,6 +54,10 @@ pub use util::UrlResolveKind;
 pub use util::compute_namespaced_symbols;
 pub use util::href_path_resolve;
 pub use util::qualify_drilldown_name;
+
+use crate::html::pages::SymbolPage;
+use crate::js_doc::JsDocTag;
+use crate::parser::ParseOutput;
 
 pub const STYLESHEET: &str = include_str!("./templates/styles.gen.css");
 pub const STYLESHEET_FILENAME: &str = "styles.css";

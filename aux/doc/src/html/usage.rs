@@ -1,19 +1,20 @@
+use std::borrow::Cow;
+#[cfg(all(target_arch = "wasm32", not(target_os = "emscripten")))]
+use std::cell::RefCell;
+#[cfg(all(target_arch = "wasm32", not(target_os = "emscripten")))]
+use std::ffi::c_void;
+
+use indexmap::IndexMap;
+use regex::Regex;
+use serde::Deserialize;
+use serde::Serialize;
+
 use super::DocNodeWithContext;
 use super::FileMode;
 use super::RenderContext;
 use super::UrlResolveKind;
 use crate::DeclarationDef;
 use crate::js_doc::JsDocTag;
-use indexmap::IndexMap;
-use regex::Regex;
-use serde::Deserialize;
-use serde::Serialize;
-use std::borrow::Cow;
-
-#[cfg(all(target_arch = "wasm32", not(target_os = "emscripten")))]
-use std::cell::RefCell;
-#[cfg(all(target_arch = "wasm32", not(target_os = "emscripten")))]
-use std::ffi::c_void;
 
 #[cfg(all(target_arch = "wasm32", not(target_os = "emscripten")))]
 thread_local! {

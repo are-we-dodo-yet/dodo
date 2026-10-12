@@ -2,17 +2,28 @@
 
 use std::borrow::Cow;
 
-use super::{Context, LintRule};
-use crate::handler::{Handler, Traverse};
-use crate::tags::{self, Tags};
-use crate::Program;
-use deno_ast::view::{
-  ClassDecl, ClassMember, Expr, Ident, PropName, TsEntityName, TsInterfaceDecl,
-  TsType, TsTypeAliasDecl, TsTypeAnn,
-  TsTypeElement::{TsConstructSignatureDecl, TsMethodSignature},
-};
 use deno_ast::SourceRanged;
+use deno_ast::view::ClassDecl;
+use deno_ast::view::ClassMember;
+use deno_ast::view::Expr;
+use deno_ast::view::Ident;
+use deno_ast::view::PropName;
+use deno_ast::view::TsEntityName;
+use deno_ast::view::TsInterfaceDecl;
+use deno_ast::view::TsType;
+use deno_ast::view::TsTypeAliasDecl;
+use deno_ast::view::TsTypeAnn;
+use deno_ast::view::TsTypeElement::TsConstructSignatureDecl;
+use deno_ast::view::TsTypeElement::TsMethodSignature;
 use derive_more::Display;
+
+use super::Context;
+use super::LintRule;
+use crate::Program;
+use crate::handler::Handler;
+use crate::handler::Traverse;
+use crate::tags::Tags;
+use crate::tags::{self};
 
 #[derive(Debug)]
 pub struct NoMisusedNew;

@@ -3,6 +3,7 @@
 #![allow(clippy::disallowed_methods)]
 
 use std::collections::HashSet;
+use std::fmt::Write;
 use std::io::Write as _;
 use std::path::PathBuf;
 use std::sync::Arc;
@@ -29,7 +30,6 @@ use file_test_runner::collection::strategies::TestPerFileCollectionStrategy;
 use futures::FutureExt;
 use indexmap::IndexMap;
 use serde::Deserialize;
-use std::fmt::Write;
 use tempfile::tempdir;
 use thiserror::Error;
 use url::Url;
@@ -234,8 +234,9 @@ impl deno_graph::source::JsrUrlProvider for PassthroughJsrUrlProvider {
   }
 }
 
+use std::fs;
+use std::io;
 use std::path::Path;
-use std::{fs, io};
 
 fn copy_dir_all(
   src: impl AsRef<Path>,

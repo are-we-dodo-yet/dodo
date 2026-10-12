@@ -4,16 +4,16 @@
 // implement swc's `Comments` trait
 #![allow(clippy::disallowed_types)]
 
+use std::cell::RefCell;
+use std::rc::Rc;
+use std::sync::Arc;
+
 use crate::SourcePos;
 use crate::swc::common::BytePos as SwcBytePos;
 use crate::swc::common::comments::Comment;
 use crate::swc::common::comments::Comments as SwcComments;
 use crate::swc::common::comments::SingleThreadedComments;
 use crate::swc::common::comments::SingleThreadedCommentsMapInner;
-
-use std::cell::RefCell;
-use std::rc::Rc;
-use std::sync::Arc;
 
 #[derive(Debug)]
 struct MultiThreadedCommentsInner {

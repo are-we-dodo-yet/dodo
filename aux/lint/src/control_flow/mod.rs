@@ -3,20 +3,21 @@
 #[cfg(test)]
 mod analyze_test;
 
-use deno_ast::swc::ast::*;
-use deno_ast::swc::common::SyntaxContext;
-use deno_ast::swc::utils::ExprCtx;
-use deno_ast::swc::{
-  ecma_visit::{noop_visit_type, Visit, VisitWith},
-  utils::{ExprExt, Value},
-};
-use deno_ast::view;
+use std::collections::BTreeMap;
+use std::collections::HashSet;
+use std::mem::take;
+
 use deno_ast::SourcePos;
 use deno_ast::SourceRangedForSpanned;
-use std::{
-  collections::{BTreeMap, HashSet},
-  mem::take,
-};
+use deno_ast::swc::ast::*;
+use deno_ast::swc::common::SyntaxContext;
+use deno_ast::swc::ecma_visit::Visit;
+use deno_ast::swc::ecma_visit::VisitWith;
+use deno_ast::swc::ecma_visit::noop_visit_type;
+use deno_ast::swc::utils::ExprCtx;
+use deno_ast::swc::utils::ExprExt;
+use deno_ast::swc::utils::Value;
+use deno_ast::view;
 
 #[derive(Debug, Clone)]
 pub struct ControlFlow {

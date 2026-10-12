@@ -2,21 +2,22 @@
 
 use std::borrow::Cow;
 
+use deno_ast::MediaType;
+use deno_ast::ModuleSpecifier;
+use deno_ast::ParsedSource;
+use deno_ast::SourceTextInfo;
+use deno_ast::TextChange;
+use deno_ast::diagnostics::Diagnostic;
+use deno_ast::view as ast_view;
+
 use crate::ast_parser;
 use crate::diagnostic::LintDiagnostic;
 use crate::linter::LintConfig;
 use crate::linter::LintFileOptions;
 use crate::linter::Linter;
 use crate::linter::LinterOptions;
-use crate::rules::get_all_rules;
 use crate::rules::LintRule;
-use deno_ast::diagnostics::Diagnostic;
-use deno_ast::view as ast_view;
-use deno_ast::MediaType;
-use deno_ast::ModuleSpecifier;
-use deno_ast::ParsedSource;
-use deno_ast::SourceTextInfo;
-use deno_ast::TextChange;
+use crate::rules::get_all_rules;
 
 #[macro_export]
 macro_rules! assert_lint_ok {

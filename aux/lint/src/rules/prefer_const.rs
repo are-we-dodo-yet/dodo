@@ -1,31 +1,68 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::program_ref;
-use super::{Context, LintRule};
-use crate::tags::{self, Tags};
-use crate::Program;
-use crate::ProgramRef;
-use deno_ast::swc::ast::{
-  ArrayPat, ArrowExpr, AssignExpr, AssignPat, AssignTarget, AssignTargetPat,
-  BindingIdent, BlockStmt, BlockStmtOrExpr, CatchClause, Class, Constructor,
-  DoWhileStmt, Expr, ExprStmt, ForHead, ForInStmt, ForOfStmt, ForStmt,
-  Function, Ident, IfStmt, Module, ObjectPat, ObjectPatProp,
-  ParamOrTsParamProp, Pat, RestPat, Script, SimpleAssignTarget, Stmt,
-  SwitchStmt, TsParamPropParam, UpdateExpr, VarDecl, VarDeclKind,
-  VarDeclOrExpr, WhileStmt, WithStmt,
-};
-use deno_ast::swc::atoms::Atom;
-use deno_ast::swc::ecma_visit::noop_visit_type;
-use deno_ast::swc::ecma_visit::{Visit, VisitWith};
-use deno_ast::swc::utils::find_pat_ids;
-use deno_ast::SourceRangedForSpanned;
-use deno_ast::{SourceRange, SourceRanged};
-use derive_more::Display;
 use std::cell::RefCell;
-use std::collections::{BTreeMap, HashMap};
+use std::collections::BTreeMap;
+use std::collections::HashMap;
 use std::iter;
 use std::mem;
 use std::rc::Rc;
+
+use deno_ast::SourceRange;
+use deno_ast::SourceRanged;
+use deno_ast::SourceRangedForSpanned;
+use deno_ast::swc::ast::ArrayPat;
+use deno_ast::swc::ast::ArrowExpr;
+use deno_ast::swc::ast::AssignExpr;
+use deno_ast::swc::ast::AssignPat;
+use deno_ast::swc::ast::AssignTarget;
+use deno_ast::swc::ast::AssignTargetPat;
+use deno_ast::swc::ast::BindingIdent;
+use deno_ast::swc::ast::BlockStmt;
+use deno_ast::swc::ast::BlockStmtOrExpr;
+use deno_ast::swc::ast::CatchClause;
+use deno_ast::swc::ast::Class;
+use deno_ast::swc::ast::Constructor;
+use deno_ast::swc::ast::DoWhileStmt;
+use deno_ast::swc::ast::Expr;
+use deno_ast::swc::ast::ExprStmt;
+use deno_ast::swc::ast::ForHead;
+use deno_ast::swc::ast::ForInStmt;
+use deno_ast::swc::ast::ForOfStmt;
+use deno_ast::swc::ast::ForStmt;
+use deno_ast::swc::ast::Function;
+use deno_ast::swc::ast::Ident;
+use deno_ast::swc::ast::IfStmt;
+use deno_ast::swc::ast::Module;
+use deno_ast::swc::ast::ObjectPat;
+use deno_ast::swc::ast::ObjectPatProp;
+use deno_ast::swc::ast::ParamOrTsParamProp;
+use deno_ast::swc::ast::Pat;
+use deno_ast::swc::ast::RestPat;
+use deno_ast::swc::ast::Script;
+use deno_ast::swc::ast::SimpleAssignTarget;
+use deno_ast::swc::ast::Stmt;
+use deno_ast::swc::ast::SwitchStmt;
+use deno_ast::swc::ast::TsParamPropParam;
+use deno_ast::swc::ast::UpdateExpr;
+use deno_ast::swc::ast::VarDecl;
+use deno_ast::swc::ast::VarDeclKind;
+use deno_ast::swc::ast::VarDeclOrExpr;
+use deno_ast::swc::ast::WhileStmt;
+use deno_ast::swc::ast::WithStmt;
+use deno_ast::swc::atoms::Atom;
+use deno_ast::swc::ecma_visit::Visit;
+use deno_ast::swc::ecma_visit::VisitWith;
+use deno_ast::swc::ecma_visit::noop_visit_type;
+use deno_ast::swc::utils::find_pat_ids;
+use derive_more::Display;
+
+use super::Context;
+use super::LintRule;
+use super::program_ref;
+use crate::Program;
+use crate::ProgramRef;
+use crate::tags::Tags;
+use crate::tags::{self};
 
 #[derive(Debug)]
 pub struct PreferConst;
@@ -1837,9 +1874,8 @@ for (let {a, b} of obj) {}
 
 #[cfg(test)]
 mod prefer_const_tests {
-  use crate::test_util;
-
   use super::*;
+  use crate::test_util;
 
   // Some tests are derived from
   // https://github.com/eslint/eslint/blob/v7.10.0/tests/lib/rules/prefer-const.js

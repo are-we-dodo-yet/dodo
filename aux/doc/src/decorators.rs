@@ -1,7 +1,8 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use crate::node::Location;
-use crate::util::swc::get_location;
+use std::fmt::Display;
+use std::fmt::Formatter;
+use std::fmt::Result as FmtResult;
 
 use deno_ast::SourceRangedForSpanned;
 use deno_ast::swc::ast::Decorator;
@@ -10,9 +11,9 @@ use deno_graph::symbols::EsModuleInfo;
 use deno_terminal::colors;
 use serde::Deserialize;
 use serde::Serialize;
-use std::fmt::Display;
-use std::fmt::Formatter;
-use std::fmt::Result as FmtResult;
+
+use crate::node::Location;
+use crate::util::swc::get_location;
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Eq)]
 #[serde(rename_all = "camelCase")]

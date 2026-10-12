@@ -1,19 +1,39 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::program_ref;
-use super::{Context, LintRule};
-use crate::Program;
-use crate::ProgramRef;
-use deno_ast::swc::ast::{
-  ArrowExpr, CallExpr, ClassProp, Expr, Function, Ident, Lit, NewExpr, OptCall,
-  OptChainBase, OptChainExpr, Pat, PrivateProp, TsEntityName, TsKeywordType,
-  TsKeywordTypeKind, TsType, TsTypeAnn, TsTypeRef, UnaryExpr, VarDecl,
-};
-use deno_ast::swc::ast::{Callee, PropName};
-use deno_ast::swc::ecma_visit::{Visit, VisitWith};
 use deno_ast::SourceRange;
 use deno_ast::SourceRangedForSpanned;
+use deno_ast::swc::ast::ArrowExpr;
+use deno_ast::swc::ast::CallExpr;
+use deno_ast::swc::ast::Callee;
+use deno_ast::swc::ast::ClassProp;
+use deno_ast::swc::ast::Expr;
+use deno_ast::swc::ast::Function;
+use deno_ast::swc::ast::Ident;
+use deno_ast::swc::ast::Lit;
+use deno_ast::swc::ast::NewExpr;
+use deno_ast::swc::ast::OptCall;
+use deno_ast::swc::ast::OptChainBase;
+use deno_ast::swc::ast::OptChainExpr;
+use deno_ast::swc::ast::Pat;
+use deno_ast::swc::ast::PrivateProp;
+use deno_ast::swc::ast::PropName;
+use deno_ast::swc::ast::TsEntityName;
+use deno_ast::swc::ast::TsKeywordType;
+use deno_ast::swc::ast::TsKeywordTypeKind;
+use deno_ast::swc::ast::TsType;
+use deno_ast::swc::ast::TsTypeAnn;
+use deno_ast::swc::ast::TsTypeRef;
+use deno_ast::swc::ast::UnaryExpr;
+use deno_ast::swc::ast::VarDecl;
+use deno_ast::swc::ecma_visit::Visit;
+use deno_ast::swc::ecma_visit::VisitWith;
 use derive_more::Display;
+
+use super::Context;
+use super::LintRule;
+use super::program_ref;
+use crate::Program;
+use crate::ProgramRef;
 
 #[derive(Debug)]
 pub struct NoInferrableTypes;

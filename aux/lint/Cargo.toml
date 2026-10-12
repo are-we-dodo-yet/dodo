@@ -1,13 +1,13 @@
 [package]
 name = "deno_lint"
 version = "0.84.1"
-edition = "2021"
-description = "lint for deno"
 authors = ["the Deno authors"]
+categories = ["development-tools"]
+edition = "2021"
+keywords = ["deno", "lint"]
 license = "MIT"
 repository = "https://github.com/denoland/deno_lint"
-keywords = ["deno", "lint"]
-categories = ["development-tools"]
+description = "lint for deno"
 
 [lib]
 name = "deno_lint"
@@ -18,11 +18,11 @@ default = []
 [dependencies]
 deno_ast = { workspace = true, features = ["scopes", "transforms", "utils", "visit", "view", "react"] }
 deno_semver.workspace = true
-log.workspace = true
-serde = { workspace = true, features = ["derive"] }
-serde_json.workspace = true
-regex.workspace = true
-once_cell.workspace = true
 derive_more = { workspace = true, features = ["display"] }
 if_chain.workspace = true
+log.workspace = true
+once_cell.workspace = true
 phf = { workspace = true, features = ["macros"] }
+regex.workspace = true
+serde = { workspace = true, features = ["derive"] }
+serde_json.workspace = true

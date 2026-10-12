@@ -1,11 +1,20 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::{Context, LintRule};
-use crate::handler::{Handler, Traverse};
-use crate::tags::{self, Tags};
+use deno_ast::SourceRanged;
+use deno_ast::SourceRangedForSpanned;
+use deno_ast::view::ArrowExpr;
+use deno_ast::view::BlockStmt;
+use deno_ast::view::Constructor;
+use deno_ast::view::Function;
+use deno_ast::view::SwitchStmt;
+
+use super::Context;
+use super::LintRule;
 use crate::Program;
-use deno_ast::view::{ArrowExpr, BlockStmt, Constructor, Function, SwitchStmt};
-use deno_ast::{SourceRanged, SourceRangedForSpanned};
+use crate::handler::Handler;
+use crate::handler::Traverse;
+use crate::tags::Tags;
+use crate::tags::{self};
 
 #[derive(Debug)]
 pub struct NoEmpty;

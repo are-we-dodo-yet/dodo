@@ -1,5 +1,9 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
+use std::env::current_dir;
+use std::path::PathBuf;
+use std::sync::Arc;
+
 use clap::Parser;
 use clap::Subcommand;
 use deno_doc::DocParser;
@@ -23,9 +27,6 @@ use deno_graph::source::LoadResponse;
 use deno_graph::source::Loader;
 use futures::future;
 use indexmap::IndexMap;
-use std::env::current_dir;
-use std::path::PathBuf;
-use std::sync::Arc;
 
 #[derive(Parser)]
 #[command(name = "ddoc")]

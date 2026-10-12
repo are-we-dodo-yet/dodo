@@ -39,7 +39,6 @@ pub use node::DeclarationDef;
 pub use node::Document;
 pub use node::Location;
 pub use node::Symbol;
-
 use params::ParamDef;
 
 cfg_if! {
@@ -444,8 +443,9 @@ fn migrate_js_doc_tags(value: &mut serde_json::Value) {
 
 #[cfg(test)]
 mod v1_to_v2_tests {
-  use super::*;
   use serde_json::json;
+
+  use super::*;
 
   #[test]
   fn non_array_returns_default() {

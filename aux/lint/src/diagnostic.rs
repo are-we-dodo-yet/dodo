@@ -2,6 +2,9 @@
 
 use std::borrow::Cow;
 
+use deno_ast::ModuleSpecifier;
+use deno_ast::SourceRange;
+use deno_ast::SourceTextInfo;
 use deno_ast::diagnostics::Diagnostic;
 use deno_ast::diagnostics::DiagnosticLevel;
 use deno_ast::diagnostics::DiagnosticLocation;
@@ -10,9 +13,6 @@ use deno_ast::diagnostics::DiagnosticSnippetHighlight;
 use deno_ast::diagnostics::DiagnosticSnippetHighlightStyle;
 use deno_ast::diagnostics::DiagnosticSourcePos;
 use deno_ast::diagnostics::DiagnosticSourceRange;
-use deno_ast::ModuleSpecifier;
-use deno_ast::SourceRange;
-use deno_ast::SourceTextInfo;
 use serde::Deserialize;
 use serde::Serialize;
 

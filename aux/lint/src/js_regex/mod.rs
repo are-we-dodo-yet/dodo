@@ -6,7 +6,8 @@ mod validator;
 
 use std::fmt;
 
-pub use validator::{EcmaRegexValidator, EcmaVersion};
+pub use validator::EcmaRegexValidator;
+pub use validator::EcmaVersion;
 
 #[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Copy)]
 pub struct UnicodeChar {

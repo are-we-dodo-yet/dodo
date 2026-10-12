@@ -1,29 +1,39 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use crate::control_flow::ControlFlow;
-use crate::diagnostic::{
-  LintDiagnostic, LintDiagnosticDetails, LintDiagnosticRange,
-  LintDiagnosticSeverity, LintDocsUrl, LintFix,
-};
-use crate::ignore_directives::{
-  parse_line_ignore_directives, CodeStatus, FileIgnoreDirective,
-  LineIgnoreDirective,
-};
-use crate::linter::LinterContext;
-use crate::rules;
+use std::borrow::Cow;
+use std::collections::HashMap;
+use std::collections::HashSet;
+use std::rc::Rc;
+
+use deno_ast::MediaType;
+use deno_ast::ModuleSpecifier;
+use deno_ast::MultiThreadedComments;
+use deno_ast::ParsedSource;
+use deno_ast::RootNode;
+use deno_ast::Scope;
+use deno_ast::SourcePos;
+use deno_ast::SourceRange;
+use deno_ast::SourceTextInfo;
 use deno_ast::swc::ast::Expr;
+use deno_ast::swc::common::SourceMap;
+use deno_ast::swc::common::SyntaxContext;
 use deno_ast::swc::common::comments::Comment;
 use deno_ast::swc::common::util::take::Take;
-use deno_ast::swc::common::{SourceMap, SyntaxContext};
-use deno_ast::SourceTextInfo;
-use deno_ast::{
-  view as ast_view, ParsedSource, RootNode, SourcePos, SourceRange,
-};
-use deno_ast::{MediaType, ModuleSpecifier};
-use deno_ast::{MultiThreadedComments, Scope};
-use std::borrow::Cow;
-use std::collections::{HashMap, HashSet};
-use std::rc::Rc;
+use deno_ast::view as ast_view;
+
+use crate::control_flow::ControlFlow;
+use crate::diagnostic::LintDiagnostic;
+use crate::diagnostic::LintDiagnosticDetails;
+use crate::diagnostic::LintDiagnosticRange;
+use crate::diagnostic::LintDiagnosticSeverity;
+use crate::diagnostic::LintDocsUrl;
+use crate::diagnostic::LintFix;
+use crate::ignore_directives::CodeStatus;
+use crate::ignore_directives::FileIgnoreDirective;
+use crate::ignore_directives::LineIgnoreDirective;
+use crate::ignore_directives::parse_line_ignore_directives;
+use crate::linter::LinterContext;
+use crate::rules;
 
 /// `Context` stores all data needed to perform linting of a particular file.
 pub struct Context<'a> {

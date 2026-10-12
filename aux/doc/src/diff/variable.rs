@@ -1,11 +1,12 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::Change;
-use super::ts_type::TsTypeDiff;
-use crate::variable::VariableDef;
 use deno_ast::swc::ast::VarDeclKind;
 use serde::Deserialize;
 use serde::Serialize;
+
+use super::Change;
+use super::ts_type::TsTypeDiff;
+use crate::variable::VariableDef;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

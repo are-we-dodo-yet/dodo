@@ -1,18 +1,22 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::{Context, LintRule};
-use crate::handler::{Handler, Traverse};
-use crate::tags::{self, Tags};
-
-use deno_ast::view::{Decl, Pat, Program};
 use deno_ast::SourceRanged;
+use deno_ast::view::Decl;
+use deno_ast::view::Pat;
+use deno_ast::view::Program;
+
+use super::Context;
+use super::LintRule;
+use crate::handler::Handler;
+use crate::handler::Traverse;
+use crate::tags::Tags;
+use crate::tags::{self};
 
 #[derive(Debug)]
 pub struct FreshHandlerExport;
 
 const CODE: &str = "fresh-handler-export";
-const MESSAGE: &str =
-  "Fresh only recognizes \"handler\", \"handlers\", and \"config\" exports in route files.";
+const MESSAGE: &str = "Fresh only recognizes \"handler\", \"handlers\", and \"config\" exports in route files.";
 const HINT: &str = "Rename this export or move it out of the route file.";
 
 /// Named exports that Fresh recognizes in a route file. A default export (the

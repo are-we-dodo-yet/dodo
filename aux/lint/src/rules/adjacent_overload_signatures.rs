@@ -1,13 +1,19 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::{Context, LintRule};
-use crate::handler::{Handler, Traverse};
-use crate::swc_util::StringRepr;
-use crate::tags::{self, Tags};
-use crate::Program;
-use deno_ast::{view as ast_view, SourceRanged};
-use derive_more::Display;
 use std::collections::HashSet;
+
+use deno_ast::SourceRanged;
+use deno_ast::view as ast_view;
+use derive_more::Display;
+
+use super::Context;
+use super::LintRule;
+use crate::Program;
+use crate::handler::Handler;
+use crate::handler::Traverse;
+use crate::swc_util::StringRepr;
+use crate::tags::Tags;
+use crate::tags::{self};
 
 #[derive(Debug)]
 pub struct AdjacentOverloadSignatures;
@@ -145,7 +151,8 @@ impl ExtractMethod for ast_view::Stmt<'_> {
 
 impl ExtractMethod for ast_view::ModuleItem<'_> {
   fn get_method(&self) -> Option<Method> {
-    use deno_ast::view::{ModuleDecl, ModuleItem};
+    use deno_ast::view::ModuleDecl;
+    use deno_ast::view::ModuleItem;
     match self {
       ModuleItem::ModuleDecl(ModuleDecl::ExportDecl(export_decl)) => {
         export_decl.get_method()
@@ -158,7 +165,8 @@ impl ExtractMethod for ast_view::ModuleItem<'_> {
 
 impl ExtractMethod for ast_view::ClassMember<'_> {
   fn get_method(&self) -> Option<Method> {
-    use deno_ast::view::{ClassMember, ClassMethod};
+    use deno_ast::view::ClassMember;
+    use deno_ast::view::ClassMethod;
     match self {
       ClassMember::Method(ClassMethod { inner, .. }) => {
         inner.key.string_repr().map(|k| {
@@ -179,7 +187,10 @@ impl ExtractMethod for ast_view::ClassMember<'_> {
 
 impl ExtractMethod for ast_view::TsTypeElement<'_> {
   fn get_method(&self) -> Option<Method> {
-    use deno_ast::view::{Expr, Lit, TsMethodSignature, TsTypeElement};
+    use deno_ast::view::Expr;
+    use deno_ast::view::Lit;
+    use deno_ast::view::TsMethodSignature;
+    use deno_ast::view::TsTypeElement;
     match self {
       TsTypeElement::TsMethodSignature(TsMethodSignature {
         ref key, ..

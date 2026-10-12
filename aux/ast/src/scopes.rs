@@ -1,19 +1,40 @@
 // Copyright 2020-2022 the Deno authors. All rights reserved. MIT license.
 
+use std::collections::HashMap;
+
+use crate::swc::ast::ArrowExpr;
+use crate::swc::ast::BlockStmt;
+use crate::swc::ast::BlockStmtOrExpr;
+use crate::swc::ast::CatchClause;
+use crate::swc::ast::ClassDecl;
+use crate::swc::ast::ClassExpr;
+use crate::swc::ast::DoWhileStmt;
+use crate::swc::ast::Expr;
+use crate::swc::ast::FnDecl;
+use crate::swc::ast::FnExpr;
+use crate::swc::ast::ForInStmt;
+use crate::swc::ast::ForOfStmt;
+use crate::swc::ast::ForStmt;
+use crate::swc::ast::Function;
 use crate::swc::ast::Id;
-use crate::swc::ast::{
-  ArrowExpr, BlockStmt, BlockStmtOrExpr, CatchClause, ClassDecl, ClassExpr,
-  DoWhileStmt, Expr, FnDecl, FnExpr, ForInStmt, ForOfStmt, ForStmt, Function,
-  Ident, ImportDefaultSpecifier, ImportNamedSpecifier, ImportStarAsSpecifier,
-  Param, Pat, SwitchStmt, TsInterfaceDecl, TsTypeAliasDecl, VarDecl,
-  VarDeclKind, WhileStmt, WithStmt,
-};
+use crate::swc::ast::Ident;
+use crate::swc::ast::ImportDefaultSpecifier;
+use crate::swc::ast::ImportNamedSpecifier;
+use crate::swc::ast::ImportStarAsSpecifier;
+use crate::swc::ast::Param;
+use crate::swc::ast::Pat;
+use crate::swc::ast::SwitchStmt;
+use crate::swc::ast::TsInterfaceDecl;
+use crate::swc::ast::TsTypeAliasDecl;
+use crate::swc::ast::VarDecl;
+use crate::swc::ast::VarDeclKind;
+use crate::swc::ast::WhileStmt;
+use crate::swc::ast::WithStmt;
 use crate::swc::atoms::Atom;
 use crate::swc::ecma_visit::Visit;
 use crate::swc::ecma_visit::VisitWith;
 use crate::swc::utils::find_pat_ids;
 use crate::view;
-use std::collections::HashMap;
 
 #[derive(Debug)]
 pub struct Scope {
@@ -349,7 +370,10 @@ impl Visit for Analyzer<'_> {
 
 #[cfg(test)]
 mod tests {
-  use super::{BindingKind, Scope, ScopeKind, Var};
+  use super::BindingKind;
+  use super::Scope;
+  use super::ScopeKind;
+  use super::Var;
   use crate::MediaType;
   use crate::ModuleSpecifier;
   use crate::ParseParams;

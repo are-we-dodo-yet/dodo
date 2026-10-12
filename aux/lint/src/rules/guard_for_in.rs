@@ -1,9 +1,12 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::{Context, LintRule};
-use crate::handler::{Handler, Traverse};
-use crate::Program;
 use deno_ast::SourceRanged;
+
+use super::Context;
+use super::LintRule;
+use crate::Program;
+use crate::handler::Handler;
+use crate::handler::Traverse;
 
 #[derive(Debug)]
 pub struct GuardForIn;
@@ -34,7 +37,10 @@ impl Handler for GuardForInHandler {
     for_in_stmt: &deno_ast::view::ForInStmt,
     ctx: &mut Context,
   ) {
-    use deno_ast::view::Stmt::{Block, Continue, Empty, If};
+    use deno_ast::view::Stmt::Block;
+    use deno_ast::view::Stmt::Continue;
+    use deno_ast::view::Stmt::Empty;
+    use deno_ast::view::Stmt::If;
 
     match for_in_stmt.body {
       Empty(_) | If(_) => (),

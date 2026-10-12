@@ -1,19 +1,34 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::program_ref;
-use super::{Context, LintRule};
-use crate::tags::{self, Tags};
-use crate::Program;
-use crate::ProgramRef;
-use deno_ast::swc::ast::{
-  ArrowExpr, BlockStmtOrExpr, Constructor, Decl, DefaultDecl, FnDecl, Function,
-  ModuleDecl, ModuleItem, Script, Stmt, VarDecl, VarDeclKind,
-};
-use deno_ast::swc::ecma_visit::{noop_visit_type, Visit, VisitWith};
+use std::collections::HashSet;
+
 use deno_ast::SourceRange;
 use deno_ast::SourceRangedForSpanned;
+use deno_ast::swc::ast::ArrowExpr;
+use deno_ast::swc::ast::BlockStmtOrExpr;
+use deno_ast::swc::ast::Constructor;
+use deno_ast::swc::ast::Decl;
+use deno_ast::swc::ast::DefaultDecl;
+use deno_ast::swc::ast::FnDecl;
+use deno_ast::swc::ast::Function;
+use deno_ast::swc::ast::ModuleDecl;
+use deno_ast::swc::ast::ModuleItem;
+use deno_ast::swc::ast::Script;
+use deno_ast::swc::ast::Stmt;
+use deno_ast::swc::ast::VarDecl;
+use deno_ast::swc::ast::VarDeclKind;
+use deno_ast::swc::ecma_visit::Visit;
+use deno_ast::swc::ecma_visit::VisitWith;
+use deno_ast::swc::ecma_visit::noop_visit_type;
 use derive_more::Display;
-use std::collections::HashSet;
+
+use super::Context;
+use super::LintRule;
+use super::program_ref;
+use crate::Program;
+use crate::ProgramRef;
+use crate::tags::Tags;
+use crate::tags::{self};
 
 #[derive(Debug)]
 pub struct NoInnerDeclarations;

@@ -123,11 +123,10 @@ mod test {
 
   use deno_media_type::MediaType;
 
+  use super::ModuleExportsAndReExports;
   use crate::ModuleSpecifier;
   use crate::ParseParams;
   use crate::parse_module;
-
-  use super::ModuleExportsAndReExports;
 
   struct Tester {
     analysis: RefCell<ModuleExportsAndReExports>,

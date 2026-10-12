@@ -3,10 +3,11 @@
 #![deny(clippy::print_stderr)]
 #![deny(clippy::print_stdout)]
 
-use serde::Serialize;
-use serde::Serializer;
 use std::fmt;
 use std::path::Path;
+
+use serde::Serialize;
+use serde::Serializer;
 
 #[cfg(feature = "data_url")]
 pub mod data_url;
@@ -681,9 +682,18 @@ mod tests {
       ("https://deno.land/x/mod.jsonc", MediaType::Jsonc),
       ("https://deno.land/x/mod.json5", MediaType::Json5),
       ("https://deno.land/x/mod.md", MediaType::Markdown),
-      ("data:application/typescript;base64,ZXhwb3J0IGNvbnN0IGEgPSAiYSI7CgpleHBvcnQgZW51bSBBIHsKICBBLAogIEIsCiAgQywKfQo=", MediaType::TypeScript),
-      ("data:application/javascript;base64,ZXhwb3J0IGNvbnN0IGEgPSAiYSI7CgpleHBvcnQgZW51bSBBIHsKICBBLAogIEIsCiAgQywKfQo=", MediaType::JavaScript),
-      ("data:text/plain;base64,ZXhwb3J0IGNvbnN0IGEgPSAiYSI7CgpleHBvcnQgZW51bSBBIHsKICBBLAogIEIsCiAgQywKfQo=", MediaType::Unknown),
+      (
+        "data:application/typescript;base64,ZXhwb3J0IGNvbnN0IGEgPSAiYSI7CgpleHBvcnQgZW51bSBBIHsKICBBLAogIEIsCiAgQywKfQo=",
+        MediaType::TypeScript,
+      ),
+      (
+        "data:application/javascript;base64,ZXhwb3J0IGNvbnN0IGEgPSAiYSI7CgpleHBvcnQgZW51bSBBIHsKICBBLAogIEIsCiAgQywKfQo=",
+        MediaType::JavaScript,
+      ),
+      (
+        "data:text/plain;base64,ZXhwb3J0IGNvbnN0IGEgPSAiYSI7CgpleHBvcnQgZW51bSBBIHsKICBBLAogIEIsCiAgQywKfQo=",
+        MediaType::Unknown,
+      ),
     ];
 
     for (specifier, expected) in fixtures {

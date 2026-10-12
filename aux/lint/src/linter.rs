@@ -1,18 +1,22 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
+use std::borrow::Cow;
+use std::collections::HashSet;
+use std::sync::Arc;
+
+use deno_ast::MediaType;
+use deno_ast::ModuleSpecifier;
+use deno_ast::ParseDiagnostic;
+use deno_ast::ParsedSource;
+use deno_ast::diagnostics::Diagnostic;
+
 use crate::ast_parser::parse_program;
 use crate::context::Context;
 use crate::diagnostic::LintDiagnostic;
 use crate::ignore_directives::parse_file_ignore_directives;
 use crate::performance_mark::PerformanceMark;
-use crate::rules::{ban_unknown_rule_code::BanUnknownRuleCode, LintRule};
-use deno_ast::diagnostics::Diagnostic;
-use deno_ast::MediaType;
-use deno_ast::ParsedSource;
-use deno_ast::{ModuleSpecifier, ParseDiagnostic};
-use std::borrow::Cow;
-use std::collections::HashSet;
-use std::sync::Arc;
+use crate::rules::LintRule;
+use crate::rules::ban_unknown_rule_code::BanUnknownRuleCode;
 
 pub struct LinterOptions {
   /// Rules to lint with.

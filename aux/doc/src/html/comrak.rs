@@ -1,12 +1,14 @@
-use crate::html::ShortPath;
-use comrak::Arena;
-use comrak::adapters::SyntaxHighlighterAdapter;
-use comrak::nodes::AstNode;
-use comrak::nodes::NodeValue;
 use std::borrow::Cow;
 use std::collections::HashMap;
 use std::fmt::Write;
 use std::sync::Arc;
+
+use comrak::Arena;
+use comrak::adapters::SyntaxHighlighterAdapter;
+use comrak::nodes::AstNode;
+use comrak::nodes::NodeValue;
+
+use crate::html::ShortPath;
 
 pub const COMRAK_STYLESHEET: &str = include_str!("./templates/comrak.gen.css");
 pub const COMRAK_STYLESHEET_FILENAME: &str = "comrak.css";

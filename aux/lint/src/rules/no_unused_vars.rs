@@ -1,32 +1,79 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::program_ref;
-use super::{Context, LintRule};
-use crate::tags::{self, Tags};
-use crate::Program;
-use crate::ProgramRef;
-use deno_ast::swc::ast::{
-  ArrowExpr, AssignExpr, AssignPat, AssignPatProp, AssignTarget, CallExpr,
-  CatchClause, ClassDecl, ClassMethod, ClassProp, Constructor, Decl,
-  DefaultDecl, ExportDecl, ExportDefaultDecl, ExportNamedSpecifier, Expr,
-  FnDecl, FnExpr, Function, Ident, ImportDefaultSpecifier,
-  ImportNamedSpecifier, ImportStarAsSpecifier, JSXElementName, JSXFragment,
-  JSXObject, MemberExpr, MemberProp, MethodKind, ModuleExportName, NamedExport,
-  NewExpr, Param, Pat, PrivateMethod, Prop, PropName, SetterProp, TsEntityName,
-  TsEnumDecl, TsExprWithTypeArgs, TsImportEqualsDecl, TsInterfaceDecl,
-  TsModuleDecl, TsModuleRef, TsNamespaceDecl, TsPropertySignature,
-  TsTypeAliasDecl, TsTypeQueryExpr, TsTypeRef, VarDecl, VarDeclarator,
-};
-use deno_ast::swc::ast::{Id, SimpleAssignTarget};
-use deno_ast::swc::ecma_visit::{Visit, VisitWith};
-use deno_ast::swc::utils::find_pat_ids;
-use deno_ast::view::AssignOp;
-use deno_ast::SourceRangedForSpanned;
-use derive_more::Display;
-use if_chain::if_chain;
 use std::collections::HashSet;
 use std::iter;
 use std::rc::Rc;
+
+use deno_ast::SourceRangedForSpanned;
+use deno_ast::swc::ast::ArrowExpr;
+use deno_ast::swc::ast::AssignExpr;
+use deno_ast::swc::ast::AssignPat;
+use deno_ast::swc::ast::AssignPatProp;
+use deno_ast::swc::ast::AssignTarget;
+use deno_ast::swc::ast::CallExpr;
+use deno_ast::swc::ast::CatchClause;
+use deno_ast::swc::ast::ClassDecl;
+use deno_ast::swc::ast::ClassMethod;
+use deno_ast::swc::ast::ClassProp;
+use deno_ast::swc::ast::Constructor;
+use deno_ast::swc::ast::Decl;
+use deno_ast::swc::ast::DefaultDecl;
+use deno_ast::swc::ast::ExportDecl;
+use deno_ast::swc::ast::ExportDefaultDecl;
+use deno_ast::swc::ast::ExportNamedSpecifier;
+use deno_ast::swc::ast::Expr;
+use deno_ast::swc::ast::FnDecl;
+use deno_ast::swc::ast::FnExpr;
+use deno_ast::swc::ast::Function;
+use deno_ast::swc::ast::Id;
+use deno_ast::swc::ast::Ident;
+use deno_ast::swc::ast::ImportDefaultSpecifier;
+use deno_ast::swc::ast::ImportNamedSpecifier;
+use deno_ast::swc::ast::ImportStarAsSpecifier;
+use deno_ast::swc::ast::JSXElementName;
+use deno_ast::swc::ast::JSXFragment;
+use deno_ast::swc::ast::JSXObject;
+use deno_ast::swc::ast::MemberExpr;
+use deno_ast::swc::ast::MemberProp;
+use deno_ast::swc::ast::MethodKind;
+use deno_ast::swc::ast::ModuleExportName;
+use deno_ast::swc::ast::NamedExport;
+use deno_ast::swc::ast::NewExpr;
+use deno_ast::swc::ast::Param;
+use deno_ast::swc::ast::Pat;
+use deno_ast::swc::ast::PrivateMethod;
+use deno_ast::swc::ast::Prop;
+use deno_ast::swc::ast::PropName;
+use deno_ast::swc::ast::SetterProp;
+use deno_ast::swc::ast::SimpleAssignTarget;
+use deno_ast::swc::ast::TsEntityName;
+use deno_ast::swc::ast::TsEnumDecl;
+use deno_ast::swc::ast::TsExprWithTypeArgs;
+use deno_ast::swc::ast::TsImportEqualsDecl;
+use deno_ast::swc::ast::TsInterfaceDecl;
+use deno_ast::swc::ast::TsModuleDecl;
+use deno_ast::swc::ast::TsModuleRef;
+use deno_ast::swc::ast::TsNamespaceDecl;
+use deno_ast::swc::ast::TsPropertySignature;
+use deno_ast::swc::ast::TsTypeAliasDecl;
+use deno_ast::swc::ast::TsTypeQueryExpr;
+use deno_ast::swc::ast::TsTypeRef;
+use deno_ast::swc::ast::VarDecl;
+use deno_ast::swc::ast::VarDeclarator;
+use deno_ast::swc::ecma_visit::Visit;
+use deno_ast::swc::ecma_visit::VisitWith;
+use deno_ast::swc::utils::find_pat_ids;
+use deno_ast::view::AssignOp;
+use derive_more::Display;
+use if_chain::if_chain;
+
+use super::Context;
+use super::LintRule;
+use super::program_ref;
+use crate::Program;
+use crate::ProgramRef;
+use crate::tags::Tags;
+use crate::tags::{self};
 
 #[derive(Debug)]
 pub struct NoUnusedVars;

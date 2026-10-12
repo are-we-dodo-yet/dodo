@@ -1,10 +1,10 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use deno_ast::get_syntax;
 use deno_ast::MediaType;
 use deno_ast::ModuleSpecifier;
 use deno_ast::ParseDiagnostic;
 use deno_ast::ParsedSource;
+use deno_ast::get_syntax;
 
 pub(crate) fn parse_program(
   specifier: ModuleSpecifier,

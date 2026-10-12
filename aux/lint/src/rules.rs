@@ -1,12 +1,13 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
+use std::cmp::Ordering;
+use std::collections::HashSet;
+
+use crate::Program;
+use crate::ProgramRef;
 use crate::context::Context;
 use crate::tags;
 use crate::tags::Tags;
-use crate::Program;
-use crate::ProgramRef;
-use std::cmp::Ordering;
-use std::collections::HashSet;
 
 pub mod adjacent_overload_signatures;
 pub mod ban_ts_comment;
@@ -382,9 +383,8 @@ fn get_all_rules_raw() -> Vec<Box<dyn LintRule>> {
 mod tests {
   use std::sync::Arc;
 
-  use crate::tags;
-
   use super::*;
+  use crate::tags;
 
   #[test]
   fn recommended_rules_sorted_alphabetically() {

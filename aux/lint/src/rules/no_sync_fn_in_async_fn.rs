@@ -1,12 +1,16 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::{Context, LintRule};
-use crate::handler::{Handler, Traverse};
-use crate::tags::Tags;
-use crate::Program;
+use deno_ast::SourceRanged;
+use deno_ast::view as ast_view;
 use deno_ast::view::NodeTrait;
-use deno_ast::{view as ast_view, SourceRanged};
 use if_chain::if_chain;
+
+use super::Context;
+use super::LintRule;
+use crate::Program;
+use crate::handler::Handler;
+use crate::handler::Traverse;
+use crate::tags::Tags;
 
 #[derive(Debug)]
 pub struct NoSyncFnInAsyncFn;
@@ -38,7 +42,10 @@ impl LintRule for NoSyncFnInAsyncFn {
 fn extract_symbol<'a>(
   member_prop: &'a ast_view::MemberProp,
 ) -> Option<&'a str> {
-  use deno_ast::view::{Expr, Lit, MemberProp, Tpl};
+  use deno_ast::view::Expr;
+  use deno_ast::view::Lit;
+  use deno_ast::view::MemberProp;
+  use deno_ast::view::Tpl;
   match member_prop {
     MemberProp::Ident(ident) => Some(ident.sym()),
     MemberProp::PrivateName(ident) => Some(ident.name()),

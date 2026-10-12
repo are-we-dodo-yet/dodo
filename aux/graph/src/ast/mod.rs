@@ -1,5 +1,23 @@
 // Copyright 2018-2024 the Deno authors. MIT license.
 
+use std::cell::RefCell;
+use std::collections::HashMap;
+use std::sync::Arc;
+
+use deno_ast::MediaType;
+use deno_ast::MultiThreadedComments;
+use deno_ast::ParseDiagnostic;
+use deno_ast::ParsedSource;
+use deno_ast::ProgramRef;
+use deno_ast::SourcePos;
+use deno_ast::SourceRanged;
+use deno_ast::SourceRangedForSpanned;
+use deno_ast::SourceTextInfo;
+use deno_ast::swc::common::comments::CommentKind;
+use deno_error::JsErrorBox;
+
+use self::dep::DependencyComment;
+use self::dep::analyze_program_dependencies;
 use crate::analysis::DependencyDescriptor;
 use crate::analysis::DynamicArgument;
 use crate::analysis::DynamicDependencyDescriptor;
@@ -24,25 +42,6 @@ use crate::analysis::is_comment_triple_slash_reference;
 use crate::graph::Position;
 use crate::graph::PositionRange;
 use crate::module_specifier::ModuleSpecifier;
-
-use deno_ast::MultiThreadedComments;
-use deno_ast::ProgramRef;
-use deno_ast::SourcePos;
-use deno_ast::SourceRanged;
-use deno_ast::SourceRangedForSpanned;
-
-use deno_ast::MediaType;
-use deno_ast::ParseDiagnostic;
-use deno_ast::ParsedSource;
-use deno_ast::SourceTextInfo;
-use deno_ast::swc::common::comments::CommentKind;
-use deno_error::JsErrorBox;
-use std::cell::RefCell;
-use std::collections::HashMap;
-use std::sync::Arc;
-
-use self::dep::DependencyComment;
-use self::dep::analyze_program_dependencies;
 
 mod dep;
 
@@ -943,10 +942,10 @@ fn comment_source_to_position_range(
 
 #[cfg(test)]
 mod tests {
-  use crate::analysis::JsDocImportInfo;
+  use pretty_assertions::assert_eq;
 
   use super::*;
-  use pretty_assertions::assert_eq;
+  use crate::analysis::JsDocImportInfo;
 
   #[test]
   fn test_parse() {

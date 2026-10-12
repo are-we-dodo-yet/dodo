@@ -1,3 +1,12 @@
+use std::borrow::Cow;
+use std::collections::HashSet;
+
+use indexmap::IndexMap;
+use serde::Deserialize;
+use serde::Serialize;
+
+use crate::Declaration;
+use crate::DeclarationDef;
 use crate::html::DiffStatus;
 use crate::html::DocNodeWithContext;
 use crate::html::RenderContext;
@@ -13,12 +22,6 @@ use crate::html::util::SectionCtx;
 use crate::html::util::Tag;
 use crate::js_doc::JsDocTag;
 use crate::ts_type::TsTypeDefKind;
-use crate::{Declaration, DeclarationDef};
-use indexmap::IndexMap;
-use serde::Deserialize;
-use serde::Serialize;
-use std::borrow::Cow;
-use std::collections::HashSet;
 
 pub mod class;
 pub mod r#enum;

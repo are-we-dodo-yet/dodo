@@ -1,13 +1,21 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::{Context, LintRule};
-use crate::handler::{Handler, Traverse};
-use crate::tags::{self, Tags};
-use crate::Program;
-use deno_ast::swc::parser::token::{IdentLike, KnownIdent, Token, Word};
+use deno_ast::SourceRanged;
+use deno_ast::SourceRangedForSpanned;
+use deno_ast::swc::parser::token::IdentLike;
+use deno_ast::swc::parser::token::KnownIdent;
+use deno_ast::swc::parser::token::Token;
+use deno_ast::swc::parser::token::Word;
 use deno_ast::view as ast_view;
-use deno_ast::{SourceRanged, SourceRangedForSpanned};
 use if_chain::if_chain;
+
+use super::Context;
+use super::LintRule;
+use crate::Program;
+use crate::handler::Handler;
+use crate::handler::Traverse;
+use crate::tags::Tags;
+use crate::tags::{self};
 
 #[derive(Debug)]
 pub struct NoImportAssertions;

@@ -3,6 +3,7 @@
 use std::borrow::Cow;
 use std::sync::Arc;
 
+use deno_error::JsError;
 use deno_media_type::MediaType;
 use dprint_swc_ext::common::SourceRangedForSpanned;
 use dprint_swc_ext::common::SourceTextInfo;
@@ -39,8 +40,6 @@ use crate::swc::transforms::react;
 use crate::swc::transforms::resolver;
 use crate::swc::transforms::typescript;
 use crate::swc::visit::Optional;
-
-use deno_error::JsError;
 
 mod jsx_precompile;
 mod transforms;
@@ -878,16 +877,15 @@ fn is_fatal_syntax_error(error_kind: &SyntaxError) -> bool {
 
 #[cfg(test)]
 mod tests {
-  use super::*;
+  use base64::Engine;
+  use pretty_assertions::assert_eq;
 
+  use super::*;
   use crate::MediaType;
   use crate::ModuleSpecifier;
   use crate::ParseParams;
   use crate::SourceMapOption;
   use crate::parse_program;
-
-  use base64::Engine;
-  use pretty_assertions::assert_eq;
 
   #[test]
   fn test_transpile() {

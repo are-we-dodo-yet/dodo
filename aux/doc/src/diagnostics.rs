@@ -1,19 +1,10 @@
 // Copyright 2020-2023 the Deno authors. All rights reserved. MIT license.
 
-use crate::Location;
-use crate::js_doc::JsDoc;
-use crate::js_doc::JsDocTag;
-use crate::node::DeclarationDef;
-use crate::node::DeclarationKind;
-use crate::node::NamespaceDef;
-use crate::node::Symbol;
-use crate::ts_type::TsTypeDef;
-use crate::util::ignore_directives::IgnoreDirectives;
-use crate::util::ignore_directives::parse_ignore_directives;
-use crate::util::swc::get_text_info_location;
-use crate::util::swc::has_ignorable_js_doc_tag;
-use crate::util::symbol::symbol_has_ignorable_js_doc_tag;
-use crate::variable::VariableDef;
+use std::borrow::Cow;
+use std::collections::HashMap;
+use std::collections::HashSet;
+use std::rc::Rc;
+use std::sync::Arc;
 
 use deno_ast::ModuleSpecifier;
 use deno_ast::SourceRange;
@@ -31,12 +22,21 @@ use deno_graph::symbols::ModuleInfoRef;
 use deno_graph::symbols::RootSymbol;
 use deno_graph::symbols::Symbol as GraphSymbol;
 use deno_graph::symbols::UniqueSymbolId;
-use std::sync::Arc;
 
-use std::borrow::Cow;
-use std::collections::HashMap;
-use std::collections::HashSet;
-use std::rc::Rc;
+use crate::Location;
+use crate::js_doc::JsDoc;
+use crate::js_doc::JsDocTag;
+use crate::node::DeclarationDef;
+use crate::node::DeclarationKind;
+use crate::node::NamespaceDef;
+use crate::node::Symbol;
+use crate::ts_type::TsTypeDef;
+use crate::util::ignore_directives::IgnoreDirectives;
+use crate::util::ignore_directives::parse_ignore_directives;
+use crate::util::swc::get_text_info_location;
+use crate::util::swc::has_ignorable_js_doc_tag;
+use crate::util::symbol::symbol_has_ignorable_js_doc_tag;
+use crate::variable::VariableDef;
 
 #[derive(Debug, Clone)]
 pub enum DocDiagnosticKind {

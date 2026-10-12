@@ -1,8 +1,9 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use crate::context::Context;
 use deno_ast::view as ast_view;
 use deno_ast::view::NodeTrait;
+
+use crate::context::Context;
 
 pub trait Handler {
   fn on_enter_node(&mut self, _n: ast_view::Node, _ctx: &mut Context) {}

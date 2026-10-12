@@ -34,21 +34,17 @@ harness = false
 
 [dependencies]
 # this is optional in order to support using parsers other than swc
-deno_ast = { workspace = true, features = ["emit"], optional = true }
-deno_error = { workspace = true, features = ["serde", "serde_json"] }
-deno_media_type = { workspace = true, features = [
-  "decoding",
-  "data_url",
-  "module_specifier",
-] }
-deno_path_util.workspace = true
-deno_semver.workspace = true
-deno_unsync.workspace = true
 async-trait.workspace = true
 boxed_error.workspace = true
 capacity_builder.workspace = true
 chrono = { workspace = true, features = ["serde"] }
 data-url.workspace = true
+deno_ast = { workspace = true, features = ["emit"], optional = true }
+deno_error = { workspace = true, features = ["serde", "serde_json"] }
+deno_media_type = { workspace = true, features = ["decoding", "data_url", "module_specifier"] }
+deno_path_util.workspace = true
+deno_semver.workspace = true
+deno_unsync.workspace = true
 futures.workspace = true
 indexmap = { workspace = true, features = ["serde"] }
 log.workspace = true

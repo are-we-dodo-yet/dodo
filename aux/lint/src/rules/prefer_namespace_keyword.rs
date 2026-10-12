@@ -1,13 +1,18 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::{Context, LintRule};
-use crate::handler::{Handler, Traverse};
-use crate::tags::{self, Tags};
-use crate::Program;
-use deno_ast::view::{TsModuleDecl, TsModuleName};
 use deno_ast::SourceRanged;
+use deno_ast::view::TsModuleDecl;
+use deno_ast::view::TsModuleName;
 use once_cell::sync::Lazy;
 use regex::Regex;
+
+use super::Context;
+use super::LintRule;
+use crate::Program;
+use crate::handler::Handler;
+use crate::handler::Traverse;
+use crate::tags::Tags;
+use crate::tags::{self};
 
 #[derive(Debug)]
 pub struct PreferNamespaceKeyword;

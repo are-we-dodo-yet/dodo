@@ -1,11 +1,11 @@
 [package]
 name = "deno_doc"
 version = "0.209.0"
-edition = "2024"
-description = "doc generation for deno"
 authors = ["the Deno authors"]
+edition = "2024"
 license = "MIT"
 repository = "https://github.com/denoland/deno_doc"
+description = "doc generation for deno"
 
 [lib]
 name = "deno_doc"
@@ -15,23 +15,23 @@ name = "ddoc"
 required-features = ["comrak"]
 
 [dependencies]
-deno_ast.workspace = true
-deno_graph = { workspace = true, features = ["symbols"] }
-deno_terminal.workspace = true
-deno_path_util.workspace = true
 anyhow.workspace = true
 cfg-if.workspace = true
+comrak = { workspace = true, optional = true }
+deno_ast.workspace = true
+deno_graph = { workspace = true, features = ["symbols"] }
+deno_path_util.workspace = true
+deno_terminal.workspace = true
+handlebars = { workspace = true, features = ["string_helpers"] }
+html-escape.workspace = true
 indexmap.workspace = true
+itoa.workspace = true
 lazy_static.workspace = true
 regex.workspace = true
 serde.workspace = true
 serde_json.workspace = true
-termcolor.workspace = true
-itoa.workspace = true
 similar.workspace = true
-html-escape.workspace = true
-handlebars = { workspace = true, features = ["string_helpers"] }
-comrak = { workspace = true, optional = true }
+termcolor.workspace = true
 
 [dev-dependencies]
 anyhow.workspace = true
@@ -40,11 +40,11 @@ console_static_text.workspace = true
 criterion = { workspace = true, features = ["async_futures", "html_reports"] }
 file_test_runner.workspace = true
 futures.workspace = true
-tokio = { workspace = true, features = ["full"] }
-pretty_assertions.workspace = true
-insta = { workspace = true, features = ["json"] }
 html5ever.workspace = true
+insta = { workspace = true, features = ["json"] }
 markup5ever_rcdom.workspace = true
+pretty_assertions.workspace = true
+tokio = { workspace = true, features = ["full"] }
 
 [target.'cfg(all(target_arch = "wasm32", not(target_os = "emscripten")))'.dependencies]
 url = "2.4.1"

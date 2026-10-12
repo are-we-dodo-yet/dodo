@@ -877,9 +877,10 @@ pub fn resolve_media_type_and_charset_from_content_type<'a>(
 
 #[cfg(test)]
 pub mod tests {
+  use serde_json::json;
+
   use super::*;
   use crate::module_specifier::resolve_import;
-  use serde_json::json;
 
   #[derive(Debug)]
   pub(crate) struct MockResolver {

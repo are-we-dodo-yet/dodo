@@ -35,9 +35,8 @@ pub fn is_fs_root_specifier(url: &ModuleSpecifier) -> bool {
 
 #[cfg(test)]
 mod test {
-  use crate::ModuleSpecifier;
-
   use super::*;
+  use crate::ModuleSpecifier;
 
   #[test]
   fn test_is_fs_root_specifier() {

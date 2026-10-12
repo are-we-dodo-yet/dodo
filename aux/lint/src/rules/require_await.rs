@@ -1,16 +1,21 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::{Context, LintRule};
-use crate::handler::{Handler, Traverse};
-use crate::swc_util::StringRepr;
-use crate::tags::{self, Tags};
-
-use deno_ast::swc::parser::token::{Token, Word};
-use deno_ast::view::{NodeTrait, Program};
 use deno_ast::SourceRange;
 use deno_ast::SourceRanged;
 use deno_ast::SourceRangedForSpanned;
+use deno_ast::swc::parser::token::Token;
+use deno_ast::swc::parser::token::Word;
+use deno_ast::view::NodeTrait;
+use deno_ast::view::Program;
 use derive_more::Display;
+
+use super::Context;
+use super::LintRule;
+use crate::handler::Handler;
+use crate::handler::Traverse;
+use crate::swc_util::StringRepr;
+use crate::tags::Tags;
+use crate::tags::{self};
 
 #[derive(Debug)]
 pub struct RequireAwait;

@@ -3,8 +3,6 @@
 use std::borrow::Cow;
 use std::sync::Arc;
 
-use crate::ModuleSpecifier;
-
 use deno_ast::EmitError;
 use deno_ast::SourceRange;
 use deno_ast::SourceTextInfo;
@@ -15,6 +13,8 @@ use deno_ast::diagnostics::DiagnosticSnippetHighlight;
 use deno_ast::diagnostics::DiagnosticSnippetHighlightStyle;
 use deno_ast::diagnostics::DiagnosticSourcePos;
 use deno_ast::diagnostics::DiagnosticSourceRange;
+
+use crate::ModuleSpecifier;
 
 mod cache;
 mod range_finder;

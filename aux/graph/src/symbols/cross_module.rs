@@ -6,9 +6,6 @@ use std::collections::VecDeque;
 use deno_ast::SourceRange;
 use indexmap::IndexMap;
 
-use crate::ModuleGraph;
-use crate::ModuleSpecifier;
-
 use super::FileDep;
 use super::FileDepName;
 use super::ModuleInfoRef;
@@ -18,6 +15,8 @@ use super::SymbolId;
 use super::SymbolNodeDep;
 use super::UniqueSymbolId;
 use super::analyzer::SymbolDeclKind;
+use crate::ModuleGraph;
+use crate::ModuleSpecifier;
 
 #[derive(Debug, Clone)]
 pub enum DefinitionOrUnresolved<'a> {

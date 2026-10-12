@@ -4,7 +4,6 @@ use criterion::Criterion;
 use criterion::async_executor::FuturesExecutor;
 use criterion::criterion_group;
 use criterion::criterion_main;
-
 use deno_doc::DocParser;
 use deno_doc::DocParserOptions;
 use deno_doc::ParseOutput;

@@ -1,8 +1,9 @@
+use std::collections::HashSet;
+
 use crate::Declaration;
 use crate::html::DocNodeWithContext;
 use crate::html::render_context::RenderContext;
 use crate::html::util::*;
-use std::collections::HashSet;
 
 pub(crate) fn render_type_alias(
   ctx: &RenderContext,

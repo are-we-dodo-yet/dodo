@@ -1,18 +1,28 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::program_ref;
-use super::{Context, LintRule};
-use crate::swc_util::StringRepr;
-use crate::tags::{self, Tags};
-use crate::Program;
-use crate::ProgramRef;
+use deno_ast::SourceRangedForSpanned;
 use deno_ast::swc::ast::BinExpr;
-use deno_ast::swc::ast::BinaryOp::{EqEq, EqEqEq, NotEq, NotEqEq};
-use deno_ast::swc::ast::Expr::{Ident, Lit, Tpl, Unary};
+use deno_ast::swc::ast::BinaryOp::EqEq;
+use deno_ast::swc::ast::BinaryOp::EqEqEq;
+use deno_ast::swc::ast::BinaryOp::NotEq;
+use deno_ast::swc::ast::BinaryOp::NotEqEq;
+use deno_ast::swc::ast::Expr::Ident;
+use deno_ast::swc::ast::Expr::Lit;
+use deno_ast::swc::ast::Expr::Tpl;
+use deno_ast::swc::ast::Expr::Unary;
 use deno_ast::swc::ast::Lit::Str;
 use deno_ast::swc::ast::UnaryOp::TypeOf;
-use deno_ast::swc::ecma_visit::{noop_visit_type, Visit};
-use deno_ast::SourceRangedForSpanned;
+use deno_ast::swc::ecma_visit::Visit;
+use deno_ast::swc::ecma_visit::noop_visit_type;
+
+use super::Context;
+use super::LintRule;
+use super::program_ref;
+use crate::Program;
+use crate::ProgramRef;
+use crate::swc_util::StringRepr;
+use crate::tags::Tags;
+use crate::tags::{self};
 
 #[derive(Debug)]
 pub struct ValidTypeof;

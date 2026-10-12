@@ -2,10 +2,12 @@
 
 use std::collections::HashMap;
 use std::collections::HashSet;
-use std::ops::{Deref, DerefMut};
+use std::ops::Deref;
+use std::ops::DerefMut;
 
+use super::UnicodeChar;
 use super::reader::Reader;
-use super::{unicode::*, UnicodeChar};
+use super::unicode::*;
 
 fn is_syntax_character(cp: UnicodeChar) -> bool {
   cp == '^'

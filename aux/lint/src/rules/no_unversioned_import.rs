@@ -1,11 +1,19 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::{Context, LintRule};
-use crate::handler::{Handler, Traverse};
-use crate::tags::{Tags, RECOMMENDED};
-use crate::Program;
-use deno_ast::view::{CallExpr, Callee, Expr, ImportDecl, Lit};
 use deno_ast::SourceRanged;
+use deno_ast::view::CallExpr;
+use deno_ast::view::Callee;
+use deno_ast::view::Expr;
+use deno_ast::view::ImportDecl;
+use deno_ast::view::Lit;
+
+use super::Context;
+use super::LintRule;
+use crate::Program;
+use crate::handler::Handler;
+use crate::handler::Traverse;
+use crate::tags::RECOMMENDED;
+use crate::tags::Tags;
 
 #[derive(Debug)]
 pub struct NoUnversionedImport;

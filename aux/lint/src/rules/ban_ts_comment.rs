@@ -1,15 +1,17 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::{Context, LintRule};
-use crate::tags;
-use crate::tags::Tags;
-use crate::Program;
-use deno_ast::swc::common::comments::Comment;
-use deno_ast::swc::common::comments::CommentKind;
 use deno_ast::SourceRange;
 use deno_ast::SourceRangedForSpanned;
+use deno_ast::swc::common::comments::Comment;
+use deno_ast::swc::common::comments::CommentKind;
 use once_cell::sync::Lazy;
 use regex::Regex;
+
+use super::Context;
+use super::LintRule;
+use crate::Program;
+use crate::tags;
+use crate::tags::Tags;
 
 /// This rule differs from typescript-eslint. In typescript-eslint the following
 /// defaults apply:
@@ -46,9 +48,15 @@ impl DirectiveKind {
   fn as_hint(&self) -> &'static str {
     use DirectiveKind::*;
     match *self {
-      ExpectError => "Add an in-line comment explaining the reason for using `@ts-expect-error`, like `// @ts-expect-error: <reason>`",
-      Ignore => "Add an in-line comment explaining the reason for using `@ts-ignore`, like `// @ts-ignore: <reason>`",
-      Nocheck => "Add an in-line comment explaining the reason for using `@ts-nocheck`, like `// @ts-nocheck: <reason>`",
+      ExpectError => {
+        "Add an in-line comment explaining the reason for using `@ts-expect-error`, like `// @ts-expect-error: <reason>`"
+      }
+      Ignore => {
+        "Add an in-line comment explaining the reason for using `@ts-ignore`, like `// @ts-ignore: <reason>`"
+      }
+      Nocheck => {
+        "Add an in-line comment explaining the reason for using `@ts-nocheck`, like `// @ts-nocheck: <reason>`"
+      }
     }
   }
 }

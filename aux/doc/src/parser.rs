@@ -1,5 +1,14 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
+use std::borrow::Cow;
+use std::cell::RefCell;
+use std::collections::HashMap;
+use std::collections::HashSet;
+use std::error::Error;
+use std::fmt;
+use std::rc::Rc;
+use std::sync::Arc;
+
 use deno_ast::ModuleItemRef;
 use deno_ast::SourceRange;
 use deno_ast::SourceRanged;
@@ -34,16 +43,10 @@ use deno_graph::symbols::SymbolDecl;
 use deno_graph::symbols::SymbolNodeRef;
 use deno_graph::symbols::UniqueSymbolId;
 use indexmap::IndexMap;
-use std::borrow::Cow;
-use std::cell::RefCell;
-use std::collections::HashMap;
-use std::collections::HashSet;
-use std::error::Error;
-use std::fmt;
-use std::rc::Rc;
-use std::sync::Arc;
 
+use crate::Declaration;
 use crate::Location;
+use crate::Symbol;
 use crate::diagnostics::DiagnosticsCollector;
 use crate::diagnostics::DocDiagnostic;
 use crate::interface::expr_to_name;
@@ -68,7 +71,6 @@ use crate::util::swc::module_js_doc_for_source;
 use crate::util::symbol::get_module_info;
 use crate::variable::VariableDef;
 use crate::visibility::SymbolVisibility;
-use crate::{Declaration, Symbol};
 
 #[derive(Debug)]
 pub enum DocError {

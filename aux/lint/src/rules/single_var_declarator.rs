@@ -1,14 +1,16 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
+use deno_ast::SourceRangedForSpanned;
+use deno_ast::swc::ast::VarDecl;
+use deno_ast::swc::ecma_visit::Visit;
+use deno_ast::swc::ecma_visit::noop_visit_type;
+use derive_more::Display;
+
+use super::Context;
+use super::LintRule;
 use super::program_ref;
-use super::{Context, LintRule};
 use crate::Program;
 use crate::ProgramRef;
-use deno_ast::swc::ast::VarDecl;
-use deno_ast::swc::ecma_visit::noop_visit_type;
-use deno_ast::swc::ecma_visit::Visit;
-use deno_ast::SourceRangedForSpanned;
-use derive_more::Display;
 
 #[derive(Debug)]
 pub struct SingleVarDeclarator;

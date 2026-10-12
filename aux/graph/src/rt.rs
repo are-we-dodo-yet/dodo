@@ -1,10 +1,11 @@
 // Copyright 2018-2024 the Deno authors. MIT license.
 
-use futures::channel::oneshot;
 use std::future::Future;
 use std::pin::Pin;
 use std::task::Context;
 use std::task::Poll;
+
+use futures::channel::oneshot;
 
 pub type BoxedFuture = Pin<Box<dyn Future<Output = ()> + 'static>>;
 

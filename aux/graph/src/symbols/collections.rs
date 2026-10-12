@@ -2,9 +2,10 @@
 
 #![allow(dead_code)]
 
-use indexmap::IndexMap;
 use std::cell::UnsafeCell;
 use std::collections::HashMap;
+
+use indexmap::IndexMap;
 
 macro_rules! define_map {
   ($name:ident, $kind:ident) => {

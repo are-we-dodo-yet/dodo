@@ -1,16 +1,16 @@
+use std::collections::HashMap;
+
+use deno_ast::RootNode;
 use deno_ast::SourceRange;
 use deno_ast::SourceRanged;
 use deno_ast::SourceRangedForSpanned;
 use deno_ast::SourceTextInfoProvider;
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
-
 use deno_ast::swc::common::comments::Comment;
 use deno_ast::swc::common::comments::CommentKind;
 use deno_ast::view as ast_view;
-use deno_ast::RootNode;
 use once_cell::sync::Lazy;
 use regex::Regex;
-use std::collections::HashMap;
 
 pub type LineIgnoreDirective = IgnoreDirective<Line>;
 pub type FileIgnoreDirective = IgnoreDirective<File>;

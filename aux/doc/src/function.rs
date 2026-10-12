@@ -1,5 +1,12 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
+use deno_ast::swc::ast::BlockStmtOrExpr;
+use deno_ast::swc::ast::ReturnStmt;
+use deno_ast::swc::ast::Stmt;
+use deno_graph::symbols::EsModuleInfo;
+use serde::Deserialize;
+use serde::Serialize;
+
 use crate::ParamDef;
 use crate::decorators::DecoratorDef;
 use crate::decorators::decorators_to_defs;
@@ -8,12 +15,6 @@ use crate::ts_type::TsTypeDef;
 use crate::ts_type_param::TsTypeParamDef;
 use crate::ts_type_param::maybe_type_param_decl_to_type_param_defs;
 use crate::util::swc::is_false;
-use deno_ast::swc::ast::BlockStmtOrExpr;
-use deno_ast::swc::ast::ReturnStmt;
-use deno_ast::swc::ast::Stmt;
-use deno_graph::symbols::EsModuleInfo;
-use serde::Deserialize;
-use serde::Serialize;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]

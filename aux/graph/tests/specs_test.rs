@@ -5,10 +5,9 @@
 use std::borrow::Cow;
 use std::cell::OnceCell;
 use std::collections::BTreeMap;
-use std::panic::AssertUnwindSafe;
-
 use std::collections::HashMap;
 use std::fmt::Write;
+use std::panic::AssertUnwindSafe;
 use std::path::Path;
 use std::path::PathBuf;
 use std::rc::Rc;

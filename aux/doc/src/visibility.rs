@@ -1,9 +1,7 @@
 // Copyright 2020-2023 the Deno authors. All rights reserved. MIT license.
 
-use crate::parser::DocError;
-use crate::util::graph::resolve_deno_graph_module;
-use crate::util::symbol::get_module_info;
-use crate::util::symbol::symbol_has_ignorable_js_doc_tag;
+use std::collections::HashMap;
+use std::collections::HashSet;
 
 use deno_ast::SourceRange;
 use deno_ast::swc::ast::TsType;
@@ -19,8 +17,10 @@ use deno_graph::symbols::UniqueSymbolId;
 use indexmap::IndexMap;
 use indexmap::IndexSet;
 
-use std::collections::HashMap;
-use std::collections::HashSet;
+use crate::parser::DocError;
+use crate::util::graph::resolve_deno_graph_module;
+use crate::util::symbol::get_module_info;
+use crate::util::symbol::symbol_has_ignorable_js_doc_tag;
 
 #[derive(Debug)]
 pub struct SymbolDeclDeps {

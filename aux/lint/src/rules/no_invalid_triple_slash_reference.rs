@@ -1,13 +1,18 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::{Context, LintRule};
-use crate::tags::{self, Tags};
-use crate::Program;
-use deno_ast::swc::common::comments::{Comment, CommentKind};
 use deno_ast::MediaType;
-use deno_ast::{SourceRange, SourceRangedForSpanned};
+use deno_ast::SourceRange;
+use deno_ast::SourceRangedForSpanned;
+use deno_ast::swc::common::comments::Comment;
+use deno_ast::swc::common::comments::CommentKind;
 use once_cell::sync::Lazy;
 use regex::Regex;
+
+use super::Context;
+use super::LintRule;
+use crate::Program;
+use crate::tags::Tags;
+use crate::tags::{self};
 
 #[derive(Debug)]
 pub struct NoInvalidTripleSlashReference;

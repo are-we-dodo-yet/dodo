@@ -17,8 +17,10 @@ use url::Url;
 use super::FastCheckCache;
 use super::FastCheckCacheItem;
 use super::FastCheckCacheKey;
+use super::FastCheckDiagnostic;
 use super::FastCheckDiagnosticRange;
 use super::FastCheckModule;
+use super::cache::fast_insecure_hash;
 use crate::ModuleGraph;
 use crate::ModuleSpecifier;
 use crate::WorkspaceMember;
@@ -34,9 +36,6 @@ use crate::symbols::SymbolDeclKind;
 use crate::symbols::SymbolId;
 use crate::symbols::SymbolNodeDep;
 use crate::symbols::SymbolNodeRef;
-
-use super::FastCheckDiagnostic;
-use super::cache::fast_insecure_hash;
 
 #[derive(Default, Debug, Clone, PartialEq, Eq)]
 struct NamedSubset(IndexMap<String, Exports>);

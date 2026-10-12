@@ -1,9 +1,5 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use crate::DocParserOptions;
-use crate::node::DeclarationDef;
-use crate::parser::DocParser;
-use crate::printer::DocPrinter;
 use deno_graph::BuildOptions;
 use deno_graph::GraphKind;
 use deno_graph::ModuleGraph;
@@ -13,6 +9,11 @@ use deno_graph::source::MemoryLoader;
 use deno_graph::source::Source;
 use pretty_assertions::assert_eq;
 use serde_json::json;
+
+use crate::DocParserOptions;
+use crate::node::DeclarationDef;
+use crate::parser::DocParser;
+use crate::printer::DocPrinter;
 
 type MaybeHeaders<S> = Option<Vec<(S, S)>>;
 

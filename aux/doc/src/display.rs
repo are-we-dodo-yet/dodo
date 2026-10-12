@@ -1,9 +1,10 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use deno_terminal::colors;
 use std::fmt::Display;
 use std::fmt::Formatter;
 use std::fmt::Result;
+
+use deno_terminal::colors;
 
 pub(crate) struct SliceDisplayer<'a, T: Display>(&'a [T], &'a str, bool);
 

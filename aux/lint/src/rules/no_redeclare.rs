@@ -1,18 +1,22 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
+use std::collections::HashSet;
+
+use deno_ast::SourceRangedForSpanned;
+use deno_ast::swc::ast::Id;
+use deno_ast::swc::ast::*;
+use deno_ast::swc::ecma_visit::Visit;
+use deno_ast::swc::ecma_visit::VisitWith;
+use deno_ast::swc::ecma_visit::noop_visit_type;
+use deno_ast::swc::utils::find_pat_ids;
+
+use super::Context;
+use super::LintRule;
 use super::program_ref;
-use super::{Context, LintRule};
-use crate::tags::{self, Tags};
 use crate::Program;
 use crate::ProgramRef;
-use deno_ast::swc::ast::Id;
-use deno_ast::swc::ecma_visit::noop_visit_type;
-use deno_ast::swc::{
-  ast::*, ecma_visit::Visit, ecma_visit::VisitWith, utils::find_pat_ids,
-};
-use deno_ast::SourceRangedForSpanned;
-
-use std::collections::HashSet;
+use crate::tags::Tags;
+use crate::tags::{self};
 
 #[derive(Debug)]
 pub struct NoRedeclare;

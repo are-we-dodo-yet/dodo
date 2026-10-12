@@ -1,18 +1,18 @@
 // Copyright 2020-2021 the Deno authors. All rights reserved. MIT license.
+use deno_ast::SourceRange;
+use deno_ast::SourceRanged;
+use deno_ast::view as ast_view;
+use if_chain::if_chain;
+
 use super::Context;
 use super::LintRule;
+use crate::Program;
 use crate::diagnostic::LintFix;
 use crate::diagnostic::LintFixChange;
 use crate::handler::Handler;
 use crate::handler::Traverse;
 use crate::tags;
 use crate::tags::Tags;
-use crate::Program;
-
-use deno_ast::view as ast_view;
-use deno_ast::SourceRange;
-use deno_ast::SourceRanged;
-use if_chain::if_chain;
 
 #[derive(Debug)]
 pub struct NoWindow;

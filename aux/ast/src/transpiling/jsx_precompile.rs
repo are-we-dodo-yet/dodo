@@ -1,6 +1,5 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use crate::swc::atoms::Atom;
 use swc_atoms::Wtf8Atom;
 use swc_common::DUMMY_SP;
 use swc_common::SyntaxContext;
@@ -11,6 +10,8 @@ use swc_ecma_utils::quote_ident;
 use swc_ecma_visit::VisitMut;
 use swc_ecma_visit::VisitMutWith;
 use swc_ecma_visit::noop_visit_mut_type;
+
+use crate::swc::atoms::Atom;
 
 #[derive(Debug, Default)]
 pub struct JsxPrecompile {
@@ -1618,6 +1619,11 @@ fn new_ident(name: Atom) -> Ident {
 mod tests {
   use std::collections::HashMap;
 
+  use pretty_assertions::assert_eq;
+  use swc_common::comments::SingleThreadedComments;
+  use swc_ecma_visit::visit_mut_pass;
+
+  use super::*;
   use crate::EmitOptions;
   use crate::ModuleSpecifier;
   use crate::SourceMap;
@@ -1625,11 +1631,6 @@ mod tests {
   use crate::swc::parser::StringInput;
   use crate::swc::parser::Syntax;
   use crate::swc::parser::TsSyntax;
-  use pretty_assertions::assert_eq;
-  use swc_common::comments::SingleThreadedComments;
-  use swc_ecma_visit::visit_mut_pass;
-
-  use super::*;
 
   #[test]
   fn basic_test() {

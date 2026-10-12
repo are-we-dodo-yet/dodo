@@ -1,7 +1,21 @@
+use std::borrow::Cow;
+use std::sync::Arc;
+
+use serde::Deserialize;
+use serde::Serialize;
+
+use super::DARKMODE_TOGGLE_FILENAME;
 use super::DocNodeWithContext;
+use super::FUSE_FILENAME;
 use super::FileMode;
 use super::GenerateCtx;
+use super::PAGE_STYLESHEET_FILENAME;
+use super::RESET_STYLESHEET_FILENAME;
 use super::RenderContext;
+use super::SCRIPT_FILENAME;
+use super::SEARCH_FILENAME;
+use super::SEARCH_INDEX_FILENAME;
+use super::STYLESHEET_FILENAME;
 use super::ShortPath;
 use super::SymbolGroupCtx;
 use super::UrlResolveKind;
@@ -12,23 +26,9 @@ use super::util;
 use super::util::AnchorCtx;
 use super::util::BreadcrumbsCtx;
 use super::util::SectionHeaderCtx;
-use std::borrow::Cow;
-use std::sync::Arc;
-
-use super::DARKMODE_TOGGLE_FILENAME;
-use super::FUSE_FILENAME;
-use super::PAGE_STYLESHEET_FILENAME;
-use super::RESET_STYLESHEET_FILENAME;
-use super::SCRIPT_FILENAME;
-use super::SEARCH_FILENAME;
-use super::SEARCH_INDEX_FILENAME;
-use super::STYLESHEET_FILENAME;
-
 use crate::DeclarationDef;
 use crate::html::usage::UsagesCtx;
 use crate::js_doc::JsDocTag;
-use serde::Deserialize;
-use serde::Serialize;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct HtmlHeadCtx {

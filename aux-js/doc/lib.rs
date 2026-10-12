@@ -2,13 +2,21 @@
 
 #![cfg(target_arch = "wasm32")]
 
-use anyhow::anyhow;
+use std::ffi::c_void;
+use std::sync::Arc;
+
 use anyhow::Context;
+use anyhow::anyhow;
+use deno_doc::DocParser;
+use deno_doc::Document;
 use deno_doc::html::UrlResolveKind;
 use deno_doc::html::UsageComposerEntry;
 use deno_doc::html::UsageToMd;
-use deno_doc::DocParser;
-use deno_doc::Document;
+use deno_graph::BuildOptions;
+use deno_graph::GraphKind;
+use deno_graph::ModuleGraph;
+use deno_graph::ModuleSpecifier;
+use deno_graph::Range;
 use deno_graph::ast::CapturingModuleAnalyzer;
 use deno_graph::source::CacheSetting;
 use deno_graph::source::LoadError;
@@ -18,18 +26,11 @@ use deno_graph::source::LoadResponse;
 use deno_graph::source::Loader;
 use deno_graph::source::ResolveError;
 use deno_graph::source::Resolver;
-use deno_graph::BuildOptions;
-use deno_graph::GraphKind;
-use deno_graph::ModuleGraph;
-use deno_graph::ModuleSpecifier;
-use deno_graph::Range;
 use import_map::ImportMap;
 use import_map::ImportMapOptions;
 use indexmap::IndexMap;
 use serde::Serialize;
 use serde_wasm_bindgen::Serializer;
-use std::ffi::c_void;
-use std::sync::Arc;
 use wasm_bindgen::prelude::*;
 use wasm_bindgen_futures::JsFuture;
 
@@ -162,7 +163,7 @@ impl Resolver for JsResolver {
       Err(_) => {
         return Err(Other(deno_error::JsErrorBox::generic(
           "JavaScript resolve() function threw.",
-        )))
+        )));
       }
     };
     let value: String = serde_wasm_bindgen::from_value(value)
@@ -211,7 +212,9 @@ async fn inner_doc(
     maybe_import_map
   {
     if print_import_map_diagnostics && maybe_resolve.is_some() {
-      console_warn!("An import map is specified as well as a resolve function, ignoring resolve function.");
+      console_warn!(
+        "An import map is specified as well as a resolve function, ignoring resolve function."
+      );
     }
     let import_map_specifier = ModuleSpecifier::parse(&import_map)?;
     if let Some(LoadResponse::Module {

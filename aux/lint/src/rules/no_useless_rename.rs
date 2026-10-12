@@ -1,13 +1,18 @@
-use super::{Context, LintRule};
-use crate::handler::{Handler, Traverse};
-use crate::tags::Tags;
-use crate::Program;
-
-use deno_ast::view::{
-  ExportNamedSpecifier, ImportNamedSpecifier, ModuleExportName, ObjectPat,
-  ObjectPatProp, Pat, PropName,
-};
 use deno_ast::SourceRanged;
+use deno_ast::view::ExportNamedSpecifier;
+use deno_ast::view::ImportNamedSpecifier;
+use deno_ast::view::ModuleExportName;
+use deno_ast::view::ObjectPat;
+use deno_ast::view::ObjectPatProp;
+use deno_ast::view::Pat;
+use deno_ast::view::PropName;
+
+use super::Context;
+use super::LintRule;
+use crate::Program;
+use crate::handler::Handler;
+use crate::handler::Traverse;
+use crate::tags::Tags;
 
 #[derive(Debug)]
 pub struct NoUselessRename;

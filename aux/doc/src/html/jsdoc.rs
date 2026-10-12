@@ -1,12 +1,14 @@
+use std::borrow::Cow;
+use std::sync::Arc;
+
+use serde::Deserialize;
+use serde::Serialize;
+
 use super::render_context::RenderContext;
 use super::util::*;
 use crate::html::ShortPath;
 use crate::js_doc::JsDoc;
 use crate::js_doc::JsDocTag;
-use serde::Deserialize;
-use serde::Serialize;
-use std::borrow::Cow;
-use std::sync::Arc;
 
 lazy_static! {
   static ref JSDOC_LINK_RE: regex::Regex = regex::Regex::new(
@@ -934,20 +936,22 @@ impl ModuleDocCtx {
 
 #[cfg(test)]
 mod test {
+  use std::sync::Arc;
+
+  use deno_ast::ModuleSpecifier;
+  use indexmap::IndexMap;
+
+  use crate::Location;
+  use crate::Symbol;
   use crate::html::GenerateCtx;
   use crate::html::GenerateOptions;
   use crate::html::HrefResolver;
+  use crate::html::RenderContext;
+  use crate::html::UrlResolveKind;
   use crate::html::UsageComposer;
   use crate::html::UsageComposerEntry;
   use crate::html::href_path_resolve;
   use crate::html::jsdoc::parse_links;
-  use crate::{Location, Symbol};
-  use deno_ast::ModuleSpecifier;
-  use indexmap::IndexMap;
-  use std::sync::Arc;
-
-  use crate::html::RenderContext;
-  use crate::html::UrlResolveKind;
   use crate::html::usage::UsageToMd;
   use crate::interface::InterfaceDef;
   use crate::js_doc::JsDoc;

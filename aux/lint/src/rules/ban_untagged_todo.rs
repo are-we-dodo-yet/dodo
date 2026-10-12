@@ -1,12 +1,14 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::{Context, LintRule};
-use crate::Program;
+use deno_ast::SourceRangedForSpanned;
 use deno_ast::swc::common::comments::Comment;
 use deno_ast::swc::common::comments::CommentKind;
-use deno_ast::SourceRangedForSpanned;
 use once_cell::sync::Lazy;
 use regex::Regex;
+
+use super::Context;
+use super::LintRule;
+use crate::Program;
 
 #[derive(Debug)]
 pub struct BanUntaggedTodo;

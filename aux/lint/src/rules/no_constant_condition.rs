@@ -1,15 +1,25 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::program_ref;
-use super::{Context, LintRule};
-use crate::tags::{self, Tags};
-use crate::Program;
-use crate::ProgramRef;
-use deno_ast::swc::ast::{BinaryOp, CondExpr, Expr, IfStmt, Lit, UnaryOp};
-use deno_ast::swc::ecma_visit::{noop_visit_type, Visit, VisitWith};
 use deno_ast::SourceRange;
 use deno_ast::SourceRangedForSpanned;
+use deno_ast::swc::ast::BinaryOp;
+use deno_ast::swc::ast::CondExpr;
+use deno_ast::swc::ast::Expr;
+use deno_ast::swc::ast::IfStmt;
+use deno_ast::swc::ast::Lit;
+use deno_ast::swc::ast::UnaryOp;
+use deno_ast::swc::ecma_visit::Visit;
+use deno_ast::swc::ecma_visit::VisitWith;
+use deno_ast::swc::ecma_visit::noop_visit_type;
 use derive_more::Display;
+
+use super::Context;
+use super::LintRule;
+use super::program_ref;
+use crate::Program;
+use crate::ProgramRef;
+use crate::tags::Tags;
+use crate::tags::{self};
 
 #[derive(Debug)]
 pub struct NoConstantCondition;

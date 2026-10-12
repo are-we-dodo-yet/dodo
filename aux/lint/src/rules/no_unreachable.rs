@@ -1,18 +1,19 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::program_ref;
-use super::Context;
-use super::LintRule;
-use crate::tags;
-use crate::tags::Tags;
-use crate::Program;
-use crate::ProgramRef;
+use deno_ast::SourceRangedForSpanned;
 use deno_ast::swc::ast::Decl;
 use deno_ast::swc::ast::Stmt;
 use deno_ast::swc::ast::VarDeclKind;
 use deno_ast::swc::ecma_visit::Visit;
 use deno_ast::swc::ecma_visit::VisitWith;
-use deno_ast::SourceRangedForSpanned;
+
+use super::Context;
+use super::LintRule;
+use super::program_ref;
+use crate::Program;
+use crate::ProgramRef;
+use crate::tags;
+use crate::tags::Tags;
 
 #[derive(Debug)]
 pub struct NoUnreachable;

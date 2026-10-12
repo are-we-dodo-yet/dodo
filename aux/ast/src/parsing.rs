@@ -424,10 +424,9 @@ fn strip_bom_from_arc(s: Arc<str>, should_panic_in_debug: bool) -> Arc<str> {
 mod test {
   use pretty_assertions::assert_eq;
 
+  use super::*;
   use crate::LineAndColumnDisplay;
   use crate::diagnostics::Diagnostic;
-
-  use super::*;
 
   #[test]
   fn should_parse_program() {

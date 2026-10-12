@@ -6,18 +6,10 @@
 #![deny(clippy::disallowed_types)]
 #![deny(clippy::unnecessary_wraps)]
 
+use std::collections::HashMap;
+use std::sync::Arc;
+
 use deno_error::JsErrorBox;
-use deno_graph::resolve_import;
-use deno_graph::source::load_data_url;
-use deno_graph::source::CacheInfo;
-use deno_graph::source::LoadFuture;
-use deno_graph::source::LoadOptions;
-use deno_graph::source::Loader;
-use deno_graph::source::NullFileSystem;
-use deno_graph::source::ResolutionKind;
-use deno_graph::source::ResolveError;
-use deno_graph::source::Resolver;
-use deno_graph::source::DEFAULT_JSX_IMPORT_SOURCE_MODULE;
 use deno_graph::BuildOptions;
 use deno_graph::GraphKind;
 use deno_graph::ModuleGraph;
@@ -25,9 +17,17 @@ use deno_graph::ModuleSpecifier;
 use deno_graph::Range;
 use deno_graph::ReferrerImports;
 use deno_graph::SpecifierError;
-use std::collections::HashMap;
-use std::sync::Arc;
-
+use deno_graph::resolve_import;
+use deno_graph::source::CacheInfo;
+use deno_graph::source::DEFAULT_JSX_IMPORT_SOURCE_MODULE;
+use deno_graph::source::LoadFuture;
+use deno_graph::source::LoadOptions;
+use deno_graph::source::Loader;
+use deno_graph::source::NullFileSystem;
+use deno_graph::source::ResolutionKind;
+use deno_graph::source::ResolveError;
+use deno_graph::source::Resolver;
+use deno_graph::source::load_data_url;
 use futures::future;
 use serde::Deserialize;
 use serde::Serialize;
@@ -198,7 +198,9 @@ impl Resolver for JsResolver {
       let value = match resolve.call2(&this, &arg1, &arg2) {
         Ok(value) => value,
         Err(_) => {
-          return Err(JsErrorBox::from_err(WasmError::JavaScriptResolve).into())
+          return Err(
+            JsErrorBox::from_err(WasmError::JavaScriptResolve).into(),
+          );
         }
       };
       let value: String = match serde_wasm_bindgen::from_value(value) {
@@ -207,7 +209,7 @@ impl Resolver for JsResolver {
           return Err(
             JsErrorBox::from_err(WasmError::Deserialize(err.to_string()))
               .into(),
-          )
+          );
         }
       };
       ModuleSpecifier::parse(&value)
@@ -397,11 +399,11 @@ pub async fn js_parse_module(
 
 #[cfg(test)]
 mod tests {
-  use super::*;
-
   use deno_graph::PositionRange;
   use serde_json::from_value;
   use serde_json::json;
+
+  use super::*;
 
   #[test]
   fn test_deserialize_types_response() {

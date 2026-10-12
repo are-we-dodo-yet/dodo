@@ -1,5 +1,12 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
+use std::collections::HashMap;
+
+use deno_ast::ModuleSpecifier;
+use indexmap::IndexMap;
+use serde::Deserialize;
+use serde::Serialize;
+
 use crate::Symbol;
 use crate::diff::DeclarationDefDiff;
 use crate::diff::DeclarationDiff;
@@ -7,13 +14,9 @@ use crate::diff::DocDiff;
 use crate::diff::ModuleDiff;
 use crate::diff::SymbolDiff;
 use crate::html::DocNodeWithContext;
-use crate::html::util::{SectionContentCtx, SectionCtx};
+use crate::html::util::SectionContentCtx;
+use crate::html::util::SectionCtx;
 use crate::node::DocNodeKind as AstDocNodeKind;
-use deno_ast::ModuleSpecifier;
-use indexmap::IndexMap;
-use serde::Deserialize;
-use serde::Serialize;
-use std::collections::HashMap;
 
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(tag = "kind", rename_all = "camelCase")]

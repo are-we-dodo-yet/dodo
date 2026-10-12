@@ -1,3 +1,9 @@
+use std::borrow::Cow;
+
+use serde::Deserialize;
+use serde::Serialize;
+use serde_json::json;
+
 use super::DocNodeWithContext;
 use super::GenerateCtx;
 use super::RenderContext;
@@ -6,10 +12,6 @@ use crate::html::util::Id;
 use crate::html::util::IdBuilder;
 use crate::html::util::IdKind;
 use crate::js_doc::JsDocTag;
-use serde::Deserialize;
-use serde::Serialize;
-use serde_json::json;
-use std::borrow::Cow;
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

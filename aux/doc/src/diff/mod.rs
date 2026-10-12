@@ -10,20 +10,7 @@ mod ts_type;
 mod type_alias;
 mod variable;
 
-use deno_ast::ModuleSpecifier;
-use indexmap::IndexMap;
-use indexmap::IndexSet;
-use serde::Deserialize;
-use serde::Serialize;
-
 use std::sync::Arc;
-
-use crate::Symbol;
-use crate::node::Declaration;
-use crate::node::DeclarationDef;
-use crate::node::DeclarationKind;
-use crate::node::DocNodeKind;
-use crate::parser::ParseOutput;
 
 pub use class::ClassDiff;
 pub use class::ConstructorDiff;
@@ -34,9 +21,12 @@ pub use class::MethodDiff;
 pub use class::MethodsDiff;
 pub use class::PropertiesDiff;
 pub use class::PropertyDiff;
+use deno_ast::ModuleSpecifier;
 pub use r#enum::EnumDiff;
 pub use function::FunctionDiff;
 pub use function::ParamsDiff;
+use indexmap::IndexMap;
+use indexmap::IndexSet;
 pub use interface::CallSignaturesDiff;
 pub use interface::InterfaceConstructorsDiff;
 pub use interface::InterfaceDiff;
@@ -49,10 +39,19 @@ pub use interface::InterfacePropertyDiff;
 pub use js_doc::JsDocDiff;
 pub use js_doc::TagsDiff;
 pub use namespace::NamespaceDiff;
+use serde::Deserialize;
+use serde::Serialize;
 pub use ts_type::TsTypeDiff;
 pub use ts_type::TypeParamsDiff;
 pub use type_alias::TypeAliasDiff;
 pub use variable::VariableDiff;
+
+use crate::Symbol;
+use crate::node::Declaration;
+use crate::node::DeclarationDef;
+use crate::node::DeclarationKind;
+use crate::node::DocNodeKind;
+use crate::parser::ParseOutput;
 
 /// Maximum change percentage for two items to be considered a rename.
 pub(crate) const RENAME_THRESHOLD: f64 = 0.10;

@@ -2,21 +2,35 @@
 
 use std::collections::HashSet;
 
-use super::{Context, LintRule};
-use crate::diagnostic::{LintFix, LintFixChange};
-use crate::tags::{self, Tags};
-use crate::Program;
-use deno_ast::swc::ast::{
-  BindingIdent, ExportNamedSpecifier, Id, Ident, ImportDecl, ImportSpecifier,
-  JSXElementName, ModuleExportName, NamedExport, TsEntityName,
-  TsImportEqualsDecl, TsModuleRef,
-};
-use deno_ast::swc::ecma_visit::{noop_visit_type, Visit, VisitWith};
+use deno_ast::SourceRange;
+use deno_ast::SourceRanged;
+use deno_ast::SourceRangedForSpanned;
+use deno_ast::swc::ast::BindingIdent;
+use deno_ast::swc::ast::ExportNamedSpecifier;
+use deno_ast::swc::ast::Id;
+use deno_ast::swc::ast::Ident;
+use deno_ast::swc::ast::ImportDecl;
+use deno_ast::swc::ast::ImportSpecifier;
+use deno_ast::swc::ast::JSXElementName;
+use deno_ast::swc::ast::ModuleExportName;
+use deno_ast::swc::ast::NamedExport;
+use deno_ast::swc::ast::TsEntityName;
+use deno_ast::swc::ast::TsImportEqualsDecl;
+use deno_ast::swc::ast::TsModuleRef;
+use deno_ast::swc::ecma_visit::Visit;
+use deno_ast::swc::ecma_visit::VisitWith;
+use deno_ast::swc::ecma_visit::noop_visit_type;
+use deno_ast::view as ast_view;
 use deno_ast::view::NodeTrait;
-use deno_ast::{
-  view as ast_view, SourceRange, SourceRanged, SourceRangedForSpanned,
-};
 use derive_more::Display;
+
+use super::Context;
+use super::LintRule;
+use crate::Program;
+use crate::diagnostic::LintFix;
+use crate::diagnostic::LintFixChange;
+use crate::tags::Tags;
+use crate::tags::{self};
 
 const CODE: &str = "verbatim-module-syntax";
 const FIX_ADD_TYPE_KEYWORD_DESC: &str = "Add a type keyword";

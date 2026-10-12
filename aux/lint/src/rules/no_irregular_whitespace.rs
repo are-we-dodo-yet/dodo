@@ -1,13 +1,19 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::{Context, LintRule};
-use crate::tags::{self, Tags};
-use crate::Program;
-use deno_ast::{RootNode, SourceRangedForSpanned};
-use deno_ast::{SourceRange, SourceRanged};
+use deno_ast::RootNode;
+use deno_ast::SourceRange;
+use deno_ast::SourceRanged;
+use deno_ast::SourceRangedForSpanned;
 use derive_more::Display;
 use once_cell::sync::Lazy;
-use regex::{Matches, Regex};
+use regex::Matches;
+use regex::Regex;
+
+use super::Context;
+use super::LintRule;
+use crate::Program;
+use crate::tags::Tags;
+use crate::tags::{self};
 
 #[derive(Debug)]
 pub struct NoIrregularWhitespace;

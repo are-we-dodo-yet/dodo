@@ -66,9 +66,9 @@ loading them is not practical or desirable.
 A minimal example would look like this:
 
 ```rust
-use deno_graph::ModuleSpecifier;
-use deno_graph::ModuleGraph;
 use deno_graph::GraphKind;
+use deno_graph::ModuleGraph;
+use deno_graph::ModuleSpecifier;
 use deno_graph::source::MemoryLoader;
 use deno_graph::source::Source;
 use futures::executor::block_on;
@@ -81,8 +81,8 @@ fn main() {
         Source::Module {
           specifier: "file:///test.ts",
           maybe_headers: None,
-          content: "import * as a from \"./a.ts\";"
-        }
+          content: "import * as a from \"./a.ts\";",
+        },
       ),
       (
         "file:///a.ts",
@@ -90,7 +90,7 @@ fn main() {
           specifier: "file:///a.ts",
           maybe_headers: None,
           content: "export const a = \"a\";",
-        }
+        },
       ),
     ],
     Vec::new(),

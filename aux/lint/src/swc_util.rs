@@ -1,16 +1,38 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use deno_ast::swc::ast::{
-  ArrowExpr, BigInt, BindingIdent, BlockStmt, Bool, CallExpr, Class,
-  ComputedPropName, Constructor, Expr, Function, Ident, IdentName, JSXText,
-  Lit, MemberExpr, MemberProp, Null, Number, PrivateName, Prop, PropName,
-  PropOrSpread, Regex, Str, Tpl,
-};
-use deno_ast::swc::common::DUMMY_SP;
-use deno_ast::swc::ecma_visit::{VisitMut, VisitMutWith};
-use deno_ast::swc::utils::{find_pat_ids, ident::IdentLike};
-use deno_ast::view::{self as ast_view};
 use deno_ast::Scope;
+use deno_ast::swc::ast::ArrowExpr;
+use deno_ast::swc::ast::BigInt;
+use deno_ast::swc::ast::BindingIdent;
+use deno_ast::swc::ast::BlockStmt;
+use deno_ast::swc::ast::Bool;
+use deno_ast::swc::ast::CallExpr;
+use deno_ast::swc::ast::Class;
+use deno_ast::swc::ast::ComputedPropName;
+use deno_ast::swc::ast::Constructor;
+use deno_ast::swc::ast::Expr;
+use deno_ast::swc::ast::Function;
+use deno_ast::swc::ast::Ident;
+use deno_ast::swc::ast::IdentName;
+use deno_ast::swc::ast::JSXText;
+use deno_ast::swc::ast::Lit;
+use deno_ast::swc::ast::MemberExpr;
+use deno_ast::swc::ast::MemberProp;
+use deno_ast::swc::ast::Null;
+use deno_ast::swc::ast::Number;
+use deno_ast::swc::ast::PrivateName;
+use deno_ast::swc::ast::Prop;
+use deno_ast::swc::ast::PropName;
+use deno_ast::swc::ast::PropOrSpread;
+use deno_ast::swc::ast::Regex;
+use deno_ast::swc::ast::Str;
+use deno_ast::swc::ast::Tpl;
+use deno_ast::swc::common::DUMMY_SP;
+use deno_ast::swc::ecma_visit::VisitMut;
+use deno_ast::swc::ecma_visit::VisitMutWith;
+use deno_ast::swc::utils::find_pat_ids;
+use deno_ast::swc::utils::ident::IdentLike;
+use deno_ast::view::{self as ast_view};
 
 /// Extracts regex string from an expression, using ScopeManager.
 /// If the passed expression is not regular expression, this will return `None`.

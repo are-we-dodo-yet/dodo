@@ -47,10 +47,9 @@ use sys_traits::FsWrite;
 use sys_traits::impls::InMemorySys;
 use url::Url;
 
+use self::helpers::TestNpmResolver;
 use crate::helpers::TestBuilder;
 use crate::helpers::TestLoader;
-
-use self::helpers::TestNpmResolver;
 
 mod helpers;
 

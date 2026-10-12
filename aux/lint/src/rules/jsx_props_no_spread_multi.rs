@@ -2,13 +2,21 @@
 
 use std::collections::HashSet;
 
-use super::{Context, LintRule};
-use crate::diagnostic::{LintFix, LintFixChange};
-use crate::handler::{Handler, Traverse};
-use crate::tags::{self, Tags};
+use deno_ast::SourceRange;
+use deno_ast::SourceRanged;
+use deno_ast::view::JSXAttrOrSpread;
+use deno_ast::view::JSXOpeningElement;
+use deno_ast::view::NodeTrait;
+
+use super::Context;
+use super::LintRule;
 use crate::Program;
-use deno_ast::view::{JSXAttrOrSpread, JSXOpeningElement, NodeTrait};
-use deno_ast::{SourceRange, SourceRanged};
+use crate::diagnostic::LintFix;
+use crate::diagnostic::LintFixChange;
+use crate::handler::Handler;
+use crate::handler::Traverse;
+use crate::tags::Tags;
+use crate::tags::{self};
 
 #[derive(Debug)]
 pub struct JSXPropsNoSpreadMulti;

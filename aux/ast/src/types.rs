@@ -1,5 +1,10 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
+use std::borrow::Cow;
+use std::fmt;
+
+use deno_error::JsError;
+
 use crate::LineAndColumnDisplay;
 use crate::ModuleSpecifier;
 use crate::SourceRange;
@@ -14,9 +19,6 @@ use crate::diagnostics::DiagnosticSnippetHighlightStyle;
 use crate::diagnostics::DiagnosticSourcePos;
 use crate::diagnostics::DiagnosticSourceRange;
 use crate::swc::parser::error::SyntaxError;
-use deno_error::JsError;
-use std::borrow::Cow;
-use std::fmt;
 
 /// Parsing diagnostic.
 #[derive(Debug, Clone, JsError)]

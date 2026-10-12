@@ -544,16 +544,15 @@ fn parse_import_attributes_from_object_lit(
 
 #[cfg(test)]
 mod tests {
-  use crate::ModuleSpecifier;
   use deno_ast::SourcePos;
   use deno_ast::SourceRange;
   use deno_ast::SourceRangedForSpanned;
   use deno_ast::swc::atoms::Atom;
   use deno_ast::swc::common::comments::CommentKind;
-
   use pretty_assertions::assert_eq;
 
   use super::*;
+  use crate::ModuleSpecifier;
 
   fn helper(
     specifier: &str,

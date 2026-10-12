@@ -1,17 +1,18 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
+use std::convert::TryFrom;
+
+use deno_ast::SourceRanged;
+use deno_ast::view as ast_view;
+use if_chain::if_chain;
+
 use super::Context;
 use super::LintRule;
+use crate::Program;
 use crate::handler::Handler;
 use crate::handler::Traverse;
 use crate::tags;
 use crate::tags::Tags;
-use crate::Program;
-
-use deno_ast::view as ast_view;
-use deno_ast::SourceRanged;
-use if_chain::if_chain;
-use std::convert::TryFrom;
 
 #[derive(Debug)]
 pub struct NoDeprecatedDenoApi;
@@ -41,7 +42,10 @@ impl LintRule for NoDeprecatedDenoApi {
 fn extract_symbol<'a>(
   member_prop: &'a ast_view::MemberProp,
 ) -> Option<&'a str> {
-  use deno_ast::view::{Expr, Lit, MemberProp, Tpl};
+  use deno_ast::view::Expr;
+  use deno_ast::view::Lit;
+  use deno_ast::view::MemberProp;
+  use deno_ast::view::Tpl;
   match member_prop {
     MemberProp::Ident(ident) => Some(ident.sym()),
     MemberProp::PrivateName(ident) => Some(ident.name()),
@@ -839,23 +843,35 @@ Deno.readAll(reader);
         "customInspect",
         "Use `Symbol.for(\"Deno.customInspect\")` instead",
       ),
-      ("fdatasync", "Use `.syncData()` from the given class instance instead"),
+      (
+        "fdatasync",
+        "Use `.syncData()` from the given class instance instead",
+      ),
       (
         "fdatasyncSync",
         "Use `.syncDataSync()` from the given class instance instead",
       ),
       ("File", "Use `Deno.FsFile` instead"),
-      ("flock", "Use `.lock()` from the given class instance instead"),
+      (
+        "flock",
+        "Use `.lock()` from the given class instance instead",
+      ),
       (
         "flockSync",
         "Use `.lockSync()` from the given class instance instead",
       ),
-      ("fstat", "Use `.stat()` from the given class instance instead"),
+      (
+        "fstat",
+        "Use `.stat()` from the given class instance instead",
+      ),
       (
         "fstatSync",
         "Use `.statSync()` from the given class instance instead",
       ),
-      ("fsync", "Use `.sync()` from the given class instance instead"),
+      (
+        "fsync",
+        "Use `.sync()` from the given class instance instead",
+      ),
       (
         "fsyncSync",
         "Use `.syncSync()` from the given class instance instead",
@@ -868,17 +884,26 @@ Deno.readAll(reader);
         "ftruncateSync",
         "Use `.truncateSync()` from the given class instance instead",
       ),
-      ("funlock", "Use `.unlock()` from the given class instance instead"),
+      (
+        "funlock",
+        "Use `.unlock()` from the given class instance instead",
+      ),
       (
         "funlockSync",
         "Use `.unlockSync()` from the given class instance instead",
       ),
-      ("futime", "Use `.utime()` from the given class instance instead"),
+      (
+        "futime",
+        "Use `.utime()` from the given class instance instead",
+      ),
       (
         "futimeSync",
         "Use `.utimeSync()` from the given class instance instead",
       ),
-      ("isatty", "Use `.isTerminal()` from the given class instance instead"),
+      (
+        "isatty",
+        "Use `.isTerminal()` from the given class instance instead",
+      ),
       (
         "iter",
         "Use `iterateReader()` from https://jsr.io/@std/io/doc/iterate-reader/~/iterateReader instead",
@@ -887,8 +912,14 @@ Deno.readAll(reader);
         "iterSync",
         "Use `iterateReaderSync()` from https://jsr.io/@std/io/doc/iterate-reader/~/iterateReaderSync instead",
       ),
-      ("read", "Use `.read()` from the given class instance instead"),
-      ("readSync", "Use `.readSync()` from the given class instance instead"),
+      (
+        "read",
+        "Use `.read()` from the given class instance instead",
+      ),
+      (
+        "readSync",
+        "Use `.readSync()` from the given class instance instead",
+      ),
       (
         "readAll",
         "Use `readAll()` from https://jsr.io/@std/io/doc/read-all/~/readAll instead",
@@ -901,14 +932,23 @@ Deno.readAll(reader);
         "run",
         "Use `Deno.Command` from https://deno.land/api?s=Deno.Command instead",
       ),
-      ("seek", "Use `.seek()` from the given class instance instead"),
-      ("seekSync", "Use `.seekSync()` from the given class instance instead"),
       (
-        "serveHttp",
-        "Use `Deno.serve()` instead",
+        "seek",
+        "Use `.seek()` from the given class instance instead",
       ),
-      ("shutdown", "Use `.closeWrite()` from the given class instance instead"),
-      ("write", "Use `.write()` from the given class instance instead"),
+      (
+        "seekSync",
+        "Use `.seekSync()` from the given class instance instead",
+      ),
+      ("serveHttp", "Use `Deno.serve()` instead"),
+      (
+        "shutdown",
+        "Use `.closeWrite()` from the given class instance instead",
+      ),
+      (
+        "write",
+        "Use `.write()` from the given class instance instead",
+      ),
       (
         "writeSync",
         "Use `.writeSync()` from the given class instance instead",

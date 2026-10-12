@@ -17,7 +17,6 @@ use crate::SourcePos;
 use crate::SourceRange;
 use crate::SourceRanged;
 use crate::SourceTextInfo;
-
 use crate::swc::common::errors::Diagnostic as SwcDiagnostic;
 
 pub enum DiagnosticLevel {

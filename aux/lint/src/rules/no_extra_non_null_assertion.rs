@@ -1,20 +1,20 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::Context;
-use super::LintRule;
-use crate::handler::Handler;
-use crate::handler::Traverse;
-use crate::tags;
-use crate::tags::Tags;
-use crate::Program;
-
+use deno_ast::SourceRange;
+use deno_ast::SourceRanged;
 use deno_ast::view::Expr;
 use deno_ast::view::OptChainBase;
 use deno_ast::view::OptChainExpr;
 use deno_ast::view::TsNonNullExpr;
-use deno_ast::SourceRange;
-use deno_ast::SourceRanged;
 use derive_more::Display;
+
+use super::Context;
+use super::LintRule;
+use crate::Program;
+use crate::handler::Handler;
+use crate::handler::Traverse;
+use crate::tags;
+use crate::tags::Tags;
 
 #[derive(Debug)]
 pub struct NoExtraNonNullAssertion;

@@ -19,13 +19,6 @@ use deno_ast::swc::utils::is_valid_ident;
 use indexmap::IndexMap;
 use indexmap::IndexSet;
 
-use crate::JsModule;
-use crate::JsonModule;
-use crate::ModuleGraph;
-use crate::ast::EsParser;
-use crate::ast::ParseOptions;
-use crate::graph::WasmModule;
-
 use super::ResolvedSymbolDepEntry;
 use super::SymbolNodeDep;
 use super::collections::AdditiveOnlyIndexMap;
@@ -39,6 +32,12 @@ use super::cross_module::DefinitionPathNode;
 use super::cross_module::ModuleExports;
 use super::dep_analyzer::ResolveDepsMode;
 use super::swc_helpers::ts_entity_name_to_parts;
+use crate::JsModule;
+use crate::JsonModule;
+use crate::ModuleGraph;
+use crate::ast::EsParser;
+use crate::ast::ParseOptions;
+use crate::graph::WasmModule;
 
 /// The root symbol from which module symbols can be retrieved.
 ///

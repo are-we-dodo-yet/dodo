@@ -1,17 +1,26 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::{Context, LintRule};
-use crate::diagnostic::{LintFix, LintFixChange};
-use crate::handler::{Handler, Traverse};
-use crate::tags::{self, Tags};
-use crate::Program;
-use deno_ast::view::{
-  Expr, JSXAttr, JSXAttrValue, JSXElement, JSXElementChild, JSXExpr, Lit,
-  NodeTrait,
-};
 use deno_ast::SourceRanged;
+use deno_ast::view::Expr;
+use deno_ast::view::JSXAttr;
+use deno_ast::view::JSXAttrValue;
+use deno_ast::view::JSXElement;
+use deno_ast::view::JSXElementChild;
+use deno_ast::view::JSXExpr;
+use deno_ast::view::Lit;
+use deno_ast::view::NodeTrait;
 use once_cell::sync::Lazy;
 use regex::Regex;
+
+use super::Context;
+use super::LintRule;
+use crate::Program;
+use crate::diagnostic::LintFix;
+use crate::diagnostic::LintFixChange;
+use crate::handler::Handler;
+use crate::handler::Traverse;
+use crate::tags::Tags;
+use crate::tags::{self};
 
 #[derive(Debug)]
 pub struct JSXCurlyBraces;

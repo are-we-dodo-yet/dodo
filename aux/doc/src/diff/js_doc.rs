@@ -1,10 +1,11 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
+use serde::Deserialize;
+use serde::Serialize;
+
 use super::Change;
 use crate::js_doc::JsDoc;
 use crate::js_doc::JsDocTag;
-use serde::Deserialize;
-use serde::Serialize;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

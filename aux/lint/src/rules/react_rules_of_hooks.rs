@@ -1,12 +1,20 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::{Context, LintRule};
-use crate::handler::{Handler, Traverse};
-use crate::tags::{self, Tags};
-use crate::Program;
-use deno_ast::view::{CallExpr, Callee, Expr, Node, Pat};
 use deno_ast::SourceRanged;
+use deno_ast::view::CallExpr;
+use deno_ast::view::Callee;
+use deno_ast::view::Expr;
+use deno_ast::view::Node;
+use deno_ast::view::Pat;
 use once_cell::sync::Lazy;
+
+use super::Context;
+use super::LintRule;
+use crate::Program;
+use crate::handler::Handler;
+use crate::handler::Traverse;
+use crate::tags::Tags;
+use crate::tags::{self};
 
 #[derive(Debug)]
 pub struct ReactRulesOfHooks;
@@ -56,9 +64,15 @@ impl DiagnosticKind {
       DiagnosticKind::OutsideComponent => {
         "Ensure that hooks are only called inside Components or custom hook functions"
       }
-      DiagnosticKind::Conditionally => "Move the hook call before you call any conditions. All hooks must be invoked on every render call",
-      DiagnosticKind::Loop => "Move the hook call before you call any loops or conditions. All hooks must be invoked on every render call",
-      DiagnosticKind::TryCatch => "Move the hook call before you call any loops, conditions or try/catch statements. All hooks must be invoked on every render call",
+      DiagnosticKind::Conditionally => {
+        "Move the hook call before you call any conditions. All hooks must be invoked on every render call"
+      }
+      DiagnosticKind::Loop => {
+        "Move the hook call before you call any loops or conditions. All hooks must be invoked on every render call"
+      }
+      DiagnosticKind::TryCatch => {
+        "Move the hook call before you call any loops, conditions or try/catch statements. All hooks must be invoked on every render call"
+      }
     }
   }
 }

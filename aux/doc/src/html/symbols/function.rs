@@ -1,3 +1,9 @@
+use std::collections::HashSet;
+
+use indexmap::IndexSet;
+use serde::Deserialize;
+use serde::Serialize;
+
 use super::SymbolContentCtx;
 use crate::Declaration;
 use crate::diff::FunctionDiff;
@@ -12,10 +18,6 @@ use crate::html::types::type_params_summary;
 use crate::html::util::*;
 use crate::js_doc::JsDocTag;
 use crate::ts_type::TsTypeDef;
-use indexmap::IndexSet;
-use serde::Deserialize;
-use serde::Serialize;
-use std::collections::HashSet;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 struct OverloadRenderCtx {

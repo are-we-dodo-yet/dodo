@@ -1,10 +1,14 @@
+use std::alloc::GlobalAlloc;
+use std::alloc::Layout;
+use std::alloc::System;
+use std::sync::Arc;
+use std::sync::atomic::AtomicUsize;
+use std::sync::atomic::Ordering;
+use std::time::Instant;
+
 use deno_doc::html::pages::SymbolPage;
 use deno_doc::html::*;
 use indexmap::IndexMap;
-use std::alloc::{GlobalAlloc, Layout, System};
-use std::sync::Arc;
-use std::sync::atomic::{AtomicUsize, Ordering};
-use std::time::Instant;
 
 /// Simple tracking allocator for single-threaded memory profiling.
 /// Uses Relaxed ordering — not accurate under multi-threaded contention.

@@ -1,20 +1,21 @@
 // Copyright 2020-2024 the Deno authors. All rights reserved. MIT license.
-use super::program_ref;
+use std::borrow::Cow;
+
+use deno_ast::SourcePos;
+use deno_ast::SourceRange;
+use deno_ast::SourceRanged;
+use deno_ast::SourceRangedForSpanned;
+use deno_ast::view as ast_view;
+
 use super::Context;
 use super::LintRule;
+use super::program_ref;
+use crate::Program;
 use crate::diagnostic::LintFix;
 use crate::diagnostic::LintFixChange;
 use crate::handler::Handler;
 use crate::handler::Traverse;
 use crate::tags::Tags;
-use crate::Program;
-use std::borrow::Cow;
-
-use deno_ast::view as ast_view;
-use deno_ast::SourcePos;
-use deno_ast::SourceRange;
-use deno_ast::SourceRanged;
-use deno_ast::SourceRangedForSpanned;
 
 #[derive(Debug)]
 pub struct NoNodeGlobals;

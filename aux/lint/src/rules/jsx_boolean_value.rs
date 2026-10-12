@@ -1,13 +1,25 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::{Context, LintRule};
-use crate::diagnostic::{LintFix, LintFixChange};
-use crate::handler::{Handler, Traverse};
-use crate::tags::Tags;
-use crate::{tags, Program};
+use deno_ast::SourceRange;
+use deno_ast::SourceRanged;
+use deno_ast::SourceRangedForSpanned;
 use deno_ast::swc::parser::token::Token;
-use deno_ast::view::{AssignOp, Expr, JSXAttr, JSXAttrValue, JSXExpr, Lit};
-use deno_ast::{SourceRange, SourceRanged, SourceRangedForSpanned};
+use deno_ast::view::AssignOp;
+use deno_ast::view::Expr;
+use deno_ast::view::JSXAttr;
+use deno_ast::view::JSXAttrValue;
+use deno_ast::view::JSXExpr;
+use deno_ast::view::Lit;
+
+use super::Context;
+use super::LintRule;
+use crate::Program;
+use crate::diagnostic::LintFix;
+use crate::diagnostic::LintFixChange;
+use crate::handler::Handler;
+use crate::handler::Traverse;
+use crate::tags;
+use crate::tags::Tags;
 
 #[derive(Debug)]
 pub struct JSXBooleanValue;

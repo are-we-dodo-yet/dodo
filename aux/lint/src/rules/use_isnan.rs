@@ -1,12 +1,20 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::{Context, LintRule};
-use crate::handler::{Handler, Traverse};
-use crate::tags::Tags;
-use crate::{tags, Program};
-use deno_ast::view::{BinExpr, BinaryOp, Expr, Ident, SwitchStmt};
 use deno_ast::SourceRanged;
+use deno_ast::view::BinExpr;
+use deno_ast::view::BinaryOp;
+use deno_ast::view::Expr;
+use deno_ast::view::Ident;
+use deno_ast::view::SwitchStmt;
 use derive_more::Display;
+
+use super::Context;
+use super::LintRule;
+use crate::Program;
+use crate::handler::Handler;
+use crate::handler::Traverse;
+use crate::tags;
+use crate::tags::Tags;
 
 #[derive(Debug)]
 pub struct UseIsNaN;

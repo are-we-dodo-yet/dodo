@@ -1,12 +1,15 @@
-use super::{Context, LintRule};
-use crate::handler::{Handler, Traverse};
-use crate::tags::Tags;
-use crate::Program;
+use std::collections::HashSet;
 
+use deno_ast::SourceRanged;
 use deno_ast::swc::ast::Id;
 use deno_ast::view as ast_view;
-use deno_ast::SourceRanged;
-use std::collections::HashSet;
+
+use super::Context;
+use super::LintRule;
+use crate::Program;
+use crate::handler::Handler;
+use crate::handler::Traverse;
+use crate::tags::Tags;
 
 #[derive(Debug)]
 pub struct NoConsole;

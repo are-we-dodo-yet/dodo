@@ -1,5 +1,8 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
+use std::fs;
+use std::sync::Arc;
+
 use deno_ast::ModuleSpecifier;
 use deno_doc::DocParser;
 use deno_doc::DocParserOptions;
@@ -20,8 +23,6 @@ use deno_graph::source::MemoryLoader;
 use deno_graph::source::Source;
 use futures::future;
 use indexmap::IndexMap;
-use std::fs;
-use std::sync::Arc;
 
 struct SourceFileLoader {}
 

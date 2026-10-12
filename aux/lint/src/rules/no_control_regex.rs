@@ -1,15 +1,25 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::{Context, LintRule};
-use crate::handler::{Handler, Traverse};
-use crate::swc_util::extract_regex;
-use crate::tags::{self, Tags};
-use crate::Program;
-use deno_ast::view::{CallExpr, Callee, Expr, NewExpr, Regex};
-use deno_ast::{SourceRange, SourceRanged};
-use derive_more::Display;
 use std::iter::Peekable;
 use std::str::Chars;
+
+use deno_ast::SourceRange;
+use deno_ast::SourceRanged;
+use deno_ast::view::CallExpr;
+use deno_ast::view::Callee;
+use deno_ast::view::Expr;
+use deno_ast::view::NewExpr;
+use deno_ast::view::Regex;
+use derive_more::Display;
+
+use super::Context;
+use super::LintRule;
+use crate::Program;
+use crate::handler::Handler;
+use crate::handler::Traverse;
+use crate::swc_util::extract_regex;
+use crate::tags::Tags;
+use crate::tags::{self};
 
 #[derive(Debug)]
 pub struct NoControlRegex;

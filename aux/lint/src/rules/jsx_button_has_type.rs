@@ -1,14 +1,23 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::{Context, LintRule};
-use crate::handler::{Handler, Traverse};
-use crate::tags::{self, Tags};
+use deno_ast::SourceRanged;
+use deno_ast::view as ast_view;
+use deno_ast::view::Expr;
+use deno_ast::view::JSXAttrName;
+use deno_ast::view::JSXAttrOrSpread;
+use deno_ast::view::JSXAttrValue;
+use deno_ast::view::JSXElementName;
+use deno_ast::view::JSXExpr;
+use deno_ast::view::Lit;
+use deno_ast::view::Tpl;
+
+use super::Context;
+use super::LintRule;
 use crate::Program;
-use deno_ast::view::{
-  Expr, JSXAttrName, JSXAttrOrSpread, JSXAttrValue, JSXElementName, JSXExpr,
-  Lit, Tpl,
-};
-use deno_ast::{view as ast_view, SourceRanged};
+use crate::handler::Handler;
+use crate::handler::Traverse;
+use crate::tags::Tags;
+use crate::tags::{self};
 
 #[derive(Debug)]
 pub struct JSXButtonHasType;
@@ -64,7 +73,9 @@ impl DiagnosticKind {
       DiagnosticKind::MissingTypeAttr => {
         "Add a `type` attribute with a value of `button`, `submit` or `reset`"
       }
-      DiagnosticKind::MissingValue | DiagnosticKind::WrongValue => "The value of the `type` attribute must be one of `button`, `submit` or `reset`",
+      DiagnosticKind::MissingValue | DiagnosticKind::WrongValue => {
+        "The value of the `type` attribute must be one of `button`, `submit` or `reset`"
+      }
     }
   }
 }

@@ -2,8 +2,6 @@
 
 use std::sync::Arc;
 
-use crate::ts_type::TsTypeDef;
-use crate::ts_type::TsTypeDefKind;
 use deno_ast::MediaType;
 use deno_ast::ModuleSpecifier;
 use deno_ast::ParseParams;
@@ -11,6 +9,9 @@ use deno_graph::symbols::EsModuleInfo;
 use regex::Regex;
 use serde::Deserialize;
 use serde::Serialize;
+
+use crate::ts_type::TsTypeDef;
+use crate::ts_type::TsTypeDefKind;
 
 lazy_static! {
   static ref JS_DOC_TAG_RE: Regex = Regex::new(r"(?s)^\s*@(\S+)").unwrap();

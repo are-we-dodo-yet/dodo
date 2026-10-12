@@ -1,10 +1,15 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::{Context, LintRule};
-use crate::handler::{Handler, Traverse};
-
-use deno_ast::{view as ast_view, MediaType, SourceRange, SourceRanged};
+use deno_ast::MediaType;
+use deno_ast::SourceRange;
+use deno_ast::SourceRanged;
+use deno_ast::view as ast_view;
 use derive_more::Display;
+
+use super::Context;
+use super::LintRule;
+use crate::handler::Handler;
+use crate::handler::Traverse;
 
 #[derive(Debug)]
 pub struct ExplicitModuleBoundaryTypes;

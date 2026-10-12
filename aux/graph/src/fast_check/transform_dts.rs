@@ -1462,6 +1462,15 @@ fn valid_prop_name(
 mod tests {
   use std::collections::VecDeque;
 
+  use deno_ast::EmitOptions;
+  use deno_ast::EmittedSourceText;
+  use deno_ast::ModuleSpecifier;
+  use deno_ast::SourceMap;
+  use deno_ast::emit;
+  use deno_semver::package::PackageNv;
+  use indexmap::IndexMap;
+  use url::Url;
+
   use crate::BuildOptions;
   use crate::GraphKind;
   use crate::ModuleGraph;
@@ -1472,14 +1481,6 @@ mod tests {
   use crate::source::MemoryLoader;
   use crate::source::Source;
   use crate::symbols::RootSymbol;
-  use deno_ast::EmitOptions;
-  use deno_ast::EmittedSourceText;
-  use deno_ast::ModuleSpecifier;
-  use deno_ast::SourceMap;
-  use deno_ast::emit;
-  use deno_semver::package::PackageNv;
-  use indexmap::IndexMap;
-  use url::Url;
 
   async fn transform_dts_test(source: &str, expected: &str) {
     let specifier = Url::parse("file:///mod.ts").unwrap();

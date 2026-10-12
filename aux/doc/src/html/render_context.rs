@@ -1,17 +1,19 @@
+use std::cmp::Ordering;
+use std::collections::HashMap;
+use std::collections::HashSet;
+use std::sync::Arc;
+use std::sync::Mutex;
+
+use deno_graph::ModuleSpecifier;
+use serde::Deserialize;
+use serde::Serialize;
+
 use crate::html::DocNodeWithContext;
 use crate::html::GenerateCtx;
 use crate::html::UrlResolveKind;
 use crate::html::util::BreadcrumbCtx;
 use crate::html::util::BreadcrumbsCtx;
 use crate::html::util::NamespacedSymbols;
-use deno_graph::ModuleSpecifier;
-use serde::Deserialize;
-use serde::Serialize;
-use std::cmp::Ordering;
-use std::collections::HashMap;
-use std::collections::HashSet;
-use std::sync::Arc;
-use std::sync::Mutex;
 
 #[derive(Debug, Clone)]
 pub(crate) struct CurrentImport {
@@ -521,15 +523,17 @@ fn get_current_imports(
 
 #[cfg(test)]
 mod test {
+  use indexmap::IndexMap;
+
   use super::*;
   use crate::Location;
+  use crate::html::GenerateOptions;
   use crate::html::HrefResolver;
-  use crate::html::{
-    GenerateOptions, UsageComposer, UsageComposerEntry, UsageToMd,
-  };
+  use crate::html::UsageComposer;
+  use crate::html::UsageComposerEntry;
+  use crate::html::UsageToMd;
   use crate::node::Document;
   use crate::node::Import;
-  use indexmap::IndexMap;
 
   struct TestResolver;
 

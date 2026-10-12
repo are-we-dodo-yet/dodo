@@ -286,6 +286,9 @@ fn create_assignment(key: swc_ast::Ident) -> swc_ast::ObjectPatProp {
 
 #[cfg(test)]
 mod test {
+  use pretty_assertions::assert_eq;
+
+  use super::*;
   use crate::ModuleSpecifier;
   use crate::swc::ast::Module;
   use crate::swc::codegen::Node;
@@ -299,9 +302,6 @@ mod test {
   use crate::swc::parser::StringInput;
   use crate::swc::parser::Syntax;
   use crate::swc::parser::TsSyntax;
-  use pretty_assertions::assert_eq;
-
-  use super::*;
 
   #[test]
   fn test_downlevel_imports_type_only() {

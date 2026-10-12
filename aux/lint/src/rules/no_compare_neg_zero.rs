@@ -1,17 +1,23 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::{Context, LintRule};
-use crate::handler::{Handler, Traverse};
-use crate::tags::{self, Tags};
-use crate::Program;
+use deno_ast::SourceRanged;
 use deno_ast::swc::ast::BinaryOp::*;
 use deno_ast::swc::ast::Expr::Lit;
 use deno_ast::swc::ast::Lit::Num;
 use deno_ast::swc::ast::UnaryExpr;
 use deno_ast::swc::ast::UnaryOp::Minus;
-use deno_ast::view::{BinExpr, BinaryOp, Expr};
-use deno_ast::SourceRanged;
+use deno_ast::view::BinExpr;
+use deno_ast::view::BinaryOp;
+use deno_ast::view::Expr;
 use derive_more::Display;
+
+use super::Context;
+use super::LintRule;
+use crate::Program;
+use crate::handler::Handler;
+use crate::handler::Traverse;
+use crate::tags::Tags;
+use crate::tags::{self};
 
 #[derive(Debug)]
 pub struct NoCompareNegZero;

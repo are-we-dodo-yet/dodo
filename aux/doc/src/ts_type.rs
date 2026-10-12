@@ -1,5 +1,18 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
+use std::fmt::Display;
+use std::fmt::Formatter;
+use std::fmt::Result as FmtResult;
+
+use deno_ast::SourceRangedForSpanned;
+use deno_ast::swc::ast::*;
+use deno_graph::symbols::EsModuleInfo;
+use deno_graph::symbols::ExportDeclRef;
+use deno_graph::symbols::SymbolNodeRef;
+use deno_terminal::colors;
+use serde::Deserialize;
+use serde::Serialize;
+
 use crate::Location;
 use crate::ParamDef;
 use crate::display::SliceDisplayer;
@@ -7,7 +20,10 @@ use crate::display::display_computed;
 use crate::display::display_method;
 use crate::display::display_optional;
 use crate::display::display_readonly;
+use crate::function::FunctionDef;
 use crate::interface::expr_to_name;
+use crate::js_doc::JsDoc;
+use crate::node::DeclarationKind;
 use crate::node::Symbol;
 use crate::params::param_to_param_def;
 use crate::params::pat_to_param_def;
@@ -18,22 +34,7 @@ use crate::ts_type_param::maybe_type_param_decl_to_type_param_defs;
 use crate::util::swc::get_location;
 use crate::util::swc::is_false;
 use crate::util::swc::js_doc_for_range;
-
-use crate::function::FunctionDef;
-use crate::js_doc::JsDoc;
-use crate::node::DeclarationKind;
 use crate::variable::VariableDef;
-use deno_ast::SourceRangedForSpanned;
-use deno_ast::swc::ast::*;
-use deno_graph::symbols::EsModuleInfo;
-use deno_graph::symbols::ExportDeclRef;
-use deno_graph::symbols::SymbolNodeRef;
-use deno_terminal::colors;
-use serde::Deserialize;
-use serde::Serialize;
-use std::fmt::Display;
-use std::fmt::Formatter;
-use std::fmt::Result as FmtResult;
 
 impl TsTypeDef {
   fn ts_lit_type(module_info: &EsModuleInfo, other: &TsLitType) -> Self {

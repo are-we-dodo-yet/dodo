@@ -1,11 +1,12 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::{Context, LintRule};
-use crate::{
-  tags::{self, Tags},
-  Program,
-};
 use deno_ast::SourceRange;
+
+use super::Context;
+use super::LintRule;
+use crate::Program;
+use crate::tags::Tags;
+use crate::tags::{self};
 
 #[derive(Debug)]
 pub struct BanUntaggedIgnore;

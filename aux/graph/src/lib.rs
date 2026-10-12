@@ -22,10 +22,6 @@ pub mod fast_check;
 pub mod packages;
 pub mod source;
 
-use source::FileSystem;
-use source::JsrUrlProvider;
-use source::Resolver;
-
 use std::collections::HashMap;
 use std::sync::Arc;
 use std::time::SystemTime;
@@ -78,7 +74,10 @@ pub use module_specifier::ModuleSpecifier;
 pub use module_specifier::SpecifierError;
 pub use module_specifier::resolve_import;
 pub use rt::Executor;
+use source::FileSystem;
+use source::JsrUrlProvider;
 pub use source::NpmResolvePkgReqsResult;
+use source::Resolver;
 
 use self::analysis::ModuleAnalyzer;
 
@@ -174,16 +173,8 @@ pub fn parse_module_from_ast(options: ParseModuleFromAstOptions) -> JsModule {
 
 #[cfg(test)]
 mod tests {
-  use crate::graph::Import;
-  use crate::graph::ImportKind;
-  use crate::graph::PositionRange;
-  use crate::graph::ResolutionResolved;
-  use crate::source::NullFileSystem;
-  use crate::source::ResolutionKind;
+  use std::collections::BTreeMap;
 
-  use self::graph::CheckJsOption;
-
-  use super::*;
   use deno_error::JsErrorBox;
   use deno_semver::package::PackageNv;
   use deno_semver::package::PackageReq;
@@ -198,7 +189,15 @@ mod tests {
   use source::ResolutionMode;
   use source::Source;
   use source::tests::MockResolver;
-  use std::collections::BTreeMap;
+
+  use self::graph::CheckJsOption;
+  use super::*;
+  use crate::graph::Import;
+  use crate::graph::ImportKind;
+  use crate::graph::PositionRange;
+  use crate::graph::ResolutionResolved;
+  use crate::source::NullFileSystem;
+  use crate::source::ResolutionKind;
 
   type Sources<'a> = Vec<(&'a str, Source<&'a str, &'a str>)>;
 

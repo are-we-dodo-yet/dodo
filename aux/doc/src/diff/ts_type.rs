@@ -1,11 +1,12 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::Change;
-use crate::ts_type::TsTypeDef;
-use crate::ts_type_param::TsTypeParamDef;
 use indexmap::IndexMap;
 use serde::Deserialize;
 use serde::Serialize;
+
+use super::Change;
+use crate::ts_type::TsTypeDef;
+use crate::ts_type_param::TsTypeParamDef;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

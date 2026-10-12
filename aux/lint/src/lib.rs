@@ -32,12 +32,17 @@ mod lint_tests {
   use std::borrow::Cow;
   use std::collections::HashSet;
 
+  use deno_ast::MediaType;
+  use deno_ast::ModuleSpecifier;
+  use deno_ast::ParsedSource;
+
   use crate::diagnostic::LintDiagnostic;
   use crate::linter::*;
-  use crate::rules::{get_all_rules, recommended_rules, LintRule};
-  use crate::test_util::{assert_diagnostic, parse};
-  use deno_ast::ParsedSource;
-  use deno_ast::{MediaType, ModuleSpecifier};
+  use crate::rules::LintRule;
+  use crate::rules::get_all_rules;
+  use crate::rules::recommended_rules;
+  use crate::test_util::assert_diagnostic;
+  use crate::test_util::parse;
 
   fn lint(
     source: &str,

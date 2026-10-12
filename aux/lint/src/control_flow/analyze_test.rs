@@ -1,8 +1,11 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::{ControlFlow, End, Metadata};
-use crate::test_util;
 use deno_ast::StartSourcePos;
+
+use super::ControlFlow;
+use super::End;
+use super::Metadata;
+use crate::test_util;
 
 fn analyze_flow(src: &str, callback: impl Fn(ControlFlow)) {
   let parsed_source = test_util::parse(src);
@@ -997,10 +1000,12 @@ for (let i = 0; i < 10; i++) {
   analyze_flow(src, |flow| {
     // The inner switch stops execution (every path either continues the loop or
     // returns), so the outer `case 0` does not fall through to `case 1`.
-    assert!(flow
-      .meta(StartSourcePos::START_SOURCE_POS + 51)
-      .unwrap()
-      .stops_execution()); // outer `case 0`
+    assert!(
+      flow
+        .meta(StartSourcePos::START_SOURCE_POS + 51)
+        .unwrap()
+        .stops_execution()
+    ); // outer `case 0`
   });
 }
 
@@ -1022,10 +1027,12 @@ switch (b1) {
   analyze_flow(src, |flow| {
     // The inner switch always returns (the empty `case true` falls through to
     // the `default`), so the outer `case true` stops execution.
-    assert!(flow
-      .meta(StartSourcePos::START_SOURCE_POS + 17)
-      .unwrap()
-      .stops_execution()); // outer `case true`
+    assert!(
+      flow
+        .meta(StartSourcePos::START_SOURCE_POS + 17)
+        .unwrap()
+        .stops_execution()
+    ); // outer `case true`
   });
 }
 

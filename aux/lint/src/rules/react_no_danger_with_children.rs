@@ -1,14 +1,19 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::{Context, LintRule};
-use crate::handler::{Handler, Traverse};
-use crate::tags::{self, Tags};
-use crate::Program;
-use deno_ast::view::{
-  JSXAttrName, JSXAttrOrSpread, JSXElement, JSXElementChild,
-};
 use deno_ast::SourceRanged;
+use deno_ast::view::JSXAttrName;
+use deno_ast::view::JSXAttrOrSpread;
+use deno_ast::view::JSXElement;
+use deno_ast::view::JSXElementChild;
 use once_cell::sync::Lazy;
+
+use super::Context;
+use super::LintRule;
+use crate::Program;
+use crate::handler::Handler;
+use crate::handler::Traverse;
+use crate::tags::Tags;
+use crate::tags::{self};
 
 #[derive(Debug)]
 pub struct ReactNoDangerWithChildren;

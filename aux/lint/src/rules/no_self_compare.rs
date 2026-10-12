@@ -1,18 +1,18 @@
-use super::{Context, LintRule};
-use crate::handler::{Handler, Traverse};
+use deno_ast::SourceRanged;
+use deno_ast::view::BinaryOp;
+use deno_ast::view::NodeTrait;
+use derive_more::Display;
 use if_chain::if_chain;
 
-use deno_ast::{
-  view::{BinaryOp, NodeTrait},
-  SourceRanged,
-};
-use derive_more::Display;
+use super::Context;
+use super::LintRule;
+use crate::handler::Handler;
+use crate::handler::Traverse;
 #[derive(Debug)]
 pub struct NoSelfCompare;
 
 const CODE: &str = "no-self-compare";
-const HINT: &str =
-  "Comparing a value to itself may be redundant and could potentially indicate a mistake in your code. Please double-check your logic";
+const HINT: &str = "Comparing a value to itself may be redundant and could potentially indicate a mistake in your code. Please double-check your logic";
 
 #[derive(Display)]
 enum NoSelfCompareMessage {

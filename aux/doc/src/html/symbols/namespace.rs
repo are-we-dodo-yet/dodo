@@ -1,3 +1,9 @@
+use std::cmp::Ordering;
+
+use indexmap::IndexSet;
+use serde::Deserialize;
+use serde::Serialize;
+
 use crate::diff::DeclarationDefDiff;
 use crate::html::DiffStatus;
 use crate::html::DocNodeWithContext;
@@ -10,10 +16,6 @@ use crate::html::types::render_type_def_colon;
 use crate::html::types::type_params_summary;
 use crate::html::util::*;
 use crate::node::DeclarationDef;
-use indexmap::IndexSet;
-use serde::Deserialize;
-use serde::Serialize;
-use std::cmp::Ordering;
 
 pub fn render_namespace<'a>(
   partitions: impl Iterator<

@@ -14,7 +14,10 @@
     "debug": "deno task tailwind && deno task gen_html ./tests/testdata/multiple/[!_]*",
     "test:update": "UPDATE=1 cargo test --locked --all-targets && cargo insta test --accept"
   },
-  "exclude": ["target", "benches/fixtures"],
+  "exclude": [
+    "target",
+    "benches/fixtures"
+  ],
   "fmt": {
     "exclude": [
       "**/*.gen.css",
@@ -23,7 +26,10 @@
     ]
   },
   "lint": {
-    "exclude": ["src/html", "tests/testdata"]
+    "exclude": [
+      "src/html",
+      "tests/testdata"
+    ]
   },
   "links": [
     "../graph"

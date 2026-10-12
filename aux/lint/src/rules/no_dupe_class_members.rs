@@ -1,20 +1,36 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::program_ref;
-use super::{Context, LintRule};
-use crate::tags::{self, Tags};
-use crate::Program;
-use crate::ProgramRef;
-use deno_ast::swc::ast::{
-  BigInt, Bool, Class, ClassMethod, ComputedPropName, Expr, IdentName, Lit,
-  MethodKind, Null, Number, PropName, Str, Tpl,
-};
-use deno_ast::swc::ecma_visit::{noop_visit_type, Visit, VisitWith};
-use deno_ast::SourceRange;
-use deno_ast::SourceRangedForSpanned;
-use derive_more::Display;
 use std::cmp::Ordering;
 use std::collections::BTreeMap;
+
+use deno_ast::SourceRange;
+use deno_ast::SourceRangedForSpanned;
+use deno_ast::swc::ast::BigInt;
+use deno_ast::swc::ast::Bool;
+use deno_ast::swc::ast::Class;
+use deno_ast::swc::ast::ClassMethod;
+use deno_ast::swc::ast::ComputedPropName;
+use deno_ast::swc::ast::Expr;
+use deno_ast::swc::ast::IdentName;
+use deno_ast::swc::ast::Lit;
+use deno_ast::swc::ast::MethodKind;
+use deno_ast::swc::ast::Null;
+use deno_ast::swc::ast::Number;
+use deno_ast::swc::ast::PropName;
+use deno_ast::swc::ast::Str;
+use deno_ast::swc::ast::Tpl;
+use deno_ast::swc::ecma_visit::Visit;
+use deno_ast::swc::ecma_visit::VisitWith;
+use deno_ast::swc::ecma_visit::noop_visit_type;
+use derive_more::Display;
+
+use super::Context;
+use super::LintRule;
+use super::program_ref;
+use crate::Program;
+use crate::ProgramRef;
+use crate::tags::Tags;
+use crate::tags::{self};
 
 #[derive(Debug)]
 pub struct NoDupeClassMembers;

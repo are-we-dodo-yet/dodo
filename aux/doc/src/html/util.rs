@@ -1,3 +1,16 @@
+use std::borrow::Cow;
+use std::collections::HashMap;
+use std::fmt::Display;
+use std::fmt::Formatter;
+use std::sync::Arc;
+
+use deno_ast::swc::ast::Accessibility;
+use deno_ast::swc::atoms::once_cell::sync::Lazy;
+use indexmap::IndexSet;
+use regex::Regex;
+use serde::Deserialize;
+use serde::Serialize;
+
 use crate::Declaration;
 use crate::diff::JsDocDiff;
 use crate::html::DiffStatus;
@@ -13,17 +26,6 @@ use crate::js_doc::JsDoc;
 use crate::js_doc::JsDocTag;
 use crate::node::DeclarationDef;
 use crate::node::DocNodeKind;
-use deno_ast::swc::ast::Accessibility;
-use deno_ast::swc::atoms::once_cell::sync::Lazy;
-use indexmap::IndexSet;
-use regex::Regex;
-use serde::Deserialize;
-use serde::Serialize;
-use std::borrow::Cow;
-use std::collections::HashMap;
-use std::fmt::Display;
-use std::fmt::Formatter;
-use std::sync::Arc;
 
 lazy_static! {
   static ref TARGET_RE: Regex = Regex::new(r"\s*\* ?|\.").unwrap();
@@ -1075,8 +1077,9 @@ pub(crate) fn sanitize_symbol_path_part(name: &str) -> Cow<'_, str> {
 
 #[cfg(test)]
 mod tests {
-  use super::*;
   use deno_ast::ModuleSpecifier;
+
+  use super::*;
 
   fn short_path(path: &str, is_main: bool) -> ShortPath {
     ShortPath {

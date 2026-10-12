@@ -1,17 +1,31 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::{Context, LintRule};
-use crate::handler::{Handler, Traverse};
-use crate::tags::{self, Tags};
-use crate::Program;
-use deno_ast::view::{
-  CallExpr, Callee, CondExpr, DoWhileStmt, Expr, ExprOrSpread, ForStmt, Ident,
-  IfStmt, NewExpr, ParenExpr, UnaryExpr, UnaryOp, WhileStmt,
-};
 use deno_ast::SourceRange;
 use deno_ast::SourceRanged;
 use deno_ast::SourceRangedForSpanned;
+use deno_ast::view::CallExpr;
+use deno_ast::view::Callee;
+use deno_ast::view::CondExpr;
+use deno_ast::view::DoWhileStmt;
+use deno_ast::view::Expr;
+use deno_ast::view::ExprOrSpread;
+use deno_ast::view::ForStmt;
+use deno_ast::view::Ident;
+use deno_ast::view::IfStmt;
+use deno_ast::view::NewExpr;
+use deno_ast::view::ParenExpr;
+use deno_ast::view::UnaryExpr;
+use deno_ast::view::UnaryOp;
+use deno_ast::view::WhileStmt;
 use derive_more::Display;
+
+use super::Context;
+use super::LintRule;
+use crate::Program;
+use crate::handler::Handler;
+use crate::handler::Traverse;
+use crate::tags::Tags;
+use crate::tags::{self};
 
 #[derive(Debug)]
 pub struct NoExtraBooleanCast;

@@ -1,18 +1,27 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::{Context, LintRule};
-use crate::handler::{Handler, Traverse};
-use crate::swc_util::StringRepr;
-use crate::tags::{self, Tags};
-use crate::Program;
-use deno_ast::view::{
-  GetterProp, KeyValueProp, MethodProp, ObjectLit, Prop, PropOrSpread,
-  SetterProp,
-};
-use deno_ast::{SourceRange, SourceRanged};
-use derive_more::Display;
-use std::collections::hash_map::Entry;
 use std::collections::HashMap;
+use std::collections::hash_map::Entry;
+
+use deno_ast::SourceRange;
+use deno_ast::SourceRanged;
+use deno_ast::view::GetterProp;
+use deno_ast::view::KeyValueProp;
+use deno_ast::view::MethodProp;
+use deno_ast::view::ObjectLit;
+use deno_ast::view::Prop;
+use deno_ast::view::PropOrSpread;
+use deno_ast::view::SetterProp;
+use derive_more::Display;
+
+use super::Context;
+use super::LintRule;
+use crate::Program;
+use crate::handler::Handler;
+use crate::handler::Traverse;
+use crate::swc_util::StringRepr;
+use crate::tags::Tags;
+use crate::tags::{self};
 
 #[derive(Debug)]
 pub struct NoDupeKeys;

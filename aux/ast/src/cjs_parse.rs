@@ -558,15 +558,15 @@ fn prop_name_from_key(prop: &PropName) -> Option<&str> {
 
 #[cfg(test)]
 mod test {
-  use pretty_assertions::assert_eq;
   use std::cell::RefCell;
 
+  use pretty_assertions::assert_eq;
+
+  use super::*;
   use crate::MediaType;
   use crate::ModuleSpecifier;
   use crate::ParseParams;
   use crate::parse_script;
-
-  use super::*;
 
   struct CjsAnalysisTester {
     analysis: RefCell<CjsAnalysis>,

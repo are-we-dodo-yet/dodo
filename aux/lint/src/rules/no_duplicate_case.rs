@@ -1,17 +1,23 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
+use std::collections::HashSet;
+
+use deno_ast::SourceRangedForSpanned;
+use deno_ast::swc::ast::Expr;
+use deno_ast::swc::ast::SwitchStmt;
+use deno_ast::swc::ecma_visit::Visit;
+use deno_ast::swc::ecma_visit::VisitWith;
+use deno_ast::swc::ecma_visit::noop_visit_type;
+use derive_more::Display;
+
+use super::Context;
+use super::LintRule;
 use super::program_ref;
-use super::{Context, LintRule};
-use crate::swc_util::span_and_ctx_drop;
-use crate::tags::{self, Tags};
 use crate::Program;
 use crate::ProgramRef;
-use deno_ast::swc::ast::{Expr, SwitchStmt};
-use deno_ast::swc::ecma_visit::noop_visit_type;
-use deno_ast::swc::ecma_visit::{Visit, VisitWith};
-use deno_ast::SourceRangedForSpanned;
-use derive_more::Display;
-use std::collections::HashSet;
+use crate::swc_util::span_and_ctx_drop;
+use crate::tags::Tags;
+use crate::tags::{self};
 
 #[derive(Debug)]
 pub struct NoDuplicateCase;

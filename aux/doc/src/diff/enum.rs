@@ -1,12 +1,13 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
+use indexmap::IndexMap;
+use serde::Deserialize;
+use serde::Serialize;
+
 use super::js_doc::JsDocDiff;
 use super::ts_type::TsTypeDiff;
 use crate::r#enum::EnumDef;
 use crate::r#enum::EnumMemberDef;
-use indexmap::IndexMap;
-use serde::Deserialize;
-use serde::Serialize;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

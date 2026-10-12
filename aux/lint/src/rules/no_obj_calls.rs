@@ -1,11 +1,20 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::{Context, LintRule};
-use crate::handler::{Handler, Traverse};
-use crate::tags::{self, Tags};
+use deno_ast::SourceRange;
+use deno_ast::SourceRanged;
+use deno_ast::view::CallExpr;
+use deno_ast::view::Callee;
+use deno_ast::view::Expr;
+use deno_ast::view::Ident;
+use deno_ast::view::NewExpr;
+
+use super::Context;
+use super::LintRule;
 use crate::Program;
-use deno_ast::view::{CallExpr, Callee, Expr, Ident, NewExpr};
-use deno_ast::{SourceRange, SourceRanged};
+use crate::handler::Handler;
+use crate::handler::Traverse;
+use crate::tags::Tags;
+use crate::tags::{self};
 
 #[derive(Debug)]
 pub struct NoObjCalls;

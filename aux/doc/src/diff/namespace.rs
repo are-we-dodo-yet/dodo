@@ -1,12 +1,14 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::SymbolDiff;
-use crate::Symbol;
-use crate::node::NamespaceDef;
+use std::sync::Arc;
+
 use indexmap::IndexMap;
 use serde::Deserialize;
 use serde::Serialize;
-use std::sync::Arc;
+
+use super::SymbolDiff;
+use crate::Symbol;
+use crate::node::NamespaceDef;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

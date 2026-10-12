@@ -18,13 +18,26 @@ concurrent = ["swc_common/concurrent"]
 cjs = ["utils", "visit"]
 codegen = ["swc_ecma_codegen", "swc_ecma_codegen_macros", "swc_macros_common"]
 compat = ["transforms", "swc_ecma_transforms_compat", "swc_trace_macro", "swc_config", "swc_config_macro"]
-proposal = ["transforms", "swc_ecma_transforms_proposal", "swc_ecma_transforms_classes", "swc_ecma_transforms_macros", "swc_macros_common"]
-react = ["transforms", "swc_ecma_transforms_react", "swc_ecma_transforms_macros", "swc_config", "swc_config_macro", "swc_macros_common"]
+proposal = [
+  "transforms",
+  "swc_ecma_transforms_proposal",
+  "swc_ecma_transforms_classes",
+  "swc_ecma_transforms_macros",
+  "swc_macros_common",
+]
+react = [
+  "transforms",
+  "swc_ecma_transforms_react",
+  "swc_ecma_transforms_macros",
+  "swc_config",
+  "swc_config_macro",
+  "swc_macros_common",
+]
 scopes = ["view", "utils", "visit"]
 sourcemap = ["dprint-swc-ext/sourcemap", "swc_sourcemap"]
 transforms = ["swc_ecma_loader", "swc_ecma_transforms_base"]
 emit = ["base64", "codegen", "sourcemap"]
-type_strip = [ "swc_ts_fast_strip" ]
+type_strip = ["swc_ts_fast_strip"]
 transpiling = ["emit", "proposal", "react", "transforms", "typescript", "utils", "visit"]
 typescript = ["transforms", "swc_ecma_transforms_typescript"]
 utils = ["swc_ecma_utils"]
@@ -32,27 +45,25 @@ view = ["dprint-swc-ext/view"]
 visit = ["swc_ecma_visit", "swc_visit", "swc_macros_common"]
 
 [dependencies]
+deno_error.workspace = true
 deno_media_type.workspace = true
 deno_terminal.workspace = true
-deno_error.workspace = true
 
 base64 = { workspace = true, optional = true }
 capacity_builder.workspace = true
 dprint-swc-ext.workspace = true
 percent-encoding.workspace = true
 serde = { workspace = true, features = ["derive"] }
-text_lines = { workspace = true, features = ["serialization"] }
-url = { workspace = true, features = ["serde"] }
-unicode-width.workspace = true
 swc_atoms.workspace = true
+swc_bundler = { workspace = true, optional = true }
 swc_common.workspace = true
 swc_config = { workspace = true, optional = true }
 swc_config_macro = { workspace = true, optional = true }
 swc_ecma_ast = { workspace = true, features = ["serde-impl"] }
 swc_ecma_codegen = { workspace = true, optional = true }
 swc_ecma_codegen_macros = { workspace = true, optional = true }
-swc_ecma_loader = { workspace = true, optional = true }
 swc_ecma_lexer.workspace = true
+swc_ecma_loader = { workspace = true, optional = true }
 swc_ecma_parser.workspace = true
 swc_ecma_transforms_base = { workspace = true, features = ["inline-helpers"], optional = true }
 swc_ecma_transforms_classes = { workspace = true, optional = true }
@@ -65,14 +76,16 @@ swc_ecma_transforms_typescript = { workspace = true, optional = true }
 swc_ecma_utils = { workspace = true, optional = true }
 swc_ecma_visit = { workspace = true, optional = true }
 swc_eq_ignore_macros.workspace = true
-swc_bundler = { workspace = true, optional = true }
 swc_graph_analyzer = { workspace = true, optional = true }
 swc_macros_common = { workspace = true, optional = true }
 swc_sourcemap = { workspace = true, optional = true }
-swc_ts_fast_strip = { workspace = true, optional = true }
 swc_trace_macro = { workspace = true, optional = true }
+swc_ts_fast_strip = { workspace = true, optional = true }
 swc_visit = { workspace = true, optional = true }
+text_lines = { workspace = true, features = ["serialization"] }
 thiserror.workspace = true
+unicode-width.workspace = true
+url = { workspace = true, features = ["serde"] }
 
 [dev-dependencies]
 pretty_assertions.workspace = true

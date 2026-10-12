@@ -1,5 +1,10 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
+use indexmap::IndexMap;
+use indexmap::IndexSet;
+use serde::Deserialize;
+use serde::Serialize;
+
 use super::Change;
 use super::RenameCandidate;
 use super::detect_renames;
@@ -14,10 +19,6 @@ use crate::ts_type::IndexSignatureDef;
 use crate::ts_type::MethodDef;
 use crate::ts_type::PropertyDef;
 use crate::ts_type::TsTypeDef;
-use indexmap::IndexMap;
-use indexmap::IndexSet;
-use serde::Deserialize;
-use serde::Serialize;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

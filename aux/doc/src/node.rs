@@ -1,9 +1,11 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use crate::js_doc::JsDoc;
+use std::sync::Arc;
+
 use serde::Deserialize;
 use serde::Serialize;
-use std::sync::Arc;
+
+use crate::js_doc::JsDoc;
 
 #[derive(Debug, Serialize, Deserialize, Clone, Default)]
 pub struct Document {

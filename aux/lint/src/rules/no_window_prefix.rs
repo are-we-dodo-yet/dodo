@@ -1,20 +1,21 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
+use std::collections::HashSet;
+
+use deno_ast::SourceRanged;
+use deno_ast::view as ast_view;
+use if_chain::if_chain;
+use once_cell::sync::Lazy;
+
 use super::Context;
 use super::LintRule;
+use crate::Program;
 use crate::diagnostic::LintFix;
 use crate::diagnostic::LintFixChange;
 use crate::handler::Handler;
 use crate::handler::Traverse;
 use crate::tags;
 use crate::tags::Tags;
-use crate::Program;
-
-use deno_ast::view as ast_view;
-use deno_ast::SourceRanged;
-use if_chain::if_chain;
-use once_cell::sync::Lazy;
-use std::collections::HashSet;
 
 #[derive(Debug)]
 pub struct NoWindowPrefix;
@@ -208,7 +209,10 @@ static PROPERTY_DENY_LIST: Lazy<HashSet<&'static str>> = Lazy::new(|| {
 /// Extracts a symbol from the given expression if the symbol is statically determined (otherwise,
 /// return `None`).
 fn extract_symbol<'a>(expr: &'a ast_view::MemberExpr) -> Option<&'a str> {
-  use deno_ast::view::{Expr, Lit, MemberProp, Tpl};
+  use deno_ast::view::Expr;
+  use deno_ast::view::Lit;
+  use deno_ast::view::MemberProp;
+  use deno_ast::view::Tpl;
   match &expr.prop {
     MemberProp::Ident(ident) => Some(ident.sym()),
     MemberProp::PrivateName(name) => Some(name.name()),

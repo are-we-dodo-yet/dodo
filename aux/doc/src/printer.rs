@@ -1,5 +1,13 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
+use std::fmt::Display;
+use std::fmt::Formatter;
+use std::fmt::Result as FmtResult;
+use std::sync::Arc;
+
+use deno_terminal::colors;
+use deno_terminal::colors::Style;
+
 use crate::Location;
 use crate::display::SliceDisplayer;
 use crate::display::display_abstract;
@@ -13,14 +21,6 @@ use crate::node::Symbol;
 use crate::parser::ParseOutput;
 use crate::ts_type::TsTypeDefKind;
 use crate::ts_type::TsTypeLiteralDef;
-
-use deno_terminal::colors;
-use deno_terminal::colors::Style;
-
-use std::fmt::Display;
-use std::fmt::Formatter;
-use std::fmt::Result as FmtResult;
-use std::sync::Arc;
 
 fn italic_cyan<'a, S: Display + 'a>(s: S) -> Style<Style<S>> {
   colors::italic(colors::cyan(s))
@@ -1437,8 +1437,9 @@ fn render_markdown(
 
 #[cfg(test)]
 mod render_markdown_tests {
-  use super::*;
   use std::fmt;
+
+  use super::*;
 
   struct Rendered<'a> {
     markdown: &'a str,

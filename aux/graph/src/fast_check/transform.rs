@@ -26,16 +26,6 @@ use deno_ast::swc::common::comments::SingleThreadedCommentsMapInner;
 use deno_ast::swc::ecma_visit::VisitWith;
 use indexmap::IndexMap;
 
-use crate::ModuleGraph;
-use crate::WorkspaceMember;
-use crate::analysis::ModuleInfo;
-use crate::ast::ParserModuleAnalyzer;
-use crate::symbols::EsModuleInfo;
-use crate::symbols::ExpandoPropertyRef;
-use crate::symbols::ExportDeclRef;
-use crate::symbols::Symbol;
-use crate::symbols::SymbolNodeRef;
-
 use super::FastCheckDiagnostic;
 use super::FastCheckDiagnosticRange;
 use super::range_finder::ModulePublicRanges;
@@ -51,6 +41,15 @@ use super::swc_helpers::tpl_to_ts_type;
 use super::swc_helpers::ts_keyword_type;
 use super::transform_dts::FastCheckDtsDiagnostic;
 use super::transform_dts::FastCheckDtsTransformer;
+use crate::ModuleGraph;
+use crate::WorkspaceMember;
+use crate::analysis::ModuleInfo;
+use crate::ast::ParserModuleAnalyzer;
+use crate::symbols::EsModuleInfo;
+use crate::symbols::ExpandoPropertyRef;
+use crate::symbols::ExportDeclRef;
+use crate::symbols::Symbol;
+use crate::symbols::SymbolNodeRef;
 
 pub struct CommentsMut {
   leading: SingleThreadedCommentsMapInner,

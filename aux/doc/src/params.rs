@@ -1,10 +1,8 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use crate::decorators::DecoratorDef;
-use crate::decorators::decorators_to_defs;
-use crate::display::SliceDisplayer;
-use crate::display::display_optional;
-use crate::ts_type::TsTypeDef;
+use std::fmt::Display;
+use std::fmt::Formatter;
+use std::fmt::Result as FmtResult;
 
 use deno_ast::SourceRangedForSpanned;
 use deno_ast::swc::ast::ObjectPatProp;
@@ -13,9 +11,12 @@ use deno_ast::swc::ast::TsFnParam;
 use deno_graph::symbols::EsModuleInfo;
 use serde::Deserialize;
 use serde::Serialize;
-use std::fmt::Display;
-use std::fmt::Formatter;
-use std::fmt::Result as FmtResult;
+
+use crate::decorators::DecoratorDef;
+use crate::decorators::decorators_to_defs;
+use crate::display::SliceDisplayer;
+use crate::display::display_optional;
+use crate::ts_type::TsTypeDef;
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
 #[serde(rename_all = "camelCase")]

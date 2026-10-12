@@ -1,15 +1,28 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::{Context, LintRule};
-use crate::handler::{Handler, Traverse};
-use crate::tags::{self, Tags};
-use crate::Program;
-use deno_ast::view::{
-  ArrayPat, BindingIdent, Expr, Lit, ObjectPat, Pat, TsAsExpr, TsLit, TsType,
-  TsTypeAnn, TsTypeAssertion, VarDecl,
-};
-use deno_ast::{SourceRange, SourceRanged};
+use deno_ast::SourceRange;
+use deno_ast::SourceRanged;
+use deno_ast::view::ArrayPat;
+use deno_ast::view::BindingIdent;
+use deno_ast::view::Expr;
+use deno_ast::view::Lit;
+use deno_ast::view::ObjectPat;
+use deno_ast::view::Pat;
+use deno_ast::view::TsAsExpr;
+use deno_ast::view::TsLit;
+use deno_ast::view::TsType;
+use deno_ast::view::TsTypeAnn;
+use deno_ast::view::TsTypeAssertion;
+use deno_ast::view::VarDecl;
 use derive_more::Display;
+
+use super::Context;
+use super::LintRule;
+use crate::Program;
+use crate::handler::Handler;
+use crate::handler::Traverse;
+use crate::tags::Tags;
+use crate::tags::{self};
 
 const CODE: &str = "prefer-as-const";
 

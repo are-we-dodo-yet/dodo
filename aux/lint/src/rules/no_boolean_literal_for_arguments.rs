@@ -1,9 +1,13 @@
-use super::{Context, LintRule};
-use crate::handler::{Handler, Traverse};
-use crate::tags::Tags;
-use crate::Program;
-use deno_ast::view::{CallExpr, NodeTrait};
 use deno_ast::SourceRanged;
+use deno_ast::view::CallExpr;
+use deno_ast::view::NodeTrait;
+
+use super::Context;
+use super::LintRule;
+use crate::Program;
+use crate::handler::Handler;
+use crate::handler::Traverse;
+use crate::tags::Tags;
 
 #[derive(Debug)]
 pub struct NoBooleanLiteralForArguments;

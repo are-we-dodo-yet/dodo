@@ -1,18 +1,21 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::program_ref;
-use super::{Context, LintRule};
-use crate::tags::Tags;
-use crate::Program;
-use crate::ProgramRef;
-use crate::{js_regex::*, tags};
-use deno_ast::swc::ast::Expr;
-use deno_ast::swc::ast::ExprOrSpread;
-use deno_ast::swc::ecma_visit::noop_visit_type;
-use deno_ast::swc::ecma_visit::Visit;
-use deno_ast::swc::ecma_visit::VisitWith;
 use deno_ast::SourceRange;
 use deno_ast::SourceRangedForSpanned;
+use deno_ast::swc::ast::Expr;
+use deno_ast::swc::ast::ExprOrSpread;
+use deno_ast::swc::ecma_visit::Visit;
+use deno_ast::swc::ecma_visit::VisitWith;
+use deno_ast::swc::ecma_visit::noop_visit_type;
+
+use super::Context;
+use super::LintRule;
+use super::program_ref;
+use crate::Program;
+use crate::ProgramRef;
+use crate::js_regex::*;
+use crate::tags;
+use crate::tags::Tags;
 
 #[derive(Debug)]
 pub struct NoInvalidRegexp;

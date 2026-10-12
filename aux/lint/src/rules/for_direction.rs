@@ -1,16 +1,24 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::{Context, LintRule};
-use crate::handler::{Handler, Traverse};
-use crate::tags::{self, Tags};
-use crate::Program;
+use deno_ast::SourceRanged;
 use deno_ast::swc::ast::AssignOp;
 use deno_ast::swc::ast::BinaryOp;
 use deno_ast::swc::ast::UpdateOp;
-use deno_ast::view::{
-  AssignExpr, AssignTarget, Expr, SimpleAssignTarget, UnaryOp, UpdateExpr,
-};
-use deno_ast::{view as ast_view, SourceRanged};
+use deno_ast::view as ast_view;
+use deno_ast::view::AssignExpr;
+use deno_ast::view::AssignTarget;
+use deno_ast::view::Expr;
+use deno_ast::view::SimpleAssignTarget;
+use deno_ast::view::UnaryOp;
+use deno_ast::view::UpdateExpr;
+
+use super::Context;
+use super::LintRule;
+use crate::Program;
+use crate::handler::Handler;
+use crate::handler::Traverse;
+use crate::tags::Tags;
+use crate::tags::{self};
 
 #[derive(Debug)]
 pub struct ForDirection;

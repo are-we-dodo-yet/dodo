@@ -1,14 +1,16 @@
-use super::DocNodeWithContext;
-use super::GenerateCtx;
-use crate::DeclarationDef;
-use crate::Location;
-use crate::js_doc::JsDocTag;
-use indexmap::IndexMap;
 use std::borrow::Cow;
 use std::cell::RefCell;
 use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::collections::HashSet;
+
+use indexmap::IndexMap;
+
+use super::DocNodeWithContext;
+use super::GenerateCtx;
+use crate::DeclarationDef;
+use crate::Location;
+use crate::js_doc::JsDocTag;
 
 pub type Partitions<T> = IndexMap<T, Vec<DocNodeWithContext>>;
 

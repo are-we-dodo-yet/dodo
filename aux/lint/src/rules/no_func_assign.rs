@@ -1,13 +1,18 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::{Context, LintRule};
-use crate::handler::{Handler, Traverse};
-use crate::swc_util::find_lhs_ids;
-use crate::tags::{self, Tags};
-use crate::Program;
+use deno_ast::BindingKind;
+use deno_ast::SourceRanged;
 use deno_ast::view::AssignExpr;
-use deno_ast::{BindingKind, SourceRanged};
 use derive_more::Display;
+
+use super::Context;
+use super::LintRule;
+use crate::Program;
+use crate::handler::Handler;
+use crate::handler::Traverse;
+use crate::swc_util::find_lhs_ids;
+use crate::tags::Tags;
+use crate::tags::{self};
 
 #[derive(Debug)]
 pub struct NoFuncAssign;
@@ -22,9 +27,7 @@ enum NoFuncAssignMessage {
 
 #[derive(Display)]
 enum NoFuncAssignHint {
-  #[display(
-    fmt = "Remove or rework the reassignment of the existing function"
-  )]
+  #[display(fmt = "Remove or rework the reassignment of the existing function")]
   RemoveOrRework,
 }
 

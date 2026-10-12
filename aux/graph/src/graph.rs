@@ -1,39 +1,19 @@
 // Copyright 2018-2024 the Deno authors. MIT license.
 
-use crate::ReferrerImports;
-use crate::analysis::DependencyDescriptor;
-use crate::analysis::DynamicArgument;
-use crate::analysis::DynamicDependencyKind;
-use crate::analysis::DynamicTemplatePart;
-use crate::analysis::ImportAttributes;
-use crate::analysis::ModuleAnalyzer;
-use crate::analysis::ModuleInfo;
-use crate::analysis::SpecifierWithRange;
-use crate::analysis::StaticDependencyKind;
-use crate::analysis::TypeScriptReference;
-use crate::analysis::TypeScriptTypesResolutionMode;
-use crate::collections::SeenPendingCollection;
-use crate::jsr::JsrMetadataStore;
-use crate::jsr::JsrMetadataStoreServices;
-use crate::jsr::PendingJsrPackageVersionInfoLoadItem;
-use crate::jsr::PendingResult;
-use crate::packages::JsrVersionResolver;
-use crate::packages::NewestDependencyDate;
+use std::borrow::Cow;
+use std::cell::RefCell;
+use std::cmp::Ordering;
+use std::collections::BTreeMap;
+use std::collections::BTreeSet;
+use std::collections::HashMap;
+use std::collections::HashSet;
+use std::collections::VecDeque;
+use std::fmt;
+use std::path::Path;
+use std::rc::Rc;
+use std::sync::Arc;
+use std::time::SystemTime;
 
-use crate::module_specifier::ModuleSpecifier;
-use crate::module_specifier::SpecifierError;
-use crate::module_specifier::is_fs_root_specifier;
-use crate::module_specifier::resolve_import;
-use crate::packages::JsrPackageInfo;
-use crate::packages::JsrPackageVersionInfo;
-use crate::packages::PackageSpecifiers;
-use crate::packages::prerelease_fallback_applies;
-use crate::packages::version_matches;
-use crate::rt::Executor;
-
-use crate::source::*;
-
-use crate::MediaType;
 use boxed_error::Boxed;
 use deno_error::JsError;
 use deno_error::JsErrorBox;
@@ -67,24 +47,43 @@ use serde::Serializer;
 use serde::ser::SerializeSeq;
 use serde::ser::SerializeStruct;
 use serde::ser::SerializeTuple;
-use std::borrow::Cow;
-use std::cell::RefCell;
-use std::cmp::Ordering;
-use std::collections::BTreeMap;
-use std::collections::BTreeSet;
-use std::collections::HashMap;
-use std::collections::HashSet;
-use std::collections::VecDeque;
-use std::fmt;
-use std::path::Path;
-use std::rc::Rc;
-use std::sync::Arc;
-use std::time::SystemTime;
 use sys_traits::FileType;
 use sys_traits::FsDirEntry;
 use thiserror::Error;
 use url::Url;
 use wasm::wasm_module_to_dts;
+
+use crate::MediaType;
+use crate::ReferrerImports;
+use crate::analysis::DependencyDescriptor;
+use crate::analysis::DynamicArgument;
+use crate::analysis::DynamicDependencyKind;
+use crate::analysis::DynamicTemplatePart;
+use crate::analysis::ImportAttributes;
+use crate::analysis::ModuleAnalyzer;
+use crate::analysis::ModuleInfo;
+use crate::analysis::SpecifierWithRange;
+use crate::analysis::StaticDependencyKind;
+use crate::analysis::TypeScriptReference;
+use crate::analysis::TypeScriptTypesResolutionMode;
+use crate::collections::SeenPendingCollection;
+use crate::jsr::JsrMetadataStore;
+use crate::jsr::JsrMetadataStoreServices;
+use crate::jsr::PendingJsrPackageVersionInfoLoadItem;
+use crate::jsr::PendingResult;
+use crate::module_specifier::ModuleSpecifier;
+use crate::module_specifier::SpecifierError;
+use crate::module_specifier::is_fs_root_specifier;
+use crate::module_specifier::resolve_import;
+use crate::packages::JsrPackageInfo;
+use crate::packages::JsrPackageVersionInfo;
+use crate::packages::JsrVersionResolver;
+use crate::packages::NewestDependencyDate;
+use crate::packages::PackageSpecifiers;
+use crate::packages::prerelease_fallback_applies;
+use crate::packages::version_matches;
+use crate::rt::Executor;
+use crate::source::*;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize, Hash)]
 pub struct Position {
@@ -7135,16 +7134,16 @@ where
 
 #[cfg(test)]
 mod tests {
-  use crate::analysis::ImportAttribute;
-  use crate::packages::JsrPackageInfoVersion;
   use deno_ast::EmitOptions;
   use deno_ast::SourceMap;
   use deno_ast::emit;
   use pretty_assertions::assert_eq;
   use serde_json::json;
+  use url::Url;
 
   use super::*;
-  use url::Url;
+  use crate::analysis::ImportAttribute;
+  use crate::packages::JsrPackageInfoVersion;
 
   #[test]
   fn test_range_includes() {

@@ -1,11 +1,15 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::{Context, LintRule};
-use crate::handler::{Handler, Traverse};
-use crate::Program;
-use deno_ast::view::{Expr, ThrowStmt};
 use deno_ast::SourceRanged;
+use deno_ast::view::Expr;
+use deno_ast::view::ThrowStmt;
 use derive_more::Display;
+
+use super::Context;
+use super::LintRule;
+use crate::Program;
+use crate::handler::Handler;
+use crate::handler::Traverse;
 
 #[derive(Debug)]
 pub struct NoThrowLiteral;

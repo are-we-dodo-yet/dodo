@@ -1,3 +1,13 @@
+use std::collections::BTreeMap;
+use std::collections::HashMap;
+use std::collections::HashSet;
+
+use deno_ast::swc::ast::Accessibility;
+use deno_ast::swc::ast::MethodKind;
+use indexmap::IndexMap;
+use serde::Deserialize;
+use serde::Serialize;
+
 use crate::Declaration;
 use crate::DeclarationDef;
 use crate::class::ClassDef;
@@ -17,14 +27,6 @@ use crate::html::util::*;
 use crate::interface::InterfaceDef;
 use crate::js_doc::JsDocTag;
 use crate::ts_type::TsTypeDefKind;
-use deno_ast::swc::ast::Accessibility;
-use deno_ast::swc::ast::MethodKind;
-use indexmap::IndexMap;
-use serde::Deserialize;
-use serde::Serialize;
-use std::collections::BTreeMap;
-use std::collections::HashMap;
-use std::collections::HashSet;
 
 /// Collects method and property documentation from all interfaces
 /// implemented by a class, to be used as fallback when the class

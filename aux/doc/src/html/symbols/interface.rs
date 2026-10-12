@@ -1,3 +1,6 @@
+use deno_ast::swc::ast::MethodKind;
+use indexmap::IndexMap;
+
 use crate::Declaration;
 use crate::html::DiffStatus;
 use crate::html::DocNodeWithContext;
@@ -6,8 +9,6 @@ use crate::html::render_context::RenderContext;
 use crate::html::types::render_type_def_colon;
 use crate::html::types::type_params_summary;
 use crate::html::util::*;
-use deno_ast::swc::ast::MethodKind;
-use indexmap::IndexMap;
 
 pub(crate) fn render_interface(
   ctx: &RenderContext,

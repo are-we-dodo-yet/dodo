@@ -1,12 +1,12 @@
 [package]
 name = "deno_graph_wasm"
 version = "0.0.0"
+authors = ["the Deno authors"]
+documentation = "https://docs.rs/deno_graph"
 edition = "2021"
 homepage = "https://deno.land/"
-repository = "https://github.com/denoland/deno_graph"
-documentation = "https://docs.rs/deno_graph"
-authors = ["the Deno authors"]
 license = "MIT"
+repository = "https://github.com/denoland/deno_graph"
 
 [lib]
 name = "deno_graph_wasm"
@@ -14,18 +14,18 @@ path = "lib.rs"
 crate-type = ["cdylib"]
 
 [dependencies]
-deno_graph = { workspace = true, features = ["swc"], default-features = false }
 console_error_panic_hook.workspace = true
+deno_error.workspace = true
+deno_graph = { workspace = true, features = ["swc"], default-features = false }
 futures.workspace = true
 js-sys.workspace = true
 serde = { workspace = true, features = ["derive", "rc"] }
-serde_json = { workspace = true, features = ["preserve_order"] }
 serde-wasm-bindgen.workspace = true
+serde_json = { workspace = true, features = ["preserve_order"] }
 sys_traits = { workspace = true, features = ["real"] }
+thiserror.workspace = true
 wasm-bindgen.workspace = true
 wasm-bindgen-futures.workspace = true
-thiserror.workspace = true
-deno_error.workspace = true
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 sys_traits = { workspace = true, features = ["real", "wasm"] }

@@ -1,14 +1,15 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::{Context, LintRule};
-
-use deno_ast::swc::common::comments::Comment;
-use deno_ast::swc::common::comments::CommentKind;
 use deno_ast::SourceRange;
 use deno_ast::SourceRangedForSpanned;
+use deno_ast::swc::common::comments::Comment;
+use deno_ast::swc::common::comments::CommentKind;
 use derive_more::Display;
 use once_cell::sync::Lazy;
 use regex::Regex;
+
+use super::Context;
+use super::LintRule;
 
 #[derive(Debug)]
 pub struct TripleSlashReference;

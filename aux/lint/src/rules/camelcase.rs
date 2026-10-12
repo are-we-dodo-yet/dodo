@@ -1,15 +1,24 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
-use super::{Context, LintRule};
-use crate::handler::{Handler, Traverse};
+use std::collections::BTreeMap;
+use std::collections::BTreeSet;
+
+use deno_ast::SourceRange;
+use deno_ast::SourceRanged;
+use deno_ast::view as ast_view;
+use deno_ast::view::Node;
+use deno_ast::view::NodeKind;
+use deno_ast::view::NodeTrait;
+use once_cell::sync::Lazy;
+use regex::Captures;
+use regex::Regex;
+
+use super::Context;
+use super::LintRule;
+use crate::handler::Handler;
+use crate::handler::Traverse;
 use crate::swc_util::StringRepr;
 use crate::tags::Tags;
-
-use deno_ast::view::{Node, NodeKind, NodeTrait};
-use deno_ast::{view as ast_view, SourceRange, SourceRanged};
-use once_cell::sync::Lazy;
-use regex::{Captures, Regex};
-use std::collections::{BTreeMap, BTreeSet};
 
 #[derive(Debug)]
 pub struct Camelcase;

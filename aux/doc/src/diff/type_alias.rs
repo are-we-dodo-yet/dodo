@@ -1,10 +1,11 @@
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
+use serde::Deserialize;
+use serde::Serialize;
+
 use super::ts_type::TsTypeDiff;
 use super::ts_type::TypeParamsDiff;
 use crate::type_alias::TypeAliasDef;
-use serde::Deserialize;
-use serde::Serialize;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
