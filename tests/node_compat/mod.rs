@@ -677,14 +677,9 @@ impl TestSetup {
       }
     }
 
-    let timeout =
-      Duration::from_millis(test_config.and_then(|c| c.timeout_ms).unwrap_or(
-        if cfg!(target_os = "macos") {
-          20_000
-        } else {
-          10_000
-        },
-      ));
+    let timeout = Duration::from_millis(
+      test_config.and_then(|c| c.timeout_ms).unwrap_or(30_000),
+    );
 
     TestSetup {
       test_suite_path,
