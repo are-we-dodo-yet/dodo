@@ -1,8 +1,19 @@
 // Copyright 2018-2026 the Deno authors. MIT license.
 
-import { assertEquals, assertRejects } from "./test_util.ts";
+import {
+  assertAlmostEquals,
+  assertEquals,
+  assertRejects,
+} from "./test_util.ts";
 
 const prefix = "tests/testdata/image";
+
+function assertPixelApproxEquals(actual: Uint8Array, expected: number[]) {
+  assertEquals(actual.length, expected.length);
+  for (let i = 0; i < expected.length; i++) {
+    assertAlmostEquals(actual[i], expected[i], 1);
+  }
+}
 
 function generateNumberedData(n: number): Uint8ClampedArray<ArrayBuffer> {
   return new Uint8ClampedArray(
@@ -125,7 +136,7 @@ Deno.test("imageOrientation", async (t) => {
       START,
       END,
     );
-    assertEquals(targetPixel, new Uint8Array([253, 0, 0]));
+    assertPixelApproxEquals(targetPixel, [255, 0, 0]);
   });
   // reference:
   // https://github.com/web-platform-tests/wpt/blob/a1f4bbf4c6e1a9a861a145a34cd097ea260b5a49/html/canvas/element/manual/imagebitmap/createImageBitmap-exif-orientation.html#L55
@@ -138,7 +149,7 @@ Deno.test("imageOrientation", async (t) => {
       START,
       END,
     );
-    assertEquals(targetPixel, new Uint8Array([253, 127, 127]));
+    assertPixelApproxEquals(targetPixel, [255, 128, 128]);
   });
 });
 

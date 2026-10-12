@@ -17,6 +17,24 @@ export async function assertFormattedAs(obj: unknown, result: object) {
   assertEquals(formatted, result);
 }
 
+async function decodePng(base64: string): Promise<Uint8Array> {
+  const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+  const bitmap = await createImageBitmap(
+    new Blob([bytes], { type: "image/png" }),
+  );
+  // @ts-ignore: Deno[Deno.internal] allowed
+  return Deno[Deno.internal].getBitmapData(bitmap);
+}
+
+async function assertFormattedAsPng(obj: unknown, expectedBase64: string) {
+  const formatted = await format(obj) as Record<string, string>;
+  assertEquals(Object.keys(formatted), ["image/png"]);
+  assertEquals(
+    await decodePng(formatted["image/png"]),
+    await decodePng(expectedBase64),
+  );
+}
+
 Deno.test("display(canvas) creates a PNG", async () => {
   // Let's make a fake Canvas with a fake Data URL
   class FakeCanvas {
@@ -187,10 +205,10 @@ fn fs_main() -> @location(0) vec4<f32> {
 
     device.queue.submit([encoder.finish()]);
 
-    await assertFormattedAs(texture, {
-      "image/png":
-        "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",
-    });
+    await assertFormattedAsPng(
+      texture,
+      "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",
+    );
   },
 );
 
