@@ -9,7 +9,6 @@ members = [
   "aux/graph",
   "aux/lint",
   "aux/media_type",
-
   "cli",
   "cli/lib",
   "cli/rt",
@@ -483,10 +482,10 @@ windows-sys = { version = "0.59.0", features = ["Win32_Foundation", "Win32_Media
 winres = "=0.1.12"
 
 # web-sys, pinned as required by deno-wasmbuild
+js-sys = "=0.3.85"
 serde-wasm-bindgen = "0.6.5"
 wasm-bindgen = "=0.2.108"
 wasm-bindgen-futures = "0.4.58"
-js-sys = "=0.3.85"
 
 # remaining
 approx = "0.5.1"

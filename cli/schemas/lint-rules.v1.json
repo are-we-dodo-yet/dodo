@@ -121,7 +121,6 @@
         "prefer-ascii",
         "prefer-const",
         "prefer-namespace-keyword",
-        "prefer-primordials",
         "react-no-danger",
         "react-no-danger-with-children",
         "react-rules-of-hooks",
