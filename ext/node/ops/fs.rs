@@ -957,7 +957,7 @@ pub fn op_node_fs_read_sync(
 /// the raw OS fd directly (no dup/clone). When the fd is closed via
 /// Async read for node:fs. Uses the File trait from FdTable for proper
 /// I/O through the file handle.
-#[op2]
+#[op2(async(deferred))]
 #[smi]
 pub async fn op_node_fs_read_deferred(
   state: Rc<RefCell<OpState>>,
