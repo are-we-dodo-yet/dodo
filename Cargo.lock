@@ -7312,6 +7312,7 @@ dependencies = [
  "deno_terminal",
  "file_test_runner",
  "jsonc-parser",
+ "libc",
  "regex",
  "serde",
  "serde_json",

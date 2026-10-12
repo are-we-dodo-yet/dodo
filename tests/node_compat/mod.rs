@@ -834,6 +834,38 @@ fn make_collected_result(
   }
 }
 
+#[cfg(target_os = "linux")]
+fn limit_child_cpus() {
+  const CPUS_PER_TEST: usize = 4;
+  static ALLOWED_CPUS: std::sync::LazyLock<Vec<usize>> =
+    // SAFETY: cpu_set_t is plain data and outlives the libc calls using it.
+    std::sync::LazyLock::new(|| unsafe {
+      let mut set: libc::cpu_set_t = std::mem::zeroed();
+      if libc::sched_getaffinity(0, std::mem::size_of_val(&set), &mut set) != 0
+      {
+        return Vec::new();
+      }
+      (0..libc::CPU_SETSIZE as usize)
+        .filter(|&cpu| libc::CPU_ISSET(cpu, &set))
+        .collect()
+    });
+  static NEXT_WINDOW: AtomicUsize = AtomicUsize::new(0);
+
+  if ALLOWED_CPUS.len() <= CPUS_PER_TEST {
+    return;
+  }
+  let windows = ALLOWED_CPUS.len() / CPUS_PER_TEST;
+  let window = NEXT_WINDOW.fetch_add(1, Ordering::Relaxed) % windows;
+  // SAFETY: cpu_set_t is plain data and outlives the libc calls using it.
+  unsafe {
+    let mut set: libc::cpu_set_t = std::mem::zeroed();
+    for &cpu in &ALLOWED_CPUS[window * CPUS_PER_TEST..][..CPUS_PER_TEST] {
+      libc::CPU_SET(cpu, &mut set);
+    }
+    libc::sched_setaffinity(0, std::mem::size_of_val(&set), &set);
+  }
+}
+
 fn run_test(
   cli_args: &CliArgs,
   test: &CollectedTest<NodeCompatTestData>,
@@ -872,6 +904,9 @@ fn run_test(
   }
 
   let setup = TestSetup::new(cli_args, data, test_config);
+
+  #[cfg(target_os = "linux")]
+  limit_child_cpus();
 
   let (success, output_text, exit_code) = if is_pseudo_tty_test {
     setup.run_pty()

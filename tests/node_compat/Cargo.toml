@@ -19,6 +19,7 @@ chrono = { workspace = true, features = ["now"] }
 deno_terminal.workspace = true
 file_test_runner.workspace = true
 jsonc-parser.workspace = true
+libc.workspace = true
 regex.workspace = true
 serde.workspace = true
 serde_json.workspace = true
