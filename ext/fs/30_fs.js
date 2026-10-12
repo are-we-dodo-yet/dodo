@@ -234,6 +234,7 @@ function readDir(path) {
       let rid;
       let ridPromise;
       let finished = false;
+      let nextPending = false;
       async function getRid() {
         if (ridPromise === undefined) {
           ridPromise = op_fs_read_dir_async(pathString);
@@ -246,16 +247,27 @@ function readDir(path) {
           if (finished) {
             return { value: undefined, done: true };
           }
-          if (rid === undefined) {
-            await getRid();
+          if (nextPending) {
+            throw core.buildCustomError(
+              "Busy",
+              "Resource is unavailable because it is in use by a promise",
+            );
           }
-          const value = await op_fs_read_dir_async_next(rid);
-          if (value === null) {
-            finished = true;
-            core.close(rid);
-            return { value: undefined, done: true };
+          nextPending = true;
+          try {
+            if (rid === undefined) {
+              await getRid();
+            }
+            const value = await op_fs_read_dir_async_next(rid);
+            if (value === null) {
+              finished = true;
+              core.close(rid);
+              return { value: undefined, done: true };
+            }
+            return { value, done: false };
+          } finally {
+            nextPending = false;
           }
-          return { value, done: false };
         },
         async return(value) {
           if (finished) {

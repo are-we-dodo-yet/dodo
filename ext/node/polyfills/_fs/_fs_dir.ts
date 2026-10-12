@@ -31,6 +31,7 @@ export default class Dir {
   #dirPath: string | Uint8Array;
   #syncIterator!: Iterator<Deno.DirEntry, undefined> | null;
   #asyncIterator!: AsyncIterator<Deno.DirEntry, undefined> | null;
+  #pendingRead: Promise<void> | null = null;
   #closed = false;
 
   constructor(path: string | Uint8Array) {
@@ -64,8 +65,20 @@ export default class Dir {
         this.#asyncIterator = Deno.readDir(this.path)[SymbolAsyncIterator]();
       }
       assert(this.#asyncIterator);
+      const iterator = this.#asyncIterator;
+      const next = () => ReflectApply(iterator.next, iterator, []);
+      const result = this.#pendingRead === null
+        ? next()
+        : PromisePrototypeThen(this.#pendingRead, next);
+      const settle = () => {
+        if (this.#pendingRead === pendingRead) {
+          this.#pendingRead = null;
+        }
+      };
+      const pendingRead = PromisePrototypeThen(result, settle, settle);
+      this.#pendingRead = pendingRead;
       PromisePrototypeThen(
-        ReflectApply(this.#asyncIterator.next, this.#asyncIterator, []),
+        result,
         (iteratorResult) => {
           resolve(
             iteratorResult.done
