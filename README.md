@@ -1,8 +1,23 @@
-# Deno
+# Dodo
 
-[![](https://img.shields.io/crates/v/deno.svg)](https://crates.io/crates/deno)
-[![Twitter badge][]][Twitter link] [![Bluesky badge][]][Bluesky link]
-[![Discord badge][]][Discord link] [![YouTube badge][]][YouTube link]
+[![Discord badge][]][Discord link]
+
+A community fork of [Deno](https://github.com/denoland/deno).
+
+> [!IMPORTANT]
+> On October 9, 2026, Deno [announced](https://deno.com/blog/cloudflare) that its team is [joining Cloudflare](https://blog.cloudflare.com/deno-joins-cloudflare/). The Deno team will keep shipping monthly bug fix and security releases of the runtime for one more year, and then stop developing it. Deno stays open source, and the announcement invites others to continue it. Dodo is one of those efforts.
+
+## Why fork
+
+Deno's core pieces live in separate `denoland` repos (`deno_graph`, `deno_ast`, `deno_doc`, `deno_lint`, `deno_media_type`, and more) and reach this repo as pinned crates.io releases. A change that spans them has to be merged and released in each repo before Deno can use it, which makes outside contributions very hard.
+
+The first goal is to bring those repos into this one, so any change can be made and reviewed in a single PR.
+
+## Status
+
+Early. There are no Dodo releases yet, so the install commands below install upstream Deno. To run the fork, [build it from source](#build-and-install-from-source).
+
+## About Deno
 
 <img align="right" src="https://deno.land/logo.svg" height="150px" alt="the deno mascot dinosaur standing in the rain">
 
@@ -61,8 +76,7 @@ scoop install main/deno
 
 ### Build and install from source
 
-Complete instructions for building Deno from source can be found
-[here](https://github.com/denoland/deno/blob/main/.github/CONTRIBUTING.md#building-from-source).
+Complete instructions for building Dodo from source can be found [here](.github/CONTRIBUTING.md#building-from-source).
 
 ## Your first Deno program
 
@@ -101,16 +115,7 @@ Learn more about writing and running Deno programs
 
 ## Contributing
 
-We appreciate your help! To contribute, please read our
-[contributing instructions](.github/CONTRIBUTING.md).
+We appreciate your help! Open pull requests against the `trunk` branch of [are-we-dodo-yet/dodo](https://github.com/are-we-dodo-yet/dodo), and please read the [contributing instructions](.github/CONTRIBUTING.md).
 
-[Build status - Cirrus]: https://github.com/denoland/deno/workflows/ci/badge.svg?branch=main&event=push
-[Build status]: https://github.com/denoland/deno/actions
-[Twitter badge]: https://img.shields.io/twitter/follow/deno_land.svg?style=social&label=Follow
-[Twitter link]: https://twitter.com/intent/follow?screen_name=deno_land
-[Bluesky badge]: https://img.shields.io/badge/Follow-whitesmoke?logo=bluesky
-[Bluesky link]: https://bsky.app/profile/deno.land
-[YouTube badge]: https://img.shields.io/youtube/channel/subscribers/UCqC2G2M-rg4fzg1esKFLFIw?style=social
-[YouTube link]: https://www.youtube.com/@deno_land
-[Discord badge]: https://img.shields.io/discord/684898665143206084?logo=discord&style=social
-[Discord link]: https://discord.gg/deno
+[Discord badge]: https://img.shields.io/discord/1558888938251223050?logo=discord&style=social
+[Discord link]: https://discord.gg/sX7R8Pqnp

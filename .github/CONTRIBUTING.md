@@ -113,7 +113,7 @@ Deno you can download a prebuilt executable (more information in the
 **Linux(Debian)**/**Mac**/**WSL**:
 
 ```shell
-git clone --recurse-submodules https://github.com/denoland/deno.git
+git clone --recurse-submodules https://github.com/are-we-dodo-yet/dodo.git
 ```
 
 **Windows**:
@@ -125,7 +125,7 @@ git clone --recurse-submodules https://github.com/denoland/deno.git
 
    ```shell
    git config --global core.symlinks true
-   git clone --recurse-submodules https://github.com/denoland/deno.git
+   git clone --recurse-submodules https://github.com/are-we-dodo-yet/dodo.git
    ```
 
 ### Prerequisites
