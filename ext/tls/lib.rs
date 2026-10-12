@@ -395,6 +395,9 @@ pub fn load_certs(
     return Err(TlsError::CertsNotFound);
   }
 
+  webpki::EndEntityCert::try_from(&certs[0])
+    .map_err(|_| TlsError::CertInvalid)?;
+
   Ok(certs)
 }
 
@@ -453,6 +456,11 @@ pub fn load_private_keys(
 
   if keys.is_empty() {
     return Err(TlsError::KeysNotFound);
+  }
+
+  for key in &keys {
+    rustls::crypto::aws_lc_rs::sign::any_supported_type(key)
+      .map_err(|_| TlsError::KeyDecode)?;
   }
 
   Ok(keys)
