@@ -3,7 +3,7 @@
   "steps": [{
     "args": [
       "eval",
-      "Deno.writeTextFileSync('.gitignore', 'before.txt\\n[\\nafter.txt')"
+      "Deno.writeTextFileSync('.gitignore', 'before.txt\\n[z-a]\\nafter.txt')"
     ],
     "output": "[WILDCARD]"
   }, {
