@@ -1435,18 +1435,18 @@ Deno.test(
   { permissions: { net: true } },
   async function netUdpReuseAddr() {
     const sender = Deno.listenDatagram({
-      port: 4002,
+      port: 0,
       transport: "udp",
       hostname: "127.0.0.1",
     });
     const listener1 = Deno.listenDatagram({
-      port: 4000,
+      port: 0,
       transport: "udp",
       reuseAddress: true,
       hostname: "127.0.0.1",
     });
     const listener2 = Deno.listenDatagram({
-      port: 4000,
+      port: (listener1.addr as Deno.NetAddr).port,
       transport: "udp",
       reuseAddress: true,
       hostname: "127.0.0.1",
