@@ -183,7 +183,7 @@ impl TryFrom<Field> for DictionaryField {
         for argument in args {
           match argument {
             DictionaryFieldArgument::Default { value, .. } => {
-              default_value = Some(value)
+              default_value = Some(*value)
             }
             DictionaryFieldArgument::Rename { value, .. } => {
               rename = Some(value.value())
@@ -242,7 +242,7 @@ enum DictionaryFieldArgument {
   Default {
     name_token: kw::default,
     eq_token: Token![=],
-    value: Expr,
+    value: Box<Expr>,
   },
   Rename {
     name_token: kw::rename,

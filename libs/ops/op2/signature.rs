@@ -274,7 +274,7 @@ impl Parse for WebIDLPair {
 }
 
 #[derive(Clone, Debug)]
-pub struct WebIDLDefault(pub syn::Expr);
+pub struct WebIDLDefault(pub Box<syn::Expr>);
 impl PartialEq for WebIDLDefault {
   fn eq(&self, _other: &Self) -> bool {
     true
@@ -304,7 +304,7 @@ impl Parse for WebIDLArgs {
           ));
         }
         input.parse::<Token![=]>()?;
-        default = Some(WebIDLDefault(input.parse::<syn::Expr>()?));
+        default = Some(WebIDLDefault(Box::new(input.parse::<syn::Expr>()?)));
       } else if key == "options" {
         if !options.is_empty() {
           return Err(syn::Error::new(

@@ -171,7 +171,7 @@ impl TryFrom<Field> for StructField {
         for argument in args {
           match argument {
             StructFieldArgument::Default { value, .. } => {
-              default_value = Some(value.unwrap_or_else(|| {
+              default_value = Some(*value.unwrap_or_else(|| {
                 syn::parse2(quote!(Default::default())).unwrap()
               }))
             }
@@ -218,7 +218,7 @@ enum StructFieldArgument {
   Default {
     name_token: kw::default,
     eq_token: Option<Token![=]>,
-    value: Option<Expr>,
+    value: Option<Box<Expr>>,
   },
   Rename {
     name_token: crate::conversion::kw::rename,
