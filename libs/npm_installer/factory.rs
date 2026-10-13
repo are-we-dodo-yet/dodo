@@ -224,6 +224,8 @@ pub struct NpmInstallerFactory<
   tarball_cache: Deferred<Arc<TarballCache<TNpmCacheHttpClient, TSys>>>,
   options: NpmInstallerFactoryOptions,
   install_reporter: Option<Arc<dyn InstallReporter + 'static>>,
+
+  lockfile: async_once_cell::OnceCell<Option<Arc<LockfileLock<TSys>>>>,
 }
 
 impl<
@@ -257,6 +259,7 @@ impl<
       tarball_cache: Default::default(),
       install_reporter,
       options,
+      lockfile: Default::default(),
     }
   }
 
@@ -356,14 +359,26 @@ impl<
     })
   }
 
+  async fn maybe_lockfile_uncached(
+    &self,
+  ) -> Result<Option<Arc<LockfileLock<TSys>>>, anyhow::Error> {
+    let workspace_factory = self.workspace_factory();
+    let package_info_provider = self.lockfile_npm_package_info_provider()?;
+    Ok(
+      workspace_factory
+        .maybe_lockfile(package_info_provider)
+        .await?
+        .map(Arc::new),
+    )
+  }
   pub async fn maybe_lockfile(
     &self,
   ) -> Result<Option<&Arc<LockfileLock<TSys>>>, anyhow::Error> {
-    let workspace_factory = self.workspace_factory();
-    let package_info_provider = self.lockfile_npm_package_info_provider()?;
-    workspace_factory
-      .maybe_lockfile(package_info_provider)
+    self
+      .lockfile
+      .get_or_try_init(self.maybe_lockfile_uncached())
       .await
+      .map(|c| c.as_ref())
   }
 
   pub fn npm_cache(&self) -> Result<&Arc<NpmCache<TSys>>, anyhow::Error> {

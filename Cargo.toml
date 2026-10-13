@@ -44,6 +44,7 @@ members = [
   "ext/webstorage",
   "libs/cache_dir",
   "libs/cli_parser",
+  "libs/compat_resolver",
   "libs/config",
   "libs/core",
   "libs/core/examples/snapshot",
@@ -156,6 +157,7 @@ deno_media_type = { version = "0.4.0", path = "./auxiliary/media_type", features
 deno_bench_util = { version = "0.253.0", path = "./tests/bench_util" }
 deno_cache_dir = { version = "0.51.0", path = "./libs/cache_dir" }
 deno_cli_parser = { version = "0.9.0", path = "./libs/cli_parser" }
+deno_compat_resolver = { version = "0.1.0", path = "libs/compat_resolver" }
 deno_config = { version = "0.109.0", features = ["workspace"], path = "./libs/config" }
 # Workspace binaries select the JavaScript engine at their top level. Keep the
 # backend-independent runtime defaults enabled here without pulling deno_core's
