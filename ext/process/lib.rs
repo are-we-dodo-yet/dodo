@@ -1571,7 +1571,10 @@ fn get_requires_allow_all_env_vars(env: &RunEnv) -> Vec<&str> {
     let key = key.trim();
     // we could be more targted here, but there are quite a lot of
     // LD_* and DYLD_* env variables
-    starts_with_ignore_case(key, "LD_") || starts_with_ignore_case(key, "DYLD_")
+    starts_with_ignore_case(key, "LD_")
+      || starts_with_ignore_case(key, "DYLD_")
+      || key.eq_ignore_ascii_case("NIX_LD")
+      || starts_with_ignore_case(key, "NIX_LD_")
   }
 
   fn is_empty(value: &OsString) -> bool {
