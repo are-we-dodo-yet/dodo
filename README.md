@@ -5,17 +5,30 @@
 A community fork of [Deno](https://github.com/denoland/deno).
 
 > [!IMPORTANT]
-> On October 9, 2026, Deno [announced](https://deno.com/blog/cloudflare) that its team is [joining Cloudflare](https://blog.cloudflare.com/deno-joins-cloudflare/). The Deno team will keep shipping monthly bug fix and security releases of the runtime for one more year, and then stop developing it. Deno stays open source, and the announcement invites others to continue it. Dodo is one of those efforts.
+> On October 9, 2026, Deno [announced](https://deno.com/blog/cloudflare) that
+> its team is
+> [joining Cloudflare](https://blog.cloudflare.com/deno-joins-cloudflare/). The
+> Deno team will keep shipping monthly bug fix and security releases of the
+> runtime for one more year, and then stop developing it. Deno stays open
+> source, and the announcement invites others to continue it. Dodo is one of
+> those efforts.
 
 ## Why fork
 
-Deno's core pieces live in separate `denoland` repos (`deno_graph`, `deno_ast`, `deno_doc`, `deno_lint`, `deno_media_type`, and more) and reach this repo as pinned crates.io releases. A change that spans them has to be merged and released in each repo before Deno can use it, which makes outside contributions very hard.
+Deno's core pieces live in separate `denoland` repos (`deno_graph`, `deno_ast`,
+`deno_doc`, `deno_lint`, `deno_media_type`, and more) and reach this repo as
+pinned crates.io releases. A change that spans them has to be merged and
+released in each repo before Deno can use it, which makes outside contributions
+very hard.
 
-The first goal is to bring those repos into this one, so any change can be made and reviewed in a single PR.
+The first goal is to bring those repos into this one, so any change can be made
+and reviewed in a single PR.
 
 ## Status
 
-Early. There are no Dodo releases yet, so the install commands below install upstream Deno. To run the fork, [build it from source](#build-and-install-from-source).
+Early. There are no Dodo releases yet, so the install commands below install
+upstream Deno. To run the fork,
+[build it from source](#build-and-install-from-source).
 
 ## About Deno
 
@@ -76,7 +89,8 @@ scoop install main/deno
 
 ### Build and install from source
 
-Complete instructions for building Dodo from source can be found [here](.github/CONTRIBUTING.md#building-from-source).
+Complete instructions for building Dodo from source can be found
+[here](.github/CONTRIBUTING.md#building-from-source).
 
 ## Your first Deno program
 
@@ -115,7 +129,9 @@ Learn more about writing and running Deno programs
 
 ## Contributing
 
-We appreciate your help! Open pull requests against the `trunk` branch of [are-we-dodo-yet/dodo](https://github.com/are-we-dodo-yet/dodo), and please read the [contributing instructions](.github/CONTRIBUTING.md).
+We appreciate your help! Open pull requests against the `trunk` branch of
+[are-we-dodo-yet/dodo](https://github.com/are-we-dodo-yet/dodo), and please read
+the [contributing instructions](.github/CONTRIBUTING.md).
 
 [Discord badge]: https://img.shields.io/discord/1558888938251223050?logo=discord&style=social
 [Discord link]: https://discord.gg/sX7R8Pqnp
