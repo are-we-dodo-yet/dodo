@@ -105,6 +105,8 @@ async function lintJS() {
       ":!:tests/wpt/runner/**",
       ":!:tests/wpt/suite/**",
       ":!:libs/**",
+      ":!:auxiliary/**",
+      ":!:auxiliary-js/**",
     ]);
 
     if (!sourceFiles.length) {
@@ -460,8 +462,19 @@ async function clippy() {
       new TextDecoder().decode(metadataOutput.stdout),
     );
     const workspaceMembers = new Set(metadata.workspace_members);
+    const excludedPackages = new Set(["deno_core"]);
+    for (const pkg of metadata.packages) {
+      if (
+        workspaceMembers.has(pkg.id) &&
+        /[\\/]auxiliary(-js)?[\\/]/.test(pkg.manifest_path)
+      ) {
+        excludedPackages.add(pkg.name);
+      }
+    }
     const workspaceFeatures = metadata.packages
-      .filter((pkg) => workspaceMembers.has(pkg.id) && pkg.name !== "deno_core")
+      .filter((pkg) =>
+        workspaceMembers.has(pkg.id) && !excludedPackages.has(pkg.name)
+      )
       .flatMap((pkg) =>
         Object.keys(pkg.features).map((feature) => `${pkg.name}/${feature}`)
       )
@@ -478,8 +491,8 @@ async function clippy() {
       workspaceFeatures.join(","),
       "--locked",
       "--workspace",
-      "--exclude",
-      "deno_core",
+      ...[...excludedPackages].flatMap((name) => ["--exclude", name]),
+      "--no-deps",
     ];
 
     if (currentBuildMode != "debug") {
@@ -507,6 +520,7 @@ async function clippy() {
       "--locked",
       "--features",
       DENO_CORE_CLIPPY_FEATURES,
+      "--no-deps",
     ];
 
     if (currentBuildMode != "debug") {
@@ -820,6 +834,8 @@ async function ensureNoNewTopLevelEntries() {
     ".devcontainer",
     ".github",
     "x",
+    "auxiliary",
+    "auxiliary-js",
     "cli",
     "doc",
     "ext",
@@ -829,6 +845,7 @@ async function ensureNoNewTopLevelEntries() {
     "tools",
     ".dprint.json",
     ".editorconfig",
+    ".envrc",
     ".gitattributes",
     // WARNING! See Notice above before adding anything here
     ".gitignore",

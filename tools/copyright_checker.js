@@ -46,6 +46,8 @@ export async function checkCopyright() {
     ":!:libs/config/testdata/**",
     ":!:libs/eszip/testdata/**",
     ":!:ext/node/polyfills/deps/**",
+    ":!:auxiliary/**",
+    ":!:auxiliary-js/**",
 
     // rust
     "*.rs",
