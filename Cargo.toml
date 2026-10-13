@@ -375,17 +375,17 @@ anstream = "0.6.14"
 console_static_text = "0.8.3"
 crossterm = "0.28.1"
 dhat = "0.3.3"
-dprint-core = "=0.67.4"
-dprint-plugin-json = "=0.21.3"
-dprint-plugin-jupyter = "=0.2.2"
-dprint-plugin-markdown = "=0.20.0"
-dprint-plugin-typescript = "=0.96.1"
+dprint-core = "=0.71.0"
+dprint-plugin-json = { git = "https://github.com/are-we-dodo-yet/dprint-plugin-json", branch = "push-yszvxtllzwlu", version = "=0.25.2" }
+dprint-plugin-jupyter = { git = "https://github.com/are-we-dodo-yet/dprint-plugin-jupyter", branch = "push-zyzsssukmskk", version = "=0.5.0" }
+dprint-plugin-markdown = { git = "https://github.com/are-we-dodo-yet/dprint-plugin-markdown", branch = "push-lpqpkxwxlllp", version = "=0.26.0" }
+dprint-plugin-typescript = { git = "https://github.com/are-we-dodo-yet/dprint-plugin-typescript", branch = "push-lmrnoqpvpyvm", version = "=0.96.1" }
 dunce = "1.0.5"
 env_logger = { version = "0.11.6", default-features = false, features = ["regex"] }
 imara-diff = "=0.2.0"
-lax-css = "=0.3.0"
-lax-markup = "=0.3.2"
-lax-sql = "=0.3.0"
+lax-css = { git = "https://github.com/are-we-dodo-yet/lax", branch = "push-xyvrpnyxxwsn", version = "=0.3.0" }
+lax-markup = { git = "https://github.com/are-we-dodo-yet/lax", branch = "push-xyvrpnyxxwsn", version = "=0.3.2" }
+lax-sql = { git = "https://github.com/are-we-dodo-yet/lax", branch = "push-xyvrpnyxxwsn", version = "=0.3.0" }
 libsui = "=0.16.4"
 object = { version = "0.36.3", default-features = false, features = ["read_core", "pe"] }
 open = "5.0.1"

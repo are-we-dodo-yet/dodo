@@ -20,6 +20,8 @@ use std::sync::atomic::AtomicUsize;
 use std::sync::atomic::Ordering;
 
 use async_trait::async_trait;
+use deno_ast::ParseDiagnosticsError;
+use deno_ast::ParsedSource;
 use deno_config::deno_json::NewLineKind;
 use deno_config::glob::FileCollector;
 use deno_config::glob::FilePatterns;
@@ -312,7 +314,7 @@ fn format_markdown(
     &markdown_config,
     move |tag, text, line_width| {
       let tag = tag.to_lowercase();
-      if matches!(
+      let result: Result<Option<String>, AnyError> = if matches!(
         tag.as_str(),
         "ts"
           | "tsx"
@@ -354,6 +356,7 @@ fn format_markdown(
             let mut json_config = get_resolved_json_config(fmt_options);
             json_config.line_width = line_width;
             dprint_plugin_json::format_text(&fake_filename, text, &json_config)
+              .map_err(AnyError::from)
           }
           "css" | "scss" | "less" => {
             format_css(&fake_filename, text, fmt_options)
@@ -384,20 +387,25 @@ fn format_markdown(
               dprint_plugin_typescript::FormatTextOptions {
                 path: &fake_filename,
                 extension: None,
-                text: text.to_string(),
+                text: text.into(),
                 config: &codeblock_config,
                 external_formatter: Some(
                   &create_external_formatter_for_typescript(unstable_options),
                 ),
               },
             )
+            .map_err(typescript_format_error)
           }
         }
       } else {
         Ok(None)
-      }
+      };
+      result.map_err(|err| {
+        dprint_plugin_markdown::FormatError::CodeBlock(err.into())
+      })
     },
   )
+  .map_err(AnyError::from)
 }
 
 /// Formats JSON and JSONC using the rules provided by .deno()
@@ -410,6 +418,7 @@ pub fn format_json(
 ) -> Result<Option<String>, AnyError> {
   let config = get_resolved_json_config(fmt_options);
   dprint_plugin_json::format_text(file_path, file_text, &config)
+    .map_err(AnyError::from)
 }
 
 pub fn format_css(
@@ -526,6 +535,7 @@ fn format_markup_embedded(
       json_config.line_width = print_width;
       let path = file_path.with_extension("json");
       dprint_plugin_json::format_text(&path, text, &json_config)
+        .map_err(AnyError::from)
     }
     "js"
     | "jsx"
@@ -560,13 +570,14 @@ fn format_markup_embedded(
         dprint_plugin_typescript::FormatTextOptions {
           path: &path,
           extension: Some(ext),
-          text: text.to_string(),
+          text: text.into(),
           config: &typescript_config,
           external_formatter: Some(&create_external_formatter_for_typescript(
             unstable_options,
           )),
         },
       )
+      .map_err(typescript_format_error)
     }
     _ => Ok(None),
   }
@@ -579,20 +590,23 @@ fn create_external_formatter_for_typescript(
   &str,
   String,
   &dprint_plugin_typescript::configuration::Configuration,
-) -> deno_core::anyhow::Result<Option<String>>
+) -> Result<Option<String>, Box<dyn std::error::Error + Send + Sync>>
 + use<> {
   let unstable_sql = unstable_options.sql;
-  move |lang, text, config| match lang {
-    "css" => format_embedded_css(&text, config),
-    "html" | "xml" | "svg" => format_embedded_html(lang, &text, config),
-    "sql" => {
-      if unstable_sql {
-        format_embedded_sql(&text, config)
-      } else {
-        Ok(None)
+  move |lang, text, config| {
+    match lang {
+      "css" => format_embedded_css(&text, config),
+      "html" | "xml" | "svg" => format_embedded_html(lang, &text, config),
+      "sql" => {
+        if unstable_sql {
+          format_embedded_sql(&text, config)
+        } else {
+          Ok(None)
+        }
       }
+      _ => Ok(None),
     }
-    _ => Ok(None),
+    .map_err(Into::into)
   }
 }
 
@@ -815,6 +829,7 @@ pub fn format_file(
           text: file_text.into(),
         };
         format_file(file_path, &file, fmt_options, unstable_options, None)
+          .map_err(Into::into)
       },
     )?,
     "sql" => {
@@ -830,13 +845,14 @@ pub fn format_file(
         dprint_plugin_typescript::FormatTextOptions {
           path: file_path,
           extension: Some(&ext),
-          text: file.text.to_string(),
+          text: file.text.as_ref().into(),
           config: &config,
           external_formatter: Some(&create_external_formatter_for_typescript(
             unstable_options,
           )),
         },
-      )?
+      )
+      .map_err(typescript_format_error)?
     }
   };
 
@@ -848,6 +864,69 @@ pub fn format_file(
     }
     None => None,
   })
+}
+
+fn typescript_format_error(
+  err: dprint_plugin_typescript::FormatError,
+) -> AnyError {
+  let diagnostics = match &err {
+    dprint_plugin_typescript::FormatError::Parse(diagnostic) => {
+      std::slice::from_ref(diagnostic)
+    }
+    dprint_plugin_typescript::FormatError::SyntaxErrors(errors) => &errors.0,
+    dprint_plugin_typescript::FormatError::Other(_) => return err.into(),
+  };
+  let deno_ast_diagnostics = diagnostics
+    .iter()
+    .map(to_deno_ast_diagnostic)
+    .collect::<Option<Vec<_>>>();
+  match deno_ast_diagnostics {
+    Some(diagnostics) => ParseDiagnosticsError(diagnostics).into(),
+    None => err.into(),
+  }
+}
+
+fn to_deno_ast_diagnostic(
+  diagnostic: &dprint_plugin_typescript::parsing::ParseDiagnostic,
+) -> Option<deno_ast::ParseDiagnostic> {
+  let specifier =
+    deno_ast::ModuleSpecifier::parse(diagnostic.specifier()).ok()?;
+  let range = diagnostic.range();
+  let span = deno_ast::swc::common::Span::new(
+    range.start.as_byte_pos(),
+    range.end.as_byte_pos(),
+  );
+  Some(deno_ast::ParseDiagnostic::from_swc_error(
+    deno_ast::swc::parser::error::Error::new(span, diagnostic.kind().clone()),
+    &specifier,
+    diagnostic.text_info().clone(),
+  ))
+}
+
+pub fn format_parsed_source(
+  parsed_source: &ParsedSource,
+  fmt_options: &FmtOptionsConfig,
+  unstable_options: &UnstableFmtOptions,
+) -> Result<Option<String>, AnyError> {
+  let unsupported_diagnostics = parsed_source
+    .diagnostics()
+    .iter()
+    .filter(|d| dprint_plugin_typescript::is_unsupported_syntax_error(d.kind()))
+    .cloned()
+    .collect::<Vec<_>>();
+  if !unsupported_diagnostics.is_empty() {
+    return Err(ParseDiagnosticsError(unsupported_diagnostics).into());
+  }
+  Ok(dprint_plugin_typescript::format_parsed_source(
+    dprint_plugin_typescript::FormatParsedSourceOptions {
+      source: parsed_source,
+      syntax: deno_ast::get_syntax(parsed_source.media_type()),
+      config: &get_resolved_typescript_config(fmt_options),
+      external_formatter: Some(&create_external_formatter_for_typescript(
+        unstable_options,
+      )),
+    },
+  )?)
 }
 
 #[async_trait]

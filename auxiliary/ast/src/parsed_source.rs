@@ -524,7 +524,17 @@ impl ParsedSource {
     &self,
     with_view: impl FnOnce(crate::view::Program<'a>) -> T,
   ) -> T {
-    let program_info = crate::view::ProgramInfo {
+    crate::view::with_ast_view(
+      crate::view::ProgramInfoProvider::program_info(self),
+      with_view,
+    )
+  }
+}
+
+#[cfg(feature = "view")]
+impl crate::view::ProgramInfoProvider for ParsedSource {
+  fn program_info(&self) -> crate::view::ProgramInfo<'_> {
+    crate::view::ProgramInfo {
       program: match self.program_ref() {
         ProgramRef::Module(module) => crate::view::ProgramRef::Module(module),
         ProgramRef::Script(script) => crate::view::ProgramRef::Script(script),
@@ -535,9 +545,7 @@ impl ParsedSource {
         leading: self.comments().leading_map(),
         trailing: self.comments().trailing_map(),
       }),
-    };
-
-    crate::view::with_ast_view(program_info, with_view)
+    }
   }
 }
 

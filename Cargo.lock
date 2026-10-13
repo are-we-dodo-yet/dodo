@@ -2144,7 +2144,7 @@ dependencies = [
  "criterion",
  "crossterm",
  "dashmap",
- "deno_ast 0.53.3",
+ "deno_ast",
  "deno_bundle_runtime",
  "deno_cache_dir",
  "deno_cli_parser",
@@ -2157,7 +2157,7 @@ dependencies = [
  "deno_lib",
  "deno_lint",
  "deno_lockfile",
- "deno_media_type 0.4.0",
+ "deno_media_type",
  "deno_npm",
  "deno_npm_cache",
  "deno_npm_installer",
@@ -2199,7 +2199,7 @@ dependencies = [
  "imara-diff",
  "import_map",
  "indexmap",
- "jsonc-parser",
+ "jsonc-parser 0.32.4",
  "keyring",
  "lax-css",
  "lax-markup",
@@ -2293,7 +2293,7 @@ dependencies = [
  "base64 0.22.1",
  "capacity_builder",
  "deno_error",
- "deno_media_type 0.4.0",
+ "deno_media_type",
  "deno_terminal",
  "dprint-swc-ext",
  "percent-encoding",
@@ -2328,31 +2328,6 @@ dependencies = [
  "swc_trace_macro",
  "swc_ts_fast_strip",
  "swc_visit",
- "text_lines",
- "thiserror 2.0.21",
- "unicode-width 0.2.2",
- "url",
-]
-
-[[package]]
-name = "deno_ast"
-version = "0.53.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6f7c1384d87fc0a6439a065312fbef8f6ac6128689dbc2831b28b3a1d4f3a4e6"
-dependencies = [
- "capacity_builder",
- "deno_error",
- "deno_media_type 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "deno_terminal",
- "dprint-swc-ext",
- "percent-encoding",
- "serde",
- "swc_atoms",
- "swc_common",
- "swc_ecma_ast",
- "swc_ecma_lexer",
- "swc_ecma_parser",
- "swc_eq_ignore_macros",
  "text_lines",
  "thiserror 2.0.21",
  "unicode-width 0.2.2",
@@ -2417,7 +2392,7 @@ dependencies = [
  "data-url",
  "deno_error",
  "deno_maybe_sync",
- "deno_media_type 0.4.0",
+ "deno_media_type",
  "deno_path_util",
  "http",
  "log",
@@ -2483,7 +2458,7 @@ dependencies = [
  "ignore",
  "import_map",
  "indexmap",
- "jsonc-parser",
+ "jsonc-parser 0.32.4",
  "log",
  "pretty_assertions",
  "serde",
@@ -2507,7 +2482,7 @@ dependencies = [
  "bytes",
  "cooked-waker",
  "criterion",
- "deno_ast 0.53.3",
+ "deno_ast",
  "deno_core_icudata",
  "deno_error",
  "deno_ops",
@@ -2553,7 +2528,7 @@ name = "deno_core_testing"
 version = "0.0.0"
 dependencies = [
  "anyhow",
- "deno_ast 0.53.3",
+ "deno_ast",
  "deno_core",
  "deno_error",
  "futures",
@@ -2642,7 +2617,7 @@ dependencies = [
  "comrak",
  "console_static_text",
  "criterion",
- "deno_ast 0.53.3",
+ "deno_ast",
  "deno_graph",
  "deno_path_util",
  "deno_terminal",
@@ -2832,9 +2807,9 @@ dependencies = [
  "capacity_builder",
  "chrono",
  "data-url",
- "deno_ast 0.53.3",
+ "deno_ast",
  "deno_error",
- "deno_media_type 0.4.0",
+ "deno_media_type",
  "deno_path_util",
  "deno_semver",
  "deno_terminal",
@@ -3030,7 +3005,7 @@ dependencies = [
  "deno_bundle_runtime",
  "deno_error",
  "deno_fs",
- "deno_media_type 0.4.0",
+ "deno_media_type",
  "deno_node",
  "deno_npm",
  "deno_npm_installer",
@@ -3059,7 +3034,7 @@ dependencies = [
 name = "deno_lint"
 version = "0.84.1"
 dependencies = [
- "deno_ast 0.53.3",
+ "deno_ast",
  "deno_semver",
  "derive_more",
  "if_chain",
@@ -3104,17 +3079,6 @@ dependencies = [
  "pretty_assertions",
  "serde",
  "serde_json",
- "url",
-]
-
-[[package]]
-name = "deno_media_type"
-version = "0.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "debab24ecd9f4fd64aa42fb18a02dff20a97d5830b2b85b98ce70b509f790763"
-dependencies = [
- "data-url",
- "serde",
  "url",
 ]
 
@@ -3189,7 +3153,7 @@ dependencies = [
  "brotli 6.0.0",
  "bytes",
  "cc",
- "deno_ast 0.53.3",
+ "deno_ast",
  "deno_core",
  "deno_dotenv",
  "deno_error",
@@ -3586,14 +3550,14 @@ dependencies = [
  "capacity_builder",
  "chrono",
  "dashmap",
- "deno_ast 0.53.3",
+ "deno_ast",
  "deno_cache_dir",
  "deno_config",
  "deno_error",
  "deno_graph",
  "deno_lockfile",
  "deno_maybe_sync",
- "deno_media_type 0.4.0",
+ "deno_media_type",
  "deno_npm",
  "deno_npmrc",
  "deno_package_json",
@@ -3607,7 +3571,7 @@ dependencies = [
  "imara-diff",
  "import_map",
  "indexmap",
- "jsonc-parser",
+ "jsonc-parser 0.32.4",
  "log",
  "node_resolver",
  "once_cell",
@@ -3632,7 +3596,7 @@ dependencies = [
  "base64 0.22.1",
  "boxed_error",
  "color-print",
- "deno_ast 0.53.3",
+ "deno_ast",
  "deno_bundle_runtime",
  "deno_cache",
  "deno_canvas",
@@ -4054,13 +4018,13 @@ version = "2.9.7"
 dependencies = [
  "async-trait",
  "bincode",
- "deno_ast 0.53.3",
+ "deno_ast",
  "deno_cache_dir",
  "deno_config",
  "deno_core",
  "deno_error",
  "deno_lib",
- "deno_media_type 0.4.0",
+ "deno_media_type",
  "deno_node",
  "deno_npm",
  "deno_npmrc",
@@ -4075,7 +4039,7 @@ dependencies = [
  "deno_v8",
  "import_map",
  "indexmap",
- "jsonc-parser",
+ "jsonc-parser 0.32.4",
  "junction",
  "libsui",
  "log",
@@ -4442,11 +4406,10 @@ dependencies = [
 
 [[package]]
 name = "dprint-core"
-version = "0.67.4"
+version = "0.71.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2c1d827947704a9495f705d6aeed270fa21a67f825f22902c28f38dc3af7a9ae"
+checksum = "7e70ef7f0176218b94519b7e72448f002b6df3536f4f6b6a67fde414a95ed049"
 dependencies = [
- "anyhow",
  "bumpalo",
  "hashbrown 0.15.5",
  "indexmap",
@@ -4467,60 +4430,54 @@ dependencies = [
 
 [[package]]
 name = "dprint-plugin-json"
-version = "0.21.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a2fe735acd073034b25ca9868f49b5265ff01a831dff89a2302dbe70178ca1db"
+version = "0.25.2"
+source = "git+https://github.com/are-we-dodo-yet/dprint-plugin-json?branch=push-yszvxtllzwlu#68efb846b4951e47aa8ba3324a260cffaa830313"
 dependencies = [
- "anyhow",
  "dprint-core",
  "dprint-core-macros",
- "jsonc-parser",
+ "jsonc-parser 0.34.0",
  "serde",
  "text_lines",
+ "thiserror 2.0.21",
 ]
 
 [[package]]
 name = "dprint-plugin-jupyter"
-version = "0.2.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f703cac0273eb41521f4bd89cc4848007655cd88ee2d1dc24e08aff6fa074b00"
+version = "0.5.0"
+source = "git+https://github.com/are-we-dodo-yet/dprint-plugin-jupyter?branch=push-zyzsssukmskk#0125264c5776bf703395d9eda56a28d43f8aed1e"
 dependencies = [
- "anyhow",
  "dprint-core",
- "jsonc-parser",
+ "jsonc-parser 0.34.0",
  "serde",
  "serde_json",
+ "thiserror 2.0.21",
 ]
 
 [[package]]
 name = "dprint-plugin-markdown"
-version = "0.20.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "897d39d10e75ae13b9c0f7e47ae5708d2c7117b53a34d5600714f801ca4b841e"
+version = "0.26.0"
+source = "git+https://github.com/are-we-dodo-yet/dprint-plugin-markdown?branch=push-lpqpkxwxlllp#b342a36cfd61dda148032e2330fea0c725ae1c84"
 dependencies = [
- "anyhow",
  "dprint-core",
  "dprint-core-macros",
- "pulldown-cmark",
- "regex",
  "serde",
- "unicode-width 0.1.14",
+ "thiserror 2.0.21",
+ "unicode-width 0.2.2",
 ]
 
 [[package]]
 name = "dprint-plugin-typescript"
 version = "0.96.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "90733c56ab425fc299c25ad81a5924bfc3c0050f25d865da742a6987b1255927"
+source = "git+https://github.com/are-we-dodo-yet/dprint-plugin-typescript?branch=push-lmrnoqpvpyvm#040482df74e4d5a3494c6bcd31a460b10b220ab0"
 dependencies = [
- "anyhow",
  "capacity_builder",
- "deno_ast 0.53.3 (registry+https://github.com/rust-lang/crates.io-index)",
  "dprint-core",
  "dprint-core-macros",
+ "dprint-swc-ext",
  "percent-encoding",
  "rustc-hash 2.1.3",
  "serde",
+ "thiserror 2.0.21",
 ]
 
 [[package]]
@@ -4843,7 +4800,7 @@ version = "0.137.0"
 dependencies = [
  "anyhow",
  "async-trait",
- "deno_ast 0.53.3",
+ "deno_ast",
  "deno_error",
  "deno_graph",
  "deno_npm",
@@ -4853,7 +4810,7 @@ dependencies = [
  "import_map",
  "indexmap",
  "insta",
- "jsonc-parser",
+ "jsonc-parser 0.32.4",
  "pretty_assertions",
  "reqwest",
  "serde",
@@ -6513,6 +6470,14 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "840785e1a8b4fdb27be18440a35a81af64820dc185c3973ff8b012d4c6282512"
 dependencies = [
  "serde",
+]
+
+[[package]]
+name = "jsonc-parser"
+version = "0.34.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "0ecded084f9b9a718d39668a42657c32253663d1f6afb3fbb9134f0305f73f48"
+dependencies = [
  "unicode-width 0.2.2",
 ]
 
@@ -6625,8 +6590,7 @@ dependencies = [
 [[package]]
 name = "lax-core"
 version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "31e9266de41ab34dbeb7b0176a6430b1091f1fa7f4dd9f7ccf3e430a9c5a6789"
+source = "git+https://github.com/are-we-dodo-yet/lax?branch=push-xyvrpnyxxwsn#a1753cafa02a34f679eebbd9b1e2b28f728a794d"
 dependencies = [
  "dprint-core",
 ]
@@ -6634,8 +6598,7 @@ dependencies = [
 [[package]]
 name = "lax-css"
 version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c964e0b1c58e6a38762c707d7b5f7a78ab4efab65d3e6c4ab2031deb8f65229e"
+source = "git+https://github.com/are-we-dodo-yet/lax?branch=push-xyvrpnyxxwsn#a1753cafa02a34f679eebbd9b1e2b28f728a794d"
 dependencies = [
  "anyhow",
  "dprint-core",
@@ -6646,8 +6609,7 @@ dependencies = [
 [[package]]
 name = "lax-markup"
 version = "0.3.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0b6f67a7a729b68c4b8e6f45315b0777fdf9618cfd569d4551d14d0906b93306"
+source = "git+https://github.com/are-we-dodo-yet/lax?branch=push-xyvrpnyxxwsn#a1753cafa02a34f679eebbd9b1e2b28f728a794d"
 dependencies = [
  "anyhow",
  "dprint-core",
@@ -6658,8 +6620,7 @@ dependencies = [
 [[package]]
 name = "lax-sql"
 version = "0.3.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e2cca919c19f0e32e8a9fe410e087fc71e4a5ce7a843f939967c643e7881981f"
+source = "git+https://github.com/are-we-dodo-yet/lax?branch=push-xyvrpnyxxwsn#a1753cafa02a34f679eebbd9b1e2b28f728a794d"
 dependencies = [
  "anyhow",
  "dprint-core",
@@ -7311,7 +7272,7 @@ dependencies = [
  "chrono",
  "deno_terminal",
  "file_test_runner",
- "jsonc-parser",
+ "jsonc-parser 0.32.4",
  "libc",
  "regex",
  "serde",
@@ -7330,7 +7291,7 @@ dependencies = [
  "deno_error",
  "deno_graph",
  "deno_maybe_sync",
- "deno_media_type 0.4.0",
+ "deno_media_type",
  "deno_package_json",
  "deno_path_util",
  "deno_semver",
@@ -8583,17 +8544,6 @@ checksum = "4dcd034599e63b970727f70d79e02d62390a4a84f7c6b827c27c46d5ac3fa622"
 dependencies = [
  "ar_archive_writer",
  "cc",
-]
-
-[[package]]
-name = "pulldown-cmark"
-version = "0.11.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "679341d22c78c6c649893cbd6c3278dcbe9fc4faa62fea3a9296ae2b50c14625"
-dependencies = [
- "bitflags 2.13.2",
- "memchr",
- "unicase",
 ]
 
 [[package]]
@@ -11181,7 +11131,7 @@ dependencies = [
  "fluent-uri",
  "indexmap",
  "inventory",
- "jsonc-parser",
+ "jsonc-parser 0.32.4",
  "lazy-regex",
  "libc",
  "ls-types",
@@ -11772,12 +11722,6 @@ name = "unarray"
 version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "eaea85b334db583fe3274d12b4cd1880032beab409c0d774be044d4480ab9a94"
-
-[[package]]
-name = "unicase"
-version = "2.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "357cc3acc6a036009fd6c973ed009037c732d60d0b4f6c673e9041497482a28f"
 
 [[package]]
 name = "unicode-general-category"
