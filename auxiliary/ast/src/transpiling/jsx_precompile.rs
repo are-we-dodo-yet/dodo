@@ -1250,16 +1250,14 @@ impl JsxPrecompile {
                   // Case: <img width={100} />
                   match &expr {
                     Expr::Lit(lit) => match lit {
-                      Lit::Bool(lit_bool) => {
-                        if is_boolean_attr(&attr_name) {
-                          if !lit_bool.value {
-                            continue;
-                          }
-
-                          strings.last_mut().unwrap().push(' ');
-                          strings.last_mut().unwrap().push_str(&attr_name);
+                      Lit::Bool(lit_bool) if is_boolean_attr(&attr_name) => {
+                        if !lit_bool.value {
                           continue;
                         }
+
+                        strings.last_mut().unwrap().push(' ');
+                        strings.last_mut().unwrap().push_str(&attr_name);
+                        continue;
                       }
                       Lit::Num(num) => {
                         let serialized_attr =

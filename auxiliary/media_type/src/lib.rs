@@ -13,7 +13,7 @@ use serde::Serializer;
 pub mod data_url;
 pub mod encoding;
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Default)]
 pub enum MediaType {
   JavaScript,
   Jsx,
@@ -35,6 +35,7 @@ pub enum MediaType {
   Sql,
   Wasm,
   SourceMap,
+  #[default]
   Unknown,
 }
 
@@ -356,7 +357,7 @@ impl MediaType {
     }
   }
 
-  #[allow(clippy::should_implement_trait)]
+  #[allow(clippy::should_implement_trait, reason = "TODO: deno legacy")]
   pub fn from_str(path: &str) -> Self {
     Self::from_path(Path::new(path))
   }
@@ -377,12 +378,6 @@ impl MediaType {
         None => Self::Unknown,
       }
     }
-  }
-}
-
-impl Default for MediaType {
-  fn default() -> Self {
-    Self::Unknown
   }
 }
 
