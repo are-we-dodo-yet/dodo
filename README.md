@@ -11,7 +11,7 @@ A community fork of [Deno](https://github.com/denoland/deno):
 > [V8](https://v8.dev/), [Rust](https://www.rust-lang.org/), and
 > [Tokio](https://tokio.rs/).
 
-<img align="right" src="https://github.com/are-we-dodo-yet/branding/blob/trunk/Mark%20only/Dark%20(outlined)/Transparent/mark_dark_transparent.png?raw=true" height="150px" alt="the dodo mascot">
+<img align="right" src="https://github.com/are-we-dodo-yet/branding/blob/main/Mark%20only/Dark%20(outlined)/Transparent/mark_dark_transparent.png?raw=true" height="150px" alt="the dodo mascot">
 
 > [!IMPORTANT]
 > On October 9, 2026, Deno [announced](https://deno.com/blog/cloudflare) that
@@ -35,10 +35,10 @@ Deno's core lives across multiple `denoland` repos (`deno_graph`, `deno_ast`,
 via pinned crates.io releases. This means that each change has to be merged and
 released to multiple packages, which makes outside contributions very difficult.
 
-We're also hoping to compartmentalize many of Deno's auxiliary features _(a.k.a.
+We also plan to compartmentalize many of Deno's auxiliary features _(a.k.a.
 anything not critical to Deno's internal libraries)_ as **dynamically-linked
-extensions**. This allows the community to decentralize the maintenance burden
-and for developers to keep their runtime lean.
+extensions**. The hope is that this will allow the community to decentralize the
+maintenance burden and enable developers to keep their runtimes lean.
 
 ### Current Roadmap
 
