@@ -27,7 +27,7 @@ use node_resolver::NpmPackageFolderResolver;
 use node_resolver::PackageJsonResolverRc;
 use node_resolver::errors::PackageJsonLoadError;
 
-extern crate libz_sys as zlib;
+extern crate libz_rs_sys as zlib;
 
 pub mod ops;
 
