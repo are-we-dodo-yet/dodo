@@ -22,6 +22,12 @@ A community fork of [Deno](https://github.com/denoland/deno):
 > source, and the announcement invites others to continue it. Dodo is one of
 > these efforts.
 
+## Status
+
+**Very Early.** There are no Dodo releases yet. Complete instructions for
+building Dodo from source can be found
+[here](.github/CONTRIBUTING.md#building-from-source).
+
 ## Why fork?
 
 Deno's core lives across multiple `denoland` repos (`deno_graph`, `deno_ast`,
@@ -29,14 +35,34 @@ Deno's core lives across multiple `denoland` repos (`deno_graph`, `deno_ast`,
 via pinned crates.io releases. This means that each change has to be merged and
 released to multiple packages, which makes outside contributions very difficult.
 
-Our first goal is to bring all these repos together, so every change can be made
-and reviewed in a single PR. Full roadmap to follow.
+We're also hoping to compartmentalize many of Deno's auxiliary features _(a.k.a.
+anything not critical to Deno's internal libraries)_ as **dynamically-linked
+extensions**. This allows the community to decentralize the maintenance burden
+and for developers to keep their runtime lean.
 
-## Status
+### Current Roadmap
 
-**Very Early.** There are no Dodo releases yet. Complete instructions for
-building Dodo from source can be found
-[here](.github/CONTRIBUTING.md#building-from-source).
+#### Now
+
+- **[IN PROGRESS]** Get the Monorepo stable, with passing CI.
+- **[IN PROGRESS]** Triage top Deno issues in
+  [our own project board](https://github.com/orgs/are-we-dodo-yet/projects/2).
+- Release our first build!
+- Setup a basic fundraising mechanism.
+
+#### Near
+
+- **[IN PROGRESS]** A proposal for Dodo Extensions emerges.
+- The Dodo Volunteers are equipped to take in security patches as Deno releases
+  them.
+- Dodo becomes the most-starred Deno fork 🤞
+
+#### Far
+
+- Dodo Volunteers are equipped to author their _own_ security patches and
+  dependency updates (like support for new releases of v8 and TypeScript)
+- Deno Desktop adds support for Mobile.
+- Dodo pursues official buy-in from organizations previously dependent on Deno.
 
 ## Your first Dodo program
 
