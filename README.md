@@ -64,16 +64,16 @@ maintenance burden and enable developers to keep their runtimes lean.
 - Deno Desktop adds support for Mobile.
 - Dodo pursues official buy-in from organizations previously dependent on Deno.
 
-## Your first Dodo program
+---
 
-Dodo can be used for many different applications, but is most commonly used to
+## Your first Deno program
+
+Deno can be used for many different applications, but is most commonly used to
 build web servers. Create a file called `server.ts` and include the following
 TypeScript code:
 
 ```ts
-const Dodo = Deno;
-
-Dodo.serve((_req: Request) => {
+Deno.serve((_req: Request) => {
   return new Response("Hello, world!");
 });
 ```
@@ -81,13 +81,13 @@ Dodo.serve((_req: Request) => {
 Run your server with the following command:
 
 ```sh
-dodo run --allow-net server.ts
+deno run --allow-net server.ts
 ```
 
 This should start a local web server on
 [http://localhost:8000](http://localhost:8000).
 
-Learn more about writing and running Dodo programs
+Learn more about writing and running Deno programs
 [in the docs](https://docs.deno.com/runtime/manual).
 
 ## Additional resources
