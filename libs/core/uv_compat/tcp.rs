@@ -750,6 +750,11 @@ pub unsafe fn uv_tcp_connect(
             }
           }
         };
+        // https://github.com/libuv/libuv/blob/840404ce8ba7cc0204be52389a6cfff9f2c90fb6/src/win/tcp.c#L856-L873
+        #[cfg(windows)]
+        if sock_addr.ip().is_loopback() {
+          disable_syn_retransmissions(&socket);
+        }
         socket.connect(sock_addr).await
       }),
       req,
@@ -758,6 +763,56 @@ pub unsafe fn uv_tcp_connect(
   }
 
   0
+}
+
+/// This makes connect() fail instantly if the target port on the localhost
+/// is not reachable, instead of waiting for 2s. We do not care if this fails.
+/// This only works on Windows version 10.0.16299 and later.
+#[cfg(windows)]
+fn disable_syn_retransmissions(socket: &tokio::net::TcpSocket) {
+  use std::os::windows::io::AsRawSocket;
+  use std::sync::LazyLock;
+
+  use windows_sys::Wdk::System::SystemServices::RtlGetVersion;
+  use windows_sys::Win32::Networking::WinSock::SIO_TCP_INITIAL_RTO;
+  use windows_sys::Win32::Networking::WinSock::TCP_INITIAL_RTO_DEFAULT_RTT;
+  use windows_sys::Win32::Networking::WinSock::TCP_INITIAL_RTO_NO_SYN_RETRANSMISSIONS;
+  use windows_sys::Win32::Networking::WinSock::TCP_INITIAL_RTO_PARAMETERS;
+  use windows_sys::Win32::Networking::WinSock::WSAIoctl;
+  use windows_sys::Win32::System::SystemInformation::OSVERSIONINFOW;
+
+  static SUPPORTED: LazyLock<bool> = LazyLock::new(|| {
+    let mut info: OSVERSIONINFOW = unsafe { std::mem::zeroed() };
+    info.dwOSVersionInfoSize = std::mem::size_of::<OSVERSIONINFOW>() as u32;
+    if unsafe { RtlGetVersion(&mut info) } < 0 || info.dwMajorVersion < 10 {
+      return false;
+    }
+    info.dwMajorVersion > 10
+      || info.dwMinorVersion > 0
+      || info.dwBuildNumber >= 16299
+  });
+  if !*SUPPORTED {
+    return;
+  }
+
+  let params = TCP_INITIAL_RTO_PARAMETERS {
+    Rtt: TCP_INITIAL_RTO_DEFAULT_RTT as u16,
+    MaxSynRetransmissions: TCP_INITIAL_RTO_NO_SYN_RETRANSMISSIONS as u8,
+  };
+  let mut bytes = 0;
+  unsafe {
+    WSAIoctl(
+      socket.as_raw_socket() as usize,
+      SIO_TCP_INITIAL_RTO,
+      &params as *const TCP_INITIAL_RTO_PARAMETERS as *const c_void,
+      std::mem::size_of::<TCP_INITIAL_RTO_PARAMETERS>() as u32,
+      std::ptr::null_mut(),
+      0,
+      &mut bytes,
+      std::ptr::null_mut(),
+      None,
+    );
+  }
 }
 
 /// ### Safety

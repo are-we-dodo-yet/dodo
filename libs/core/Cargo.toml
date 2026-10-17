@@ -63,7 +63,7 @@ v8.workspace = true
 wasm_dep_analyzer.workspace = true
 
 [target.'cfg(windows)'.dependencies]
-windows-sys.workspace = true
+windows-sys = { workspace = true, features = ["Wdk_System_SystemServices", "Win32_Networking_WinSock", "Win32_System_SystemInformation"] }
 
 [dev-dependencies]
 bencher.workspace = true
