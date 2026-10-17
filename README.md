@@ -7,8 +7,9 @@ A community fork of [Deno](https://github.com/denoland/deno):
 > [Deno](https://deno.com)
 > ([/ˈdiːnoʊ/](https://ipa-reader.com/?text=%CB%88di%CB%90no%CA%8A), pronounced
 > `dee-no`) is a JavaScript, TypeScript, and WebAssembly runtime with secure
-> defaults and a great developer experience. It's built on [V8](https://v8.dev/),
-> [Rust](https://www.rust-lang.org/), and [Tokio](https://tokio.rs/).
+> defaults and a great developer experience. It's built on
+> [V8](https://v8.dev/), [Rust](https://www.rust-lang.org/), and
+> [Tokio](https://tokio.rs/).
 
 <img align="right" src="https://github.com/are-we-dodo-yet/branding/blob/trunk/Mark%20only/Dark%20(outlined)/Transparent/mark_dark_transparent.png?raw=true" height="150px" alt="the dodo mascot">
 
@@ -24,17 +25,17 @@ A community fork of [Deno](https://github.com/denoland/deno):
 ## Why fork?
 
 Deno's core lives across multiple `denoland` repos (`deno_graph`, `deno_ast`,
-`deno_doc`, `deno_lint`, `deno_media_type`, and more), which reach _this_ repo via
-pinned crates.io releases. This means that each change has to be merged and
-released to multiple packages, which makes outside contributions
-very difficult.
+`deno_doc`, `deno_lint`, `deno_media_type`, and more), which reach _this_ repo
+via pinned crates.io releases. This means that each change has to be merged and
+released to multiple packages, which makes outside contributions very difficult.
 
 Our first goal is to bring all these repos together, so every change can be made
 and reviewed in a single PR. Full roadmap to follow.
 
 ## Status
 
-**Very Early.** There are no Dodo releases yet. Complete instructions for building Dodo from source can be found
+**Very Early.** There are no Dodo releases yet. Complete instructions for
+building Dodo from source can be found
 [here](.github/CONTRIBUTING.md#building-from-source).
 
 ## Your first Dodo program
