@@ -1,0 +1,21 @@
+[package]
+name = "deno_compat_resolver"
+version = "0.1.0"
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+anyhow.workspace = true
+deno_lockfile.workspace = true
+jsonc-parser.workspace = true
+log.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+sys_traits.workspace = true
+thiserror.workspace = true
+yaml_parser.workspace = true
+
+[dev-dependencies]
+deno_npm.workspace = true
