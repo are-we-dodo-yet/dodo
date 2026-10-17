@@ -2208,7 +2208,6 @@ dependencies = [
  "libc",
  "liblzma",
  "libsui",
- "libz-sys",
  "locked-tripwire",
  "log",
  "ls-types",
@@ -3179,7 +3178,7 @@ dependencies = [
  "ipnet",
  "libc",
  "libnghttp2",
- "libz-sys",
+ "libz-rs-sys",
  "log",
  "nix 0.30.1",
  "node_resolver",
@@ -5035,7 +5034,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6e634e2e0ebac1ee034020da1ca582e17ffe4e0f5e985823721e168928136dcb"
 dependencies = [
  "crc32fast",
- "libz-sys",
  "miniz_oxide 0.9.1",
  "zlib-rs",
 ]
@@ -6850,16 +6848,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "libz-sys"
-version = "1.1.30"
+name = "libz-rs-sys"
+version = "0.6.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f710a23e6dbf193214fd46ca56a9d6864e550abe86202184532ae7275e46de19"
+checksum = "434324ee61a8e4a05dd3fdf03d51c073ea7fdaf5a35b2ca33c4ca9f3f37def4a"
 dependencies = [
- "cc",
- "cmake",
- "libc",
- "pkg-config",
- "vcpkg",
+ "zlib-rs",
 ]
 
 [[package]]

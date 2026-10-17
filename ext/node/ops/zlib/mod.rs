@@ -401,7 +401,13 @@ impl Zlib {
     let mut zlib = self.inner.borrow_mut();
     let zlib = zlib.as_mut().ok_or(ZlibError::NotInitialized)?;
 
-    zlib.err = zlib.strm.deflate_params(level, strategy);
+    zlib.err = match zlib.mode {
+      Mode::Deflate | Mode::Gzip | Mode::DeflateRaw => {
+        zlib.strm.deflate_params(level, strategy)
+      }
+      // Decompression doesn't have deflate params
+      _ => Z_OK,
+    };
     zlib.level = level;
     zlib.strategy = strategy;
 
