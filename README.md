@@ -2,95 +2,69 @@
 
 [![Discord badge][]][Discord link]
 
-A community fork of [Deno](https://github.com/denoland/deno).
+A community fork of [Deno](https://github.com/denoland/deno):
+
+> [Deno](https://deno.com)
+> ([/ˈdiːnoʊ/](https://ipa-reader.com/?text=%CB%88di%CB%90no%CA%8A), pronounced
+> `dee-no`) is a JavaScript, TypeScript, and WebAssembly runtime with secure
+> defaults and a great developer experience. It's built on
+> [V8](https://v8.dev/), [Rust](https://www.rust-lang.org/), and
+> [Tokio](https://tokio.rs/).
+
+<img align="right" src="https://github.com/are-we-dodo-yet/branding/blob/main/Mark%20only/Dark%20(outlined)/Transparent/mark_dark_transparent.png?raw=true" height="150px" alt="the dodo mascot">
 
 > [!IMPORTANT]
 > On October 9, 2026, Deno [announced](https://deno.com/blog/cloudflare) that
 > its team is
 > [joining Cloudflare](https://blog.cloudflare.com/deno-joins-cloudflare/). The
-> Deno team will keep shipping monthly bug fix and security releases of the
+> Deno team will keep shipping monthly bug fixes and security releases of the
 > runtime for one more year, and then stop developing it. Deno stays open
 > source, and the announcement invites others to continue it. Dodo is one of
-> those efforts.
-
-## Why fork
-
-Deno's core pieces live in separate `denoland` repos (`deno_graph`, `deno_ast`,
-`deno_doc`, `deno_lint`, `deno_media_type`, and more) and reach this repo as
-pinned crates.io releases. A change that spans them has to be merged and
-released in each repo before Deno can use it, which makes outside contributions
-very hard.
-
-The first goal is to bring those repos into this one, so any change can be made
-and reviewed in a single PR.
+> these efforts.
 
 ## Status
 
-Early. There are no Dodo releases yet, so the install commands below install
-upstream Deno. To run the fork,
-[build it from source](#build-and-install-from-source).
-
-## About Deno
-
-<img align="right" src="https://deno.land/logo.svg" height="150px" alt="the deno mascot dinosaur standing in the rain">
-
-[Deno](https://deno.com)
-([/ˈdiːnoʊ/](https://ipa-reader.com/?text=%CB%88di%CB%90no%CA%8A), pronounced
-`dee-no`) is a JavaScript, TypeScript, and WebAssembly runtime with secure
-defaults and a great developer experience. It's built on [V8](https://v8.dev/),
-[Rust](https://www.rust-lang.org/), and [Tokio](https://tokio.rs/).
-
-Learn more about the Deno runtime
-[in the documentation](https://docs.deno.com/runtime/manual).
-
-## Installation
-
-Install the Deno runtime on your system using one of the commands below. Note
-that there are a number of ways to install Deno - a comprehensive list of
-installation options can be found
-[here](https://docs.deno.com/runtime/manual/getting_started/installation).
-
-Shell (Mac, Linux):
-
-```sh
-curl -fsSL https://deno.land/install.sh | sh
-```
-
-PowerShell (Windows):
-
-```powershell
-irm https://deno.land/install.ps1 | iex
-```
-
-[Homebrew](https://formulae.brew.sh/formula/deno) (Mac):
-
-```sh
-brew install deno
-```
-
-[Chocolatey](https://community.chocolatey.org/packages/deno) (Windows):
-
-```powershell
-choco install deno
-```
-
-[WinGet](https://winstall.app/apps/DenoLand.Deno) (Windows):
-
-```powershell
-winget install --id=DenoLand.Deno
-```
-
-[Scoop](https://scoop.sh/#/apps?q=deno&id=678d8fb557b611df996989c675b1099630a5bbee)
-(Windows):
-
-```powershell
-scoop install main/deno
-```
-
-### Build and install from source
-
-Complete instructions for building Dodo from source can be found
+**Very Early.** There are no Dodo releases yet. Complete instructions for
+building Dodo from source can be found
 [here](.github/CONTRIBUTING.md#building-from-source).
+
+## Why fork?
+
+Deno's core lives across multiple `denoland` repos (`deno_graph`, `deno_ast`,
+`deno_doc`, `deno_lint`, `deno_media_type`, and more), which reach _this_ repo
+via pinned crates.io releases. This means that each change has to be merged and
+released to multiple packages, which makes outside contributions very difficult.
+
+We also plan to compartmentalize many of Deno's auxiliary features _(a.k.a.
+anything not critical to Deno's internal libraries)_ as **dynamically-linked
+extensions**. The hope is that this will allow the community to decentralize the
+maintenance burden and enable developers to keep their runtimes lean.
+
+### Current Roadmap
+
+#### Now
+
+- **[IN PROGRESS]** Get the Monorepo stable, with passing CI.
+- **[IN PROGRESS]** Triage top Deno issues in
+  [our own project board](https://github.com/orgs/are-we-dodo-yet/projects/2).
+- Release our first build!
+- Setup a basic fundraising mechanism.
+
+#### Near
+
+- **[IN PROGRESS]** A proposal for Dodo Extensions emerges.
+- The Dodo Volunteers are equipped to take in security patches as Deno releases
+  them.
+- Dodo becomes the most-starred Deno fork 🤞
+
+#### Far
+
+- Dodo Volunteers are equipped to author their _own_ security patches and
+  dependency updates (like support for new releases of v8 and TypeScript)
+- Deno Desktop adds support for Mobile.
+- Dodo pursues official buy-in from organizations previously dependent on Deno.
+
+---
 
 ## Your first Deno program
 
