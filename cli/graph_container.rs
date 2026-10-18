@@ -4,6 +4,7 @@ use std::sync::Arc;
 
 use deno_ast::ModuleSpecifier;
 use deno_config::glob::FilePatterns;
+use deno_config::glob::PathOrPattern;
 use deno_config::glob::PathOrPatternSet;
 use deno_core::error::AnyError;
 use deno_core::parking_lot::RwLock;
@@ -111,7 +112,17 @@ impl MainModuleGraphContainer {
     files: &[String],
     options: CollectSpecifiersOptions,
   ) -> Result<Vec<ModuleSpecifier>, AnyError> {
-    let excludes = self.cli_options.workspace().resolve_config_excludes()?;
+    let mut excludes =
+      self.cli_options.workspace().resolve_config_excludes()?;
+    // The native type check's generated project at the workspace
+    // root (`.deno/`: Deno's types, the built-in `@types/node`, mirrors) is
+    // never one of the project's own modules.
+    if let Ok(root) = self.cli_options.workspace().root_dir_url().to_file_path()
+    {
+      let mut entries = excludes.into_path_or_patterns();
+      entries.push(PathOrPattern::Path(root.join(".deno")));
+      excludes = PathOrPatternSet::new(entries);
+    }
     let include_patterns =
       PathOrPatternSet::from_include_relative_path_or_patterns(
         self.cli_options.initial_cwd(),

@@ -26,6 +26,19 @@
       "output": "env_unknown.out",
       "exitCode": 0
     },
+    // the in-process compiler never collects the native check's generated
+    // `.deno/` (Node's types, mirrors) as the project's own modules
+    "tsc_after_native": {
+      "cwd": "project",
+      "steps": [
+        { "args": "check --quiet", "output": "" },
+        {
+          "args": "check --quiet",
+          "envs": { "DENO_CHECK_ENGINE": "tsc" },
+          "output": ""
+        }
+      ]
+    },
     // code blocks are checked by the in-process compiler only
     "doc_only_tsc": {
       "args": "check --doc-only doc.ts",
