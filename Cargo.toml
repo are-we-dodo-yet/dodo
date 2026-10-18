@@ -519,7 +519,7 @@ libnghttp2 = "1.68.0"
 locked-tripwire = "0.1.1"
 markup5ever_rcdom = "0.3.0"
 plist = "1"
-rusty_v8 = { package = "v8", version = "150.4.0", default-features = false }
+rusty_v8 = { package = "v8", version = "152.2.0", default-features = false }
 serde_v8_utilities = { path = "libs/serde_v8/utilities", default-features = false }
 similar = "2"
 stringcase = "0.4.0"
