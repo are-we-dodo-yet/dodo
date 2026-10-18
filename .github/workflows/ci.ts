@@ -1189,7 +1189,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
             },
             {
               // The rest of CI only exercises the default v8 backend. Make sure the
-              // experimental QuickJS backend (the deno_v8 facade over the v8x crate)
+              // experimental QuickJS backend (the v8x crate's quickjs engine)
               // keeps compiling for the deno + denort binaries so `deno compile`
               // and the desktop runtime don't silently regress (notably the
               // mutually-exclusive v8/quickjs feature guard). A `check` is enough to
@@ -1919,7 +1919,6 @@ const publishCanaryJob = job("publish-canary", {
 // Cargo package names for the libs/* workspace members (merged from deno_core).
 const denoCorePackageNames = [
   "deno_core",
-  "deno_v8",
   "build-your-own-js-snapshot",
   "dcore",
   "deno_ops",
@@ -1989,8 +1988,7 @@ const denoCoreTestJob = job("deno-core-test", {
     {
       // Ported from denoland/deno_core .github/workflows/ci-test-ops/action.yml
       name: "Cargo nextest ops compile test runner (release)",
-      run:
-        "cargo nextest run --release -p deno_ops_compile_test_runner -p deno_v8",
+      run: "cargo nextest run --release -p deno_ops_compile_test_runner",
     },
     {
       name: "Cargo doc test",

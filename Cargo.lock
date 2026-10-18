@@ -2177,7 +2177,6 @@ dependencies = [
  "deno_telemetry",
  "deno_terminal",
  "deno_tower_lsp",
- "deno_v8",
  "dhat",
  "dprint-core",
  "dprint-plugin-json",
@@ -2264,6 +2263,7 @@ dependencies = [
  "unicode-general-category",
  "unicode-width 0.2.2",
  "uuid",
+ "v8x",
  "walkdir",
  "wasm_dep_analyzer",
  "wasmparser",
@@ -2488,7 +2488,6 @@ dependencies = [
  "deno_ops",
  "deno_path_util",
  "deno_unsync",
- "deno_v8",
  "futures",
  "indexmap",
  "inventory",
@@ -2513,6 +2512,7 @@ dependencies = [
  "unicycle",
  "url",
  "uuid",
+ "v8x",
  "wasm_dep_analyzer",
  "windows-sys 0.59.0",
 ]
@@ -3847,14 +3847,6 @@ name = "deno_url"
 version = "0.222.0"
 
 [[package]]
-name = "deno_v8"
-version = "0.4.0"
-dependencies = [
- "v8",
- "v8x",
-]
-
-[[package]]
 name = "deno_web"
 version = "0.290.0"
 dependencies = [
@@ -4036,7 +4028,6 @@ dependencies = [
  "deno_snapshots",
  "deno_subprocess_windows",
  "deno_terminal",
- "deno_v8",
  "import_map",
  "indexmap",
  "jsonc-parser 0.32.4",
@@ -4054,6 +4045,7 @@ dependencies = [
  "thiserror 2.0.21",
  "tokio",
  "url",
+ "v8x",
 ]
 
 [[package]]
@@ -4066,7 +4058,6 @@ dependencies = [
  "deno_runtime",
  "deno_snapshots",
  "deno_terminal",
- "deno_v8",
  "denort",
  "laufey",
  "libc",
@@ -4077,6 +4068,7 @@ dependencies = [
  "serde_json",
  "tempfile",
  "tokio",
+ "v8x",
 ]
 
 [[package]]
@@ -9629,7 +9621,6 @@ name = "serde_v8"
 version = "0.321.0"
 dependencies = [
  "deno_error",
- "deno_v8",
  "num-bigint",
  "serde",
  "serde_bytes",
@@ -9637,13 +9628,14 @@ dependencies = [
  "serde_v8_utilities",
  "smallvec",
  "thiserror 2.0.21",
+ "v8x",
 ]
 
 [[package]]
 name = "serde_v8_utilities"
 version = "0.28.0"
 dependencies = [
- "deno_v8",
+ "v8x",
 ]
 
 [[package]]
@@ -11926,9 +11918,8 @@ dependencies = [
 
 [[package]]
 name = "v8x"
-version = "149.4.0-rc.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3701ffb3692a24808503d17f758b0a3f688d2c451779247982566b5941033e63"
+version = "152.2.0-rc.1"
+source = "git+https://github.com/are-we-dodo-yet/v8x?rev=aa28e8e80d492494bfb17bf123fbcfb09da0ce44#aa28e8e80d492494bfb17bf123fbcfb09da0ce44"
 dependencies = [
  "bindgen 0.70.1",
  "bitflags 2.13.2",
@@ -11939,6 +11930,7 @@ dependencies = [
  "temporal_capi",
  "temporal_rs",
  "timezone_provider",
+ "v8",
 ]
 
 [[package]]

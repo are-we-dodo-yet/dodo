@@ -358,7 +358,7 @@ pub struct ContextifyContext {
   /// queue). Dropping the handle releases a root into the isolate's heap; the
   /// associated context keeps the queue itself alive for as long as it needs
   /// it, so there is nothing else to tear down by hand.
-  microtask_queue: Option<v8::OwnedMicrotaskQueue>,
+  microtask_queue: Option<v8::MicrotaskQueueHandle>,
   context: v8::TracedReference<v8::Context>,
   sandbox: v8::TracedReference<v8::Object>,
   allow_code_gen_wasm: bool,
@@ -744,10 +744,10 @@ pub enum ContextInitMode {
 /// Null when there is no handle, which tells V8 to use the isolate's default
 /// queue.
 ///
-/// The queue is only borrowed here: whoever holds the [`v8::OwnedMicrotaskQueue`]
+/// The queue is only borrowed here: whoever holds the [`v8::MicrotaskQueueHandle`]
 /// keeps it alive, and must outlive every context created with the pointer.
 fn microtask_queue_ptr(
-  handle: &Option<v8::OwnedMicrotaskQueue>,
+  handle: &Option<v8::MicrotaskQueueHandle>,
 ) -> *mut v8::MicrotaskQueue {
   handle.as_ref().map_or(std::ptr::null_mut(), |queue| {
     &**queue as *const v8::MicrotaskQueue as *mut v8::MicrotaskQueue
@@ -1004,7 +1004,7 @@ fn property_setter<'s>(
   key: v8::Local<'s, v8::Name>,
   value: v8::Local<'s, v8::Value>,
   args: v8::PropertyCallbackArguments<'s>,
-  _rv: v8::PropertyInterceptorReturnValue<'_>,
+  _rv: v8::ReturnValue<v8::Boolean>,
 ) -> v8::Intercepted {
   let Some(ctx) = ContextifyContext::get(scope, args.holder()) else {
     return v8::Intercepted::kNo;
@@ -1120,7 +1120,7 @@ fn property_definer<'s>(
   key: v8::Local<'s, v8::Name>,
   desc: &v8::PropertyDescriptor,
   args: v8::PropertyCallbackArguments<'s>,
-  _: v8::PropertyInterceptorReturnValue<'_>,
+  _: v8::ReturnValue<v8::Boolean>,
 ) -> v8::Intercepted {
   let Some(ctx) = ContextifyContext::get(scope, args.holder()) else {
     return v8::Intercepted::kNo;
@@ -1329,7 +1329,7 @@ fn indexed_property_setter<'s>(
   index: u32,
   value: v8::Local<'s, v8::Value>,
   args: v8::PropertyCallbackArguments<'s>,
-  rv: v8::PropertyInterceptorReturnValue<'_>,
+  rv: v8::ReturnValue<v8::Boolean>,
 ) -> v8::Intercepted {
   let key = uint32_to_name(scope, index);
   property_setter(scope, key, value, args, rv)
@@ -1350,7 +1350,7 @@ fn indexed_property_definer<'s>(
   index: u32,
   descriptor: &v8::PropertyDescriptor,
   args: v8::PropertyCallbackArguments<'s>,
-  rv: v8::PropertyInterceptorReturnValue<'_>,
+  rv: v8::ReturnValue<v8::Boolean>,
 ) -> v8::Intercepted {
   let key = uint32_to_name(scope, index);
   property_definer(scope, key, descriptor, args, rv)

@@ -480,7 +480,7 @@ async function clippy() {
       )
       .filter((feature) =>
         !feature.endsWith("/quickjs") &&
-        !feature.startsWith("deno_v8/v8_enable_")
+        !feature.includes("/v8_enable_")
       )
       .sort();
 
