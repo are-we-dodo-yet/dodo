@@ -70,7 +70,7 @@ deno_terminal.workspace = true
 env_logger.workspace = true
 file_test_runner.workspace = true
 pretty_assertions.workspace = true
-reqwest = { workspace = true, features = ["http2", "charset", "rustls-tls-webpki-roots"] }
+reqwest = { workspace = true, features = ["http2", "charset"] }
 sys_traits = { workspace = true, features = ["memory"] }
 tempfile.workspace = true
 tokio = { workspace = true, features = ["macros", "rt-multi-thread", "sync"] }

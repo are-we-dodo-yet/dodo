@@ -15,12 +15,12 @@ use deno_npm_installer::process_state::NpmProcessStateKind;
 use deno_runtime::UNSTABLE_ENV_VAR_NAMES;
 use deno_runtime::colors;
 use deno_runtime::deno_node::ops::ipc::ChildIpcSerialization;
-use deno_runtime::deno_tls::deno_native_certs::load_native_certs;
 use deno_runtime::deno_tls::rustls;
 use deno_runtime::deno_tls::rustls::RootCertStore;
 use deno_runtime::deno_tls::rustls_pemfile;
 use deno_runtime::deno_tls::webpki_roots;
 use deno_semver::npm::NpmPackageReqReference;
+use rustls_native_certs::load_native_certs;
 use serde::Deserialize;
 use serde::Serialize;
 use sys_traits::EnvVar;
@@ -152,13 +152,9 @@ pub fn get_root_cert_store(
         root_cert_store.extend(webpki_roots::TLS_SERVER_ROOTS.to_vec());
       }
       "system" => {
-        let roots = load_native_certs().map_err(|err| {
-          RootCertStoreLoadError::FailedNativeCerts(err.to_string())
-        })?;
+        let roots = load_native_certs().certs;
         for root in roots {
-          if let Err(err) = root_cert_store
-            .add(rustls::pki_types::CertificateDer::from(root.0.clone()))
-          {
+          if let Err(err) = root_cert_store.add(root.clone()) {
             log::error!(
               "{}",
               colors::yellow(&format!(
@@ -166,7 +162,7 @@ pub fn get_root_cert_store(
                 err
               ))
             );
-            let hex_encoded_root = faster_hex::hex_string(&root.0);
+            let hex_encoded_root = faster_hex::hex_string(&root);
             log::error!("{}", colors::gray(&hex_encoded_root));
           }
         }
