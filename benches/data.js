@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1792533822220,
+  "lastUpdate": 1792533823775,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo-staging-ci",
   "entries": {
     "Execution Time": [
@@ -115,6 +115,97 @@ window.BENCHMARK_DATA = {
             "range": "± 30.186",
             "unit": "ms",
             "extra": "min 530.789 ms, max 636.443 ms, user 389.428 ms, system 313.979 ms"
+          }
+        ]
+      }
+    ],
+    "Thread Count": [
+      {
+        "commit": {
+          "author": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "committer": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "distinct": true,
+          "id": "5a0df0bed104f64882b03f059b1e02fc6028d1b5",
+          "message": "ci: also run on staging repo",
+          "timestamp": "2026-10-20T23:30:08+02:00",
+          "tree_id": "475066cba91b9dd87c26def032bea41645e5f698",
+          "url": "https://github.com/are-we-dodo-yet/dodo-staging-ci/commit/5a0df0bed104f64882b03f059b1e02fc6028d1b5"
+        },
+        "date": 1792533823236,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "cold_hello",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "cold_relative_import",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "error_001",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "hello",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "no_check_hello",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "relative_import",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "response_string",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "text_decoder",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "text_encoder",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "text_encoder_into",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "workers_large_message",
+            "value": 58,
+            "unit": "threads"
+          },
+          {
+            "name": "workers_round_robin",
+            "value": 12,
+            "unit": "threads"
+          },
+          {
+            "name": "workers_startup",
+            "value": 59,
+            "unit": "threads"
           }
         ]
       }
