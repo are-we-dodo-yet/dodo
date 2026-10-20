@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1792533832766,
+  "lastUpdate": 1792533835034,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo-staging-ci",
   "entries": {
     "Execution Time": [
@@ -428,6 +428,37 @@ window.BENCHMARK_DATA = {
           {
             "name": "swc_rlib",
             "value": 90.897,
+            "unit": "MiB"
+          }
+        ]
+      }
+    ],
+    "Snapshot File Sizes": [
+      {
+        "commit": {
+          "author": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "committer": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "distinct": true,
+          "id": "5a0df0bed104f64882b03f059b1e02fc6028d1b5",
+          "message": "ci: also run on staging repo",
+          "timestamp": "2026-10-20T23:30:08+02:00",
+          "tree_id": "475066cba91b9dd87c26def032bea41645e5f698",
+          "url": "https://github.com/are-we-dodo-yet/dodo-staging-ci/commit/5a0df0bed104f64882b03f059b1e02fc6028d1b5"
+        },
+        "date": 1792533833776,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CLI_SNAPSHOT.bin",
+            "value": 1.695,
             "unit": "MiB"
           }
         ]
