@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1792533837685,
+  "lastUpdate": 1792533839824,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo-staging-ci",
   "entries": {
     "Execution Time": [
@@ -491,6 +491,57 @@ window.BENCHMARK_DATA = {
             "name": "cargo_deps",
             "value": 1174,
             "unit": "dependencies"
+          }
+        ]
+      }
+    ],
+    "LSP Performance": [
+      {
+        "commit": {
+          "author": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "committer": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "distinct": true,
+          "id": "5a0df0bed104f64882b03f059b1e02fc6028d1b5",
+          "message": "ci: also run on staging repo",
+          "timestamp": "2026-10-20T23:30:08+02:00",
+          "tree_id": "475066cba91b9dd87c26def032bea41645e5f698",
+          "url": "https://github.com/are-we-dodo-yet/dodo-staging-ci/commit/5a0df0bed104f64882b03f059b1e02fc6028d1b5"
+        },
+        "date": 1792533838690,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "big_file_edits",
+            "value": 2177,
+            "unit": "ms"
+          },
+          {
+            "name": "code_lens",
+            "value": 922,
+            "unit": "ms"
+          },
+          {
+            "name": "deco_apps_edits_nav",
+            "value": 13214,
+            "unit": "ms"
+          },
+          {
+            "name": "find_replace",
+            "value": 13,
+            "unit": "ms"
+          },
+          {
+            "name": "startup_shutdown",
+            "value": 6,
+            "unit": "ms"
           }
         ]
       }
