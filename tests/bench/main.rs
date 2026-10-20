@@ -333,25 +333,17 @@ fn cargo_deps() -> usize {
   count
 }
 
-// TODO(@littledivy): Remove this, denoland/benchmark_data is deprecated.
+/// Written to `bench.json`, which `tools/build_benchmark_jsons.ts` converts
+/// for the benchmark dashboard.
 #[derive(Default, serde::Serialize)]
 struct BenchResult {
   created_at: String,
   sha1: String,
-
-  // TODO(ry) The "benchmark" benchmark should actually be called "exec_time".
-  // When this is changed, the historical data in gh-pages branch needs to be
-  // changed too.
-  benchmark: HashMap<String, HashMap<String, f64>>,
+  exec_time: HashMap<String, HashMap<String, f64>>,
   binary_size: HashMap<String, i64>,
-  bundle_size: HashMap<String, i64>,
   cargo_deps: usize,
-  // TODO(bartlomieju): remove
-  max_latency: HashMap<String, f64>,
   max_memory: HashMap<String, i64>,
   lsp_exec_time: HashMap<String, i64>,
-  // TODO(bartlomieju): remove
-  req_per_sec: HashMap<String, i64>,
   syscall_count: HashMap<String, i64>,
   thread_count: HashMap<String, i64>,
 }
@@ -411,7 +403,7 @@ async fn main() -> Result<()> {
 
   if benchmarks.contains(&"exec_time") {
     let exec_times = run_exec_time(&deno_exe, &target_dir)?;
-    new_data.benchmark = exec_times;
+    new_data.exec_time = exec_times;
   }
 
   if benchmarks.contains(&"binary_size") {

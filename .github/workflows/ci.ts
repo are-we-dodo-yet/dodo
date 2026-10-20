@@ -14,6 +14,10 @@ import {
   literal,
   step,
 } from "jsr:@david/gagen@0.3.1";
+import {
+  BENCHMARK_SECTIONS,
+  sectionFile,
+} from "../../tools/build_benchmark_jsons.ts";
 
 // Bump this number when you want to purge the cache.
 // Note: the tools/release/01_bump_crate_versions.ts script will update this version
@@ -31,6 +35,7 @@ const macosArmRunner = "macos-14";
 
 // shared conditions
 const isDenoland = conditions.isRepository("denoland/deno");
+const isDodo = conditions.isRepository("are-we-dodo-yet/dodo");
 const isMainBranch = conditions.isBranch("main");
 const isTag = conditions.isTag();
 const isNotTag = isTag.not();
@@ -1747,6 +1752,10 @@ const benchCacheSteps = createCargoCacheHomeStep({
   ...benchProfile,
   cachePrefix: "bench",
 });
+const benchResultsDir = "target/bench_results";
+const benchResultsArtifact = defineArtifact("bench-results", {
+  retentionDays: 7,
+});
 const benchJob = job(
   "bench",
   {
@@ -1771,13 +1780,19 @@ const benchJob = job(
         installNodeStep,
         installRustStep,
         cloneSubmodule("./tests/bench/testdata/lsp_benchdata"),
-        cloneStdSubmoduleStep,
         step(sysRootConfig),
         installDenoStep,
         {
-          name: "Install benchmark tools",
-          env: { GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}" },
-          run: "./tools/install_prebuilt.js wrk hyperfine",
+          name: "Install hyperfine",
+          run: [
+            "curl --proto '=https' --tlsv1.2 --retry 10 --retry-connrefused -fsSL \\",
+            "  https://github.com/sharkdp/hyperfine/releases/download/v1.16.0/hyperfine-v1.16.0-x86_64-unknown-linux-gnu.tar.gz \\",
+            "  -o /tmp/hyperfine.tar.gz",
+            "echo '0ad49092bf0227334a2b817ba06377c8942b7b8ce698b8dda96dd66e88d61b1c  /tmp/hyperfine.tar.gz' | sha256sum -c -",
+            "mkdir -p third_party/prebuilt/linux64",
+            "tar -xzf /tmp/hyperfine.tar.gz -C third_party/prebuilt/linux64 --strip-components=1 \\",
+            "  hyperfine-v1.16.0-x86_64-unknown-linux-gnu/hyperfine",
+          ],
         },
         // We currently do a full deno build instead of getting this from the build
         // job because the benchmarks inspect the target folder to see the sizes of
@@ -1795,24 +1810,13 @@ const benchJob = job(
           run: "cargo bench -p bench_tests --bench deno_bench --locked",
         },
         {
-          name: "Post benchmarks",
-          if: isDenoland.and(isMainBranch),
-          env: {
-            DENOBOT_PAT: "${{ secrets.DENOBOT_PAT }}",
-          },
-          run: [
-            "git clone --depth 1 --branch gh-pages                             \\",
-            "    https://${DENOBOT_PAT}@github.com/denoland/benchmark_data.git \\",
-            "    gh-pages",
-            "./target/release/deno run --allow-all ./tools/build_benchmark_jsons.js --release",
-            "cd gh-pages",
-            'git config user.email "propelml@gmail.com"',
-            'git config user.name "denobot"',
-            "git add .",
-            'git commit --message "Update benchmarks"',
-            "git push origin gh-pages",
-          ],
+          name: "Convert benchmarks for github-action-benchmark",
+          if: isDodo.and(isMainBranch),
+          run:
+            `./target/release/deno run --allow-read --allow-write ./tools/build_benchmark_jsons.ts target/release/bench.json ${benchResultsDir}`,
         },
+        benchResultsArtifact.upload({ path: benchResultsDir })
+          .if(isDodo.and(isMainBranch)),
         {
           name: "Worker info",
           run: ["cat /proc/cpuinfo", "cat /proc/meminfo"],
@@ -1821,6 +1825,46 @@ const benchJob = job(
       ),
   },
 );
+
+const benchPublishJob = job("bench-publish", {
+  name: "bench publish",
+  needs: [benchJob],
+  if: isDodo.and(isMainBranch),
+  runsOn: ubuntuX86Runner,
+  timeoutMinutes: 15,
+  concurrency: {
+    group: "${{ github.workflow }}-bench-publish",
+    cancelInProgress: false,
+  },
+  steps: step(
+    {
+      name: "Clone repository",
+      uses: "actions/checkout@v6",
+    },
+    benchResultsArtifact.download({ dirPath: benchResultsDir }),
+    ...BENCHMARK_SECTIONS.map((section, i) => ({
+      name: `Store ${section.name}`,
+      uses: "benchmark-action/github-action-benchmark@v1.22.2",
+      with: {
+        name: section.name,
+        tool: "customSmallerIsBetter",
+        "output-file-path": `${benchResultsDir}/${sectionFile(section.name)}`,
+        "gh-pages-branch": "gh-pages",
+        "benchmark-data-dir-path": "benches",
+        "github-token": "${{ secrets.GITHUB_TOKEN }}",
+        "auto-push": false,
+        // Fetching again once local gh-pages is ahead of origin is rejected.
+        "skip-fetch-gh-pages": i > 0,
+        "max-items-in-chart": 250,
+        "summary-always": true,
+      },
+    })),
+    {
+      name: "Push gh-pages",
+      run: "git push origin gh-pages",
+    },
+  ),
+});
 
 // === lint job ===
 
@@ -2112,6 +2156,7 @@ const workflow = createWorkflow({
   jobs: [
     preBuildJob,
     benchJob,
+    benchPublishJob,
     ...buildJobs.map((j) => [j.buildJob, ...j.additionalJobs]).flat(),
     lintJob,
     denoCoreTestJob,

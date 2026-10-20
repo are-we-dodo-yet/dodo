@@ -1,10 +1,8 @@
-benchmark filtering:
+benchmark filtering (one of `exec_time`, `binary_size`, `cargo_deps`, `lsp`,
+`strace`, `mem_usage`):
 
 ```
-cargo bench --bench deno_bench -- bundle
+cargo bench --bench deno_bench -- exec_time
 ```
 
-benchmark plots:
-
-new: https://denoland.grafana.net/d/vErC9VCnz/benchmarks?orgId=1 old:
-deno.land/benchmarks
+benchmark plots: https://are-we-dodo-yet.github.io/dodo/benches/
