@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1792533823775,
+  "lastUpdate": 1792533826342,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo-staging-ci",
   "entries": {
     "Execution Time": [
@@ -206,6 +206,97 @@ window.BENCHMARK_DATA = {
             "name": "workers_startup",
             "value": 59,
             "unit": "threads"
+          }
+        ]
+      }
+    ],
+    "Syscall Count": [
+      {
+        "commit": {
+          "author": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "committer": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "distinct": true,
+          "id": "5a0df0bed104f64882b03f059b1e02fc6028d1b5",
+          "message": "ci: also run on staging repo",
+          "timestamp": "2026-10-20T23:30:08+02:00",
+          "tree_id": "475066cba91b9dd87c26def032bea41645e5f698",
+          "url": "https://github.com/are-we-dodo-yet/dodo-staging-ci/commit/5a0df0bed104f64882b03f059b1e02fc6028d1b5"
+        },
+        "date": 1792533825101,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "cold_hello",
+            "value": 1867,
+            "unit": "syscalls"
+          },
+          {
+            "name": "cold_relative_import",
+            "value": 1889,
+            "unit": "syscalls"
+          },
+          {
+            "name": "error_001",
+            "value": 1934,
+            "unit": "syscalls"
+          },
+          {
+            "name": "hello",
+            "value": 1874,
+            "unit": "syscalls"
+          },
+          {
+            "name": "no_check_hello",
+            "value": 1881,
+            "unit": "syscalls"
+          },
+          {
+            "name": "relative_import",
+            "value": 1889,
+            "unit": "syscalls"
+          },
+          {
+            "name": "response_string",
+            "value": 2111,
+            "unit": "syscalls"
+          },
+          {
+            "name": "text_decoder",
+            "value": 2020,
+            "unit": "syscalls"
+          },
+          {
+            "name": "text_encoder",
+            "value": 2543,
+            "unit": "syscalls"
+          },
+          {
+            "name": "text_encoder_into",
+            "value": 1960,
+            "unit": "syscalls"
+          },
+          {
+            "name": "workers_large_message",
+            "value": 71426,
+            "unit": "syscalls"
+          },
+          {
+            "name": "workers_round_robin",
+            "value": 8031,
+            "unit": "syscalls"
+          },
+          {
+            "name": "workers_startup",
+            "value": 40019,
+            "unit": "syscalls"
           }
         ]
       }
