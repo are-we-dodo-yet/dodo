@@ -2769,7 +2769,7 @@ dependencies = [
  "deno_error",
  "deno_permissions",
  "denort_helper",
- "dlopen2 0.6.1",
+ "dlopen2",
  "libffi",
  "log",
  "memmap2",
@@ -3032,6 +3032,7 @@ dependencies = [
  "log",
  "node_resolver",
  "parking_lot",
+ "rustls-native-certs",
  "serde",
  "serde_json",
  "sys_traits",
@@ -3112,19 +3113,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "deno_native_certs"
-version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "86bc737e098a45aa5742d51ce694ac7236a1e69fb0d9df8c862e9b4c9583c5f9"
-dependencies = [
- "dlopen2 0.7.0",
- "dlopen2_derive",
- "once_cell",
- "rustls-native-certs 0.7.3",
- "rustls-pemfile",
-]
-
-[[package]]
 name = "deno_net"
 version = "0.251.0"
 dependencies = [
@@ -3170,7 +3158,6 @@ dependencies = [
  "deno_fs",
  "deno_inspector_server",
  "deno_io",
- "deno_native_certs",
  "deno_net",
  "deno_node_crypto",
  "deno_os",
@@ -3195,6 +3182,7 @@ dependencies = [
  "node_resolver",
  "node_shim",
  "rand 0.8.5",
+ "rustls-native-certs",
  "rustls-tokio-stream",
  "rustls-webpki",
  "serde",
@@ -3790,7 +3778,6 @@ version = "0.246.0"
 dependencies = [
  "deno_core",
  "deno_error",
- "deno_native_certs",
  "log",
  "rustls",
  "rustls-pemfile",
@@ -4375,18 +4362,6 @@ name = "dlopen2"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6bc2c7ed06fd72a8513ded8d0d2f6fd2655a85d6885c48cae8625d80faf28c03"
-dependencies = [
- "dlopen2_derive",
- "libc",
- "once_cell",
- "winapi",
-]
-
-[[package]]
-name = "dlopen2"
-version = "0.7.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9e1297103d2bbaea85724fcee6294c2d50b1081f9ad47d0f6f6f61eda65315a6"
 dependencies = [
  "dlopen2_derive",
  "libc",
@@ -7728,12 +7703,6 @@ dependencies = [
 
 [[package]]
 name = "openssl-probe"
-version = "0.1.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d05e27ee213611ffe7d6348b942e8f942b37114c00cc03cec254295a4a17852e"
-
-[[package]]
-name = "openssl-probe"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7c87def4c32ab89d880effc9e097653c8da5d6ef28e6b539d313baaacfbafcbe"
@@ -9280,24 +9249,11 @@ dependencies = [
 
 [[package]]
 name = "rustls-native-certs"
-version = "0.7.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e5bfb394eeed242e909609f56089eecfe5fda225042e8b171791b9c95f5931e5"
-dependencies = [
- "openssl-probe 0.1.6",
- "rustls-pemfile",
- "rustls-pki-types",
- "schannel",
- "security-framework 2.11.1",
-]
-
-[[package]]
-name = "rustls-native-certs"
 version = "0.8.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4a073f5dc7469f984c52ad2752b63b0807745133b6de880b7b64c1ac4c48aec4"
 dependencies = [
- "openssl-probe 0.2.1",
+ "openssl-probe",
  "rustls-pki-types",
  "schannel",
  "security-framework 3.7.0",
@@ -9334,7 +9290,7 @@ dependencies = [
  "log",
  "once_cell",
  "rustls",
- "rustls-native-certs 0.8.5",
+ "rustls-native-certs",
  "rustls-platform-verifier-android",
  "rustls-webpki",
  "security-framework 3.7.0",
