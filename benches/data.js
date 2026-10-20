@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1792533826342,
+  "lastUpdate": 1792533830031,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo-staging-ci",
   "entries": {
     "Execution Time": [
@@ -297,6 +297,97 @@ window.BENCHMARK_DATA = {
             "name": "workers_startup",
             "value": 40019,
             "unit": "syscalls"
+          }
+        ]
+      }
+    ],
+    "Max Memory Usage": [
+      {
+        "commit": {
+          "author": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "committer": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "distinct": true,
+          "id": "5a0df0bed104f64882b03f059b1e02fc6028d1b5",
+          "message": "ci: also run on staging repo",
+          "timestamp": "2026-10-20T23:30:08+02:00",
+          "tree_id": "475066cba91b9dd87c26def032bea41645e5f698",
+          "url": "https://github.com/are-we-dodo-yet/dodo-staging-ci/commit/5a0df0bed104f64882b03f059b1e02fc6028d1b5"
+        },
+        "date": 1792533828048,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "cold_hello",
+            "value": 47.578,
+            "unit": "MiB"
+          },
+          {
+            "name": "cold_relative_import",
+            "value": 48.059,
+            "unit": "MiB"
+          },
+          {
+            "name": "error_001",
+            "value": 46.953,
+            "unit": "MiB"
+          },
+          {
+            "name": "hello",
+            "value": 47.387,
+            "unit": "MiB"
+          },
+          {
+            "name": "no_check_hello",
+            "value": 47.48,
+            "unit": "MiB"
+          },
+          {
+            "name": "relative_import",
+            "value": 47.887,
+            "unit": "MiB"
+          },
+          {
+            "name": "response_string",
+            "value": 55.711,
+            "unit": "MiB"
+          },
+          {
+            "name": "text_decoder",
+            "value": 55.883,
+            "unit": "MiB"
+          },
+          {
+            "name": "text_encoder",
+            "value": 66.547,
+            "unit": "MiB"
+          },
+          {
+            "name": "text_encoder_into",
+            "value": 56.047,
+            "unit": "MiB"
+          },
+          {
+            "name": "workers_large_message",
+            "value": 429.465,
+            "unit": "MiB"
+          },
+          {
+            "name": "workers_round_robin",
+            "value": 92.434,
+            "unit": "MiB"
+          },
+          {
+            "name": "workers_startup",
+            "value": 417.453,
+            "unit": "MiB"
           }
         ]
       }
