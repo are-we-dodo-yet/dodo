@@ -25,7 +25,6 @@ use deno_core::RcRef;
 use deno_core::Resource;
 use deno_core::ResourceId;
 use deno_core::op2;
-use deno_native_certs::load_native_certs;
 use deno_net::DefaultTlsOptions;
 use deno_net::UnsafelyIgnoreCertificateErrors;
 use deno_net::ops::NetError;
@@ -42,6 +41,7 @@ use deno_tls::TlsKeysHolder;
 use deno_tls::create_client_config;
 use deno_tls::rustls::ClientConnection;
 use deno_tls::rustls::pki_types::ServerName;
+use rustls_native_certs::load_native_certs;
 use rustls_tokio_stream::TlsStream;
 use rustls_tokio_stream::TlsStreamRead;
 use rustls_tokio_stream::TlsStreamWrite;
@@ -146,14 +146,14 @@ fn parse_extra_ca_certs(sys: &(impl EnvVar + FsRead)) -> Vec<String> {
     .collect()
 }
 
-fn load_system_ca_certificates() -> Result<Vec<String>, CaCertificatesError> {
+fn load_system_ca_certificates() -> Vec<String> {
   let mut certs = load_native_certs()
-    .map_err(|err| CaCertificatesError::Other(err.to_string()))?
+    .certs
     .into_iter()
-    .map(|cert| cert_der_to_pem(&cert.0))
+    .map(|cert| cert_der_to_pem(&cert))
     .collect::<Vec<_>>();
   certs.sort_unstable();
-  Ok(certs)
+  certs
 }
 
 #[derive(Debug, thiserror::Error, deno_error::JsError)]
@@ -196,7 +196,7 @@ pub fn op_node_get_ca_certificates<TSys: ExtNodeSys + 'static>(
         .map(|cert| cert_der_to_pem(cert))
         .collect(),
     ),
-    "system" => load_system_ca_certificates(),
+    "system" => Ok(load_system_ca_certificates()),
     "extra" => Ok(parse_extra_ca_certs(sys)),
     "default" => {
       let mut certs = Vec::new();
@@ -217,7 +217,7 @@ pub fn op_node_get_ca_certificates<TSys: ExtNodeSys + 'static>(
         );
       }
       if stores.contains(&"system") {
-        certs.extend(load_system_ca_certificates()?);
+        certs.extend(load_system_ca_certificates());
       }
       certs.extend(parse_extra_ca_certs(sys));
       Ok(certs)

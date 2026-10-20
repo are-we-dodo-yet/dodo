@@ -7,7 +7,6 @@ use std::net::IpAddr;
 use std::sync::Arc;
 
 use deno_error::JsErrorBox;
-pub use deno_native_certs;
 pub use rustls;
 use rustls::ClientConfig;
 use rustls::DigitallySignedStruct;

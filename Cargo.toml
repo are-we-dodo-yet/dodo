@@ -101,7 +101,6 @@ repository = "https://github.com/denoland/deno"
 [workspace.dependencies]
 deno_core_icudata = "0.77.0"
 deno_error = "0.7.3"
-deno_native_certs = "0.3.0"
 deno_path_util = "=0.6.4"
 deno_semver = "=0.10.1"
 deno_task_shell = "=0.33.3"
@@ -306,6 +305,7 @@ rpm = { version = "0.25.1", default-features = false, features = ["payload", "zs
 rstest = "0"
 rusqlite = { version = "0.40.0", features = ["unlock_notify", "bundled", "session", "modern_sqlite", "limits", "backup", "fallible_uint"] } # "modern_sqlite": need sqlite >= 3.49.0 for some db configs; "fallible_uint": ToSql for u64/usize (needed when crates like deno_cache are published/built standalone, not just feature-unified via denokv_sqlite)
 rustls = { version = "0.23.46", default-features = false, features = ["logging", "std", "tls12", "aws_lc_rs"] }
+rustls-native-certs = "0.8.5"
 rustls-pemfile = "2"
 rustls-tokio-stream = "0.8.1"
 rustls-webpki = "0.103"

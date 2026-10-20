@@ -912,12 +912,6 @@ jobs:
         env:
           DENO_SNAPSHOT_MINIFY_SOURCES: '1'
         run: |-
-          if [ "$(uname -s)" = Darwin ] && [ "$(uname -m)" = arm64 ]; then
-            git submodule update --init tools/lzld
-            make -C tools/lzld
-            sed -i '' "s#-fuse-ld=lld #-fuse-ld=$GITHUB_WORKSPACE/tools/lzld/lzld -L$GITHUB_WORKSPACE/tools/lzld -llzld_arm64 #" .cargo/config.toml
-            grep -n fuse-ld .cargo/config.toml
-          fi
           df -h
           cargo build --release --locked -p deno -p denort -p test_server --bin deno --bin denort --bin test_server --features=deno/panic-trace
           cargo build --release --locked -p denort_desktop
@@ -2010,12 +2004,6 @@ jobs:
         env:
           DENO_SNAPSHOT_MINIFY_SOURCES: '1'
         run: |-
-          if [ "$(uname -s)" = Darwin ] && [ "$(uname -m)" = arm64 ]; then
-            git submodule update --init tools/lzld
-            make -C tools/lzld
-            sed -i '' "s#-fuse-ld=lld #-fuse-ld=$GITHUB_WORKSPACE/tools/lzld/lzld -L$GITHUB_WORKSPACE/tools/lzld -llzld_arm64 #" .cargo/config.toml
-            grep -n fuse-ld .cargo/config.toml
-          fi
           df -h
           cargo build --release --locked -p deno -p denort -p test_server --bin deno --bin denort --bin test_server --features=deno/panic-trace
           cargo build --release --locked -p denort_desktop
@@ -3078,12 +3066,6 @@ jobs:
         env:
           DENO_SNAPSHOT_MINIFY_SOURCES: '1'
         run: |-
-          if [ "$(uname -s)" = Darwin ] && [ "$(uname -m)" = arm64 ]; then
-            git submodule update --init tools/lzld
-            make -C tools/lzld
-            sed -i '' "s#-fuse-ld=lld #-fuse-ld=$GITHUB_WORKSPACE/tools/lzld/lzld -L$GITHUB_WORKSPACE/tools/lzld -llzld_arm64 #" .cargo/config.toml
-            grep -n fuse-ld .cargo/config.toml
-          fi
           df -h
           cargo build --release --locked -p deno -p denort -p test_server --bin deno --bin denort --bin test_server --features=deno/panic-trace
           cargo build --release --locked -p denort_desktop
@@ -3985,12 +3967,6 @@ jobs:
         env:
           DENO_SNAPSHOT_MINIFY_SOURCES: '1'
         run: |-
-          if [ "$(uname -s)" = Darwin ] && [ "$(uname -m)" = arm64 ]; then
-            git submodule update --init tools/lzld
-            make -C tools/lzld
-            sed -i '' "s#-fuse-ld=lld #-fuse-ld=$GITHUB_WORKSPACE/tools/lzld/lzld -L$GITHUB_WORKSPACE/tools/lzld -llzld_arm64 #" .cargo/config.toml
-            grep -n fuse-ld .cargo/config.toml
-          fi
           df -h
           cargo build --release --locked -p deno -p denort -p test_server --bin deno --bin denort --bin test_server --features=deno/panic-trace
           cargo build --release --locked -p denort_desktop
@@ -4620,12 +4596,6 @@ jobs:
         env:
           DENO_SNAPSHOT_MINIFY_SOURCES: '1'
         run: |-
-          if [ "$(uname -s)" = Darwin ] && [ "$(uname -m)" = arm64 ]; then
-            git submodule update --init tools/lzld
-            make -C tools/lzld
-            sed -i '' "s#-fuse-ld=lld #-fuse-ld=$GITHUB_WORKSPACE/tools/lzld/lzld -L$GITHUB_WORKSPACE/tools/lzld -llzld_arm64 #" .cargo/config.toml
-            grep -n fuse-ld .cargo/config.toml
-          fi
           df -h
           cargo build -Zbuild-std=core,alloc,std,proc_macro,panic_abort --release --locked -p deno -p denort -p test_server --bin deno --bin denort --bin test_server --features=deno/panic-trace-frame-pointer
           cargo build -Zbuild-std=core,alloc,std,proc_macro,panic_abort --release --locked -p denort_desktop
@@ -6750,12 +6720,6 @@ jobs:
         env:
           DENO_SNAPSHOT_MINIFY_SOURCES: '1'
         run: |-
-          if [ "$(uname -s)" = Darwin ] && [ "$(uname -m)" = arm64 ]; then
-            git submodule update --init tools/lzld
-            make -C tools/lzld
-            sed -i '' "s#-fuse-ld=lld #-fuse-ld=$GITHUB_WORKSPACE/tools/lzld/lzld -L$GITHUB_WORKSPACE/tools/lzld -llzld_arm64 #" .cargo/config.toml
-            grep -n fuse-ld .cargo/config.toml
-          fi
           df -h
           cargo build -Zbuild-std=core,alloc,std,proc_macro,panic_abort --release --locked -p deno -p denort -p test_server --bin deno --bin denort --bin test_server --features=deno/panic-trace-frame-pointer
           cargo build -Zbuild-std=core,alloc,std,proc_macro,panic_abort --release --locked -p denort_desktop
