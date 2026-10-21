@@ -1,6 +1,6 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1792533839824,
-  "repoUrl": "https://github.com/are-we-dodo-yet/dodo-staging-ci",
+  "lastUpdate": 1792540800604,
+  "repoUrl": "https://github.com/are-we-dodo-yet/dodo",
   "entries": {
     "Execution Time": [
       {
@@ -115,6 +115,121 @@ window.BENCHMARK_DATA = {
             "range": "± 30.186",
             "unit": "ms",
             "extra": "min 530.789 ms, max 636.443 ms, user 389.428 ms, system 313.979 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "ping@walter.dev",
+            "name": "wbk",
+            "username": "wbk"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e6383d644c0aa44c16496ecea4e5747712a57807",
+          "message": "ci: replace denoland/benchmark_data publishing with gh-pages (#11)",
+          "timestamp": "2026-10-21T01:21:13+02:00",
+          "tree_id": "502c3e532bd9d37b2ddc544fe98b601c093a3256",
+          "url": "https://github.com/are-we-dodo-yet/dodo/commit/e6383d644c0aa44c16496ecea4e5747712a57807"
+        },
+        "date": 1792540798599,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "cold_hello",
+            "value": 16.835,
+            "range": "± 3.791",
+            "unit": "ms",
+            "extra": "min 13.421 ms, max 59.857 ms, user 8.951 ms, system 10.511 ms"
+          },
+          {
+            "name": "cold_relative_import",
+            "value": 16.57,
+            "range": "± 1.662",
+            "unit": "ms",
+            "extra": "min 13.404 ms, max 20.782 ms, user 8.786 ms, system 10.647 ms"
+          },
+          {
+            "name": "error_001",
+            "value": 17.146,
+            "range": "± 1.746",
+            "unit": "ms",
+            "extra": "min 14.016 ms, max 21.657 ms, user 9.745 ms, system 10.575 ms"
+          },
+          {
+            "name": "hello",
+            "value": 16.827,
+            "range": "± 2.487",
+            "unit": "ms",
+            "extra": "min 13.483 ms, max 40.246 ms, user 9.005 ms, system 10.365 ms"
+          },
+          {
+            "name": "no_check_hello",
+            "value": 16.482,
+            "range": "± 1.784",
+            "unit": "ms",
+            "extra": "min 13.684 ms, max 21.845 ms, user 8.943 ms, system 10.423 ms"
+          },
+          {
+            "name": "relative_import",
+            "value": 16.994,
+            "range": "± 1.806",
+            "unit": "ms",
+            "extra": "min 13.711 ms, max 22.344 ms, user 9.016 ms, system 10.706 ms"
+          },
+          {
+            "name": "response_string",
+            "value": 27.014,
+            "range": "± 2.932",
+            "unit": "ms",
+            "extra": "min 22.378 ms, max 34.268 ms, user 20.126 ms, system 14.93 ms"
+          },
+          {
+            "name": "text_decoder",
+            "value": 28.366,
+            "range": "± 2.839",
+            "unit": "ms",
+            "extra": "min 23.359 ms, max 37.376 ms, user 20.21 ms, system 12.674 ms"
+          },
+          {
+            "name": "text_encoder",
+            "value": 86.728,
+            "range": "± 5.809",
+            "unit": "ms",
+            "extra": "min 81.382 ms, max 104.093 ms, user 77.426 ms, system 21.093 ms"
+          },
+          {
+            "name": "text_encoder_into",
+            "value": 51.629,
+            "range": "± 5.472",
+            "unit": "ms",
+            "extra": "min 45.046 ms, max 66.06 ms, user 45.635 ms, system 13.464 ms"
+          },
+          {
+            "name": "workers_large_message",
+            "value": 619.52,
+            "range": "± 8.587",
+            "unit": "ms",
+            "extra": "min 606.489 ms, max 635.862 ms, user 542.222 ms, system 387.017 ms"
+          },
+          {
+            "name": "workers_round_robin",
+            "value": 125.635,
+            "range": "± 3.405",
+            "unit": "ms",
+            "extra": "min 118.617 ms, max 135.628 ms, user 154.452 ms, system 50.408 ms"
+          },
+          {
+            "name": "workers_startup",
+            "value": 654.124,
+            "range": "± 8.418",
+            "unit": "ms",
+            "extra": "min 641.24 ms, max 672.044 ms, user 515.422 ms, system 300.092 ms"
           }
         ]
       }
