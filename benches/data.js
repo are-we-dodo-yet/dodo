@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1792540805608,
+  "lastUpdate": 1792540807985,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo",
   "entries": {
     "Execution Time": [
@@ -680,6 +680,95 @@ window.BENCHMARK_DATA = {
           {
             "name": "workers_startup",
             "value": 417.453,
+            "unit": "MiB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "ping@walter.dev",
+            "name": "wbk",
+            "username": "wbk"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e6383d644c0aa44c16496ecea4e5747712a57807",
+          "message": "ci: replace denoland/benchmark_data publishing with gh-pages (#11)",
+          "timestamp": "2026-10-21T01:21:13+02:00",
+          "tree_id": "502c3e532bd9d37b2ddc544fe98b601c093a3256",
+          "url": "https://github.com/are-we-dodo-yet/dodo/commit/e6383d644c0aa44c16496ecea4e5747712a57807"
+        },
+        "date": 1792540807156,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "cold_hello",
+            "value": 46.449,
+            "unit": "MiB"
+          },
+          {
+            "name": "cold_relative_import",
+            "value": 47.66,
+            "unit": "MiB"
+          },
+          {
+            "name": "error_001",
+            "value": 47.184,
+            "unit": "MiB"
+          },
+          {
+            "name": "hello",
+            "value": 45.223,
+            "unit": "MiB"
+          },
+          {
+            "name": "no_check_hello",
+            "value": 47.438,
+            "unit": "MiB"
+          },
+          {
+            "name": "relative_import",
+            "value": 44.324,
+            "unit": "MiB"
+          },
+          {
+            "name": "response_string",
+            "value": 55.375,
+            "unit": "MiB"
+          },
+          {
+            "name": "text_decoder",
+            "value": 55.047,
+            "unit": "MiB"
+          },
+          {
+            "name": "text_encoder",
+            "value": 68.195,
+            "unit": "MiB"
+          },
+          {
+            "name": "text_encoder_into",
+            "value": 56.109,
+            "unit": "MiB"
+          },
+          {
+            "name": "workers_large_message",
+            "value": 426.332,
+            "unit": "MiB"
+          },
+          {
+            "name": "workers_round_robin",
+            "value": 92.063,
+            "unit": "MiB"
+          },
+          {
+            "name": "workers_startup",
+            "value": 418,
             "unit": "MiB"
           }
         ]
