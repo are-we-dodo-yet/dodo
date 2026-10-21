@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1792540810543,
+  "lastUpdate": 1792540813676,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo",
   "entries": {
     "Execution Time": [
@@ -875,6 +875,35 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/are-we-dodo-yet/dodo-staging-ci/commit/5a0df0bed104f64882b03f059b1e02fc6028d1b5"
         },
         "date": 1792533833776,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CLI_SNAPSHOT.bin",
+            "value": 1.695,
+            "unit": "MiB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "ping@walter.dev",
+            "name": "wbk",
+            "username": "wbk"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e6383d644c0aa44c16496ecea4e5747712a57807",
+          "message": "ci: replace denoland/benchmark_data publishing with gh-pages (#11)",
+          "timestamp": "2026-10-21T01:21:13+02:00",
+          "tree_id": "502c3e532bd9d37b2ddc544fe98b601c093a3256",
+          "url": "https://github.com/are-we-dodo-yet/dodo/commit/e6383d644c0aa44c16496ecea4e5747712a57807"
+        },
+        "date": 1792540812083,
         "tool": "customSmallerIsBetter",
         "benches": [
           {
