@@ -50,7 +50,6 @@ members = [
   "libs/core_testing",
   "libs/crypto",
   "libs/dcore",
-  "libs/deno_v8",
   "libs/dotenv",
   "libs/eszip",
   "libs/http_h1",
@@ -108,7 +107,6 @@ deno_task_shell = "=0.33.3"
 deno_terminal = "=0.2.3"
 deno_unsync = { version = "0.4.4", default-features = false }
 deno_whoami = "0.1.0"
-v8 = { package = "deno_v8", version = "0.4.0", path = "./libs/deno_v8", default-features = false, features = ["simdutf"] }
 
 denokv_proto = "0.14.0"
 denokv_remote = "0.14.0"
@@ -190,7 +188,9 @@ serde_v8 = { version = "0.321.0", path = "./libs/serde_v8", default-features = f
 test_macro = { path = "./tests/util/test_macro" }
 test_util = { path = "./tests/util/lib" }
 
+# extrnal deno libraries
 deno_tunnel = "0.8.1"
+v8 = { package = "v8x", git = "https://github.com/are-we-dodo-yet/v8x", rev = "aa28e8e80d492494bfb17bf123fbcfb09da0ce44", default-features = false, features = ["simdutf"] }
 
 # widely used libraries
 anyhow = "1.0.57"
@@ -519,7 +519,6 @@ libnghttp2 = "1.68.0"
 locked-tripwire = "0.1.1"
 markup5ever_rcdom = "0.3.0"
 plist = "1"
-rusty_v8 = { package = "v8", version = "150.4.0", default-features = false }
 serde_v8_utilities = { path = "libs/serde_v8/utilities", default-features = false }
 similar = "2"
 stringcase = "0.4.0"
@@ -554,7 +553,6 @@ swc_visit = "=2.0.1"
 syn-match = "0.3.1"
 trybuild = "1.0.104"
 unicycle = "0.10.2"
-v8x_backend = { version = "=149.4.0-rc.4", default-features = false }
 wasm_dep_analyzer = "0.4.0"
 wasmparser = "0.244.0"
 wide = "0.7.32"
