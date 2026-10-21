@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1792540803000,
+  "lastUpdate": 1792540805608,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo",
   "entries": {
     "Execution Time": [
@@ -500,6 +500,95 @@ window.BENCHMARK_DATA = {
           {
             "name": "workers_startup",
             "value": 40019,
+            "unit": "syscalls"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "ping@walter.dev",
+            "name": "wbk",
+            "username": "wbk"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e6383d644c0aa44c16496ecea4e5747712a57807",
+          "message": "ci: replace denoland/benchmark_data publishing with gh-pages (#11)",
+          "timestamp": "2026-10-21T01:21:13+02:00",
+          "tree_id": "502c3e532bd9d37b2ddc544fe98b601c093a3256",
+          "url": "https://github.com/are-we-dodo-yet/dodo/commit/e6383d644c0aa44c16496ecea4e5747712a57807"
+        },
+        "date": 1792540804589,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "cold_hello",
+            "value": 1873,
+            "unit": "syscalls"
+          },
+          {
+            "name": "cold_relative_import",
+            "value": 1896,
+            "unit": "syscalls"
+          },
+          {
+            "name": "error_001",
+            "value": 1961,
+            "unit": "syscalls"
+          },
+          {
+            "name": "hello",
+            "value": 1879,
+            "unit": "syscalls"
+          },
+          {
+            "name": "no_check_hello",
+            "value": 1865,
+            "unit": "syscalls"
+          },
+          {
+            "name": "relative_import",
+            "value": 1890,
+            "unit": "syscalls"
+          },
+          {
+            "name": "response_string",
+            "value": 2105,
+            "unit": "syscalls"
+          },
+          {
+            "name": "text_decoder",
+            "value": 2023,
+            "unit": "syscalls"
+          },
+          {
+            "name": "text_encoder",
+            "value": 2739,
+            "unit": "syscalls"
+          },
+          {
+            "name": "text_encoder_into",
+            "value": 1939,
+            "unit": "syscalls"
+          },
+          {
+            "name": "workers_large_message",
+            "value": 70499,
+            "unit": "syscalls"
+          },
+          {
+            "name": "workers_round_robin",
+            "value": 7937,
+            "unit": "syscalls"
+          },
+          {
+            "name": "workers_startup",
+            "value": 39834,
             "unit": "syscalls"
           }
         ]
