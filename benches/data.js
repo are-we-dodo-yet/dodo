@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1792540807985,
+  "lastUpdate": 1792540810543,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo",
   "entries": {
     "Execution Time": [
@@ -800,6 +800,45 @@ window.BENCHMARK_DATA = {
           {
             "name": "deno",
             "value": 340.197,
+            "unit": "MiB"
+          },
+          {
+            "name": "rusty_v8_rlib",
+            "value": 185.934,
+            "unit": "MiB"
+          },
+          {
+            "name": "swc_rlib",
+            "value": 90.897,
+            "unit": "MiB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "ping@walter.dev",
+            "name": "wbk",
+            "username": "wbk"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e6383d644c0aa44c16496ecea4e5747712a57807",
+          "message": "ci: replace denoland/benchmark_data publishing with gh-pages (#11)",
+          "timestamp": "2026-10-21T01:21:13+02:00",
+          "tree_id": "502c3e532bd9d37b2ddc544fe98b601c093a3256",
+          "url": "https://github.com/are-we-dodo-yet/dodo/commit/e6383d644c0aa44c16496ecea4e5747712a57807"
+        },
+        "date": 1792540809548,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "deno",
+            "value": 340.17,
             "unit": "MiB"
           },
           {
