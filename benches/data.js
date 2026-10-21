@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1792540816084,
+  "lastUpdate": 1792540818654,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo",
   "entries": {
     "Execution Time": [
@@ -1020,6 +1020,55 @@ window.BENCHMARK_DATA = {
           {
             "name": "startup_shutdown",
             "value": 6,
+            "unit": "ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "ping@walter.dev",
+            "name": "wbk",
+            "username": "wbk"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e6383d644c0aa44c16496ecea4e5747712a57807",
+          "message": "ci: replace denoland/benchmark_data publishing with gh-pages (#11)",
+          "timestamp": "2026-10-21T01:21:13+02:00",
+          "tree_id": "502c3e532bd9d37b2ddc544fe98b601c093a3256",
+          "url": "https://github.com/are-we-dodo-yet/dodo/commit/e6383d644c0aa44c16496ecea4e5747712a57807"
+        },
+        "date": 1792540817623,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "big_file_edits",
+            "value": 3019,
+            "unit": "ms"
+          },
+          {
+            "name": "code_lens",
+            "value": 1273,
+            "unit": "ms"
+          },
+          {
+            "name": "deco_apps_edits_nav",
+            "value": 17746,
+            "unit": "ms"
+          },
+          {
+            "name": "find_replace",
+            "value": 17,
+            "unit": "ms"
+          },
+          {
+            "name": "startup_shutdown",
+            "value": 8,
             "unit": "ms"
           }
         ]
