@@ -1,17 +1,17 @@
 # Copyright 2018-2026 the Deno authors. MIT license.
 
 [package]
-name = "deno"
+name = "dodo"
 version = "2.9.7"
 authors.workspace = true
-default-run = "deno"
+default-run = "dodo"
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
 description = "Provides the deno executable"
 
 [[bin]]
-name = "deno"
+name = "dodo"
 path = "main.rs"
 doc = false
 

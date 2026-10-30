@@ -79,7 +79,7 @@ cargo build
 For faster iteration during development (less optimization):
 
 ```bash
-cargo build --bin deno
+cargo build --bin dodo
 ```
 
 Execute your development build:

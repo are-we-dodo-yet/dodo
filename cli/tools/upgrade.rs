@@ -1182,7 +1182,7 @@ pub async fn upgrade(
   check_windows_access_denied_error(output_result, output_exe_path)?;
 
   log::info!(
-    "\nUpgraded successfully to Deno {} {}\n",
+    "\nUpgraded successfully to Dodo {} {}\n",
     colors::green(selected_version_to_upgrade.display()),
     colors::gray(&format!(
       "({})",

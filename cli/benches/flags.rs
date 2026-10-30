@@ -54,7 +54,7 @@ fn benches(c: &mut Criterion) {
       b.iter_batched(
         || input.clone(),
         |args| {
-          black_box(deno::flags_from_vec_with_initial_cwd(
+          black_box(dodo::flags_from_vec_with_initial_cwd(
             black_box(args),
             None,
           ))

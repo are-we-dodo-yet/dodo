@@ -228,7 +228,7 @@ The recommended way to build Deno is using the `./x` tool:
 ./x build
 ```
 
-This builds the debug binary at `./target/debug/deno`. You can also use cargo
+This builds the debug binary at `./target/debug/dodo`. You can also use cargo
 directly:
 
 ```console

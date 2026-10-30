@@ -36,7 +36,7 @@ link_args="-fuse-ld=$lzld_dir/lzld -Wl,--icf=safe -L$lzld_dir -llzld_$(uname -m)
 
 args=("$@")
 if [ ${#args[@]} -eq 0 ]; then
-  args=(--release --bin deno)
+  args=(--release --bin dodo)
 fi
 
 exec cargo build \
