@@ -85,17 +85,17 @@ cargo build --bin dodo
 Execute your development build:
 
 ```bash
-./target/debug/deno eval 'console.log("Hello from dev build")'
+./target/release/dodo eval 'console.log("Hello from dev build")'
 ```
 
 ### Running with your changes
 
 ```bash
 # Run a local file
-./target/debug/deno run path/to/file.ts
+./target/release/dodo run path/to/file.ts
 
 # Run with permissions
-./target/debug/deno run --allow-net --allow-read script.ts
+./target/release/dodo run --allow-net --allow-read script.ts
 
 # Run the REPL
 ./target/debug/deno
@@ -144,7 +144,7 @@ cargo test <nameOfTest>
 cargo test -p deno_core
 
 # Run just the CLI integration tests
-cargo test --bin deno
+cargo test --bin dodo
 
 # Run spec tests only
 cargo test specs
@@ -172,7 +172,7 @@ cargo test unit_node::crypto_test
 cargo test unit_node::
 ```
 
-Do NOT run these directly with `./target/debug/deno test` — they depend on the
+Do NOT run these directly with `./target/release/dodo test` — they depend on the
 cargo test harness for correct setup.
 
 ### Test Organization
@@ -316,10 +316,10 @@ Use println debugging.
 
 ```bash
 # Set Rust log level
-DENO_LOG=debug ./target/debug/deno run script.ts
+DENO_LOG=debug ./target/release/dodo run script.ts
 
 # Specific module logging
-DENO_LOG=deno_core=debug ./target/debug/deno run script.ts
+DENO_LOG=deno_core=debug ./target/release/dodo run script.ts
 ```
 
 ### Debug Prints
