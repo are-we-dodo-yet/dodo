@@ -520,6 +520,7 @@ const denoCoreChangesCheckStep = step({
   id: "deno_core_changes",
   run: [
     // Fetch the base SHA so it's available even in shallow clones
+    `alias dodo="deno"`,
     `git fetch --depth=1 origin \${{ github.event.pull_request.base.sha }}`,
     `dodo run -A tools/check_deno_core_changes.js \${{ github.event.pull_request.base.sha }}`,
   ],
@@ -533,6 +534,7 @@ const denoCoreChangesCheckStep = step({
 const docsOnlyChangesCheckStep = step({
   id: "docs_only_changes",
   run: [
+    `alias dodo="deno"`,
     `dodo run -A tools/check_docs_only_changes.js \${{ github.event.pull_request.base.sha }}`,
   ],
   outputs: ["docs_only"] as const,
