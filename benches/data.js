@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793738191531,
+  "lastUpdate": 1793738194677,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo",
   "entries": {
     "Execution Time": [
@@ -1414,6 +1414,35 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/are-we-dodo-yet/dodo/commit/e6383d644c0aa44c16496ecea4e5747712a57807"
         },
         "date": 1792540815219,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "cargo_deps",
+            "value": 1170,
+            "unit": "dependencies"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "46793832+0xMax42@users.noreply.github.com",
+            "name": "Max P.",
+            "username": "0xMax42"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "d5d91316c3d5677e0c850f5d22b7ebd8651c3203",
+          "message": "docs: improve pull request template (#10)",
+          "timestamp": "2026-11-03T14:51:14-05:00",
+          "tree_id": "dce8afe65f508b3f2d32d62a88396d80a1312e4e",
+          "url": "https://github.com/are-we-dodo-yet/dodo/commit/d5d91316c3d5677e0c850f5d22b7ebd8651c3203"
+        },
+        "date": 1793738193127,
         "tool": "customSmallerIsBetter",
         "benches": [
           {
