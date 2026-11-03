@@ -521,7 +521,7 @@ const denoCoreChangesCheckStep = step({
   run: [
     // Fetch the base SHA so it's available even in shallow clones
     `git fetch --depth=1 origin \${{ github.event.pull_request.base.sha }}`,
-    `deno run -A tools/check_deno_core_changes.js \${{ github.event.pull_request.base.sha }}`,
+    `dodo run -A tools/check_deno_core_changes.js \${{ github.event.pull_request.base.sha }}`,
   ],
   outputs: ["skip_deno_core_test"] as const,
 });
@@ -533,7 +533,7 @@ const denoCoreChangesCheckStep = step({
 const docsOnlyChangesCheckStep = step({
   id: "docs_only_changes",
   run: [
-    `deno run -A tools/check_docs_only_changes.js \${{ github.event.pull_request.base.sha }}`,
+    `dodo run -A tools/check_docs_only_changes.js \${{ github.event.pull_request.base.sha }}`,
   ],
   outputs: ["docs_only"] as const,
 });
@@ -756,7 +756,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               `shasum -a 256 dodo > deno-${buildItem.arch}-unknown-linux-gnu.sha256sum`,
               `zip -r deno-${buildItem.arch}-unknown-linux-gnu.zip deno`,
               `shasum -a 256 deno-${buildItem.arch}-unknown-linux-gnu.zip > deno-${buildItem.arch}-unknown-linux-gnu.zip.sha256sum`,
-              // denort is the `deno compile` base binary: libsui rewrites its
+              // denort is the `dodo compile` base binary: libsui rewrites its
               // ELF to embed user code, and that rewrite drops `.relr.dyn`
               // relative relocations when the symbol table is gone, producing a
               // compiled binary whose C++ static-init guards deadlock
@@ -772,7 +772,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               "if readelf -lW ./libdenort.so | grep -q GNU_EH_FRAME; then echo 'PT_GNU_EH_FRAME remains in libdenort.so'; exit 1; fi",
               `zip -r libdenort-${buildItem.arch}-unknown-linux-gnu.zip libdenort.so`,
               `shasum -a 256 libdenort-${buildItem.arch}-unknown-linux-gnu.zip > libdenort-${buildItem.arch}-unknown-linux-gnu.zip.sha256sum`,
-              // QuickJS denort/libdenort for `deno compile --engine quickjs`.
+              // QuickJS denort/libdenort for `dodo compile --engine quickjs`.
               // Reuse the same target dir (a second one would exceed runner
               // disk). Back up the v8 binaries and restore them even if the
               // QuickJS build fails so later release steps never see a partial
@@ -833,7 +833,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               "strip -x -S ./libdenort.dylib",
               `zip -r libdenort-${buildItem.arch}-apple-darwin.zip libdenort.dylib`,
               `shasum -a 256 libdenort-${buildItem.arch}-apple-darwin.zip > libdenort-${buildItem.arch}-apple-darwin.zip.sha256sum`,
-              // QuickJS denort/libdenort for `deno compile --engine quickjs`
+              // QuickJS denort/libdenort for `dodo compile --engine quickjs`
               // (see the linux note).
               "restore_v8_runtimes() {",
               "  test ! -e denort.v8 || mv -f denort.v8 denort",
@@ -910,7 +910,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               `Get-FileHash target/release/denort-${buildItem.arch}-pc-windows-msvc.zip -Algorithm SHA256 | Format-List > target/release/denort-${buildItem.arch}-pc-windows-msvc.zip.sha256sum`,
               `Compress-Archive -CompressionLevel Optimal -Force -Path target/release/denort.dll -DestinationPath target/release/libdenort-${buildItem.arch}-pc-windows-msvc.zip`,
               `Get-FileHash target/release/libdenort-${buildItem.arch}-pc-windows-msvc.zip -Algorithm SHA256 | Format-List > target/release/libdenort-${buildItem.arch}-pc-windows-msvc.zip.sha256sum`,
-              // QuickJS denort/libdenort for `deno compile --engine quickjs`
+              // QuickJS denort/libdenort for `dodo compile --engine quickjs`
               // (see the linux note).
               "try {",
               "  Move-Item target/release/denort.exe target/release/denort.v8.exe",
@@ -949,7 +949,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               'echo "Generating delta from $PREV_VERSION for $TARGET"',
               'curl -fSL -o prev.zip "https://github.com/denoland/deno/releases/download/v${PREV_VERSION}/deno-${TARGET}.zip" || { echo "Previous release not found, skipping delta"; exit 0; }',
               "unzip -o prev.zip -d prev/",
-              './target/release/bsdiff_helper prev/deno target/release/dodo "target/release/deno-${TARGET}.from-${PREV_VERSION}.bsdiff"',
+              './target/release/bsdiff_helper prev/dodo target/release/dodo "target/release/deno-${TARGET}.from-${PREV_VERSION}.bsdiff"',
               'cd target/release && shasum -a 256 "deno-${TARGET}.from-${PREV_VERSION}.bsdiff" > "deno-${TARGET}.from-${PREV_VERSION}.bsdiff.sha256sum"',
             ],
           },
@@ -963,7 +963,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               'echo "Generating delta from $PREV_VERSION for $TARGET"',
               'curl -fSL -o prev.zip "https://github.com/denoland/deno/releases/download/v${PREV_VERSION}/deno-${TARGET}.zip" || { echo "Previous release not found, skipping delta"; exit 0; }',
               "unzip -o prev.zip -d prev/",
-              './target/release/bsdiff_helper prev/deno target/release/dodo "target/release/deno-${TARGET}.from-${PREV_VERSION}.bsdiff"',
+              './target/release/bsdiff_helper prev/dodo target/release/dodo "target/release/deno-${TARGET}.from-${PREV_VERSION}.bsdiff"',
               'cd target/release && shasum -a 256 "deno-${TARGET}.from-${PREV_VERSION}.bsdiff" > "deno-${TARGET}.from-${PREV_VERSION}.bsdiff.sha256sum"',
             ],
           },
@@ -999,7 +999,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
         );
         const packagesToBuild = ["deno", "denort", "test_server"]
           .map((name) => `-p ${name}`).join(" ");
-        const binsToBuild = ["deno", "denort", "test_server"]
+        const binsToBuild = ["dodo", "denort", "test_server"]
           .map((name) => `--bin ${name}`).join(" ");
         const cargoBuildReleaseCommand =
           `cargo build${buildStdArgs} --release --locked ${packagesToBuild} ${binsToBuild} --features=${panicTraceFeatures}`;
@@ -1195,12 +1195,12 @@ const buildJobs = buildItems.map((rawBuildItem) => {
             {
               // The rest of CI only exercises the default v8 backend. Make sure the
               // experimental QuickJS backend (the deno_v8 facade over the v8x crate)
-              // keeps compiling for the dodo + denort binaries so `deno compile`
+              // keeps compiling for the dodo + denort binaries so `dodo compile`
               // and the desktop runtime don't silently regress (notably the
               // mutually-exclusive v8/quickjs feature guard). A `check` is enough to
               // catch feature/build-script breakage and does not clobber the v8
               // binary this job produces.
-              name: "Check QuickJS backend (deno + denort)",
+              name: "Check QuickJS backend (dodo + denort)",
               if: isDebug.and(
                 isLinux.and(buildItem.arch.equals("x86_64")).or(
                   isMacos.and(buildItem.arch.equals("aarch64")),
@@ -1216,7 +1216,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               // of our build mode
               name: "Check dodo binary",
               run:
-                `target/${buildItem.profile}/deno eval "console.log(1+2)" | grep 3`,
+                `target/${buildItem.profile}/dodo eval "console.log(1+2)" | grep 3`,
               env: { NO_COLOR: 1 },
             },
             {
@@ -1461,7 +1461,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
             },
           },
           {
-            // Warm the cache with the compiler `deno check` uses (into the
+            // Warm the cache with the compiler `dodo check` uses (into the
             // default target/.native_tsc/deno_dir) so the test step doesn't
             // re-download it for every test's fresh DENO_DIR. The harness
             // resolves that path and injects DENO_TSC_BIN per-test itself (see
@@ -1677,9 +1677,9 @@ const buildJobs = buildItems.map((rawBuildItem) => {
             if: isDebug,
             env: { DENO_BIN: "./target/debug/deno" },
             run: [
-              "deno run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json \\",
+              "dodo run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json \\",
               "    ./tests/wpt/wpt.ts setup",
-              "deno run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json --unsafely-ignore-certificate-errors \\",
+              "dodo run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json --unsafely-ignore-certificate-errors \\",
               '    ./tests/wpt/wpt.ts run --all --quiet --binary="$DENO_BIN"',
             ],
           },
@@ -1690,9 +1690,9 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               DENO_BIN: "./target/release/deno",
             },
             run: [
-              "deno run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json \\",
+              "dodo run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json \\",
               "    ./tests/wpt/wpt.ts setup",
-              "deno run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json --unsafely-ignore-certificate-errors \\",
+              "dodo run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json --unsafely-ignore-certificate-errors \\",
               '    ./tests/wpt/wpt.ts run --all --quiet --release --binary="$DENO_BIN" --json=wpt.json --wptreport=wptreport.json',
             ],
           },
@@ -1916,19 +1916,19 @@ const lintJob = job("lint", {
         {
           name: "test_format.js",
           run:
-            "deno run --allow-write --allow-read --allow-run --allow-net ./tools/format.js --check",
+            "dodo run --allow-write --allow-read --allow-run --allow-net ./tools/format.js --check",
         },
         {
           name: "jsdoc_checker.js",
           run:
-            "deno run --allow-read --allow-env --allow-sys ./tools/jsdoc_checker.js",
+            "dodo run --allow-read --allow-env --allow-sys ./tools/jsdoc_checker.js",
         },
       ),
       {
         name: "lint.js",
         env: { GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}" },
         run:
-          "deno run --allow-write --allow-read --allow-run --allow-net --allow-env ./tools/lint.js",
+          "dodo run --allow-write --allow-read --allow-run --allow-net --allow-env ./tools/lint.js",
       },
       saveCacheStep,
     );
