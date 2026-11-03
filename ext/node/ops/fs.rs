@@ -732,12 +732,14 @@ pub async fn op_node_mkdtemp(
 }
 
 fn temp_path_append_suffix(prefix: &str) -> String {
-  use rand::Rng;
-  use rand::distributions::Alphanumeric;
-  use rand::rngs::OsRng;
+  use rand::RngExt;
+  use rand::distr::Alphanumeric;
+  use rand::rand_core::UnwrapErr;
+  use rand::rngs::SysRng;
 
+  let mut rng = UnwrapErr(SysRng);
   let suffix: String =
-    (0..6).map(|_| OsRng.sample(Alphanumeric) as char).collect();
+    (0..6).map(|_| rng.sample(Alphanumeric) as char).collect();
   format!("{}{}", prefix, suffix)
 }
 

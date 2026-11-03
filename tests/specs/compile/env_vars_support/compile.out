@@ -1,4 +1,4 @@
-Warning Failed parsing value 'ANOTHER_FOO=c:ath' at index 14 within the specified environment file.
+Warning Failed parsing value 'ANOTHER_FOO=c:[WILDCHAR]ath' at index 14 within the specified environment file.
     at [WILDLINE]environment.env
 Check [WILDCARD]main.ts
 Compile [WILDCARD]main.ts to out[WILDCARD]

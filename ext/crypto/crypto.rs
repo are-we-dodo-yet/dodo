@@ -14,9 +14,8 @@ use deno_core::OpState;
 use deno_core::op2;
 use deno_core::v8;
 use deno_core::webidl::WebIdlInterfaceConverter;
-use rand::Rng;
+use rand::RngExt;
 use rand::rngs::StdRng;
-use rand::thread_rng;
 
 use crate::CryptoError;
 use crate::fast_uuid_v4_bytes;
@@ -32,7 +31,7 @@ pub fn op_crypto_random_uuid_batch<'s>(
 ) -> Result<v8::Local<'s, v8::String>, CryptoError> {
   let mut entropy = [0u8; UUID_BYTES * UUID_BATCH_SIZE];
   let mut output = [0u8; UUID_STRING_BYTES * UUID_BATCH_SIZE];
-  thread_rng().fill(&mut entropy[..]);
+  rand::rng().fill(&mut entropy[..]);
 
   for (bytes, uuid_output) in entropy
     .chunks_exact_mut(UUID_BYTES)
@@ -149,7 +148,7 @@ impl Crypto {
       if let Some(seeded_rng) = maybe_seeded_rng {
         seeded_rng.fill(bytes);
       } else {
-        let mut rng = thread_rng();
+        let mut rng = rand::rng();
         rng.fill(bytes);
       }
     }
@@ -185,7 +184,7 @@ impl Crypto {
     if let Some(seeded_rng) = maybe_seeded_rng {
       seeded_rng.fill(&mut bytes);
     } else {
-      let mut rng = thread_rng();
+      let mut rng = rand::rng();
       rng.fill(&mut bytes);
     }
     let uuid = fast_uuid_v4_bytes(&mut bytes);

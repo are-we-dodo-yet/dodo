@@ -27,6 +27,7 @@ deno_error = { workspace = true, features = ["url"] }
 deno_maybe_sync.workspace = true
 deno_media_type.workspace = true
 deno_path_util.workspace = true
+faster-hex.workspace = true
 http = { workspace = true, optional = true }
 log.workspace = true
 once_cell.workspace = true

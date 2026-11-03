@@ -110,7 +110,7 @@ where
       );
       rendered_items = new_items;
     }
-    static_text.eprint_items(rendered_items.iter());
+    let _ = static_text.eprint_items(rendered_items.iter());
 
     let event = crossterm::event::read()?;
     #[allow(clippy::single_match, reason = "more clear")]
@@ -161,7 +161,7 @@ where
     }
   }
 
-  static_text.eprint_clear();
+  let _ = static_text.eprint_clear();
 
   hide_cursor_guard.show()?;
   raw_mode.disable()?;

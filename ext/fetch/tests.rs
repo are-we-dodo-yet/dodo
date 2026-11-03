@@ -14,8 +14,7 @@ use deno_permissions::PermissionsContainer;
 use deno_permissions::PermissionsOptions;
 use deno_permissions::RuntimePermissionDescriptorParser;
 use deno_tls::rustls::pki_types::PrivateKeyDer;
-use fast_socks5::server::Config as Socks5Config;
-use fast_socks5::server::Socks5Socket;
+use fast_socks5::server::Socks5ServerProtocol;
 use http::header::ACCEPT_ENCODING;
 use http::header::CONTENT_ENCODING;
 use http::header::CONTENT_LENGTH;
@@ -70,7 +69,10 @@ fn test_userspace_resolver() {
     // use `localhost` to ensure dns step happens.
     let addr = format!("localhost:{}", src_addr.port());
 
-    let hickory = hickory_resolver::Resolver::builder_tokio().unwrap().build();
+    let hickory = hickory_resolver::Resolver::builder_tokio()
+      .unwrap()
+      .build()
+      .unwrap();
 
     assert_eq!(thread_counter.load(SeqCst), 0);
     run_test_client_with_resolver(
@@ -882,15 +884,20 @@ async fn create_socks_proxy(src_addr: SocketAddr) -> SocketAddr {
 
   tokio::spawn(async move {
     while let Ok((sock, _)) = prx_tcp.accept().await {
-      let cfg: Socks5Config = Default::default();
-      let mut socks_conn = Socks5Socket::new(sock, cfg.into())
-        .upgrade_to_socks5()
+      let (proto, _, _) = Socks5ServerProtocol::accept_no_auth(sock)
+        .await
+        .unwrap()
+        .read_command()
         .await
         .unwrap();
 
       let fut = async move {
         let mut dst_tcp =
           tokio::net::TcpStream::connect(src_addr).await.unwrap();
+        let mut socks_conn = proto
+          .reply_success(dst_tcp.local_addr().unwrap())
+          .await
+          .unwrap();
         tokio::io::copy_bidirectional(&mut socks_conn, &mut dst_tcp)
           .await
           .unwrap();

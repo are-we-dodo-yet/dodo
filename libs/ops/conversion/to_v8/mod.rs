@@ -116,9 +116,10 @@ fn create_impl(
     Some(lifetime) => lifetime.lifetime.clone(),
     None => {
       let lifetime = syn::Lifetime::new("'a", proc_macro2::Span::call_site());
-      impl_generics
-        .params
-        .insert(0, syn::LifetimeParam::new(lifetime.clone()).into());
+      impl_generics.params.insert(
+        0,
+        syn::GenericParam::Lifetime(syn::LifetimeParam::new(lifetime.clone())),
+      );
       lifetime
     }
   };

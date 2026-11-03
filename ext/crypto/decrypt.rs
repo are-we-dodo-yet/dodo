@@ -1,14 +1,11 @@
 // Copyright 2018-2026 the Deno authors. MIT license.
 
-use aes::cipher::BlockDecryptMut;
-use aes::cipher::KeyIvInit;
-use aes::cipher::block_padding::Pkcs7;
-use aes_gcm::AeadInPlace;
+use aes_gcm::AeadInOut;
 use aes_gcm::KeyInit;
 use aes_gcm::Nonce;
-use aes_gcm::aead::generic_array::ArrayLength;
-use aes_gcm::aead::generic_array::typenum::U12;
-use aes_gcm::aead::generic_array::typenum::U16;
+use aes_gcm::aead::array::ArraySize;
+use aes_gcm::aead::consts::U12;
+use aes_gcm::aead::consts::U16;
 use aes_gcm::aes::Aes128;
 use aes_gcm::aes::Aes192;
 use aes_gcm::aes::Aes256;
@@ -17,9 +14,12 @@ use aws_lc_rs::aead::CHACHA20_POLY1305;
 use aws_lc_rs::aead::LessSafeKey;
 use aws_lc_rs::aead::Nonce as AwsNonce;
 use aws_lc_rs::aead::UnboundKey;
+use cbc::cipher::BlockModeDecrypt;
+use cbc::cipher::block_padding::Pkcs7;
 use ctr::Ctr32BE;
 use ctr::Ctr64BE;
 use ctr::Ctr128BE;
+use ctr::cipher::KeyIvInit;
 use ctr::cipher::StreamCipher;
 use rsa::pkcs1::DecodeRsaPrivateKey;
 
@@ -77,12 +77,9 @@ pub(crate) fn decrypt_rsa_oaep(
 ) -> Result<Vec<u8>, DecryptError> {
   let key = key.as_rsa_private_key()?;
 
-  let private_key = rsa::RsaPrivateKey::from_pkcs1_der(key)?;
-  let padding = rsa_oaep_padding(hash, &label);
+  let private_key = rsa::PrivateKey::from_pkcs1_der(key)?;
 
-  private_key
-    .decrypt(padding, data)
-    .map_err(DecryptError::Rsa)
+  rsa_oaep_decrypt(&private_key, hash, &label, data).map_err(DecryptError::Rsa)
 }
 
 pub(crate) fn decrypt_aes_cbc(
@@ -102,7 +99,7 @@ pub(crate) fn decrypt_aes_cbc(
         .map_err(|_| DecryptError::InvalidKeyOrIv)?;
 
       cipher
-        .decrypt_padded_vec_mut::<Pkcs7>(data)
+        .decrypt_padded_vec::<Pkcs7>(data)
         .map_err(|_| DecryptError::Failed)?
     }
     192 => {
@@ -112,7 +109,7 @@ pub(crate) fn decrypt_aes_cbc(
         .map_err(|_| DecryptError::InvalidKeyOrIv)?;
 
       cipher
-        .decrypt_padded_vec_mut::<Pkcs7>(data)
+        .decrypt_padded_vec::<Pkcs7>(data)
         .map_err(|_| DecryptError::Failed)?
     }
     256 => {
@@ -122,7 +119,7 @@ pub(crate) fn decrypt_aes_cbc(
         .map_err(|_| DecryptError::InvalidKeyOrIv)?;
 
       cipher
-        .decrypt_padded_vec_mut::<Pkcs7>(data)
+        .decrypt_padded_vec::<Pkcs7>(data)
         .map_err(|_| DecryptError::Failed)?
     }
     _ => unreachable!(),
@@ -140,7 +137,8 @@ fn decrypt_aes_ctr_gen<B>(
 where
   B: KeyIvInit + StreamCipher,
 {
-  let mut cipher = B::new(key.into(), counter.into());
+  let mut cipher = B::new_from_slices(key, counter)
+    .map_err(|_| DecryptError::InvalidKeyOrIv)?;
 
   let mut plaintext = data.to_vec();
   cipher
@@ -150,7 +148,7 @@ where
   Ok(plaintext)
 }
 
-fn decrypt_aes_gcm_gen<N: ArrayLength<u8>>(
+fn decrypt_aes_gcm_gen<N: ArraySize>(
   key: &[u8],
   tag: &aes_gcm::Tag,
   nonce: &[u8],
@@ -158,16 +156,18 @@ fn decrypt_aes_gcm_gen<N: ArrayLength<u8>>(
   additional_data: Vec<u8>,
   plaintext: &mut [u8],
 ) -> Result<(), DecryptError> {
-  let nonce = Nonce::from_slice(nonce);
+  let nonce: &Nonce<N> = nonce
+    .try_into()
+    .map_err(|_| DecryptError::InvalidIvLength)?;
   match length {
     128 => {
       let cipher = aes_gcm::AesGcm::<Aes128, N>::new_from_slice(key)
         .map_err(|_| DecryptError::Failed)?;
       cipher
-        .decrypt_in_place_detached(
+        .decrypt_inout_detached(
           nonce,
           additional_data.as_slice(),
-          plaintext,
+          plaintext.into(),
           tag,
         )
         .map_err(|_| DecryptError::Failed)?
@@ -176,10 +176,10 @@ fn decrypt_aes_gcm_gen<N: ArrayLength<u8>>(
       let cipher = aes_gcm::AesGcm::<Aes192, N>::new_from_slice(key)
         .map_err(|_| DecryptError::Failed)?;
       cipher
-        .decrypt_in_place_detached(
+        .decrypt_inout_detached(
           nonce,
           additional_data.as_slice(),
-          plaintext,
+          plaintext.into(),
           tag,
         )
         .map_err(|_| DecryptError::Failed)?
@@ -188,10 +188,10 @@ fn decrypt_aes_gcm_gen<N: ArrayLength<u8>>(
       let cipher = aes_gcm::AesGcm::<Aes256, N>::new_from_slice(key)
         .map_err(|_| DecryptError::Failed)?;
       cipher
-        .decrypt_in_place_detached(
+        .decrypt_inout_detached(
           nonce,
           additional_data.as_slice(),
-          plaintext,
+          plaintext.into(),
           tag,
         )
         .map_err(|_| DecryptError::Failed)?
@@ -254,7 +254,9 @@ pub(crate) fn decrypt_aes_gcm(
   }
 
   let sep = data.len() - (tag_length / 8);
-  let tag = &data[sep..];
+  let tag: &aes_gcm::Tag = data[sep..]
+    .try_into()
+    .map_err(|_| DecryptError::InvalidTagLength)?;
 
   // The actual ciphertext, called plaintext because it is reused in place.
   let mut plaintext = data[..sep].to_vec();
@@ -263,7 +265,7 @@ pub(crate) fn decrypt_aes_gcm(
   match iv.len() {
     12 => decrypt_aes_gcm_gen::<U12>(
       key,
-      tag.into(),
+      tag,
       &iv,
       length,
       additional_data,
@@ -271,7 +273,7 @@ pub(crate) fn decrypt_aes_gcm(
     )?,
     16 => decrypt_aes_gcm_gen::<U16>(
       key,
-      tag.into(),
+      tag,
       &iv,
       length,
       additional_data,
@@ -324,21 +326,21 @@ pub(crate) fn decrypt_aes_ocb(
   additional_data: Option<Vec<u8>>,
   data: &[u8],
 ) -> Result<Vec<u8>, DecryptError> {
-  use aes_gcm::aead::generic_array::GenericArray;
-  use aes_gcm::aead::generic_array::typenum::U6;
-  use aes_gcm::aead::generic_array::typenum::U7;
-  use aes_gcm::aead::generic_array::typenum::U8;
-  use aes_gcm::aead::generic_array::typenum::U9;
-  use aes_gcm::aead::generic_array::typenum::U10;
-  use aes_gcm::aead::generic_array::typenum::U11;
-  use aes_gcm::aead::generic_array::typenum::U12;
-  use aes_gcm::aead::generic_array::typenum::U13;
-  use aes_gcm::aead::generic_array::typenum::U14;
-  use aes_gcm::aead::generic_array::typenum::U15;
-  use aes_gcm::aead::generic_array::typenum::U16;
   use ocb3::Ocb3;
-  use ocb3::aead::AeadInPlace as Ocb3AeadInPlace;
+  use ocb3::aead::AeadInOut as Ocb3AeadInOut;
   use ocb3::aead::KeyInit as Ocb3KeyInit;
+  use ocb3::aead::array::Array;
+  use ocb3::aead::consts::U6;
+  use ocb3::aead::consts::U7;
+  use ocb3::aead::consts::U8;
+  use ocb3::aead::consts::U9;
+  use ocb3::aead::consts::U10;
+  use ocb3::aead::consts::U11;
+  use ocb3::aead::consts::U12;
+  use ocb3::aead::consts::U13;
+  use ocb3::aead::consts::U14;
+  use ocb3::aead::consts::U15;
+  use ocb3::aead::consts::U16;
 
   let key = key.as_secret_key()?;
   let additional_data = additional_data.unwrap_or_default();
@@ -379,10 +381,19 @@ pub(crate) fn decrypt_aes_ocb(
     ($aes:ty, $nonce:ty, $tag:ty) => {{
       let cipher = Ocb3::<$aes, $nonce, $tag>::new_from_slice(key)
         .map_err(|_| DecryptError::Failed)?;
-      let nonce = GenericArray::<u8, $nonce>::from_slice(&iv);
-      let tag = GenericArray::<u8, $tag>::from_slice(tag_bytes);
+      let nonce: &Array<u8, $nonce> = iv
+        .as_slice()
+        .try_into()
+        .map_err(|_| DecryptError::InvalidIvLength)?;
+      let tag: &Array<u8, $tag> =
+        tag_bytes.try_into().map_err(|_| DecryptError::Failed)?;
       cipher
-        .decrypt_in_place_detached(nonce, &additional_data, &mut plaintext, tag)
+        .decrypt_inout_detached(
+          nonce,
+          &additional_data,
+          plaintext.as_mut_slice().into(),
+          tag,
+        )
         .map_err(|_| DecryptError::Failed)?;
     }};
   }

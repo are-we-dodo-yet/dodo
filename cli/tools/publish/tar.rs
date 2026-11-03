@@ -57,7 +57,10 @@ pub fn create_gzipped_tarball(
       path_str: path_str.clone(),
       specifier: specifier.clone(),
       // This hash string matches the checksum computed by registry
-      hash: format!("sha256-{:x}", sha2::Sha256::digest(&content)),
+      hash: format!(
+        "sha256-{}",
+        faster_hex::hex_string(&sha2::Sha256::digest(&content))
+      ),
       size: content.len(),
     });
     assert!(path_str.starts_with('/'));

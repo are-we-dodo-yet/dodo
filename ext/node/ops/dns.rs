@@ -293,7 +293,7 @@ fn getnameinfo(socket_addr: SocketAddr) -> Result<(String, String), DnsError> {
     // SAFETY: Calling getnameinfo
     let code = unsafe {
       libc::getnameinfo(
-        c_sockaddr,
+        c_sockaddr as _,
         c_sockaddr_len,
         c_host.as_mut_ptr() as _,
         c_host.len() as _,

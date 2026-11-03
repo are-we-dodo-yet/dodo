@@ -19,7 +19,7 @@ const CODE: &str = "single-var-declarator";
 
 #[derive(Display)]
 enum SingleVarDeclaratorMessage {
-  #[display(fmt = "Multiple variable declarators are not allowed")]
+  #[display("Multiple variable declarators are not allowed")]
   Unexpected,
 }
 

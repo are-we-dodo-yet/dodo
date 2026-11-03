@@ -207,7 +207,7 @@ impl LoaderChecksum {
     use sha2::Sha256;
     let mut hasher = Sha256::new();
     hasher.update(source);
-    format!("{:x}", hasher.finalize())
+    faster_hex::hex_string(&hasher.finalize())
   }
 }
 

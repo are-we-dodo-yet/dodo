@@ -1,8 +1,9 @@
 // Copyright 2018-2026 the Deno authors. MIT license.
 
 use base64::prelude::BASE64_URL_SAFE_NO_PAD;
-use rand::RngCore;
-use rand::rngs::OsRng;
+use rand::Rng;
+use rand::rand_core::UnwrapErr;
+use rand::rngs::SysRng;
 use spki::der::Encode;
 use spki::der::asn1::BitString;
 use subtle::ConstantTimeEq;
@@ -24,7 +25,7 @@ pub enum X448Error {
 /// corresponding 56-byte Montgomery-form public key into `pubkey`. Called
 /// from the cppgc X448 generate-key path in `subtle_generate_key.rs`.
 pub fn generate_x448_keypair(pkey: &mut [u8], pubkey: &mut [u8]) {
-  let mut rng = OsRng;
+  let mut rng = UnwrapErr(SysRng);
   rng.fill_bytes(pkey);
 
   // x448(pkey, 5)
@@ -91,13 +92,13 @@ pub(crate) fn export_spki_x448(pubkey: &[u8]) -> Result<Vec<u8>, X448Error> {
 
 pub(crate) fn export_pkcs8_x448(pkey: &[u8]) -> Result<Vec<u8>, X448Error> {
   use rsa::pkcs1::der::Encode;
-  let pk_info = rsa::pkcs8::PrivateKeyInfo {
+  let pk_info = rsa::pkcs8::PrivateKeyInfoRef {
     public_key: None,
     algorithm: rsa::pkcs8::AlgorithmIdentifierRef {
       oid: X448_OID,
       parameters: None,
     },
-    private_key: pkey,
+    private_key: rsa::pkcs8::der::asn1::OctetStringRef::new(pkey)?,
   };
   let mut buf = Vec::new();
   pk_info.encode_to_vec(&mut buf)?;

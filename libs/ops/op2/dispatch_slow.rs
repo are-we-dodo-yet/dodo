@@ -363,7 +363,7 @@ pub(crate) fn with_self(
   generator_state.needs_scope = true;
   let throw_exception = throw_invalid_this_type_error(
     generator_state,
-    format!("expected {}", &generator_state.self_ty),
+    format!("expected {}", generator_state.self_ty),
   );
   if ret_val.is_async() {
     let tokens = gs_quote!(generator_state(self_ty, fn_args, scope, try_unwrap_cppgc) => {
@@ -813,7 +813,7 @@ pub fn from_arg(
         quote!(#arg_ident)
       };
       let throw_exception =
-        throw_type_error(generator_state, format!("expected {}", &ty));
+        throw_type_error(generator_state, format!("expected {ty}"));
 
       let scope = &generator_state.scope;
       let try_unwrap_cppgc = &generator_state.try_unwrap_cppgc;
@@ -842,7 +842,7 @@ pub fn from_arg(
     Arg::OptionCppGcResource(ty) => {
       *needs_scope = true;
       let throw_exception =
-        throw_type_error(generator_state, format!("expected {}", &ty));
+        throw_type_error(generator_state, format!("expected {ty}"));
       let ty = syn::parse_str::<syn::Path>(ty)
         .map_err(|_| "failed to reparse type")?;
       let scope = &generator_state.scope;

@@ -998,7 +998,7 @@ pub enum X509VerifyError {
 /// Verify an RSA-PSS signature. Parses the hash algorithm from the
 /// RSASSA-PSS-params in the certificate's signature algorithm.
 fn verify_rsa_pss(
-  rsa_key: &rsa::RsaPublicKey,
+  rsa_key: &rsa::PublicKey,
   sig_alg: &x509_parser::x509::AlgorithmIdentifier,
   tbs_raw: &[u8],
   sig_value: &[u8],

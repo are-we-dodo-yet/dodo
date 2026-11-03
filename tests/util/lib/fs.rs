@@ -22,14 +22,17 @@ use crate::println;
 use crate::testdata_path;
 
 #[cfg(feature = "lsp")]
-pub fn url_to_uri(url: &Url) -> Result<lsp_types::Uri, anyhow::Error> {
+pub fn url_to_uri(
+  url: &Url,
+) -> Result<tower_lsp_server::ls_types::Uri, anyhow::Error> {
   use std::str::FromStr;
 
   use url::Position;
-  let uri_before_path = lsp_types::Uri::from_str(&url[..Position::BeforePath])
-    .map_err(|err| {
-      anyhow::anyhow!("Could not convert URL \"{url}\" to URI: {err}")
-    })?;
+  let uri_before_path =
+    tower_lsp_server::ls_types::Uri::from_str(&url[..Position::BeforePath])
+      .map_err(|err| {
+        anyhow::anyhow!("Could not convert URL \"{url}\" to URI: {err}")
+      })?;
   let mut encoded_path =
     fluent_uri::pct_enc::EString::<fluent_uri::pct_enc::encoder::Path>::new();
   encoded_path.encode_str::<fluent_uri::pct_enc::encoder::Path>(
@@ -71,10 +74,10 @@ pub fn url_to_uri(url: &Url) -> Result<lsp_types::Uri, anyhow::Error> {
 }
 
 #[cfg(feature = "lsp")]
-pub fn url_to_notebook_cell_uri(url: &Url) -> lsp_types::Uri {
+pub fn url_to_notebook_cell_uri(url: &Url) -> tower_lsp_server::ls_types::Uri {
   use std::str::FromStr;
   let uri = url_to_uri(url).unwrap();
-  lsp_types::Uri::from_str(&format!(
+  tower_lsp_server::ls_types::Uri::from_str(&format!(
     "vscode-notebook-cell:{}",
     uri.as_str().strip_prefix("file:").unwrap()
   ))
@@ -126,12 +129,12 @@ impl PathRef {
   }
 
   #[cfg(feature = "lsp")]
-  pub fn uri_dir(&self) -> lsp_types::Uri {
+  pub fn uri_dir(&self) -> tower_lsp_server::ls_types::Uri {
     url_to_uri(&self.url_dir()).unwrap()
   }
 
   #[cfg(feature = "lsp")]
-  pub fn uri_file(&self) -> lsp_types::Uri {
+  pub fn uri_file(&self) -> tower_lsp_server::ls_types::Uri {
     url_to_uri(&self.url_file()).unwrap()
   }
 
@@ -551,7 +554,7 @@ impl TempDir {
   }
 
   #[cfg(feature = "lsp")]
-  pub fn uri(&self) -> lsp_types::Uri {
+  pub fn uri(&self) -> tower_lsp_server::ls_types::Uri {
     url_to_uri(&self.url()).unwrap()
   }
 

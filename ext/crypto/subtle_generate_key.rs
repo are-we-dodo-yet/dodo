@@ -452,7 +452,7 @@ pub async fn run(
         return Err(op_error("Invalid length".into()));
       }
       let mut bytes = vec![0u8; (length / 8) as usize];
-      crate::rand::thread_rng().fill(&mut bytes[..]);
+      crate::rand::rng().fill(&mut bytes[..]);
       Ok(GenerateKeyOutput::Symmetric {
         algorithm_name: name,
         length: Some(length),
@@ -537,7 +537,7 @@ pub async fn run(
       )?;
       // Generate a fresh 64-byte FIPS 203 seed.
       let mut seed = vec![0u8; 64];
-      crate::rand::thread_rng().fill(&mut seed[..]);
+      crate::rand::rng().fill(&mut seed[..]);
       let res = crate::mlkem::from_seed(variant, &seed)
         .map_err(|e| CryptoError::Other(JsErrorBox::from_err(e)))?;
       let alg = AlgorithmDict::new(ml_kem_name(variant));
@@ -560,7 +560,7 @@ pub async fn run(
     GenerateKeyAlgorithm::MlDsa(variant, name) => {
       check_usages(&usages, &["sign", "verify"])?;
       let mut seed = vec![0u8; 32];
-      crate::rand::thread_rng().fill(&mut seed[..]);
+      crate::rand::rng().fill(&mut seed[..]);
       let res = crate::mldsa::from_seed(variant, &seed)
         .map_err(|e| CryptoError::Other(JsErrorBox::from_err(e)))?;
       let alg = AlgorithmDict::new(&name);
@@ -625,7 +625,7 @@ pub async fn run(
   Ok(result)
 }
 
-use crate::rand::Rng;
+use crate::rand::RngExt;
 
 fn check_usages(
   usages: &[String],
@@ -873,11 +873,10 @@ fn read_hash_name<'s>(
 
 fn public_exponent_from_pkcs1(pkcs1_der: &[u8]) -> Vec<u8> {
   use rsa::pkcs1::DecodeRsaPrivateKey;
-  rsa::RsaPrivateKey::from_pkcs1_der(pkcs1_der)
+  rsa::PrivateKey::from_pkcs1_der(pkcs1_der)
     .map(|k| {
       use rsa::traits::PublicKeyParts;
-      let e = k.e();
-      e.to_bytes_be()
+      k.e_bytes().into_vec()
     })
     .unwrap_or_else(|_| vec![1, 0, 1])
 }

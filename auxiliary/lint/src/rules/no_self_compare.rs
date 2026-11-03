@@ -16,7 +16,7 @@ const HINT: &str = "Comparing a value to itself may be redundant and could poten
 
 #[derive(Display)]
 enum NoSelfCompareMessage {
-  #[display(fmt = "`{}` is compared to itself", _0)]
+  #[display("`{}` is compared to itself", _0)]
   Invalid(String),
 }
 

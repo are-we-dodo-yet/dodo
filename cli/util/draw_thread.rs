@@ -119,7 +119,7 @@ impl DrawThread {
       // because the calling code might be called from outside a
       // tokio runtime and when it goes to start the thread on the
       // thread pool it might panic.
-      internal_state.static_text.eprint_clear();
+      let _ = internal_state.static_text.eprint_clear();
     }
   }
 
@@ -149,7 +149,7 @@ impl DrawThread {
 
   fn clear_and_stop_draw_thread(internal_state: &mut InternalState) {
     if internal_state.has_draw_thread {
-      internal_state.static_text.eprint_clear();
+      let _ = internal_state.static_text.eprint_clear();
       // bump the drawer id to exit the draw thread
       internal_state.drawer_id += 1;
       internal_state.has_draw_thread = false;
@@ -225,7 +225,7 @@ impl DrawThread {
                 if internal_state.should_exit_draw_thread(drawer_id) {
                   break;
                 }
-                internal_state.static_text.eprint_with_size(
+                let _ = internal_state.static_text.eprint_with_size(
                   &text,
                   console_static_text::ConsoleSize {
                     cols: Some(size.cols as u16),

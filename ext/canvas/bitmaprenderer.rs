@@ -252,7 +252,7 @@ impl ImageBitmapRenderingContext {
               .render_pass_set_vertex_buffer(
                 &mut pass,
                 0,
-                *vertex_buffer,
+                Some(*vertex_buffer),
                 0,
                 std::num::NonZeroU64::new(size_of_val(VERTICES) as _),
               )
@@ -479,6 +479,7 @@ pub fn create<'s>(
           power_preference: Default::default(),
           force_fallback_adapter: false,
           compatible_surface: Some(*id),
+          apply_limit_buckets: false,
         },
         backends,
         None,
@@ -513,6 +514,7 @@ pub fn create<'s>(
       desired_maximum_frame_latency: 0,
       alpha_mode: wgpu_types::CompositeAlphaMode::Opaque,
       view_formats: vec![],
+      color_space: wgpu_types::SurfaceColorSpace::Auto,
     };
     let err = instance.surface_configure(*id, device, &config);
     maybe_err_to_err(err)?;
@@ -605,7 +607,7 @@ pub fn create<'s>(
             constants: Default::default(),
             zero_initialize_workgroup_memory: false,
           },
-          buffers: vec![wgpu_core::pipeline::VertexBufferLayout {
+          buffers: vec![Some(wgpu_core::pipeline::VertexBufferLayout {
             array_stride: size_of::<Vertex>() as _,
             step_mode: wgpu_types::VertexStepMode::Vertex,
             attributes: vec![
@@ -621,7 +623,7 @@ pub fn create<'s>(
               },
             ]
             .into(),
-          }]
+          })]
           .into(),
         },
         fragment: Some(wgpu_core::pipeline::FragmentState {

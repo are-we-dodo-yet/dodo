@@ -232,19 +232,21 @@ fn export_okp_pkcs8(
   wrapped.push(0x04);
   wrapped.push(inner_len);
   wrapped.extend_from_slice(raw.bytes());
-  let pk = pk8::PrivateKeyInfo {
+  let encode_err = |e: pk8::der::Error| {
+    CryptoError::Other(JsErrorBox::type_error(format!(
+      "OKP PKCS8 encode failed: {e:?}"
+    )))
+  };
+  let pk = pk8::PrivateKeyInfoRef {
     algorithm: pk8::AlgorithmIdentifierRef {
       oid: *oid,
       parameters: None,
     },
-    private_key: &wrapped,
+    private_key: pk8::der::asn1::OctetStringRef::new(&wrapped)
+      .map_err(encode_err)?,
     public_key: None,
   };
-  let mut out = pk.to_der().map_err(|e| {
-    CryptoError::Other(JsErrorBox::type_error(format!(
-      "OKP PKCS8 encode failed: {e:?}"
-    )))
-  })?;
+  let mut out = pk.to_der().map_err(encode_err)?;
   // The legacy JS wrote `data[15] = inner_len_byte` to set the inner
   // OCTET STRING length byte. Match the legacy behavior for byte-perfect
   // parity with consumers that grew tolerant of the original encoder.

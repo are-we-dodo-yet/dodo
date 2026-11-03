@@ -23,12 +23,12 @@ use jsonc_parser::ast::Object;
 use jsonc_parser::ast::StringLit;
 use jsonc_parser::ast::Value as JsoncValue;
 use jsonc_parser::common::Ranged;
-use lsp_types::CompletionList;
 use node_resolver::NodeResolutionKind;
 use node_resolver::ResolutionMode;
 use once_cell::sync::Lazy;
 use regex::Regex;
-use tower_lsp::lsp_types as lsp;
+use tower_lsp_server::ls_types as lsp;
+use tower_lsp_server::ls_types::CompletionList;
 
 use super::client::Client;
 use super::config::Config;

@@ -390,7 +390,7 @@ fn check_appimage_runtime_hashes() {
       Ok(b) => b,
       Err(_) => continue,
     };
-    let actual = format!("{:x}", sha2::Sha256::digest(&bytes));
+    let actual = faster_hex::hex_string(&sha2::Sha256::digest(&bytes));
     if actual != *expected {
       panic!(
         "checked-in AppImage runtime stub {} does not match the SHA-256 \

@@ -2,12 +2,12 @@
 
 use aws_lc_rs::rand::SecureRandom;
 use aws_lc_rs::signature::EcdsaKeyPair;
+use elliptic_curve::Generate;
 use elliptic_curve::pkcs8::EncodePrivateKey;
-use elliptic_curve::rand_core::OsRng;
-use num_traits::FromPrimitive;
-use once_cell::sync::Lazy;
-use rsa::BigUint;
-use rsa::RsaPrivateKey;
+use rand::rand_core::UnwrapErr;
+use rand::rngs::SysRng;
+use rsa::BoxedUint;
+use rsa::PrivateKey as RsaPrivateKey;
 use rsa::pkcs1::EncodeRsaPrivateKey;
 
 use crate::shared::*;
@@ -41,10 +41,17 @@ pub enum GenerateKeyError {
 }
 
 // Allowlist for RSA public exponents.
-static PUB_EXPONENT_1: Lazy<BigUint> =
-  Lazy::new(|| BigUint::from_u64(3).unwrap());
-static PUB_EXPONENT_2: Lazy<BigUint> =
-  Lazy::new(|| BigUint::from_u64(65537).unwrap());
+const PUB_EXPONENT_1: u64 = 3;
+const PUB_EXPONENT_2: u64 = 65537;
+
+fn public_exponent_to_u64(bytes: &[u8]) -> Option<u64> {
+  let start = bytes.iter().position(|b| *b != 0).unwrap_or(bytes.len());
+  let bytes = &bytes[start..];
+  if bytes.len() > 8 {
+    return None;
+  }
+  Some(bytes.iter().fold(0u64, |acc, b| (acc << 8) | u64::from(*b)))
+}
 
 /// Rust-callable view of the RSA keygen path. Returns raw PKCS#1 DER
 /// bytes ready to feed [`crate::shared::RawKeyData::Private`].
@@ -79,16 +86,18 @@ fn generate_key_rsa(
   modulus_length: u32,
   public_exponent: &[u8],
 ) -> Result<Vec<u8>, GenerateKeyError> {
-  let exponent = BigUint::from_bytes_be(public_exponent);
-  if exponent != *PUB_EXPONENT_1 && exponent != *PUB_EXPONENT_2 {
-    return Err(GenerateKeyError::BadPublicExponent);
-  }
+  let exponent = public_exponent_to_u64(public_exponent)
+    .filter(|e| *e == PUB_EXPONENT_1 || *e == PUB_EXPONENT_2)
+    .ok_or(GenerateKeyError::BadPublicExponent)?;
 
-  let mut rng = OsRng;
+  let mut rng = UnwrapErr(SysRng);
 
-  let private_key =
-    RsaPrivateKey::new_with_exp(&mut rng, modulus_length as usize, &exponent)
-      .map_err(|_| GenerateKeyError::FailedRSAKeyGeneration)?;
+  let private_key = RsaPrivateKey::new_with_exp(
+    &mut rng,
+    modulus_length as usize,
+    BoxedUint::from(exponent),
+  )
+  .map_err(|_| GenerateKeyError::FailedRSAKeyGeneration)?;
 
   let private_key = private_key
     .to_pkcs1_der()
@@ -98,8 +107,7 @@ fn generate_key_rsa(
 }
 
 fn generate_key_ec_p521() -> Result<Vec<u8>, GenerateKeyError> {
-  let mut rng = OsRng;
-  let key = p521::SecretKey::random(&mut rng);
+  let key = p521::SecretKey::generate();
   let pkcs8 = key
     .to_pkcs8_der()
     .map_err(|_| GenerateKeyError::FailedECKeyGeneration)?;

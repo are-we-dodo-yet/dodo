@@ -22,7 +22,7 @@ use deno_resolver::loader::MemoryFilesRc;
 use log::error;
 use once_cell::sync::Lazy;
 use serde::Serialize;
-use tower_lsp::lsp_types as lsp;
+use tower_lsp_server::ls_types as lsp;
 
 use super::completions::IMPORT_COMMIT_CHARS;
 use super::logging::lsp_log;

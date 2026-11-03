@@ -1346,14 +1346,14 @@ impl OkpKind {
     true
   }
   fn import_pkcs8(self, key_data: &[u8], out: &mut [u8]) -> bool {
-    use elliptic_curve::pkcs8::PrivateKeyInfo;
+    use elliptic_curve::pkcs8::PrivateKeyInfoRef;
     use elliptic_curve::pkcs8::der::Decode;
     let oid = match self {
       Self::Ed25519 => crate::ed25519::ED25519_OID,
       Self::X25519 => crate::x25519::X25519_OID,
       Self::X448 => crate::x448::X448_OID,
     };
-    let Ok(pk_info) = PrivateKeyInfo::from_der(key_data) else {
+    let Ok(pk_info) = PrivateKeyInfoRef::from_der(key_data) else {
       return false;
     };
     if pk_info.algorithm.oid != oid || pk_info.algorithm.parameters.is_some() {
@@ -1363,10 +1363,10 @@ impl OkpKind {
     // octet-string header followed by the raw private key bytes.
     let want_inner = out.len();
     let want_total = want_inner + 2;
-    if pk_info.private_key.len() != want_total {
+    if pk_info.private_key.as_bytes().len() != want_total {
       return false;
     }
-    out.copy_from_slice(&pk_info.private_key[2..]);
+    out.copy_from_slice(&pk_info.private_key.as_bytes()[2..]);
     true
   }
 }

@@ -12,6 +12,7 @@ use std::task::ready;
 use std::time::Duration;
 
 use deno_core::parking_lot;
+use deno_core::parking_lot::lock_api::GuardNoSend;
 use deno_core::parking_lot::lock_api::RawMutex;
 use deno_core::parking_lot::lock_api::RawMutexTimed;
 use deno_runtime::deno_io::AsyncPipeRead;
@@ -60,7 +61,7 @@ impl Drop for SendMutex {
   fn drop(&mut self) {
     // SAFETY: We know this was locked by the sender
     unsafe {
-      (*self.0).unlock();
+      (*self.0).unlock(GuardNoSend::new());
     }
   }
 }
@@ -418,7 +419,7 @@ impl TestEventSender {
     self
       .sync_sender
       .send((SendMutex(&mutex1 as _), SendMutex(&mutex2 as _)))?;
-    if !mutex1.try_lock_for(Duration::from_secs(30)) {
+    if mutex1.try_lock_for(Duration::from_secs(30)).is_none() {
       panic!(
         "Test flush deadlock 1, sender closed = {}",
         self.sync_sender.is_closed()
@@ -426,7 +427,7 @@ impl TestEventSender {
     }
     _ = self.stdout_writer.write_all(SYNC_MARKER);
     _ = self.stderr_writer.write_all(SYNC_MARKER);
-    if !mutex2.try_lock_for(Duration::from_secs(30)) {
+    if mutex2.try_lock_for(Duration::from_secs(30)).is_none() {
       panic!(
         "Test flush deadlock 2, sender closed = {}",
         self.sync_sender.is_closed()

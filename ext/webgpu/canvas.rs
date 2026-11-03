@@ -287,6 +287,7 @@ impl GPUCanvasContext {
           desired_maximum_frame_latency: 2,
           alpha_mode: configuration.alpha_mode.clone().into(),
           view_formats,
+          color_space: wgpu_types::SurfaceColorSpace::Auto,
         }))
       }
     }

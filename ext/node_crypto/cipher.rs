@@ -5,17 +5,26 @@ use std::cell::RefCell;
 use std::mem::MaybeUninit;
 use std::rc::Rc;
 
-use aes::cipher::BlockDecryptMut;
-use aes::cipher::BlockEncryptMut;
+use aes::cipher::Array;
+use aes::cipher::BlockModeDecrypt;
+use aes::cipher::BlockModeEncrypt;
+use aes::cipher::KeyInit;
 use aes::cipher::KeyIvInit;
 use aes::cipher::KeySizeUser;
 use aes::cipher::StreamCipher;
+use aes::cipher::array::ArraySize;
 use aes::cipher::block_padding::Pkcs7;
 use deno_core::Resource;
 use deno_error::JsErrorClass;
-use digest::KeyInit;
-use digest::generic_array::GenericArray;
 use subtle::ConstantTimeEq;
+
+fn as_array<N: ArraySize>(bytes: &[u8]) -> &Array<u8, N> {
+  bytes.try_into().expect("slice length mismatch")
+}
+
+fn as_array_mut<N: ArraySize>(bytes: &mut [u8]) -> &mut Array<u8, N> {
+  bytes.try_into().expect("slice length mismatch")
+}
 
 type Tag = Option<Vec<u8>>;
 
@@ -298,8 +307,8 @@ pub fn aes_unwrap_key(
   }
 }
 
-type Aes128Gcm = aead_gcm_stream::AesGcm<aes::Aes128>;
-type Aes256Gcm = aead_gcm_stream::AesGcm<aes::Aes256>;
+type Aes128Gcm = crate::gcm_stream::AesGcm<aes::Aes128>;
+type Aes256Gcm = crate::gcm_stream::AesGcm<aes::Aes256>;
 
 enum CipherInitError {
   ContextAllocation,
@@ -838,7 +847,7 @@ impl Cipher {
         if iv.len() != 16 {
           return Err(CipherError::InvalidInitializationVector);
         }
-        Aes128Cbc(Box::new(cbc::Encryptor::new(key.into(), iv.into())))
+        Aes128Cbc(Box::new(cbc::Encryptor::new(as_array(key), as_array(iv))))
       }
       "aes-128-ecb" => {
         if key.len() != 16 {
@@ -847,7 +856,7 @@ impl Cipher {
         if !iv.is_empty() {
           return Err(CipherError::InvalidInitializationVector);
         }
-        Aes128Ecb(Box::new(ecb::Encryptor::new(key.into())))
+        Aes128Ecb(Box::new(ecb::Encryptor::new(as_array(key))))
       }
       "aes-192-ecb" => {
         if key.len() != 24 {
@@ -856,7 +865,7 @@ impl Cipher {
         if !iv.is_empty() {
           return Err(CipherError::InvalidInitializationVector);
         }
-        Aes192Ecb(Box::new(ecb::Encryptor::new(key.into())))
+        Aes192Ecb(Box::new(ecb::Encryptor::new(as_array(key))))
       }
       "aes-256-ecb" => {
         if key.len() != 32 {
@@ -865,7 +874,7 @@ impl Cipher {
         if !iv.is_empty() {
           return Err(CipherError::InvalidInitializationVector);
         }
-        Aes256Ecb(Box::new(ecb::Encryptor::new(key.into())))
+        Aes256Ecb(Box::new(ecb::Encryptor::new(as_array(key))))
       }
       "aes-128-gcm" => {
         if key.len() != aes::Aes128::key_size() {
@@ -882,7 +891,7 @@ impl Cipher {
         }
 
         let cipher =
-          aead_gcm_stream::AesGcm::<aes::Aes128>::new(key.into(), iv);
+          crate::gcm_stream::AesGcm::<aes::Aes128>::new(as_array(key), iv);
 
         Aes128Gcm(Box::new(cipher), auth_tag_length)
       }
@@ -901,7 +910,7 @@ impl Cipher {
         }
 
         let cipher =
-          aead_gcm_stream::AesGcm::<aes::Aes256>::new(key.into(), iv);
+          crate::gcm_stream::AesGcm::<aes::Aes256>::new(as_array(key), iv);
 
         Aes256Gcm(Box::new(cipher), auth_tag_length)
       }
@@ -913,7 +922,7 @@ impl Cipher {
           return Err(CipherError::InvalidInitializationVector);
         }
 
-        Aes256Cbc(Box::new(cbc::Encryptor::new(key.into(), iv.into())))
+        Aes256Cbc(Box::new(cbc::Encryptor::new(as_array(key), as_array(iv))))
       }
       "aes-256-ctr" => {
         if key.len() != 32 {
@@ -922,7 +931,7 @@ impl Cipher {
         if iv.len() != 16 {
           return Err(CipherError::InvalidInitializationVector);
         }
-        Aes256Ctr(Box::new(ctr::Ctr128BE::new(key.into(), iv.into())))
+        Aes256Ctr(Box::new(ctr::Ctr128BE::new(as_array(key), as_array(iv))))
       }
       "aes-192-ctr" => {
         if key.len() != 24 {
@@ -931,7 +940,7 @@ impl Cipher {
         if iv.len() != 16 {
           return Err(CipherError::InvalidInitializationVector);
         }
-        Aes192Ctr(Box::new(ctr::Ctr128BE::new(key.into(), iv.into())))
+        Aes192Ctr(Box::new(ctr::Ctr128BE::new(as_array(key), as_array(iv))))
       }
       "aes-128-ctr" => {
         if key.len() != 16 {
@@ -940,7 +949,7 @@ impl Cipher {
         if iv.len() != 16 {
           return Err(CipherError::InvalidInitializationVector);
         }
-        Aes128Ctr(Box::new(ctr::Ctr128BE::new(key.into(), iv.into())))
+        Aes128Ctr(Box::new(ctr::Ctr128BE::new(as_array(key), as_array(iv))))
       }
       "des-ede3-cbc" => {
         if key.len() != 24 {
@@ -949,7 +958,7 @@ impl Cipher {
         if iv.len() != 8 {
           return Err(CipherError::InvalidInitializationVector);
         }
-        DesEde3Cbc(Box::new(cbc::Encryptor::new(key.into(), iv.into())))
+        DesEde3Cbc(Box::new(cbc::Encryptor::new(as_array(key), as_array(iv))))
       }
       "chacha20" => {
         if key.len() != 32 {
@@ -1009,25 +1018,25 @@ impl Cipher {
       Aes128Cbc(encryptor) => {
         assert!(input.len().is_multiple_of(16));
         for (input, output) in input.chunks(16).zip(output.chunks_mut(16)) {
-          encryptor.encrypt_block_b2b_mut(input.into(), output.into());
+          encryptor.encrypt_block_b2b(as_array(input), as_array_mut(output));
         }
       }
       Aes128Ecb(encryptor) => {
         assert!(input.len().is_multiple_of(16));
         for (input, output) in input.chunks(16).zip(output.chunks_mut(16)) {
-          encryptor.encrypt_block_b2b_mut(input.into(), output.into());
+          encryptor.encrypt_block_b2b(as_array(input), as_array_mut(output));
         }
       }
       Aes192Ecb(encryptor) => {
         assert!(input.len().is_multiple_of(16));
         for (input, output) in input.chunks(16).zip(output.chunks_mut(16)) {
-          encryptor.encrypt_block_b2b_mut(input.into(), output.into());
+          encryptor.encrypt_block_b2b(as_array(input), as_array_mut(output));
         }
       }
       Aes256Ecb(encryptor) => {
         assert!(input.len().is_multiple_of(16));
         for (input, output) in input.chunks(16).zip(output.chunks_mut(16)) {
-          encryptor.encrypt_block_b2b_mut(input.into(), output.into());
+          encryptor.encrypt_block_b2b(as_array(input), as_array_mut(output));
         }
       }
       Aes128Gcm(cipher, _) => {
@@ -1041,22 +1050,22 @@ impl Cipher {
       Aes256Cbc(encryptor) => {
         assert!(input.len().is_multiple_of(16));
         for (input, output) in input.chunks(16).zip(output.chunks_mut(16)) {
-          encryptor.encrypt_block_b2b_mut(input.into(), output.into());
+          encryptor.encrypt_block_b2b(as_array(input), as_array_mut(output));
         }
       }
       Aes256Ctr(encryptor) => {
-        encryptor.apply_keystream_b2b(input, output).unwrap();
+        encryptor.apply_keystream_b2b(input, output);
       }
       Aes192Ctr(encryptor) => {
-        encryptor.apply_keystream_b2b(input, output).unwrap();
+        encryptor.apply_keystream_b2b(input, output);
       }
       Aes128Ctr(encryptor) => {
-        encryptor.apply_keystream_b2b(input, output).unwrap();
+        encryptor.apply_keystream_b2b(input, output);
       }
       DesEde3Cbc(encryptor) => {
         assert!(input.len().is_multiple_of(8));
         for (input, output) in input.chunks(8).zip(output.chunks_mut(8)) {
-          encryptor.encrypt_block_b2b_mut(input.into(), output.into());
+          encryptor.encrypt_block_b2b(as_array(input), as_array_mut(output));
         }
       }
       ChaCha20(cipher) => {
@@ -1079,54 +1088,42 @@ impl Cipher {
     match (self, auto_pad) {
       (Aes128Cbc(encryptor), true) => {
         let _ = (*encryptor)
-          .encrypt_padded_b2b_mut::<Pkcs7>(input, output)
+          .encrypt_padded_b2b::<Pkcs7>(input, output)
           .map_err(|_| CipherError::CannotPadInputData)?;
         Ok(None)
       }
       (Aes128Cbc(mut encryptor), false) => {
-        encryptor.encrypt_block_b2b_mut(
-          GenericArray::from_slice(input),
-          GenericArray::from_mut_slice(output),
-        );
+        encryptor.encrypt_block_b2b(as_array(input), as_array_mut(output));
         Ok(None)
       }
       (Aes128Ecb(encryptor), true) => {
         let _ = (*encryptor)
-          .encrypt_padded_b2b_mut::<Pkcs7>(input, output)
+          .encrypt_padded_b2b::<Pkcs7>(input, output)
           .map_err(|_| CipherError::CannotPadInputData)?;
         Ok(None)
       }
       (Aes128Ecb(mut encryptor), false) => {
-        encryptor.encrypt_block_b2b_mut(
-          GenericArray::from_slice(input),
-          GenericArray::from_mut_slice(output),
-        );
+        encryptor.encrypt_block_b2b(as_array(input), as_array_mut(output));
         Ok(None)
       }
       (Aes192Ecb(encryptor), true) => {
         let _ = (*encryptor)
-          .encrypt_padded_b2b_mut::<Pkcs7>(input, output)
+          .encrypt_padded_b2b::<Pkcs7>(input, output)
           .map_err(|_| CipherError::CannotPadInputData)?;
         Ok(None)
       }
       (Aes192Ecb(mut encryptor), false) => {
-        encryptor.encrypt_block_b2b_mut(
-          GenericArray::from_slice(input),
-          GenericArray::from_mut_slice(output),
-        );
+        encryptor.encrypt_block_b2b(as_array(input), as_array_mut(output));
         Ok(None)
       }
       (Aes256Ecb(encryptor), true) => {
         let _ = (*encryptor)
-          .encrypt_padded_b2b_mut::<Pkcs7>(input, output)
+          .encrypt_padded_b2b::<Pkcs7>(input, output)
           .map_err(|_| CipherError::CannotPadInputData)?;
         Ok(None)
       }
       (Aes256Ecb(mut encryptor), false) => {
-        encryptor.encrypt_block_b2b_mut(
-          GenericArray::from_slice(input),
-          GenericArray::from_mut_slice(output),
-        );
+        encryptor.encrypt_block_b2b(as_array(input), as_array_mut(output));
         Ok(None)
       }
       (Aes128Gcm(cipher, auth_tag_length), _) => {
@@ -1145,15 +1142,12 @@ impl Cipher {
       }
       (Aes256Cbc(encryptor), true) => {
         let _ = (*encryptor)
-          .encrypt_padded_b2b_mut::<Pkcs7>(input, output)
+          .encrypt_padded_b2b::<Pkcs7>(input, output)
           .map_err(|_| CipherError::CannotPadInputData)?;
         Ok(None)
       }
       (Aes256Cbc(mut encryptor), false) => {
-        encryptor.encrypt_block_b2b_mut(
-          GenericArray::from_slice(input),
-          GenericArray::from_mut_slice(output),
-        );
+        encryptor.encrypt_block_b2b(as_array(input), as_array_mut(output));
         Ok(None)
       }
       (Aes256Ctr(_) | Aes128Ctr(_) | Aes192Ctr(_) | ChaCha20(_), _) => Ok(None),
@@ -1163,15 +1157,12 @@ impl Cipher {
       }
       (DesEde3Cbc(encryptor), true) => {
         let _ = (*encryptor)
-          .encrypt_padded_b2b_mut::<Pkcs7>(input, output)
+          .encrypt_padded_b2b::<Pkcs7>(input, output)
           .map_err(|_| CipherError::CannotPadInputData)?;
         Ok(None)
       }
       (DesEde3Cbc(mut encryptor), false) => {
-        encryptor.encrypt_block_b2b_mut(
-          GenericArray::from_slice(input),
-          GenericArray::from_mut_slice(output),
-        );
+        encryptor.encrypt_block_b2b(as_array(input), as_array_mut(output));
         Ok(None)
       }
     }
@@ -1294,7 +1285,7 @@ impl Decipher {
         if iv.len() != 16 {
           return Err(DecipherError::InvalidInitializationVector);
         }
-        Aes128Cbc(Box::new(cbc::Decryptor::new(key.into(), iv.into())))
+        Aes128Cbc(Box::new(cbc::Decryptor::new(as_array(key), as_array(iv))))
       }
       "aes-128-ecb" => {
         if key.len() != 16 {
@@ -1303,7 +1294,7 @@ impl Decipher {
         if !iv.is_empty() {
           return Err(DecipherError::InvalidInitializationVector);
         }
-        Aes128Ecb(Box::new(ecb::Decryptor::new(key.into())))
+        Aes128Ecb(Box::new(ecb::Decryptor::new(as_array(key))))
       }
       "aes-192-ecb" => {
         if key.len() != 24 {
@@ -1312,7 +1303,7 @@ impl Decipher {
         if !iv.is_empty() {
           return Err(DecipherError::InvalidInitializationVector);
         }
-        Aes192Ecb(Box::new(ecb::Decryptor::new(key.into())))
+        Aes192Ecb(Box::new(ecb::Decryptor::new(as_array(key))))
       }
       "aes-256-ecb" => {
         if key.len() != 32 {
@@ -1321,7 +1312,7 @@ impl Decipher {
         if !iv.is_empty() {
           return Err(DecipherError::InvalidInitializationVector);
         }
-        Aes256Ecb(Box::new(ecb::Decryptor::new(key.into())))
+        Aes256Ecb(Box::new(ecb::Decryptor::new(as_array(key))))
       }
       "aes-128-gcm" => {
         if key.len() != aes::Aes128::key_size() {
@@ -1338,7 +1329,7 @@ impl Decipher {
         }
 
         let decipher =
-          aead_gcm_stream::AesGcm::<aes::Aes128>::new(key.into(), iv);
+          crate::gcm_stream::AesGcm::<aes::Aes128>::new(as_array(key), iv);
 
         Aes128Gcm(Box::new(decipher), auth_tag_length)
       }
@@ -1357,7 +1348,7 @@ impl Decipher {
         }
 
         let decipher =
-          aead_gcm_stream::AesGcm::<aes::Aes256>::new(key.into(), iv);
+          crate::gcm_stream::AesGcm::<aes::Aes256>::new(as_array(key), iv);
 
         Aes256Gcm(Box::new(decipher), auth_tag_length)
       }
@@ -1369,7 +1360,7 @@ impl Decipher {
           return Err(DecipherError::InvalidInitializationVector);
         }
 
-        Aes256Cbc(Box::new(cbc::Decryptor::new(key.into(), iv.into())))
+        Aes256Cbc(Box::new(cbc::Decryptor::new(as_array(key), as_array(iv))))
       }
       "aes-256-ctr" => {
         if key.len() != 32 {
@@ -1378,7 +1369,7 @@ impl Decipher {
         if iv.len() != 16 {
           return Err(DecipherError::InvalidInitializationVector);
         }
-        Aes256Ctr(Box::new(ctr::Ctr128BE::new(key.into(), iv.into())))
+        Aes256Ctr(Box::new(ctr::Ctr128BE::new(as_array(key), as_array(iv))))
       }
       "aes-192-ctr" => {
         if key.len() != 24 {
@@ -1387,7 +1378,7 @@ impl Decipher {
         if iv.len() != 16 {
           return Err(DecipherError::InvalidInitializationVector);
         }
-        Aes192Ctr(Box::new(ctr::Ctr128BE::new(key.into(), iv.into())))
+        Aes192Ctr(Box::new(ctr::Ctr128BE::new(as_array(key), as_array(iv))))
       }
       "aes-128-ctr" => {
         if key.len() != 16 {
@@ -1396,7 +1387,7 @@ impl Decipher {
         if iv.len() != 16 {
           return Err(DecipherError::InvalidInitializationVector);
         }
-        Aes128Ctr(Box::new(ctr::Ctr128BE::new(key.into(), iv.into())))
+        Aes128Ctr(Box::new(ctr::Ctr128BE::new(as_array(key), as_array(iv))))
       }
       "des-ede3-cbc" => {
         if key.len() != 24 {
@@ -1405,7 +1396,7 @@ impl Decipher {
         if iv.len() != 8 {
           return Err(DecipherError::InvalidInitializationVector);
         }
-        DesEde3Cbc(Box::new(cbc::Decryptor::new(key.into(), iv.into())))
+        DesEde3Cbc(Box::new(cbc::Decryptor::new(as_array(key), as_array(iv))))
       }
       "chacha20" => {
         if key.len() != 32 {
@@ -1495,25 +1486,25 @@ impl Decipher {
       Aes128Cbc(decryptor) => {
         assert!(input.len().is_multiple_of(16));
         for (input, output) in input.chunks(16).zip(output.chunks_mut(16)) {
-          decryptor.decrypt_block_b2b_mut(input.into(), output.into());
+          decryptor.decrypt_block_b2b(as_array(input), as_array_mut(output));
         }
       }
       Aes128Ecb(decryptor) => {
         assert!(input.len().is_multiple_of(16));
         for (input, output) in input.chunks(16).zip(output.chunks_mut(16)) {
-          decryptor.decrypt_block_b2b_mut(input.into(), output.into());
+          decryptor.decrypt_block_b2b(as_array(input), as_array_mut(output));
         }
       }
       Aes192Ecb(decryptor) => {
         assert!(input.len().is_multiple_of(16));
         for (input, output) in input.chunks(16).zip(output.chunks_mut(16)) {
-          decryptor.decrypt_block_b2b_mut(input.into(), output.into());
+          decryptor.decrypt_block_b2b(as_array(input), as_array_mut(output));
         }
       }
       Aes256Ecb(decryptor) => {
         assert!(input.len().is_multiple_of(16));
         for (input, output) in input.chunks(16).zip(output.chunks_mut(16)) {
-          decryptor.decrypt_block_b2b_mut(input.into(), output.into());
+          decryptor.decrypt_block_b2b(as_array(input), as_array_mut(output));
         }
       }
       Aes128Gcm(decipher, _) => {
@@ -1527,22 +1518,22 @@ impl Decipher {
       Aes256Cbc(decryptor) => {
         assert!(input.len().is_multiple_of(16));
         for (input, output) in input.chunks(16).zip(output.chunks_mut(16)) {
-          decryptor.decrypt_block_b2b_mut(input.into(), output.into());
+          decryptor.decrypt_block_b2b(as_array(input), as_array_mut(output));
         }
       }
       Aes256Ctr(decryptor) => {
-        decryptor.apply_keystream_b2b(input, output).unwrap();
+        decryptor.apply_keystream_b2b(input, output);
       }
       Aes192Ctr(decryptor) => {
-        decryptor.apply_keystream_b2b(input, output).unwrap();
+        decryptor.apply_keystream_b2b(input, output);
       }
       Aes128Ctr(decryptor) => {
-        decryptor.apply_keystream_b2b(input, output).unwrap();
+        decryptor.apply_keystream_b2b(input, output);
       }
       DesEde3Cbc(decryptor) => {
         assert!(input.len().is_multiple_of(8));
         for (input, output) in input.chunks(8).zip(output.chunks_mut(8)) {
-          decryptor.decrypt_block_b2b_mut(input.into(), output.into());
+          decryptor.decrypt_block_b2b(as_array(input), as_array_mut(output));
         }
       }
       ChaCha20(decipher) => {
@@ -1582,68 +1573,56 @@ impl Decipher {
       (Aes128Cbc(decryptor), true) => {
         assert_block_len!(input.len(), 16);
         let _ = (*decryptor)
-          .decrypt_padded_b2b_mut::<Pkcs7>(input, output)
+          .decrypt_padded_b2b::<Pkcs7>(input, output)
           .map_err(|_| DecipherError::CannotUnpadInputData)?;
         Ok(())
       }
       (Aes128Cbc(mut decryptor), false) => {
         if !input.is_empty() {
           assert_block_len!(input.len(), 16);
-          decryptor.decrypt_block_b2b_mut(
-            GenericArray::from_slice(input),
-            GenericArray::from_mut_slice(output),
-          );
+          decryptor.decrypt_block_b2b(as_array(input), as_array_mut(output));
         }
         Ok(())
       }
       (Aes128Ecb(decryptor), true) => {
         assert_block_len!(input.len(), 16);
         let _ = (*decryptor)
-          .decrypt_padded_b2b_mut::<Pkcs7>(input, output)
+          .decrypt_padded_b2b::<Pkcs7>(input, output)
           .map_err(|_| DecipherError::CannotUnpadInputData)?;
         Ok(())
       }
       (Aes128Ecb(mut decryptor), false) => {
         if !input.is_empty() {
           assert_block_len!(input.len(), 16);
-          decryptor.decrypt_block_b2b_mut(
-            GenericArray::from_slice(input),
-            GenericArray::from_mut_slice(output),
-          );
+          decryptor.decrypt_block_b2b(as_array(input), as_array_mut(output));
         }
         Ok(())
       }
       (Aes192Ecb(decryptor), true) => {
         assert_block_len!(input.len(), 16);
         let _ = (*decryptor)
-          .decrypt_padded_b2b_mut::<Pkcs7>(input, output)
+          .decrypt_padded_b2b::<Pkcs7>(input, output)
           .map_err(|_| DecipherError::CannotUnpadInputData)?;
         Ok(())
       }
       (Aes192Ecb(mut decryptor), false) => {
         if !input.is_empty() {
           assert_block_len!(input.len(), 16);
-          decryptor.decrypt_block_b2b_mut(
-            GenericArray::from_slice(input),
-            GenericArray::from_mut_slice(output),
-          );
+          decryptor.decrypt_block_b2b(as_array(input), as_array_mut(output));
         }
         Ok(())
       }
       (Aes256Ecb(decryptor), true) => {
         assert_block_len!(input.len(), 16);
         let _ = (*decryptor)
-          .decrypt_padded_b2b_mut::<Pkcs7>(input, output)
+          .decrypt_padded_b2b::<Pkcs7>(input, output)
           .map_err(|_| DecipherError::CannotUnpadInputData)?;
         Ok(())
       }
       (Aes256Ecb(mut decryptor), false) => {
         if !input.is_empty() {
           assert_block_len!(input.len(), 16);
-          decryptor.decrypt_block_b2b_mut(
-            GenericArray::from_slice(input),
-            GenericArray::from_mut_slice(output),
-          );
+          decryptor.decrypt_block_b2b(as_array(input), as_array_mut(output));
         }
         Ok(())
       }
@@ -1688,30 +1667,27 @@ impl Decipher {
       (Aes256Cbc(decryptor), true) => {
         assert_block_len!(input.len(), 16);
         let _ = (*decryptor)
-          .decrypt_padded_b2b_mut::<Pkcs7>(input, output)
+          .decrypt_padded_b2b::<Pkcs7>(input, output)
           .map_err(|_| DecipherError::CannotUnpadInputData)?;
         Ok(())
       }
       (Aes256Cbc(mut decryptor), false) => {
         if !input.is_empty() {
           assert_block_len!(input.len(), 16);
-          decryptor.decrypt_block_b2b_mut(
-            GenericArray::from_slice(input),
-            GenericArray::from_mut_slice(output),
-          );
+          decryptor.decrypt_block_b2b(as_array(input), as_array_mut(output));
         }
         Ok(())
       }
       (Aes256Ctr(mut decryptor), _) => {
-        decryptor.apply_keystream_b2b(input, output).unwrap();
+        decryptor.apply_keystream_b2b(input, output);
         Ok(())
       }
       (Aes192Ctr(mut decryptor), _) => {
-        decryptor.apply_keystream_b2b(input, output).unwrap();
+        decryptor.apply_keystream_b2b(input, output);
         Ok(())
       }
       (Aes128Ctr(mut decryptor), _) => {
-        decryptor.apply_keystream_b2b(input, output).unwrap();
+        decryptor.apply_keystream_b2b(input, output);
         Ok(())
       }
       (ChaCha20(mut decipher), _) => {
@@ -1721,17 +1697,14 @@ impl Decipher {
       (DesEde3Cbc(decryptor), true) => {
         assert_block_len!(input.len(), 8);
         let _ = (*decryptor)
-          .decrypt_padded_b2b_mut::<Pkcs7>(input, output)
+          .decrypt_padded_b2b::<Pkcs7>(input, output)
           .map_err(|_| DecipherError::CannotUnpadInputData)?;
         Ok(())
       }
       (DesEde3Cbc(mut decryptor), false) => {
         if !input.is_empty() {
           assert_block_len!(input.len(), 8);
-          decryptor.decrypt_block_b2b_mut(
-            GenericArray::from_slice(input),
-            GenericArray::from_mut_slice(output),
-          );
+          decryptor.decrypt_block_b2b(as_array(input), as_array_mut(output));
         }
         Ok(())
       }

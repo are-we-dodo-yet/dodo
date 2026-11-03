@@ -44,8 +44,6 @@ use std::sync::OnceLock;
 use std::task::Poll;
 
 use futures_channel::oneshot;
-use windows_sys::Win32::Foundation::BOOL;
-use windows_sys::Win32::Foundation::BOOLEAN;
 use windows_sys::Win32::Foundation::CloseHandle;
 use windows_sys::Win32::Foundation::ERROR_ACCESS_DENIED;
 use windows_sys::Win32::Foundation::ERROR_INVALID_PARAMETER;
@@ -121,6 +119,7 @@ use windows_sys::Win32::UI::Shell::FOLDERID_LocalAppData;
 use windows_sys::Win32::UI::Shell::SHGetKnownFolderPath;
 use windows_sys::Win32::UI::WindowsAndMessaging::SW_HIDE;
 use windows_sys::Win32::UI::WindowsAndMessaging::SW_SHOWDEFAULT;
+use windows_sys::core::BOOL;
 use windows_sys::w;
 
 use crate::env::CommandEnv;
@@ -467,7 +466,7 @@ impl ChildProcess {
 
 unsafe extern "system" fn callback(
   ptr: *mut std::ffi::c_void,
-  _timer_fired: BOOLEAN,
+  _timer_fired: bool,
 ) {
   let complete = unsafe { &mut *(ptr as *mut Option<oneshot::Sender<()>>) };
   let _ = complete.take().unwrap().send(());
@@ -1284,7 +1283,7 @@ fn uv__kill(
         if h_dump_file != INVALID_HANDLE_VALUE {
           // Check against INVALID_HANDLE_VALUE
           // If something goes wrong while writing it out, delete the file
-          let delete_on_close = FILE_DISPOSITION_INFO { DeleteFile: 1 }; // 1 = TRUE for DeleteFile
+          let delete_on_close = FILE_DISPOSITION_INFO { DeleteFile: true };
           SetFileInformationByHandle(
             h_dump_file,
             FileDispositionInfo,
@@ -1313,7 +1312,8 @@ fn uv__kill(
 
           if success != 0 {
             // Don't delete the file on close if we successfully wrote it out
-            let dont_delete_on_close = FILE_DISPOSITION_INFO { DeleteFile: 0 }; // 0 = FALSE for DeleteFile
+            let dont_delete_on_close =
+              FILE_DISPOSITION_INFO { DeleteFile: false };
             SetFileInformationByHandle(
               h_dump_file,
               FileDispositionInfo,

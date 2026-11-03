@@ -1229,10 +1229,10 @@ pub(crate) mod webtransport {
     let (connect_tx_rid, connect_rx_rid) = {
       let (mut tx, mut rx) = conn.open_bi().await?;
 
-      let request = ConnectRequest { url: url.clone() };
+      let request = ConnectRequest::new(url.clone());
 
       let mut buf = Vec::new();
-      request.encode(&mut buf);
+      request.encode(&mut buf)?;
       tx.write_all(&buf).await?;
 
       buf.clear();
@@ -1307,10 +1307,7 @@ pub(crate) mod webtransport {
       };
 
       buf.clear();
-      let resp = ConnectResponse {
-        status: 200u16.try_into().unwrap(),
-      };
-      resp.encode(&mut buf);
+      ConnectResponse::OK.encode(&mut buf)?;
       tx.write_all(&buf).await?;
 
       let mut state = state.borrow_mut();
