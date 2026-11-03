@@ -1207,7 +1207,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
                 ),
               ),
               run:
-                `cargo check --locked -p dodo -p denort --no-default-features --features quickjs`,
+                `cargo check --locked -p deno -p denort --no-default-features --features quickjs`,
               env: { CARGO_PROFILE_DEV_DEBUG: 0 },
             },
             cargoBuildReleaseStep,
@@ -1632,7 +1632,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
             "cargo check --no-default-features --features package_json -p deno_config",
             "cargo check --no-default-features --features workspace --features sync -p deno_config",
             "cargo check --target wasm32-unknown-unknown --all-features -p deno_config",
-            "cargo check -p dodo --features=lsp-tracing",
+            "cargo check -p deno --features=lsp-tracing",
           ],
         },
         saveCacheStep,

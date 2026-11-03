@@ -102,7 +102,7 @@ Build and preserve the baseline release executable:
 ```sh
 unset DENO_USE_STARTUP_ORDER DENO_STARTUP_ORDER_FILE
 DENO_SNAPSHOT_MINIFY_SOURCES=1 \
-  cargo build --release --locked -p dodo --bin dodo \
+  cargo build --release --locked -p deno --bin dodo \
     --features=deno/panic-trace
 cp -p target/release/deno target/release/deno-before-startup-order
 ```
@@ -138,7 +138,7 @@ Relink `deno`:
 DENO_SNAPSHOT_MINIFY_SOURCES=1 \
 DENO_USE_STARTUP_ORDER=1 \
 DENO_STARTUP_ORDER_FILE="$ORDER" \
-  cargo build --release --locked -p dodo --bin dodo \
+  cargo build --release --locked -p deno --bin dodo \
     --features=deno/panic-trace
 ```
 

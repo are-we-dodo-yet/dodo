@@ -17,7 +17,7 @@ crates.
 First, compile Deno normally.
 
 ```
-cargo build -p dodo [--release]
+cargo build -p deno [--release]
 ```
 
 Run the following command to start watching for changes in `ext/webgpu` crate
