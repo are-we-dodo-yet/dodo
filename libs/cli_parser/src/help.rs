@@ -145,7 +145,7 @@ fn has_permission_args(cmd: &CommandDef) -> bool {
     .any(|g| std::ptr::eq(g.as_ptr(), crate::defs::PERMISSION_ARGS.as_ptr()))
 }
 
-/// Render the "Environment variables" section documented in `deno --help`.
+/// Render the "Environment variables" section documented in `dodo --help`.
 fn render_env_vars() -> String {
   use crate::env_vars::ENV_VARS;
   let mut out = String::from(
@@ -174,7 +174,7 @@ fn render_env_vars() -> String {
   out
 }
 
-/// Render help for the root command when called with `deno --help`.
+/// Render help for the root command when called with `dodo --help`.
 pub fn render_root_help(cmd: &CommandDef) -> String {
   render_help(cmd)
 }

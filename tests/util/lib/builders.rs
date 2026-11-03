@@ -285,7 +285,7 @@ impl TestContextBuilder {
       None => cwd,
     };
 
-    // Point `deno check` at a pre-downloaded native compiler so each test's
+    // Point `dodo check` at a pre-downloaded native compiler so each test's
     // fresh temp `DENO_DIR` doesn't re-download it. `tools/download_tsc.ts`
     // materializes it under `<target>/.native_tsc/deno_dir`; the harness resolves
     // that path itself and injects `DENO_TSC_BIN` per-test (like `JSR_URL`),

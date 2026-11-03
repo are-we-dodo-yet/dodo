@@ -435,8 +435,8 @@ pub struct AssetFile {
 /// Walk the filesystem for non-module assets matched by the package's
 /// publish config (`publish.include`/`exclude`) and read their raw bytes.
 ///
-/// `deno publish` collects every file via the publish `FilePatterns`, but
-/// `deno pack` only walks the module graph, so static assets were never
+/// `dodo publish` collects every file via the publish `FilePatterns`, but
+/// `dodo pack` only walks the module graph, so static assets were never
 /// included. This mirrors `publish`'s `collect_paths` (ignore .git,
 /// node_modules and the vendor dir, honour .gitignore, skip non-regular
 /// files / `.DS_Store` / `.gitignore`) and then drops anything already
@@ -497,7 +497,7 @@ fn collect_asset_files(
 
   let collected = FileCollector::new(|e| {
     if !e.metadata.file_type().is_file() {
-      // Mirror `deno publish`, which surfaces a diagnostic for non-regular
+      // Mirror `dodo publish`, which surfaces a diagnostic for non-regular
       // files matched by the publish config. `pack` can't include them, so
       // warn rather than silently dropping (e.g. a symlinked asset) to
       // avoid a confusing "why is my file missing?" report.
@@ -717,7 +717,7 @@ fn process_single_module(
   // processing. SWC's module parser rejects shebangs with "Expected
   // ident", and tools downstream don't want to deal with them either.
   // We re-prepend the shebang to the final emitted JS so executable
-  // scripts still work after `deno pack`.
+  // scripts still work after `dodo pack`.
   let (shebang, source_text) = split_shebang(raw_source);
 
   let parsed = parsed_source_cache.remove_or_parse_module(
@@ -784,7 +784,7 @@ fn process_single_module(
   };
 
   // Re-prepend the shebang we stripped earlier so executable scripts
-  // (e.g. `#!/usr/bin/env -S deno run -A`) still work after pack.
+  // (e.g. `#!/usr/bin/env -S dodo run -A`) still work after pack.
   let js_content = match shebang {
     Some(line) => format!("{}{}", line, js_content),
     None => js_content,

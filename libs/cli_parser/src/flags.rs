@@ -220,7 +220,7 @@ pub struct CompileFlags {
   /// `--include npm:<pkg>` for any such packages.
   pub exclude_unused_npm: bool,
   /// JS engine the compiled binary should run on. Named `engine` because
-  /// `deno desktop --backend` already means the render backend.
+  /// `dodo desktop --backend` already means the render backend.
   pub engine: JavaScriptEngine,
 }
 
@@ -278,7 +278,7 @@ pub struct DesktopFlags {
   pub compress: Option<String>,
   /// Embed only the npm packages reachable from the module graph instead of
   /// the full managed snapshot. Same opt-in semantics as
-  /// `deno compile --exclude-unused-npm`.
+  /// `dodo compile --exclude-unused-npm`.
   pub exclude_unused_npm: bool,
 }
 
@@ -921,7 +921,7 @@ pub struct InternalFlags {
   pub lockfile_skip_write: bool,
   /// Set when running the desktop subcommand to use desktop type libs.
   pub is_desktop: bool,
-  /// Set by `deno compile --bundle` when the bundled output contains
+  /// Set by `dodo compile --bundle` when the bundled output contains
   /// references that need to resolve against npm packages at runtime
   /// (CJS dependencies, native addons). When true, the standalone
   /// binary writer embeds (a subset of) the npm tree. Pure-ESM bundles
@@ -935,7 +935,7 @@ pub struct InternalFlags {
   /// Force-enable bundle-style resolution config regardless of the
   /// current subcommand. Set by `compile --bundle` so the bundle phase
   /// of compilation pulls deep CJS files (e.g. `jiti.cjs`) into the
-  /// module graph the same way `deno bundle` does.
+  /// module graph the same way `dodo bundle` does.
   pub force_bundle_mode: bool,
 }
 

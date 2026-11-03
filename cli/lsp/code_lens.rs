@@ -150,7 +150,7 @@ fn find_test_fn_body(node: &ast::CallExpr) -> Option<TestFnBody<'_>> {
 
 /// Push the "Run Test" and "Debug" code lenses for a test or test step. For a
 /// test step, `name` is the name of the enclosing top-level test (the only
-/// granularity `deno test --filter` supports), so debugging a step runs its
+/// granularity `dodo test --filter` supports), so debugging a step runs its
 /// parent test under the inspector.
 fn add_test_code_lenses(
   code_lenses: &mut Vec<lsp::CodeLens>,

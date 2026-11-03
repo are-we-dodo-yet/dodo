@@ -1003,7 +1003,7 @@ async fn test_specifier_inner(
     .map_err(|e| CoreErrorKind::Js(e).into_box())?;
 
   // Run any pending Node-API finalizers before the worker is torn down. This
-  // matches the `deno run`/`deno bench` paths and Node.js, where finalizers
+  // matches the `dodo run`/`dodo bench` paths and Node.js, where finalizers
   // registered via `napi_wrap`/`napi_add_finalizer` are invoked at teardown
   // even if the wrapped value was never garbage collected during the run.
   worker.run_napi_ref_finalizers();
@@ -1028,9 +1028,9 @@ async fn test_specifier_inner(
 
   // If a debugger session is still attached (e.g. Chrome DevTools holding
   // the connection open for an in-progress Performance recording), wait for
-  // it to disconnect before tearing down the worker. Mirrors `deno run`'s
+  // it to disconnect before tearing down the worker. Mirrors `dodo run`'s
   // behavior; otherwise the connection is dropped mid-flight, making it
-  // impossible to profile `deno test` runs. See issue #19289.
+  // impossible to profile `dodo test` runs. See issue #19289.
   worker.wait_for_inspector_session_disconnect().await?;
 
   Ok(())

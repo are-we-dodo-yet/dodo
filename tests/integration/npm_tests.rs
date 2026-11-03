@@ -1411,7 +1411,7 @@ console.log(getKind());
     .args("run --allow-read chalk.ts")
     .run();
   output.assert_matches_text(
-    r#"error: Could not find a matching package for 'npm:chalk@5' in the node_modules directory. Ensure you have all your JSR and npm dependencies listed in your deno.json or package.json, then run `deno install`. Alternatively, turn on auto-install by specifying `"nodeModulesDir": "auto"` in your deno.json file.
+    r#"error: Could not find a matching package for 'npm:chalk@5' in the node_modules directory. Ensure you have all your JSR and npm dependencies listed in your deno.json or package.json, then run `dodo install`. Alternatively, turn on auto-install by specifying `"nodeModulesDir": "auto"` in your deno.json file.
     at file:///[WILDCARD]chalk.ts:1:19
 "#);
   output.assert_exit_code(1);
@@ -1479,7 +1479,7 @@ fn byonm_package_specifier_not_installed_and_invalid_subpath() {
   // no npm install has been run, so this should give an informative error
   let output = test_context.new_command().args("run main.ts").run();
   output.assert_matches_text(
-    r#"error: Could not resolve "chalk", but found it in a package.json. Deno expects the node_modules/ directory to be up to date. Did you forget to run `deno install`?
+    r#"error: Could not resolve "chalk", but found it in a package.json. Deno expects the node_modules/ directory to be up to date. Did you forget to run `dodo install`?
     at file:///[WILDCARD]/main.ts:1:19
 "#,
   );

@@ -38,7 +38,7 @@ use reqwest::StatusCode;
 /// deno run --allow-net --allow-read=. --allow-write=. jsr:@david/bench-registry@0.3.2/cli --cached-only
 /// ```
 ///
-/// Then do `deno clean ; pnpm cache delete`, create an `.npmrc` with:
+/// Then do `dodo clean ; pnpm cache delete`, create an `.npmrc` with:
 ///
 /// ```ini
 /// registry=http://localhost:8000/npm/

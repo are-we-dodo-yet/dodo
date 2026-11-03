@@ -451,7 +451,7 @@ impl ReplSession {
     // resolution microtask drains, the weakly-held promise is collected and
     // the CDP client gets a `-32000 "Promise was collected"` error. Doing
     // the dispatch + drain pair here closes that window for external
-    // debuggers attached via `deno repl --inspect`.
+    // debuggers attached via `dodo repl --inspect`.
     // (post_message_with_event_loop above handles the same race for the
     // in-process REPL session.)
     std::future::poll_fn(|cx| {

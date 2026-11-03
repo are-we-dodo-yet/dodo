@@ -48,7 +48,7 @@ fn main() {
 
   if std::fs::metadata("./tests/ecosystem/jsr_mirror").is_err() {
     println!(
-      "skipping, ecosystem mirror not found. run `deno run -A ./tests/ecosystem/jsr_mirror.ts` to populate"
+      "skipping, ecosystem mirror not found. run `dodo run -A ./tests/ecosystem/jsr_mirror.ts` to populate"
     );
     return;
   }

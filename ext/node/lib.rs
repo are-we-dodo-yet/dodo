@@ -469,7 +469,7 @@ deno_core::extension!(deno_node,
   // explicit eager `esm` entry: the whole node process closure
   // (module / process / stream / net / tty / ...) is moved to
   // `lazy_loaded_esm` and only deserialized on first node:* use, so non-node
-  // `deno run` programs never pay for it in the snapshot. An explicit entry
+  // `dodo run` programs never pay for it in the snapshot. An explicit entry
   // here that no eager module imports would land in the module map
   // unevaluated and fail snapshot validation with `NonEvaluatedModules`.
   esm = [
@@ -478,7 +478,7 @@ deno_core::extension!(deno_node,
   // Keep the rest of the node-polyfill closures (process / module / net /
   // tty / 01_require) out of the eager evaluation graph: their foundational
   // SFIs and context state are loaded only on first node:* use, so non-node
-  // `deno run` paths skip ~2 MB of node-polyfill deserialization.
+  // `dodo run` paths skip ~2 MB of node-polyfill deserialization.
   // node:module previously had to stay eager because lazy bootstrap shifted
   // Agent.keepSocketAlive's setUnrefTimeout(5000) into test execution where
   // the sanitizer saw it as a leak; the timer is now marked is_system in

@@ -201,7 +201,7 @@ pub async fn ci_command(
   let factory = CliFactory::from_flags(flags.clone());
   if factory.maybe_lockfile().await?.is_none() {
     bail!(
-      "deno ci requires a lockfile, but none was found.\n  hint: run `deno install` to create one."
+      "deno ci requires a lockfile, but none was found.\n  hint: run `dodo install` to create one."
     );
   }
   if let Some(node_modules_dir) = factory.node_modules_dir_path()?
@@ -231,19 +231,19 @@ pub async fn ci_command(
   .await
 }
 
-/// `deno sync-types`: generate a tsconfig + type mappings so stock TypeScript
+/// `dodo sync-types`: generate a tsconfig + type mappings so stock TypeScript
 /// tooling can type-check the project. Assumes dependencies are already
-/// installed (run `deno install` first); materializes `jsr:`/`http(s):` types
+/// installed (run `dodo install` first); materializes `jsr:`/`http(s):` types
 /// and writes `.deno/tsconfig.json`.
 /// How `sync_types_command` should treat the root `tsconfig.json`.
 #[derive(Debug, Clone, Copy)]
 pub enum RootTsConfigMode {
   /// Always create/update a root `tsconfig.json` extending `.deno/tsconfig.json`
-  /// (used by the standalone `deno sync-types` command, for IDE setup).
+  /// (used by the standalone `dodo sync-types` command, for IDE setup).
   Always,
   /// Only manage the root `tsconfig.json` when Deno is honoring a user's
   /// tsconfig (a deno.json/package.json is present and config isn't disabled).
-  /// Used by `deno check`, which otherwise points tsc at `.deno/tsconfig.json`
+  /// Used by `dodo check`, which otherwise points tsc at `.deno/tsconfig.json`
   /// directly and must not rewrite a tsconfig Deno is ignoring.
   CheckMode,
 }
@@ -263,7 +263,7 @@ pub async fn sync_types_command(
   let permissions = factory.root_permissions_container()?.clone();
 
   // Generate at the workspace/config root, not the current working directory,
-  // so running `deno sync-types` from a subdirectory still writes the config
+  // so running `dodo sync-types` from a subdirectory still writes the config
   // next to deno.json and picks up the root import map.
   let project_root = cli_options
     .workspace()
@@ -333,8 +333,8 @@ pub async fn sync_types_command(
     // *did* resolve regardless.
     let graph_creator = factory.module_graph_creator().await?;
     // Silence warn-level diagnostics during this discovery build. It's an
-    // internal step (not the user's `deno check`), and the graph the user
-    // installed was already validated by `deno install` — re-emitting e.g.
+    // internal step (not the user's `dodo check`), and the graph the user
+    // installed was already validated by `dodo install` — re-emitting e.g.
     // "workspace member ... was not used" warnings here is just noise.
     let prev_log_level = log::max_level();
     log::set_max_level(log::LevelFilter::Error);
@@ -442,18 +442,18 @@ pub async fn sync_types_command(
       .map(|opts| opts.0.clone())
   });
 
-  // Whether to manage the root `tsconfig.json`. `deno check` (CheckMode) never
+  // Whether to manage the root `tsconfig.json`. `dodo check` (CheckMode) never
   // rewrites a committed tsconfig (that would dirty the working tree). When it
   // honors a user tsconfig it instead builds a throwaway overlay in a temp file
   // (see `native_check` / `build_check_root_overlay`), leaving the user's tree
-  // untouched. `deno sync-types` (Always) still sets up the root tsconfig for
+  // untouched. `dodo sync-types` (Always) still sets up the root tsconfig for
   // IDEs.
   let manage_root_tsconfig = match root_tsconfig_mode {
     RootTsConfigMode::Always => true,
     RootTsConfigMode::CheckMode => false,
   };
 
-  // `deno check --all` type-checks remote modules; otherwise mirrored remote
+  // `dodo check --all` type-checks remote modules; otherwise mirrored remote
   // scripts get `// @ts-nocheck` so tsc skips their internals.
   let type_check_remote =
     cli_options.type_check_mode() == crate::args::TypeCheckMode::All;

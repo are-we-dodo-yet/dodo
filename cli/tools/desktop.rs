@@ -333,7 +333,7 @@ async fn compile_desktop(
             // (e.g. Vite's); type-checking it would demand the project ship
             // `@types/node` and checks nothing user-authored, so skip it.
             flags.type_check_mode = TypeCheckMode::None;
-            // The dev server used to run as an unsandboxed `deno task dev`
+            // The dev server used to run as an unsandboxed `dodo task dev`
             // subprocess; now that it runs inside the desktop runtime, keep
             // that behavior — a sandboxed Vite immediately dies on env reads
             // (e.g. NAPI_RS_WASI_FLAVOR from its napi loader).
@@ -347,10 +347,10 @@ async fn compile_desktop(
       };
       log::info!("Detected {} framework", detection.name);
       if !use_framework_hmr {
-        // Run the framework's build step (e.g. `deno task build`) before its
+        // Run the framework's build step (e.g. `dodo task build`) before its
         // build output (`dist`, `.next`, etc.) is added to the compile includes
         // below; otherwise the include points at a directory that doesn't exist
-        // yet and the compile fails (#35535). Mirrors `deno compile .`.
+        // yet and the compile fails (#35535). Mirrors `dodo compile .`.
         super::framework::run_build_command(detection, cwd)?;
       }
       // Enable CJS detection for Node-based frameworks.
@@ -381,7 +381,7 @@ async fn compile_desktop(
         }
       }
       // Write a temporary entrypoint file. tempfile gives us a unique
-      // name (no collision between concurrent `deno desktop` runs in
+      // name (no collision between concurrent `dodo desktop` runs in
       // the same project) and 0600 mode (no symlink-pre-creation
       // attack); cleanup-on-drop replaces the explicit guard.
       let entrypoint_temp = tempfile::Builder::new()
@@ -1337,7 +1337,7 @@ async fn run_desktop_hmr(
     cmd.env("LAUFEY_APP_NAME", name);
   }
   // Only enable the file watcher + setScriptSource pipeline when the user
-  // actually asked for HMR. `deno desktop --inspect` alone used to spin up
+  // actually asked for HMR. `dodo desktop --inspect` alone used to spin up
   // both, surprising users (and burning the inspector channel on hot
   // reloads they didn't request).
   if desktop_flags.hmr {
@@ -1503,7 +1503,7 @@ async fn run_desktop_hmr(
 /// touching unrelated user data that happens to share the inferred app name.
 const APP_DIR_MARKER: &str = ".deno-desktop-app";
 
-/// Used for `deno desktop --hmr` when a framework runs its own HMR server.
+/// Used for `dodo desktop --hmr` when a framework runs its own HMR server.
 /// The compiled app has nothing to serve in this case.
 const NOOP_ENTRYPOINT: &str =
   "// @ts-nocheck\nawait new Promise<void>(() => {});\n";
@@ -1547,7 +1547,7 @@ fn reserve_app_dir(app_dir: &Path) -> Result<(), AnyError> {
   if !is_ours && !is_empty {
     bail!(
       "Refusing to delete existing directory '{}': it was not created by \
-       `deno desktop`. The app name was inferred from the entrypoint or the \
+       `dodo desktop`. The app name was inferred from the entrypoint or the \
        project directory and collided with this directory. Pass --output to \
        choose a different name, or remove the directory yourself if it is a \
        leftover from an older build.",
@@ -2004,7 +2004,7 @@ impl LaufeyBackendResolver {
     })?;
     std::fs::create_dir_all(parent)?;
 
-    // Stage extraction in a sibling tempdir so concurrent `deno desktop`
+    // Stage extraction in a sibling tempdir so concurrent `dodo desktop`
     // builds don't see (or stomp on) a half-populated `dir` while one
     // is mid-extract. tempfile's cleanup-on-drop covers panic /
     // early-return paths; on the happy path we consume the TempDir via
@@ -2592,7 +2592,7 @@ fn codesign_macos_bundle(
   if !cfg!(target_os = "macos") {
     bail!(
       "codesigning requires a macOS build host (uses `codesign(1)`). \
-       Run `deno desktop` on macOS, or drop `macos.codesignIdentity` \
+       Run `dodo desktop` on macOS, or drop `macos.codesignIdentity` \
        from your deno.json when cross-building."
     );
   }
@@ -3254,7 +3254,7 @@ async fn package_macos_app_bundle(
 
   // Resolve the bundle identifier. The user-configured `identifier` is
   // preferred; otherwise we synthesize one from the app name. The
-  // synthetic form is fine for `deno run`-like local use, but real
+  // synthetic form is fine for `dodo run`-like local use, but real
   // distribution wants a stable reverse-DNS identifier — notification
   // permission (and other tcc-keyed permissions) are decided per
   // (bundle id, code signature), so a synthetic id changes the user's
@@ -6265,7 +6265,7 @@ def456  other.zip
 
   #[test]
   fn resolve_app_dir_targets_rejects_clobbering_a_backend_library() {
-    // `deno desktop --output libcef` on Linux, `--output libcef` on Windows:
+    // `dodo desktop --output libcef` on Linux, `--output libcef` on Windows:
     // the runtime library copy would replace a file CEF ships.
     let tmp = tempfile::tempdir().unwrap();
 
@@ -6398,7 +6398,7 @@ def456  other.zip
 
   #[test]
   fn reject_backend_file_collision_rejects_a_backend_file() {
-    // `deno desktop --output libcef` on Linux, or `--output d3dcompiler_47` on
+    // `dodo desktop --output libcef` on Linux, or `--output d3dcompiler_47` on
     // Windows: the copy would replace a file CEF ships and the app would no
     // longer start, with nothing in the build output to say why.
     let tmp = tempfile::tempdir().unwrap();
@@ -8266,7 +8266,7 @@ def456  other.zip
 
   #[test]
   fn reserve_app_dir_clears_previous_build() {
-    // A directory carrying our marker is a prior `deno desktop` output and
+    // A directory carrying our marker is a prior `dodo desktop` output and
     // may be replaced.
     let tmp = tempfile::tempdir().unwrap();
     let app_dir = tmp.path().join("app");

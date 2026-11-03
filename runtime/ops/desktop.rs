@@ -1,6 +1,6 @@
 // Copyright 2018-2026 the Deno authors. MIT license.
 
-//! Desktop window management ops for `deno compile --desktop`.
+//! Desktop window management ops for `dodo compile --desktop`.
 //!
 //! These ops are included in the V8 snapshot so their external references
 //! are stable. When `DesktopApi` is not present in OpState (non-desktop
@@ -1602,7 +1602,7 @@ fn op_desktop_send_error_report(state: &mut OpState, #[string] body: &str) {
   // (`https://`) primitive that bypasses the `--allow-write`/`--allow-net`
   // permission checks every other fs/net op performs.
   let Some((url, _)) = error_report_config() else {
-    // No reporting URL configured (e.g. plain `deno run`, or a desktop app
+    // No reporting URL configured (e.g. plain `dodo run`, or a desktop app
     // that didn't set one) — there is nowhere to send, so do nothing.
     return;
   };

@@ -220,7 +220,7 @@ fn unadded_dependency_message_with_import_map() {
   let mut expected_lsp_messages = Vec::from([
     "`x` is never used\nIf this is intentional, prefix it with an underscore like `_x`",
     "'x' is declared but its value is never read.",
-    "Import \"@std/fs\" not a dependency and not in import map from \"   hint: If you want to use the JSR package, try running `deno add jsr:@std/fs`",
+    "Import \"@std/fs\" not a dependency and not in import map from \"   hint: If you want to use the JSR package, try running `dodo add jsr:@std/fs`",
   ]);
   expected_lsp_messages.sort();
   let all_diagnostics = diagnostics.all();
@@ -241,7 +241,7 @@ fn unadded_dependency_message_with_import_map() {
 fn lsp_doc_lint_diagnostics() {
   let context = TestContextBuilder::new().use_temp_cwd().build();
   let temp_dir = context.temp_dir();
-  // A publishable package: `deno doc --lint` checks its export entrypoints for
+  // A publishable package: `dodo doc --lint` checks its export entrypoints for
   // missing documentation.
   temp_dir.write(
     "deno.json",
@@ -354,7 +354,7 @@ fn unadded_dependency_message() {
   let mut expected_lsp_messages = Vec::from([
     "`x` is never used\nIf this is intentional, prefix it with an underscore like `_x`",
     "'x' is declared but its value is never read.",
-    "Import \"@std/fs\" not a dependency and not in import map from \"   hint: If you want to use the JSR package, try running `deno add jsr:@std/fs`",
+    "Import \"@std/fs\" not a dependency and not in import map from \"   hint: If you want to use the JSR package, try running `dodo add jsr:@std/fs`",
   ]);
   expected_lsp_messages.sort();
   let all_diagnostics = diagnostics.all();
@@ -7013,7 +7013,7 @@ fn lsp_diagnostics_linked_pkg_wrong_name_hint() {
   temp_dir.write("package/mod.ts", "export const someValue = 1;\n");
   // Import the linked package by its unscoped tail ("package") instead of its
   // declared name ("@org/package"). The diagnostic should hint at the full
-  // name rather than suggesting `deno add npm:`.
+  // name rather than suggesting `dodo add npm:`.
   let file = temp_dir.source_file("file.ts", "import \"package\";\n");
   let mut client = context.new_lsp_command().build();
   client.initialize_default();
@@ -13563,7 +13563,7 @@ fn lsp_jupyter_tsx() {
     .to_string(),
   );
 
-  // TODO(nayeemrmn): `deno install` should work here, it doesn't as of writing.
+  // TODO(nayeemrmn): `dodo install` should work here, it doesn't as of writing.
   temp_dir.write("main.tsx", "");
   context.run_deno("check main.tsx");
 
@@ -15252,7 +15252,7 @@ fn lsp_code_actions_update_ignore_lint() {
       "languageId": "typescript",
       "version": 1,
       "text":
-"#!/usr/bin/env -S deno run
+"#!/usr/bin/env -S dodo run
 // deno-lint-ignore-file camelcase
 let snake_case = 'Hello, Deno!';
 console.log(snake_case);
@@ -20340,7 +20340,7 @@ fn lsp_byonm() {
         "severity": 1,
         "code": "resolver-error",
         "source": "deno",
-        "message": "Could not find a matching package for 'npm:chalk@5' in the node_modules directory. Ensure you have all your JSR and npm dependencies listed in your deno.json or package.json, then run `deno install`. Alternatively, turn on auto-install by specifying `\"nodeModulesDir\": \"auto\"` in your deno.json file.",
+        "message": "Could not find a matching package for 'npm:chalk@5' in the node_modules directory. Ensure you have all your JSR and npm dependencies listed in your deno.json or package.json, then run `dodo install`. Alternatively, turn on auto-install by specifying `\"nodeModulesDir\": \"auto\"` in your deno.json file.",
       },
       {
         "range": {
@@ -20356,7 +20356,7 @@ fn lsp_byonm() {
         "severity": 1,
         "code": "resolver-error",
         "source": "deno",
-        "message": "Could not resolve \"@denotest/esm-basic\", but found it in a package.json. Deno expects the node_modules/ directory to be up to date. Did you forget to run `deno install`?",
+        "message": "Could not resolve \"@denotest/esm-basic\", but found it in a package.json. Deno expects the node_modules/ directory to be up to date. Did you forget to run `dodo install`?",
       },
     ])
   );
@@ -20385,7 +20385,7 @@ fn lsp_byonm() {
         "severity": 1,
         "code": "resolver-error",
         "source": "deno",
-        "message": "Could not find a matching package for 'npm:chalk@5' in the node_modules directory. Ensure you have all your JSR and npm dependencies listed in your deno.json or package.json, then run `deno install`. Alternatively, turn on auto-install by specifying `\"nodeModulesDir\": \"auto\"` in your deno.json file.",
+        "message": "Could not find a matching package for 'npm:chalk@5' in the node_modules directory. Ensure you have all your JSR and npm dependencies listed in your deno.json or package.json, then run `dodo install`. Alternatively, turn on auto-install by specifying `\"nodeModulesDir\": \"auto\"` in your deno.json file.",
       },
     ])
   );
@@ -22497,7 +22497,7 @@ fn lsp_push_diagnostics() {
             "severity": 1,
             "code": "import-prefix-missing",
             "source": "deno",
-            "message": "Import \"foo\" not a dependency\n  hint: If you want to use the npm package, try running `deno add npm:foo`",
+            "message": "Import \"foo\" not a dependency\n  hint: If you want to use the npm package, try running `dodo add npm:foo`",
           },
         ],
         "version": 1,
@@ -22590,7 +22590,7 @@ fn lsp_force_push_based_diagnostics_setting() {
             "severity": 1,
             "code": "import-prefix-missing",
             "source": "deno",
-            "message": "Import \"foo\" not a dependency\n  hint: If you want to use the npm package, try running `deno add npm:foo`",
+            "message": "Import \"foo\" not a dependency\n  hint: If you want to use the npm package, try running `dodo add npm:foo`",
           },
         ],
         "version": 1,
@@ -22617,7 +22617,7 @@ fn lsp_force_push_based_diagnostics_setting() {
 
 // Regression test for https://github.com/denoland/deno/issues/35225: a `.d.ts`
 // opened in the editor is an entrypoint, so its own unresolved bare imports must
-// be reported (as `deno check` does for `.d.ts` entrypoints, see #32794), even
+// be reported (as `dodo check` does for `.d.ts` entrypoints, see #32794), even
 // under `skipLibCheck` where tsc would otherwise skip them.
 #[test(timeout = 300)]
 fn lsp_dts_entrypoint_unresolved_import() {
@@ -22650,7 +22650,7 @@ fn lsp_dts_entrypoint_unresolved_import() {
         "severity": 1,
         "code": "import-prefix-missing",
         "source": "deno",
-        "message": "Import \"some-non-existent-package\" not a dependency\n  hint: If you want to use the npm package, try running `deno add npm:some-non-existent-package`",
+        "message": "Import \"some-non-existent-package\" not a dependency\n  hint: If you want to use the npm package, try running `dodo add npm:some-non-existent-package`",
       },
     ]),
   );

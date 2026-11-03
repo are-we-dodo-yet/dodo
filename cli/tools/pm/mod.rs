@@ -552,7 +552,7 @@ pub async fn add(
   {
     bail!(
       concat!(
-        "`deno {}` is not supported when configuration file contains an \"importMap\" field. ",
+        "`dodo {}` is not supported when configuration file contains an \"importMap\" field. ",
         "Inline the import map into the Deno configuration file.\n",
         "    at {}",
       ),
@@ -1136,7 +1136,7 @@ impl AddRmPackageReq {
     // The reference parsers use the strict specifier version grammar, which
     // only accepts `^`, `~`, exact versions and tags. On the command line we
     // also accept the full npm range grammar (`>=4`, `>=4 <5`, `^4 || 5`,
-    // `1 - 2`, etc) by falling back to loose parsing. `deno add` resolves the
+    // `1 - 2`, etc) by falling back to loose parsing. `dodo add` resolves the
     // requirement to a concrete version before writing it, so what ends up in
     // the config (and in `npm:`/`jsr:` specifiers in code) still uses the
     // strict grammar.
@@ -1349,7 +1349,7 @@ async fn npm_install_after_modification(
 
 /// If the user-supplied `spec` looks like a path to a local JSR package
 /// directory (relative or absolute, currently exists, and contains a
-/// `deno.json`(c)), return a message suggesting `deno link` instead.
+/// `deno.json`(c)), return a message suggesting `dodo link` instead.
 fn link_hint_for_spec(cwd: &Path, spec: &str) -> Option<String> {
   // Skip anything with a registry prefix.
   if spec.contains(':') {
@@ -1373,10 +1373,10 @@ fn link_hint_for_spec(cwd: &Path, spec: &str) -> Option<String> {
   if !abs.is_dir() {
     return None;
   }
-  // Only hint when the directory is actually linkable. `deno link` requires
+  // Only hint when the directory is actually linkable. `dodo link` requires
   // the target's deno.json(c) to exist *and* declare a "name", so check the
-  // same condition here. Otherwise the hint dead-ends: `deno add ./pkg` ->
-  // "Did you mean `deno link ./pkg`?" -> `deno link ./pkg` -> "its deno.json
+  // same condition here. Otherwise the hint dead-ends: `dodo add ./pkg` ->
+  // "Did you mean `dodo link ./pkg`?" -> `dodo link ./pkg` -> "its deno.json
   // has no name field".
   read_link_target_name(&abs)?;
   Some(format!(
@@ -1557,7 +1557,7 @@ pub async fn unlink(
   let (cli_factory, mut deno_config) =
     load_deno_config_for_link(&flags, false)?;
   // Resolve path arguments relative to the cwd, matching how `link()` resolves
-  // them, so `deno unlink ../pkg` finds an entry created by `deno link ../pkg`
+  // them, so `dodo unlink ../pkg` finds an entry created by `dodo link ../pkg`
   // from the same directory regardless of where the deno.json lives.
   let cwd = cli_factory.cli_options()?.initial_cwd().to_path_buf();
   let config_dir = deno_config

@@ -560,7 +560,7 @@ fn resolve_bare_against_import_map(
 /// If the project already installed `@types/node` under its `node_modules`, we
 /// reuse that in place. Otherwise we materialize a stock copy under
 /// `.deno/npm-compat` (which is gitignored) - never downloading into the
-/// project's real `node_modules`, so `deno check` doesn't mutate the user's tree
+/// project's real `node_modules`, so `dodo check` doesn't mutate the user's tree
 /// (and doesn't dirty the working directory).
 async fn ensure_types_node(
   project_root: &Path,
@@ -918,7 +918,7 @@ fn generate_deno_tsconfig(
 ///
 /// Uses `HttpClient::download` directly (not `CliFileFetcher`) because we
 /// don't want each registry/tarball URL surfacing as a user-visible
-/// "Download …" line in `deno install` output — those are an
+/// "Download …" line in `dodo install` output — those are an
 /// implementation detail of the stock-tsc compatibility setup. The
 /// fetcher's caching and redirect handling are unnecessary for npm.jsr.io.
 async fn install_jsr_packages(
@@ -1037,7 +1037,7 @@ async fn install_jsr_packages(
 /// `package.json` is the last thing [`extract_tarball_gz_atomic`] publishes -
 /// it only ever appears via the atomic rename of a complete staging dir - so
 /// its presence is the marker that the tree is usable. A bare `exists()` check
-/// on the destination is not: with several `deno check` processes sharing a
+/// on the destination is not: with several `dodo check` processes sharing a
 /// cache, one can observe a directory the other has only started filling in,
 /// skip the download, and then fail type checking with
 /// `TS2688 Cannot find type definition file for 'node'`.
@@ -1099,7 +1099,7 @@ fn cleanup_stale_staging_dirs(
 /// half-extracted state: unpack into a sibling staging directory on the same
 /// filesystem, then `rename` it into place.
 ///
-/// Concurrent `deno check` invocations sharing a cache race to materialize the
+/// Concurrent `dodo check` invocations sharing a cache race to materialize the
 /// same package. The rename makes each one either publish a complete tree or
 /// lose harmlessly to a winner that already did.
 fn extract_tarball_gz_atomic(
@@ -1347,7 +1347,7 @@ pub async fn install_http_modules(
       Ok(f) => f,
       Err(e) => {
         log::warn!(
-          "Skipping {requested_url}: {e} (try running `deno install --allow-import` to grant access)"
+          "Skipping {requested_url}: {e} (try running `dodo install --allow-import` to grant access)"
         );
         continue;
       }
@@ -1487,7 +1487,7 @@ fn write_mirror(
   // dwarfs the project's own diagnostics). `@ts-nocheck` suppresses errors in
   // the file while keeping its exported and ambient types available to
   // importers, and triple-slash directives (which may follow a leading comment)
-  // still apply. Skipped under `deno check --all`, which does type-check remote
+  // still apply. Skipped under `dodo check --all`, which does type-check remote
   // modules.
   let is_script = matches!(
     local_path.extension().and_then(|e| e.to_str()),

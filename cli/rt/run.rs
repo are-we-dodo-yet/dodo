@@ -159,7 +159,7 @@ struct EmbeddedModuleLoader {
   hook_registry: LoaderHookRegistry,
   permissions: PermissionsContainer,
   /// Whether this loader belongs to a web worker. A worker's main module is
-  /// checked against read permissions like a dynamic import (as in `deno run`).
+  /// checked against read permissions like a dynamic import (as in `dodo run`).
   is_worker: bool,
   sys: DenoRtSys,
   /// For blob/object-URL module workers, the captured root blob and its
@@ -208,7 +208,7 @@ impl CjsAnalysisSourceProvider for StandaloneCjsAnalysisSourceProvider<'_> {
 impl EmbeddedModuleLoader {
   /// Local files that aren't embedded in the binary are read from the host
   /// file system. When loaded via `import()` or as a worker's main module,
-  /// they must pass the read permission check, the same as in `deno run`.
+  /// they must pass the read permission check, the same as in `dodo run`.
   fn check_host_fs_read_permission(
     &self,
     specifier: &Url,
@@ -881,7 +881,7 @@ impl ModuleLoader for EmbeddedModuleLoader {
               ModuleSourceCode::Bytes(bytes.into_boxed_slice().into())
             }
             _ => {
-              // Mirror `deno run`'s charset-aware decoding (see
+              // Mirror `dodo run`'s charset-aware decoding (see
               // `TextDecodedFile::decode` in cli/file_fetcher.rs) so blob
               // sources honor the content-type charset and have a leading BOM
               // stripped, instead of blindly assuming UTF-8.
@@ -1720,7 +1720,7 @@ pub async fn run_with_options(
   // and aborts script execution before the event-loop IIFE registers —
   // which manifests as a blank window where nothing works (no input,
   // no auto-tests, no bindings). Granting them up front avoids forcing
-  // every `deno desktop` user to remember `-A`.
+  // every `dodo desktop` user to remember `-A`.
   let has_desktop = op_state_init.is_some();
   let permissions = {
     let mut permissions = metadata.permissions;

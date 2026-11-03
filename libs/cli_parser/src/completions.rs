@@ -175,7 +175,7 @@ fn generate_zsh(cmd: &CommandDef) -> Vec<u8> {
     "    )\n    _describe -t commands 'deno commands' commands\n}\n\n",
   );
 
-  // `deno [flags] <script>` runs the default subcommand, so the first
+  // `dodo [flags] <script>` runs the default subcommand, so the first
   // positional can be either a subcommand or a script file.
   let default_sub = cmd
     .default_subcommand
@@ -192,7 +192,7 @@ fn generate_zsh(cmd: &CommandDef) -> Vec<u8> {
   out.push_str("    _arguments -C \\\n");
 
   // Global flags, plus the default subcommand's flags since they are accepted
-  // before the script in a bare invocation (e.g. `deno -A main.ts`).
+  // before the script in a bare invocation (e.g. `dodo -A main.ts`).
   let mut seen = std::collections::HashSet::new();
   let root_args = cmd
     .all_args()
@@ -503,7 +503,7 @@ compdef _clap_dynamic_completer_NAME BIN"#;
 pub type Candidate = (String, Option<String>);
 
 /// Produces completion candidates for a positional argument the built-in
-/// engine can't resolve on its own (e.g. `deno task <TAB>` -> task names read
+/// engine can't resolve on its own (e.g. `dodo task <TAB>` -> task names read
 /// from `deno.json`). Called with the active (sub)command and the current
 /// partial word. Returning an empty vec falls back to the shell's default
 /// (file) completion. This lives CLI-side so the parser crate needs no
@@ -639,7 +639,7 @@ fn get_candidates(
     .any(|w| !w.starts_with('-') && root.find_subcommand(w).is_some());
 
   // Value candidates come first, matching clap's ordering: subcommand names at
-  // the root, or positional values inside a subcommand (e.g. `deno task <TAB>`
+  // the root, or positional values inside a subcommand (e.g. `dodo task <TAB>`
   // -> task names via the CLI-provided completer). Skipped when the user is
   // clearly typing a flag (`-...`).
   if !want_flag {
@@ -667,7 +667,7 @@ fn get_candidates(
     candidates.extend(values);
   }
 
-  // Then flags: long flags are always offered (so `deno task <TAB>` also lists
+  // Then flags: long flags are always offered (so `dodo task <TAB>` also lists
   // `--config` etc.); short flags only when the user has typed a leading `-`.
   let mut flags: Vec<Candidate> = Vec::new();
   for arg in active_cmd
@@ -796,7 +796,7 @@ mod tests {
   #[test]
   fn generate_zsh_short_flags_keep_their_dash() {
     // Regression test for #36713: the brace expansion dropped the `-` on the
-    // short form, so `deno <TAB>` made zsh bail out with
+    // short form, so `dodo <TAB>` made zsh bail out with
     // `_arguments:comparguments:327: invalid argument: (-h --help)h[]`.
     let s =
       String::from_utf8(generate("zsh", &crate::defs::DENO_ROOT)).unwrap();
@@ -813,9 +813,9 @@ mod tests {
 
   #[test]
   fn generate_zsh_completes_files_for_bare_run() {
-    // Regression test for #36959: `deno -A ./<TAB>` only offered subcommands
+    // Regression test for #36959: `dodo -A ./<TAB>` only offered subcommands
     // for the first positional and nothing after a non-subcommand word, so
-    // script paths never completed for a bare `deno [flags] <script>`.
+    // script paths never completed for a bare `dodo [flags] <script>`.
     let s =
       String::from_utf8(generate("zsh", &crate::defs::DENO_ROOT)).unwrap();
     assert!(s.contains("_deno_commands_or_files() {"), "{s}");
