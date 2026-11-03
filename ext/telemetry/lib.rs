@@ -68,7 +68,6 @@ use opentelemetry::trace::Status as SpanStatus;
 use opentelemetry::trace::TraceFlags;
 use opentelemetry::trace::TraceId;
 use opentelemetry::trace::TraceState;
-use opentelemetry_otlp::HttpExporterBuilder;
 use opentelemetry_otlp::Protocol;
 use opentelemetry_otlp::WithExportConfig;
 use opentelemetry_otlp::WithHttpConfig;
@@ -1361,28 +1360,32 @@ pub fn init(
   } else {
     let client = hyper_client::HyperClient::new(sys)?;
 
-    let span_exporter = HttpExporterBuilder::default()
+    let span_exporter = opentelemetry_otlp::SpanExporter::builder()
+      .with_http()
       .with_http_client(client.clone())
       .with_protocol(protocol)
-      .build_span_exporter()?;
+      .build()?;
     let mut span_processor =
       BatchSpanProcessor::builder(span_exporter, OtelSharedRuntime).build();
     span_processor.set_resource(&resource);
 
-    let metric_exporter = HttpExporterBuilder::default()
+    let metric_exporter = opentelemetry_otlp::MetricExporter::builder()
+      .with_http()
       .with_http_client(client.clone())
       .with_protocol(protocol)
-      .build_metrics_exporter(temporality)?;
+      .with_temporality(temporality)
+      .build()?;
     let metric_reader = DenoPeriodicReader::new(sys, metric_exporter);
     let meter_provider = SdkMeterProvider::builder()
       .with_reader(metric_reader)
       .with_resource(resource.clone())
       .build();
 
-    let log_exporter = HttpExporterBuilder::default()
+    let log_exporter = opentelemetry_otlp::LogExporter::builder()
+      .with_http()
       .with_http_client(client)
       .with_protocol(protocol)
-      .build_log_exporter()?;
+      .build()?;
     let mut log_processor =
       BatchLogProcessor::builder(log_exporter, OtelSharedRuntime).build();
     log_processor.set_resource(&resource);

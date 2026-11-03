@@ -122,6 +122,20 @@ openssl pkcs12 -export \
 - `localhost_modern_chain.pfx` — passphrase `secret`, leaf `localhost.crt` +
   `RootCA` chain, PBES2/AES-256-CBC bags
 
+A bundle using the legacy PKCS#12 PBE-SHA1-RC2-40 scheme for both the cert bag
+and the shrouded key bag exercises the RC2-40 path in `op_node_load_pfx`.
+Generated with:
+
+```shell
+openssl pkcs12 -export -legacy \
+  -certpbe PBE-SHA1-RC2-40 -keypbe PBE-SHA1-RC2-40 \
+  -inkey localhost.key -in localhost.crt \
+  -passout pass:secret \
+  -out localhost_rc2.pfx
+```
+
+- `localhost_rc2.pfx` - passphrase `secret`, PBE-SHA1-RC2-40 bags, SHA-1 MAC
+
 A separate self-signed bundle exercises the `DEPTH_ZERO_SELF_SIGNED_CERT` path
 in the TLS handshake. Generated with:
 

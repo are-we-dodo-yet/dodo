@@ -4,11 +4,9 @@ use core::ops::Add;
 use ecdsa::der::MaxOverhead;
 use ecdsa::der::MaxSize;
 use elliptic_curve::FieldBytesSize;
-use elliptic_curve::generic_array::ArrayLength;
-use rand::rngs::OsRng;
+use elliptic_curve::array::ArraySize;
 use rsa::signature::hazmat::PrehashSigner as _;
 use rsa::signature::hazmat::PrehashVerifier as _;
-use rsa::traits::PublicKeyParts as _;
 use rsa::traits::SignatureScheme as _;
 use spki::der::Decode;
 
@@ -28,13 +26,13 @@ const RSA_PKCS1_PSS_PADDING: u32 = 6;
 /// OpenSSL RSA_PKCS1_OAEP_PADDING constant value.
 const RSA_PKCS1_OAEP_PADDING: u32 = 4;
 
-fn dsa_signature<C: elliptic_curve::PrimeCurve>(
+fn dsa_signature<C: ecdsa::EcdsaCurve>(
   encoding: u32,
   signature: ecdsa::Signature<C>,
 ) -> Result<Box<[u8]>, KeyObjectHandlePrehashedSignAndVerifyError>
 where
-  MaxSize<C>: ArrayLength<u8>,
-  <FieldBytesSize<C> as Add>::Output: Add<MaxOverhead> + ArrayLength<u8>,
+  MaxSize<C>: ArraySize,
+  <FieldBytesSize<C> as Add>::Output: Add<MaxOverhead> + ArraySize,
 {
   match encoding {
     // DER
@@ -51,8 +49,8 @@ where
 /// q_len bytes. Spec: https://www.w3.org/TR/WebCryptoAPI/#convert-an-ecdsa-signature
 fn dsa_sig_to_p1363(sig: &dsa::Signature, q_len: usize) -> Box<[u8]> {
   let mut result = vec![0u8; q_len * 2];
-  let r_bytes = sig.r().to_bytes_be();
-  let s_bytes = sig.s().to_bytes_be();
+  let r_bytes = sig.r().to_be_bytes_trimmed_vartime();
+  let s_bytes = sig.s().to_be_bytes_trimmed_vartime();
   if r_bytes.len() <= q_len {
     result[q_len - r_bytes.len()..q_len].copy_from_slice(&r_bytes);
   }
@@ -68,9 +66,9 @@ fn dsa_sig_from_p1363(bytes: &[u8], q_len: usize) -> Option<dsa::Signature> {
   if bytes.len() != 2 * q_len {
     return None;
   }
-  let r = dsa::BigUint::from_bytes_be(&bytes[..q_len]);
-  let s = dsa::BigUint::from_bytes_be(&bytes[q_len..]);
-  dsa::Signature::from_components(r, s).ok()
+  let r = dsa::BoxedUint::from_be_slice_vartime(&bytes[..q_len]);
+  let s = dsa::BoxedUint::from_be_slice_vartime(&bytes[q_len..]);
+  dsa::Signature::from_components(r, s)
 }
 
 #[derive(Debug, thiserror::Error, deno_error::JsError)]
@@ -196,44 +194,50 @@ fn resolve_pss_salt_length<D: digest::Digest>(
   }
 }
 
-fn new_pss_scheme(
-  digest_type: &str,
-  pss_salt_length: Option<i32>,
-  key_size_bits: Option<usize>,
-) -> Result<rsa::pss::Pss, KeyObjectHandlePrehashedSignAndVerifyError> {
-  let pss = match_fixed_digest_with_oid!(
-    digest_type,
-    fn <D>(algorithm: Option<RsaPssHashAlgorithm>) {
-      let _: Option<RsaPssHashAlgorithm> = algorithm;
-      let salt_len = resolve_pss_salt_length::<D>(pss_salt_length, key_size_bits);
-      rsa::pss::Pss::new_with_salt::<D>(salt_len)
-    },
-    _ => {
-      return Err(KeyObjectHandlePrehashedSignAndVerifyError::DigestNotAllowedForRsaPssSignature(digest_type.to_string()));
-    }
-  );
-  Ok(pss)
+macro_rules! with_pss_scheme {
+  ($digest_type:expr, $pss_salt_length:expr, $key_size_bits:expr, |$pss:ident| $body:expr) => {{
+    let digest_type: &str = $digest_type;
+    let pss_salt_length: Option<i32> = $pss_salt_length;
+    let key_size_bits: Option<usize> = $key_size_bits;
+    match_fixed_digest_with_oid!(
+      digest_type,
+      fn <D>(algorithm: Option<RsaPssHashAlgorithm>) {
+        let _: Option<RsaPssHashAlgorithm> = algorithm;
+        let salt_len = resolve_pss_salt_length::<D>(pss_salt_length, key_size_bits);
+        let $pss = rsa::pss::Pss::<D>::new_with_salt(salt_len);
+        $body
+      },
+      _ => {
+        return Err(KeyObjectHandlePrehashedSignAndVerifyError::DigestNotAllowedForRsaPssSignature(digest_type.to_string()));
+      }
+    )
+  }};
+}
+
+fn rsa_key_bits(key: &impl rsa::traits::PublicKeyParts) -> usize {
+  key.n().bits() as usize
 }
 
 /// Recover the PSS salt length from a signature using AUTO detection.
 /// Performs the RSA raw operation (sig^e mod n) to get the encoded message,
 /// then parses the PSS structure to find the salt length.
-fn recover_pss_salt_len<D>(key: &rsa::RsaPublicKey, sig: &[u8]) -> Option<usize>
+fn recover_pss_salt_len<D>(key: &rsa::PublicKey, sig: &[u8]) -> Option<usize>
 where
   D: digest::Digest,
 {
   use rsa::traits::PublicKeyParts;
 
   let h_len = <D as digest::Digest>::output_size();
-  let key_bits = key.n().bits();
+  let key_bits = rsa_key_bits(key);
   let em_bits = key_bits - 1;
   let em_len = em_bits.div_ceil(8);
   let key_len = key_bits.div_ceil(8);
 
   // Compute em = sig^e mod n (raw RSA public key operation)
-  let sig_bn = rsa::BigUint::from_bytes_be(sig);
+  let sig_bn =
+    rsa::BoxedUint::from_be_slice(sig, key.n_bits_precision()).ok()?;
   let em_bn = rsa::hazmat::rsa_encrypt(key, &sig_bn).ok()?;
-  let em_be = em_bn.to_bytes_be();
+  let em_be = em_bn.to_be_bytes_trimmed_vartime();
 
   // Pad em to key_len bytes (big-endian, left-pad with zeros)
   if em_be.len() > key_len {
@@ -318,14 +322,13 @@ impl KeyObjectHandle {
         }
 
         if padding == Some(RSA_PKCS1_PSS_PADDING) {
-          let pss = new_pss_scheme(
+          let signature = with_pss_scheme!(
             digest_type,
             pss_salt_length,
-            Some(key.n().bits()),
-          )?;
-          let signature = pss
-            .sign(Some(&mut OsRng), key, digest)
-            .map_err(|_| KeyObjectHandlePrehashedSignAndVerifyError::FailedToSignDigestWithRsaPss)?;
+            Some(rsa_key_bits(key)),
+            |pss| pss.sign(Some(&mut crate::rng_compat::sys_rng()), key, digest)
+          )
+          .map_err(|_| KeyObjectHandlePrehashedSignAndVerifyError::FailedToSignDigestWithRsaPss)?;
           return Ok(signature.into());
         }
 
@@ -343,7 +346,9 @@ impl KeyObjectHandle {
           )
         };
 
-        let signature = signer.sign(Some(&mut OsRng), key, digest).map_err(
+        let signature = signer
+          .sign(Some(&mut crate::rng_compat::sys_rng()), key, digest)
+          .map_err(
           |e| {
             if e == rsa::Error::MessageTooLong {
               KeyObjectHandlePrehashedSignAndVerifyError::DigestTooBigForRsaKey
@@ -383,7 +388,7 @@ impl KeyObjectHandle {
           );
         }
 
-        let pss = match_fixed_digest_with_oid!(
+        let signature = match_fixed_digest_with_oid!(
           digest_type,
           fn <D>(algorithm: Option<RsaPssHashAlgorithm>) {
             if let Some(hash_algorithm) = hash_algorithm.take()
@@ -396,7 +401,7 @@ impl KeyObjectHandle {
             // Resolve salt length: explicit pss_salt_length takes priority,
             // then key details, then default (digest length)
             let resolved = if pss_salt_length.is_some() {
-              let r = resolve_pss_salt_length::<D>(pss_salt_length, Some(key.key.n().bits()));
+              let r = resolve_pss_salt_length::<D>(pss_salt_length, Some(rsa_key_bits(&key.key)));
               // Enforce key's minimum salt length
               if let Some(min_salt) = salt_length && r < min_salt {
                 return Err(KeyObjectHandlePrehashedSignAndVerifyError::PssSaltLenTooSmall);
@@ -407,15 +412,14 @@ impl KeyObjectHandle {
             } else {
               <D as digest::Digest>::output_size()
             };
-            rsa::pss::Pss::new_with_salt::<D>(resolved)
+            rsa::pss::Pss::<D>::new_with_salt(resolved)
+              .sign(Some(&mut crate::rng_compat::sys_rng()), &key.key, digest)
           },
           _ => {
             return Err(KeyObjectHandlePrehashedSignAndVerifyError::DigestNotAllowedForRsaPssSignature(digest_type.to_string()));
           }
-        );
-        let signature = pss
-          .sign(Some(&mut OsRng), &key.key, digest)
-          .map_err(|_| KeyObjectHandlePrehashedSignAndVerifyError::FailedToSignDigestWithRsaPss)?;
+        )
+        .map_err(|_| KeyObjectHandlePrehashedSignAndVerifyError::FailedToSignDigestWithRsaPss)?;
         Ok(signature.into())
       }
       AsymmetricPrivateKey::Dsa(key) => {
@@ -436,7 +440,7 @@ impl KeyObjectHandle {
           Ok(signature.into())
         } else {
           let q_len =
-            key.verifying_key().components().q().bits().div_ceil(8);
+            key.verifying_key().components().q().bits().div_ceil(8) as usize;
           Ok(dsa_sig_to_p1363(&signature, q_len))
         }
       }
@@ -530,12 +534,12 @@ impl KeyObjectHandle {
             pss_salt_length
           };
 
-          let pss = new_pss_scheme(
+          return Ok(with_pss_scheme!(
             digest_type,
             effective_salt_length,
-            Some(key.n().bits()),
-          )?;
-          return Ok(pss.verify(key, digest, signature).is_ok());
+            Some(rsa_key_bits(key)),
+            |pss| pss.verify(key, digest, signature).is_ok()
+          ));
         }
 
         let signer = if digest_type == "md5-sha1" {
@@ -567,7 +571,7 @@ impl KeyObjectHandle {
           hash_algorithm = Some(details.hash_algorithm);
           salt_length = Some(details.salt_length as usize);
         }
-        let pss = match_fixed_digest_with_oid!(
+        let verified = match_fixed_digest_with_oid!(
           digest_type,
           fn <D>(algorithm: Option<RsaPssHashAlgorithm>) {
             if let Some(hash_algorithm) = hash_algorithm.take()
@@ -578,19 +582,21 @@ impl KeyObjectHandle {
                 });
               }
             let resolved = if pss_salt_length.is_some() {
-              resolve_pss_salt_length::<D>(pss_salt_length, Some(key.key.n().bits()))
+              resolve_pss_salt_length::<D>(pss_salt_length, Some(rsa_key_bits(&key.key)))
             } else if let Some(sl) = salt_length {
               sl
             } else {
               <D as digest::Digest>::output_size()
             };
-            rsa::pss::Pss::new_with_salt::<D>(resolved)
+            rsa::pss::Pss::<D>::new_with_salt(resolved)
+              .verify(&key.key, digest, signature)
+              .is_ok()
           },
           _ => {
             return Err(KeyObjectHandlePrehashedSignAndVerifyError::DigestNotAllowedForRsaPssSignature(digest_type.to_string()));
           }
         );
-        Ok(pss.verify(&key.key, digest, signature).is_ok())
+        Ok(verified)
       }
       AsymmetricPublicKey::Dsa(key) => {
         let sig = if dsa_signature_encoding == 0 {
@@ -600,7 +606,7 @@ impl KeyObjectHandle {
           };
           sig
         } else {
-          let q_len = key.components().q().bits().div_ceil(8);
+          let q_len = key.components().q().bits().div_ceil(8) as usize;
           let Some(sig) = dsa_sig_from_p1363(signature, q_len) else {
             return Ok(false);
           };

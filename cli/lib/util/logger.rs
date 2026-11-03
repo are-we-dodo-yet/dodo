@@ -95,7 +95,6 @@ pub fn init(options: InitLoggingOptions) {
   .filter_module("swc_ecma_lexer", log::LevelFilter::Error)
   // Suppress span lifecycle logs since they are too verbose
   .filter_module("tracing::span", log::LevelFilter::Off)
-  .filter_module("tower_lsp", log::LevelFilter::Trace)
   .filter_module("opentelemetry_sdk", log::LevelFilter::Off)
   // for deno_compile, this is too verbose
   .filter_module("editpe", log::LevelFilter::Error)

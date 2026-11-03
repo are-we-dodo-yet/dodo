@@ -2270,7 +2270,10 @@ fn extract_laufey_archive(
       // components. Anything that fails this check is a zip-slip attempt
       // (or a legitimately weird archive we don't want to handle).
       let Some(rel_path) = entry.enclosed_name() else {
-        bail!("refusing zip entry with unsafe path: {}", entry.name());
+        bail!(
+          "refusing zip entry with unsafe path: {}",
+          String::from_utf8_lossy(entry.name_raw())
+        );
       };
       // Defence in depth — re-check the components ourselves.
       if rel_path.components().any(|c| {
@@ -4844,7 +4847,7 @@ fn create_windows_msi(
     summary.set_author(manufacturer.to_string());
     summary.set_comments(format!("{app_name} desktop application"));
     summary.set_arch(arch);
-    summary.set_languages(&[msi::Language::from_code(1033)]);
+    summary.set_languages(&[msi::LanguageId::from(1033)]);
     summary.set_creating_application("deno desktop");
     // Package code: a fresh GUID identifying this exact package build.
     summary.set_uuid(uuid::Uuid::new_v5(

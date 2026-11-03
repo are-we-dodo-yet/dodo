@@ -36,7 +36,6 @@ v8.workspace = true
 
 [dependencies]
 async-trait.workspace = true
-bincode.workspace = true
 deno_ast = { workspace = true, features = ["cjs"] }
 deno_cache_dir = { workspace = true, features = ["sync"] }
 deno_config = { workspace = true, features = ["sync", "workspace"] }

@@ -14,9 +14,9 @@
 use std::collections::BTreeMap;
 use std::collections::HashMap;
 
+use rowan::ast::AstNode;
 use serde_json::Value;
 use yaml_parser::SyntaxError;
-use yaml_parser::ast::AstNode;
 use yaml_parser::ast::BlockMap;
 use yaml_parser::ast::BlockMapKey;
 use yaml_parser::ast::BlockMapValue;

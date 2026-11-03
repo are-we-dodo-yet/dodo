@@ -37,13 +37,13 @@ use import_map::ImportMap;
 use import_map::ImportMapDiagnostic;
 use import_map::ImportMapErrorKind;
 use log::error;
-use lsp_types::Uri;
 use node_resolver::NodeResolutionKind;
 use text_size::TextSize;
 use tokio::sync::mpsc;
 use tokio_util::sync::CancellationToken;
 use tokio_util::task::AbortOnDropHandle;
-use tower_lsp::lsp_types as lsp;
+use tower_lsp_server::ls_types as lsp;
+use tower_lsp_server::ls_types::Uri;
 
 use super::analysis;
 use super::analysis::import_map_lookup_for_diagnostic;
@@ -965,7 +965,9 @@ impl DenoDiagnostic {
 
   /// Given a reference to the code from an LSP diagnostic, determine if the
   /// diagnostic is fixable or not
-  pub fn is_fixable(diagnostic: &lsp_types::Diagnostic) -> bool {
+  pub fn is_fixable(
+    diagnostic: &tower_lsp_server::ls_types::Diagnostic,
+  ) -> bool {
     if let Some(lsp::NumberOrString::String(code)) = &diagnostic.code {
       match code.as_str() {
         "import-map-remap"

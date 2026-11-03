@@ -10,6 +10,7 @@ use std::sync::atomic::Ordering;
 use std::time::Instant;
 
 use deno_core::parking_lot::Mutex;
+use deno_core::parking_lot::lock_api::GuardNoSend;
 use deno_core::uv_compat;
 
 use crate::util::SendPtr;
@@ -72,7 +73,7 @@ unsafe extern "C" fn uv_mutex_lock(lock: *mut uv_mutex_t) {
 #[unsafe(no_mangle)]
 unsafe extern "C" fn uv_mutex_unlock(lock: *mut uv_mutex_t) {
   unsafe {
-    (*lock).mutex.force_unlock();
+    (*lock).mutex.force_unlock(GuardNoSend::new());
   }
 }
 
@@ -1651,7 +1652,7 @@ unsafe extern "C" fn uv_cond_wait(cond: *mut u32, mutex: *mut uv_mutex_t) {
   // block". We already hold the internal mutex, so a signaler can't slip a
   // notify past us before we park.
   unsafe {
-    (*mutex).mutex.force_unlock();
+    (*mutex).mutex.force_unlock(GuardNoSend::new());
   }
   inner.condvar.wait(&mut guard);
   drop(guard);
@@ -1674,7 +1675,7 @@ unsafe extern "C" fn uv_cond_timedwait(
   };
   let mut guard = inner.mutex.lock();
   unsafe {
-    (*mutex).mutex.force_unlock();
+    (*mutex).mutex.force_unlock(GuardNoSend::new());
   }
   let timed_out = inner
     .condvar

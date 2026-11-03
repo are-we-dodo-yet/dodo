@@ -13,7 +13,7 @@ use deno_error::JsErrorBox;
 use p256::ecdsa::Signature as P256Signature;
 use p256::ecdsa::SigningKey as P256SigningKey;
 use p256::ecdsa::VerifyingKey as P256VerifyingKey;
-use p256::elliptic_curve::sec1::FromEncodedPoint;
+use p256::elliptic_curve::sec1::FromSec1Point;
 use p256::pkcs8::DecodePrivateKey;
 use p384::ecdsa::Signature as P384Signature;
 use p384::ecdsa::SigningKey as P384SigningKey;
@@ -23,11 +23,12 @@ use p521::ecdsa::SigningKey as P521SigningKey;
 use p521::ecdsa::VerifyingKey as P521VerifyingKey;
 pub use rand;
 use rand::SeedableRng;
-use rand::rngs::OsRng;
+use rand::rand_core::UnwrapErr;
 use rand::rngs::StdRng;
+use rand::rngs::SysRng;
 use rsa::Pss;
-use rsa::RsaPrivateKey;
-use rsa::RsaPublicKey;
+use rsa::PrivateKey as RsaPrivateKey;
+use rsa::PublicKey as RsaPublicKey;
 use rsa::pkcs1::DecodeRsaPrivateKey;
 use rsa::pkcs1::DecodeRsaPublicKey;
 use rsa::signature::SignatureEncoding;
@@ -348,25 +349,25 @@ pub(crate) fn sign_key_sync(
           .ok_or_else(|| CryptoError::MissingArgumentSaltLength)?
           as usize;
 
-        let mut rng = OsRng;
+        let mut rng = UnwrapErr(SysRng);
         match args.hash.ok_or_else(|| CryptoError::MissingArgumentHash)? {
           CryptoHash::Sha1 => {
-            let signing_key = Pss::new_with_salt::<Sha1>(salt_len);
+            let signing_key = Pss::<Sha1>::new_with_salt(salt_len);
             let hashed = Sha1::digest(data);
             signing_key.sign(Some(&mut rng), &private_key, &hashed)?
           }
           CryptoHash::Sha256 => {
-            let signing_key = Pss::new_with_salt::<Sha256>(salt_len);
+            let signing_key = Pss::<Sha256>::new_with_salt(salt_len);
             let hashed = Sha256::digest(data);
             signing_key.sign(Some(&mut rng), &private_key, &hashed)?
           }
           CryptoHash::Sha384 => {
-            let signing_key = Pss::new_with_salt::<Sha384>(salt_len);
+            let signing_key = Pss::<Sha384>::new_with_salt(salt_len);
             let hashed = Sha384::digest(data);
             signing_key.sign(Some(&mut rng), &private_key, &hashed)?
           }
           CryptoHash::Sha512 => {
-            let signing_key = Pss::new_with_salt::<Sha512>(salt_len);
+            let signing_key = Pss::<Sha512>::new_with_salt(salt_len);
             let hashed = Sha512::digest(data);
             signing_key.sign(Some(&mut rng), &private_key, &hashed)?
           }
@@ -445,13 +446,13 @@ pub(crate) fn sign_key_sync(
 
         match hash {
           CryptoHash::Sha3_256 => {
-            hmac_sign::<hmac::Hmac<Sha3_256>>(&key.data, data)?
+            hmac_sign::<hmac::SimpleHmac<Sha3_256>>(&key.data, data)?
           }
           CryptoHash::Sha3_384 => {
-            hmac_sign::<hmac::Hmac<Sha3_384>>(&key.data, data)?
+            hmac_sign::<hmac::SimpleHmac<Sha3_384>>(&key.data, data)?
           }
           CryptoHash::Sha3_512 => {
-            hmac_sign::<hmac::Hmac<Sha3_512>>(&key.data, data)?
+            hmac_sign::<hmac::SimpleHmac<Sha3_512>>(&key.data, data)?
           }
           _ => {
             let hash: HmacAlgorithm = hash.into();
@@ -468,22 +469,22 @@ pub(crate) fn sign_key_sync(
   }
 }
 
-fn hmac_sign<M: hmac::Mac + hmac::digest::KeyInit>(
+fn hmac_sign<M: hmac::Mac + hmac::KeyInit>(
   key: &[u8],
   data: &[u8],
 ) -> Result<Vec<u8>, CryptoError> {
-  let mut mac = <M as hmac::Mac>::new_from_slice(key)
+  let mut mac = <M as hmac::KeyInit>::new_from_slice(key)
     .map_err(|_| CryptoError::InvalidKeyLength)?;
   mac.update(data);
   Ok(mac.finalize().into_bytes().to_vec())
 }
 
-fn hmac_verify<M: hmac::Mac + hmac::digest::KeyInit>(
+fn hmac_verify<M: hmac::Mac + hmac::KeyInit>(
   key: &[u8],
   data: &[u8],
   signature: &[u8],
 ) -> Result<bool, CryptoError> {
-  let mut mac = <M as hmac::Mac>::new_from_slice(key)
+  let mut mac = <M as hmac::KeyInit>::new_from_slice(key)
     .map_err(|_| CryptoError::InvalidKeyLength)?;
   mac.update(data);
   Ok(mac.verify_slice(signature).is_ok())
@@ -568,22 +569,22 @@ pub(crate) fn verify_key_sync(
 
         match args.hash.ok_or_else(|| CryptoError::MissingArgumentHash)? {
           CryptoHash::Sha1 => {
-            let pss = Pss::new_with_salt::<Sha1>(salt_len);
+            let pss = Pss::<Sha1>::new_with_salt(salt_len);
             let hashed = Sha1::digest(data);
             pss.verify(&public_key, &hashed, signature).is_ok()
           }
           CryptoHash::Sha256 => {
-            let pss = Pss::new_with_salt::<Sha256>(salt_len);
+            let pss = Pss::<Sha256>::new_with_salt(salt_len);
             let hashed = Sha256::digest(data);
             pss.verify(&public_key, &hashed, signature).is_ok()
           }
           CryptoHash::Sha384 => {
-            let pss = Pss::new_with_salt::<Sha384>(salt_len);
+            let pss = Pss::<Sha384>::new_with_salt(salt_len);
             let hashed = Sha384::digest(data);
             pss.verify(&public_key, &hashed, signature).is_ok()
           }
           CryptoHash::Sha512 => {
-            let pss = Pss::new_with_salt::<Sha512>(salt_len);
+            let pss = Pss::<Sha512>::new_with_salt(salt_len);
             let hashed = Sha512::digest(data);
             pss.verify(&public_key, &hashed, signature).is_ok()
           }
@@ -593,17 +594,17 @@ pub(crate) fn verify_key_sync(
       Algorithm::Hmac => {
         let hash = args.hash.ok_or_else(JsErrorBox::not_supported)?;
         match hash {
-          CryptoHash::Sha3_256 => hmac_verify::<hmac::Hmac<Sha3_256>>(
+          CryptoHash::Sha3_256 => hmac_verify::<hmac::SimpleHmac<Sha3_256>>(
             &key.data,
             data,
             &args.signature,
           )?,
-          CryptoHash::Sha3_384 => hmac_verify::<hmac::Hmac<Sha3_384>>(
+          CryptoHash::Sha3_384 => hmac_verify::<hmac::SimpleHmac<Sha3_384>>(
             &key.data,
             data,
             &args.signature,
           )?,
-          CryptoHash::Sha3_512 => hmac_verify::<hmac::Hmac<Sha3_512>>(
+          CryptoHash::Sha3_512 => hmac_verify::<hmac::SimpleHmac<Sha3_512>>(
             &key.data,
             data,
             &args.signature,
@@ -680,9 +681,8 @@ pub(crate) fn verify_key_sync(
                 let secret_key = p521::SecretKey::from_pkcs8_der(&key.data)
                   .map_err(|_| CryptoError::InvalidKeyFormat)?;
                 // Construct inner ecdsa signing key to get verifying key
-                let inner_signing_key =
-                  ecdsa::SigningKey::<p521::NistP521>::from(secret_key);
-                P521VerifyingKey::from(*inner_signing_key.verifying_key())
+                let inner_signing_key = P521SigningKey::from(secret_key);
+                *inner_signing_key.verifying_key()
               }
               _ => return Err(CryptoError::InvalidKeyFormat),
             };
@@ -780,10 +780,10 @@ pub(crate) fn derive_bits_sync(
                 .public_key()
             }
             KeyType::Public => {
-              let point = p256::EncodedPoint::from_bytes(public_key.data)
+              let point = p256::Sec1Point::from_bytes(public_key.data)
                 .map_err(|_| CryptoError::DecodePrivateKey)?;
 
-              let pk = p256::PublicKey::from_encoded_point(&point);
+              let pk = p256::PublicKey::from_sec1_point(&point);
               // pk is a constant time Option.
               if pk.is_some().into() {
                 pk.unwrap()
@@ -813,10 +813,10 @@ pub(crate) fn derive_bits_sync(
                 .public_key()
             }
             KeyType::Public => {
-              let point = p384::EncodedPoint::from_bytes(public_key.data)
+              let point = p384::Sec1Point::from_bytes(public_key.data)
                 .map_err(|_| CryptoError::DecodePrivateKey)?;
 
-              let pk = p384::PublicKey::from_encoded_point(&point);
+              let pk = p384::PublicKey::from_sec1_point(&point);
               // pk is a constant time Option.
               if pk.is_some().into() {
                 pk.unwrap()
@@ -846,10 +846,10 @@ pub(crate) fn derive_bits_sync(
                 .public_key()
             }
             KeyType::Public => {
-              let point = p521::EncodedPoint::from_bytes(public_key.data)
+              let point = p521::Sec1Point::from_bytes(public_key.data)
                 .map_err(|_| CryptoError::DecodePrivateKey)?;
 
-              let pk = p521::PublicKey::from_encoded_point(&point);
+              let pk = p521::PublicKey::from_sec1_point(&point);
               // pk is a constant time Option.
               if pk.is_some().into() {
                 pk.unwrap()
@@ -966,8 +966,8 @@ fn fast_uuid_v4(bytes: &mut [u8; 16]) -> String {
 
 #[test]
 fn test_fast_uuid_v4_correctness() {
-  use rand::Rng;
-  let mut rng = rand::thread_rng();
+  use rand::RngExt;
+  let mut rng = rand::rng();
   let mut bytes = [0u8; 16];
   rng.fill(&mut bytes);
   let uuid = fast_uuid_v4(&mut bytes.clone());

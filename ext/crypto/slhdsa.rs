@@ -152,7 +152,7 @@ pub(crate) fn public_from_private(
   private_key: &[u8],
 ) -> Result<Vec<u8>, SlhDsaError> {
   dispatch_variant!(variant, alg, {
-    let key = alg::PrivateKey::try_from_bytes(&to_array(private_key)?)
+    let key = alg::PrivateKey::try_from_bytes(to_array(private_key)?)
       .map_err(|_| SlhDsaError::InvalidKeyData)?;
     Ok(key.get_public_key().into_bytes().to_vec())
   })
@@ -169,7 +169,7 @@ pub(crate) fn sign(
     return Err(SlhDsaError::ContextTooLong);
   }
   dispatch_variant!(variant, alg, {
-    let key = alg::PrivateKey::try_from_bytes(&to_array(private_key)?)
+    let key = alg::PrivateKey::try_from_bytes(to_array(private_key)?)
       .map_err(|_| SlhDsaError::InvalidKeyData)?;
     key
       .try_sign(data, context, true)
@@ -193,7 +193,7 @@ pub(crate) fn verify(
     let Ok(public_key_bytes) = to_array(public_key) else {
       return false;
     };
-    let Ok(public_key) = alg::PublicKey::try_from_bytes(&public_key_bytes)
+    let Ok(public_key) = alg::PublicKey::try_from_bytes(public_key_bytes)
     else {
       return false;
     };
@@ -227,13 +227,14 @@ pub(crate) fn import_pkcs8(
   expected: SlhDsaVariantId,
   data: &[u8],
 ) -> Result<Vec<u8>, SlhDsaError> {
-  let info = pkcs8::PrivateKeyInfo::from_der(data)
+  let info = pkcs8::PrivateKeyInfoRef::from_der(data)
     .map_err(|_| SlhDsaError::InvalidKeyData)?;
   if variant_from_oid(&info.algorithm.oid) != Some(expected) {
     return Err(SlhDsaError::InvalidKeyData);
   }
-  let private_key = spki::der::asn1::OctetStringRef::from_der(info.private_key)
-    .map_err(|_| SlhDsaError::InvalidKeyData)?;
+  let private_key =
+    <&spki::der::asn1::OctetStringRef>::from_der(info.private_key.as_bytes())
+      .map_err(|_| SlhDsaError::InvalidKeyData)?;
   let private_key = private_key.as_bytes();
   if private_key.len() != params(expected).private_key_len {
     return Err(SlhDsaError::InvalidKeyData);
@@ -274,12 +275,13 @@ pub(crate) fn export_pkcs8(
     .map_err(|_| SlhDsaError::InvalidKeyData)?
     .to_der()
     .map_err(|_| SlhDsaError::OperationFailed)?;
-  let info = pkcs8::PrivateKeyInfo {
+  let info = pkcs8::PrivateKeyInfoRef {
     algorithm: pkcs8::AlgorithmIdentifierRef {
       oid: p.oid,
       parameters: None,
     },
-    private_key: &inner,
+    private_key: spki::der::asn1::OctetStringRef::new(&inner)
+      .map_err(|_| SlhDsaError::OperationFailed)?,
     public_key: None,
   };
   info.to_der().map_err(|_| SlhDsaError::OperationFailed)

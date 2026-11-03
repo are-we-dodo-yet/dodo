@@ -880,7 +880,7 @@ unsafe fn write_pipe(
     {
       let fd = (*pipe).internal_fd.unwrap();
       if let Ok(afd) =
-        tokio::io::unix::AsyncFd::new(super::pipe::RawFdWrapper(fd))
+        tokio::io::unix::AsyncFd::register(super::pipe::RawFdWrapper(fd))
       {
         (*pipe).internal_async_fd = Some(afd);
       }

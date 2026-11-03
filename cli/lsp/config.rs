@@ -56,10 +56,10 @@ use deno_resolver::factory::WorkspaceFactoryOptions;
 use deno_resolver::workspace::SpecifiedImportMap;
 use deno_runtime::deno_node::PackageJson;
 use indexmap::IndexSet;
-use lsp_types::ClientCapabilities;
-use lsp_types::Uri;
 use node_resolver::NodeResolverOptions;
-use tower_lsp::lsp_types as lsp;
+use tower_lsp_server::ls_types as lsp;
+use tower_lsp_server::ls_types::ClientCapabilities;
+use tower_lsp_server::ls_types::Uri;
 
 use super::logging::lsp_log;
 use super::lsp_custom;

@@ -21,38 +21,6 @@ use std::time::Instant;
 
 use anyhow::Result;
 use indexmap::IndexMap;
-use lsp_types as lsp;
-use lsp_types::ClientCapabilities;
-use lsp_types::ClientInfo;
-use lsp_types::CodeActionCapabilityResolveSupport;
-use lsp_types::CodeActionClientCapabilities;
-use lsp_types::CodeActionKindLiteralSupport;
-use lsp_types::CodeActionLiteralSupport;
-use lsp_types::CompletionClientCapabilities;
-use lsp_types::CompletionItemCapability;
-use lsp_types::CompletionItemCapabilityResolveSupport;
-use lsp_types::CompletionItemKindCapability;
-use lsp_types::CompletionItemTag;
-use lsp_types::CompletionListCapability;
-use lsp_types::DiagnosticClientCapabilities;
-use lsp_types::FoldingRangeClientCapabilities;
-use lsp_types::HoverClientCapabilities;
-use lsp_types::InitializeParams;
-use lsp_types::InsertTextMode;
-use lsp_types::InsertTextModeSupport;
-use lsp_types::MarkupKind;
-use lsp_types::ParameterInformationSettings;
-use lsp_types::SignatureHelpClientCapabilities;
-use lsp_types::SignatureInformationSettings;
-use lsp_types::SymbolKindCapability;
-use lsp_types::SymbolTag;
-use lsp_types::TagSupport;
-use lsp_types::TextDocumentClientCapabilities;
-use lsp_types::TextDocumentSyncClientCapabilities;
-use lsp_types::Uri;
-use lsp_types::WorkspaceClientCapabilities;
-use lsp_types::WorkspaceSymbolClientCapabilities;
-use lsp_types::WorkspaceSymbolResolveSupportCapability;
 use once_cell::sync::Lazy;
 use parking_lot::Condvar;
 use parking_lot::Mutex;
@@ -63,6 +31,38 @@ use serde::de;
 use serde_json::Value;
 use serde_json::json;
 use serde_json::to_value;
+use tower_lsp_server::ls_types as lsp;
+use tower_lsp_server::ls_types::ClientCapabilities;
+use tower_lsp_server::ls_types::ClientInfo;
+use tower_lsp_server::ls_types::CodeActionCapabilityResolveSupport;
+use tower_lsp_server::ls_types::CodeActionClientCapabilities;
+use tower_lsp_server::ls_types::CodeActionKindLiteralSupport;
+use tower_lsp_server::ls_types::CodeActionLiteralSupport;
+use tower_lsp_server::ls_types::CompletionClientCapabilities;
+use tower_lsp_server::ls_types::CompletionItemCapability;
+use tower_lsp_server::ls_types::CompletionItemCapabilityResolveSupport;
+use tower_lsp_server::ls_types::CompletionItemKindCapability;
+use tower_lsp_server::ls_types::CompletionItemTag;
+use tower_lsp_server::ls_types::CompletionListCapability;
+use tower_lsp_server::ls_types::DiagnosticClientCapabilities;
+use tower_lsp_server::ls_types::FoldingRangeClientCapabilities;
+use tower_lsp_server::ls_types::HoverClientCapabilities;
+use tower_lsp_server::ls_types::InitializeParams;
+use tower_lsp_server::ls_types::InsertTextMode;
+use tower_lsp_server::ls_types::InsertTextModeSupport;
+use tower_lsp_server::ls_types::MarkupKind;
+use tower_lsp_server::ls_types::ParameterInformationSettings;
+use tower_lsp_server::ls_types::SignatureHelpClientCapabilities;
+use tower_lsp_server::ls_types::SignatureInformationSettings;
+use tower_lsp_server::ls_types::SymbolKindCapability;
+use tower_lsp_server::ls_types::SymbolTag;
+use tower_lsp_server::ls_types::TagSupport;
+use tower_lsp_server::ls_types::TextDocumentClientCapabilities;
+use tower_lsp_server::ls_types::TextDocumentSyncClientCapabilities;
+use tower_lsp_server::ls_types::Uri;
+use tower_lsp_server::ls_types::WorkspaceClientCapabilities;
+use tower_lsp_server::ls_types::WorkspaceSymbolClientCapabilities;
+use tower_lsp_server::ls_types::WorkspaceSymbolResolveSupportCapability;
 use url::Url;
 
 use super::TempDir;
@@ -431,7 +431,7 @@ impl InitializeParamsBuilder {
 
   pub fn set_workspace_folders(
     &mut self,
-    folders: Vec<lsp_types::WorkspaceFolder>,
+    folders: Vec<tower_lsp_server::ls_types::WorkspaceFolder>,
   ) -> &mut Self {
     self.params.workspace_folders = Some(folders);
     self

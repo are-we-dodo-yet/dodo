@@ -51,10 +51,10 @@ use tokio::sync::mpsc::UnboundedReceiver;
 use tokio::sync::mpsc::UnboundedSender;
 use tokio::sync::mpsc::unbounded_channel;
 use tokio_util::sync::CancellationToken;
-use tower_lsp::jsonrpc::Error as LspError;
-use tower_lsp::jsonrpc::Result as LspResult;
-use tower_lsp::lsp_types::request::*;
-use tower_lsp::lsp_types::*;
+use tower_lsp_server::jsonrpc::Error as LspError;
+use tower_lsp_server::jsonrpc::Result as LspResult;
+use tower_lsp_server::ls_types::request::*;
+use tower_lsp_server::ls_types::*;
 
 use super::analysis::CodeActionData;
 use super::analysis::TsResponseImportMapper;
@@ -161,13 +161,15 @@ pub enum Diagnosable {
   Ignore,
 }
 
-pub fn to_lsp_range(referrer: &deno_graph::Range) -> lsp_types::Range {
-  lsp_types::Range {
-    start: lsp_types::Position {
+pub fn to_lsp_range(
+  referrer: &deno_graph::Range,
+) -> tower_lsp_server::ls_types::Range {
+  tower_lsp_server::ls_types::Range {
+    start: tower_lsp_server::ls_types::Position {
       line: referrer.range.start.line as u32,
       character: referrer.range.start.character as u32,
     },
-    end: lsp_types::Position {
+    end: tower_lsp_server::ls_types::Position {
       line: referrer.range.end.line as u32,
       character: referrer.range.end.character as u32,
     },
@@ -3724,9 +3726,8 @@ impl Inner {
   }
 }
 
-#[tower_lsp::async_trait(?Send)]
-impl tower_lsp::LanguageServer for LanguageServer {
-  async fn execute_command(
+impl LanguageServer {
+  pub async fn execute_command(
     &self,
     params: ExecuteCommandParams,
     _token: CancellationToken,
@@ -3755,14 +3756,14 @@ impl tower_lsp::LanguageServer for LanguageServer {
     }
   }
 
-  async fn initialize(
+  pub async fn initialize(
     &self,
     params: InitializeParams,
   ) -> LspResult<InitializeResult> {
     self.inner.write().await.initialize(params)
   }
 
-  async fn initialized(&self, _: InitializedParams) {
+  pub async fn initialized(&self, _: InitializedParams) {
     self.refresh_configuration().await;
     let (registrations, http_client) = {
       let mut inner = self.inner.write().await;
@@ -3809,17 +3810,17 @@ impl tower_lsp::LanguageServer for LanguageServer {
     lsp_log!("Server ready.");
   }
 
-  async fn shutdown(&self) -> LspResult<()> {
+  pub fn shutdown(&self) -> LspResult<()> {
     Ok(())
   }
 
-  async fn did_open(&self, params: DidOpenTextDocumentParams) {
+  pub async fn did_open(&self, params: DidOpenTextDocumentParams) {
     self.init_flag.wait_raised().await;
     *self.did_change_batch_queue.borrow_mut() = None;
     self.inner.write().await.did_open(params);
   }
 
-  async fn did_change(&self, params: DidChangeTextDocumentParams) {
+  pub async fn did_change(&self, params: DidChangeTextDocumentParams) {
     self.init_flag.wait_raised().await;
     let (batch_queue, token) = {
       let existing = self.did_change_batch_queue.borrow_mut().take();
@@ -3844,41 +3845,47 @@ impl tower_lsp::LanguageServer for LanguageServer {
     }
   }
 
-  async fn did_save(&self, params: DidSaveTextDocumentParams) {
+  pub async fn did_save(&self, params: DidSaveTextDocumentParams) {
     self.init_flag.wait_raised().await;
     self.inner.read().await.did_save(params).await;
   }
 
-  async fn did_close(&self, params: DidCloseTextDocumentParams) {
+  pub async fn did_close(&self, params: DidCloseTextDocumentParams) {
     self.init_flag.wait_raised().await;
     *self.did_change_batch_queue.borrow_mut() = None;
     self.inner.write().await.did_close(params);
   }
 
-  async fn notebook_did_open(&self, params: DidOpenNotebookDocumentParams) {
+  pub async fn notebook_did_open(&self, params: DidOpenNotebookDocumentParams) {
     self.init_flag.wait_raised().await;
     *self.did_change_batch_queue.borrow_mut() = None;
     self.inner.write().await.notebook_did_open(params)
   }
 
-  async fn notebook_did_change(&self, params: DidChangeNotebookDocumentParams) {
+  pub async fn notebook_did_change(
+    &self,
+    params: DidChangeNotebookDocumentParams,
+  ) {
     self.init_flag.wait_raised().await;
     *self.did_change_batch_queue.borrow_mut() = None;
     self.inner.write().await.notebook_did_change(params)
   }
 
-  async fn notebook_did_save(&self, params: DidSaveNotebookDocumentParams) {
+  pub async fn notebook_did_save(&self, params: DidSaveNotebookDocumentParams) {
     self.init_flag.wait_raised().await;
     self.inner.read().await.notebook_did_save(params).await
   }
 
-  async fn notebook_did_close(&self, params: DidCloseNotebookDocumentParams) {
+  pub async fn notebook_did_close(
+    &self,
+    params: DidCloseNotebookDocumentParams,
+  ) {
     self.init_flag.wait_raised().await;
     *self.did_change_batch_queue.borrow_mut() = None;
     self.inner.write().await.notebook_did_close(params)
   }
 
-  async fn did_change_configuration(
+  pub async fn did_change_configuration(
     &self,
     params: DidChangeConfigurationParams,
   ) {
@@ -3897,7 +3904,7 @@ impl tower_lsp::LanguageServer for LanguageServer {
     self.performance.measure(mark);
   }
 
-  async fn did_change_watched_files(
+  pub async fn did_change_watched_files(
     &self,
     params: DidChangeWatchedFilesParams,
   ) {
@@ -3911,7 +3918,7 @@ impl tower_lsp::LanguageServer for LanguageServer {
       .await;
   }
 
-  async fn did_change_workspace_folders(
+  pub async fn did_change_workspace_folders(
     &self,
     params: DidChangeWorkspaceFoldersParams,
   ) {
@@ -3936,7 +3943,7 @@ impl tower_lsp::LanguageServer for LanguageServer {
     self.performance.measure(mark);
   }
 
-  async fn document_symbol(
+  pub async fn document_symbol(
     &self,
     params: DocumentSymbolParams,
     token: CancellationToken,
@@ -3950,7 +3957,7 @@ impl tower_lsp::LanguageServer for LanguageServer {
       .await
   }
 
-  async fn formatting(
+  pub async fn formatting(
     &self,
     params: DocumentFormattingParams,
     token: CancellationToken,
@@ -3959,7 +3966,7 @@ impl tower_lsp::LanguageServer for LanguageServer {
     self.inner.read().await.formatting(params, &token).await
   }
 
-  async fn hover(
+  pub async fn hover(
     &self,
     params: HoverParams,
     token: CancellationToken,
@@ -3968,7 +3975,7 @@ impl tower_lsp::LanguageServer for LanguageServer {
     self.inner.read().await.hover(params, &token).await
   }
 
-  async fn inlay_hint(
+  pub async fn inlay_hint(
     &self,
     params: InlayHintParams,
     token: CancellationToken,
@@ -3977,7 +3984,7 @@ impl tower_lsp::LanguageServer for LanguageServer {
     self.inner.read().await.inlay_hint(params, &token).await
   }
 
-  async fn code_action(
+  pub async fn code_action(
     &self,
     params: CodeActionParams,
     token: CancellationToken,
@@ -3986,7 +3993,7 @@ impl tower_lsp::LanguageServer for LanguageServer {
     self.inner.read().await.code_action(params, &token).await
   }
 
-  async fn code_action_resolve(
+  pub async fn code_action_resolve(
     &self,
     params: CodeAction,
     token: CancellationToken,
@@ -4000,7 +4007,7 @@ impl tower_lsp::LanguageServer for LanguageServer {
       .await
   }
 
-  async fn code_lens(
+  pub async fn code_lens(
     &self,
     params: CodeLensParams,
     token: CancellationToken,
@@ -4009,7 +4016,7 @@ impl tower_lsp::LanguageServer for LanguageServer {
     self.inner.read().await.code_lens(params, &token).await
   }
 
-  async fn code_lens_resolve(
+  pub async fn code_lens_resolve(
     &self,
     params: CodeLens,
     token: CancellationToken,
@@ -4023,7 +4030,7 @@ impl tower_lsp::LanguageServer for LanguageServer {
       .await
   }
 
-  async fn document_highlight(
+  pub async fn document_highlight(
     &self,
     params: DocumentHighlightParams,
     token: CancellationToken,
@@ -4037,7 +4044,7 @@ impl tower_lsp::LanguageServer for LanguageServer {
       .await
   }
 
-  async fn references(
+  pub async fn references(
     &self,
     params: ReferenceParams,
     token: CancellationToken,
@@ -4046,7 +4053,7 @@ impl tower_lsp::LanguageServer for LanguageServer {
     self.inner.read().await.references(params, &token).await
   }
 
-  async fn goto_definition(
+  pub async fn goto_definition(
     &self,
     params: GotoDefinitionParams,
     token: CancellationToken,
@@ -4060,7 +4067,7 @@ impl tower_lsp::LanguageServer for LanguageServer {
       .await
   }
 
-  async fn goto_type_definition(
+  pub async fn goto_type_definition(
     &self,
     params: GotoTypeDefinitionParams,
     token: CancellationToken,
@@ -4074,7 +4081,7 @@ impl tower_lsp::LanguageServer for LanguageServer {
       .await
   }
 
-  async fn completion(
+  pub async fn completion(
     &self,
     params: CompletionParams,
     token: CancellationToken,
@@ -4083,7 +4090,7 @@ impl tower_lsp::LanguageServer for LanguageServer {
     self.inner.read().await.completion(params, &token).await
   }
 
-  async fn completion_resolve(
+  pub async fn completion_resolve(
     &self,
     params: CompletionItem,
     token: CancellationToken,
@@ -4097,7 +4104,7 @@ impl tower_lsp::LanguageServer for LanguageServer {
       .await
   }
 
-  async fn diagnostic(
+  pub async fn diagnostic(
     &self,
     params: DocumentDiagnosticParams,
     token: CancellationToken,
@@ -4106,7 +4113,7 @@ impl tower_lsp::LanguageServer for LanguageServer {
     self.inner.read().await.diagnostic(params, &token).await
   }
 
-  async fn goto_implementation(
+  pub async fn goto_implementation(
     &self,
     params: GotoImplementationParams,
     token: CancellationToken,
@@ -4120,7 +4127,7 @@ impl tower_lsp::LanguageServer for LanguageServer {
       .await
   }
 
-  async fn folding_range(
+  pub async fn folding_range(
     &self,
     params: FoldingRangeParams,
     token: CancellationToken,
@@ -4129,7 +4136,7 @@ impl tower_lsp::LanguageServer for LanguageServer {
     self.inner.read().await.folding_range(params, &token).await
   }
 
-  async fn incoming_calls(
+  pub async fn incoming_calls(
     &self,
     params: CallHierarchyIncomingCallsParams,
     token: CancellationToken,
@@ -4138,7 +4145,7 @@ impl tower_lsp::LanguageServer for LanguageServer {
     self.inner.read().await.incoming_calls(params, &token).await
   }
 
-  async fn outgoing_calls(
+  pub async fn outgoing_calls(
     &self,
     params: CallHierarchyOutgoingCallsParams,
     token: CancellationToken,
@@ -4147,7 +4154,7 @@ impl tower_lsp::LanguageServer for LanguageServer {
     self.inner.read().await.outgoing_calls(params, &token).await
   }
 
-  async fn prepare_call_hierarchy(
+  pub async fn prepare_call_hierarchy(
     &self,
     params: CallHierarchyPrepareParams,
     token: CancellationToken,
@@ -4161,7 +4168,7 @@ impl tower_lsp::LanguageServer for LanguageServer {
       .await
   }
 
-  async fn rename(
+  pub async fn rename(
     &self,
     params: RenameParams,
     token: CancellationToken,
@@ -4170,7 +4177,7 @@ impl tower_lsp::LanguageServer for LanguageServer {
     self.inner.read().await.rename(params, &token).await
   }
 
-  async fn selection_range(
+  pub async fn selection_range(
     &self,
     params: SelectionRangeParams,
     token: CancellationToken,
@@ -4184,7 +4191,7 @@ impl tower_lsp::LanguageServer for LanguageServer {
       .await
   }
 
-  async fn semantic_tokens_full(
+  pub async fn semantic_tokens_full(
     &self,
     params: SemanticTokensParams,
     token: CancellationToken,
@@ -4198,7 +4205,7 @@ impl tower_lsp::LanguageServer for LanguageServer {
       .await
   }
 
-  async fn semantic_tokens_range(
+  pub async fn semantic_tokens_range(
     &self,
     params: SemanticTokensRangeParams,
     token: CancellationToken,
@@ -4212,7 +4219,7 @@ impl tower_lsp::LanguageServer for LanguageServer {
       .await
   }
 
-  async fn signature_help(
+  pub async fn signature_help(
     &self,
     params: SignatureHelpParams,
     token: CancellationToken,
@@ -4221,7 +4228,7 @@ impl tower_lsp::LanguageServer for LanguageServer {
     self.inner.read().await.signature_help(params, &token).await
   }
 
-  async fn will_rename_files(
+  pub async fn will_rename_files(
     &self,
     params: RenameFilesParams,
     token: CancellationToken,
@@ -4235,7 +4242,7 @@ impl tower_lsp::LanguageServer for LanguageServer {
       .await
   }
 
-  async fn symbol(
+  pub async fn symbol(
     &self,
     params: WorkspaceSymbolParams,
     token: CancellationToken,

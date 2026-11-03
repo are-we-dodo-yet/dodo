@@ -6,9 +6,9 @@ use imara_diff::Diff;
 use imara_diff::InternedInput;
 use text_size::TextRange;
 use text_size::TextSize;
-use tower_lsp::jsonrpc;
-use tower_lsp::lsp_types as lsp;
-use tower_lsp::lsp_types::TextEdit;
+use tower_lsp_server::jsonrpc;
+use tower_lsp_server::ls_types as lsp;
+use tower_lsp_server::ls_types::TextEdit;
 
 use crate::util::text_encoding::Utf16Map;
 

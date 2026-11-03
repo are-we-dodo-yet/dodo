@@ -20,7 +20,7 @@ use deno_core::OpState;
 use deno_core::op2;
 use deno_permissions::OpenAccessKind;
 use deno_permissions::PermissionsContainer;
-use rand::RngCore;
+use rand::Rng;
 
 const ERRNO_SUCCESS: i32 = 0;
 const ERRNO_ACCES: i32 = 2;
@@ -743,7 +743,7 @@ impl WasiContext {
     let Some(dest) = get_memory_slice_mut(memory, buf_ptr, buf_len) else {
       return ERRNO_FAULT;
     };
-    rand::thread_rng().fill_bytes(dest);
+    rand::rng().fill_bytes(dest);
     ERRNO_SUCCESS
   }
 

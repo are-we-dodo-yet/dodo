@@ -14,7 +14,8 @@ use deno_core::convert::Uint8Array;
 use deno_core::op2;
 use deno_core::unsync::spawn_blocking;
 use deno_error::JsErrorBox;
-use elliptic_curve::sec1::ToEncodedPoint;
+use elliptic_curve::Generate;
+use elliptic_curve::sec1::ToSec1Point;
 use hkdf::Hkdf;
 use keys::AsymmetricPrivateKey;
 use keys::AsymmetricPublicKey;
@@ -22,33 +23,29 @@ use keys::EcPrivateKey;
 use keys::EcPublicKey;
 use keys::KeyObjectHandle;
 use num_bigint::BigInt;
-use num_bigint_dig::BigUint;
-use p224::NistP224;
-use p256::NistP256;
-use p384::NistP384;
-use p521::NistP521;
-use rand::Rng;
-use rand::distributions::Distribution;
-use rand::distributions::Uniform;
+use num_bigint::BigUint;
+use rand::RngExt;
+use rand::distr::Distribution;
+use rand::distr::Uniform;
 use rsa::Oaep;
 use rsa::Pkcs1v15Encrypt;
-use rsa::RsaPrivateKey;
-use rsa::RsaPublicKey;
+use rsa::PrivateKey as RsaPrivateKey;
+use rsa::PublicKey as RsaPublicKey;
 use rsa::hazmat::rsa_decrypt_and_check;
 use rsa::hazmat::rsa_encrypt;
 use rsa::pkcs1::DecodeRsaPrivateKey;
-use rsa::pkcs1::DecodeRsaPublicKey;
 use rsa::pkcs8::DecodePrivateKey;
-use rsa::pkcs8::DecodePublicKey;
 use rsa::traits::PublicKeyParts;
 
 pub mod cipher;
 pub(crate) mod dh;
 pub mod digest;
+pub(crate) mod gcm_stream;
 pub mod keys;
 pub(crate) mod md5_sha1;
 pub(crate) mod pkcs3;
 pub(crate) mod primes;
+pub(crate) mod rng_compat;
 pub mod sign;
 pub mod x509;
 
@@ -371,23 +368,46 @@ fn pkcs1v15_type1_unpad(
   Ok(em[sep + 1..].to_vec())
 }
 
-fn create_oaep(
-  hash: Option<&str>,
-  label: Option<&[u8]>,
-) -> Result<Oaep, PrivateEncryptDecryptError> {
-  let hash = hash.unwrap_or("sha1");
-  let mut oaep = digest::match_fixed_digest!(hash, fn <D>() {
-    Oaep::new::<D>()
-  }, _ => {
-    return Err(PrivateEncryptDecryptError::InvalidDigest);
-  });
-  if let Some(label) = label {
-    // The rsa crate stores the label as String but only uses
-    // .as_bytes() on it, so the UTF-8 invariant is not relied upon.
-    // SAFETY: label bytes are only ever hashed, never interpreted as text.
-    oaep.label = Some(unsafe { String::from_utf8_unchecked(label.to_vec()) });
+macro_rules! with_oaep {
+  ($hash:expr, $label:expr, |$oaep:ident| $body:expr) => {{
+    let hash: Option<&str> = $hash;
+    let label: Option<&[u8]> = $label;
+    digest::match_fixed_digest!(hash.unwrap_or("sha1"), fn <D>() {
+      let $oaep = match label {
+        Some(label) => Oaep::<D>::new_with_label(label),
+        None => Oaep::<D>::new(),
+      };
+      $body
+    }, _ => {
+      return Err(PrivateEncryptDecryptError::InvalidDigest);
+    })
+  }};
+}
+
+fn pkcs1_to_pkcs8_error(err: rsa::pkcs1::Error) -> pkcs8::Error {
+  match err {
+    rsa::pkcs1::Error::Asn1(err) => pkcs8::Error::Asn1(err),
+    _ => pkcs8::Error::KeyMalformed(pkcs8::KeyError::Invalid),
   }
-  Ok(oaep)
+}
+
+fn pkcs1_to_spki_error(err: rsa::pkcs1::Error) -> spki::Error {
+  spki::Error::from(pkcs1_to_pkcs8_error(err))
+}
+
+fn rsa_uint(
+  bytes: &[u8],
+  key: &impl PublicKeyParts,
+) -> Result<rsa::BoxedUint, PrivateEncryptDecryptError> {
+  rsa::BoxedUint::from_be_slice(bytes, key.n_bits_precision())
+    .map_err(|_| PrivateEncryptDecryptError::Rsa(rsa::Error::Decryption))
+}
+
+fn rsa_uint_to_bytes(value: &rsa::BoxedUint, k: usize) -> Vec<u8> {
+  let bytes = value.to_be_bytes_trimmed_vartime();
+  let mut out = vec![0u8; k.saturating_sub(bytes.len())];
+  out.extend_from_slice(&bytes);
+  out
 }
 
 #[op2]
@@ -401,31 +421,27 @@ pub fn op_node_private_encrypt(
   let key = match std::str::from_utf8(&key) {
     Ok(pem) => RsaPrivateKey::from_pkcs8_pem(pem)
       .or_else(|_| rsa::pkcs1::DecodeRsaPrivateKey::from_pkcs1_pem(pem))
-      .map_err(|e| PrivateEncryptDecryptError::Pkcs8(e.into()))?,
+      .map_err(|e| {
+        PrivateEncryptDecryptError::Pkcs8(pkcs1_to_pkcs8_error(e))
+      })?,
     Err(_) => RsaPrivateKey::from_pkcs8_der(&key).or_else(|_| {
-      RsaPrivateKey::from_pkcs1_der(&key).map_err(pkcs8::Error::from)
+      RsaPrivateKey::from_pkcs1_der(&key).map_err(pkcs1_to_pkcs8_error)
     })?,
   };
 
   let k = key.size();
-  let mut rng = rand::thread_rng();
+  let mut rng = rng_compat::sys_rng();
   match padding {
     1 => {
       // PKCS1 type 1 padding + raw RSA private key operation
       let em = pkcs1v15_type1_pad(&msg, k)?;
-      let int = num_bigint_dig::BigUint::from_bytes_be(&em);
+      let int = rsa_uint(&em, &key)?;
       let result = rsa_decrypt_and_check(&key, Some(&mut rng), &int)?;
-      let mut result_bytes = result.to_bytes_be();
-      // Left-pad with zeros to key size
-      while result_bytes.len() < k {
-        result_bytes.insert(0, 0);
-      }
-      Ok(result_bytes.into())
+      Ok(rsa_uint_to_bytes(&result, k).into())
     }
-    4 => {
-      let oaep = create_oaep(oaep_hash.as_deref(), oaep_label.as_deref())?;
+    4 => with_oaep!(oaep_hash.as_deref(), oaep_label.as_deref(), |oaep| {
       Ok(key.as_ref().encrypt(&mut rng, oaep, &msg)?.into())
-    }
+    }),
     _ => Err(PrivateEncryptDecryptError::UnknownPadding),
   }
 }
@@ -449,34 +465,31 @@ pub fn op_node_private_decrypt(
       }
       RsaPrivateKey::from_pkcs8_pem(pem)
         .or_else(|_| rsa::pkcs1::DecodeRsaPrivateKey::from_pkcs1_pem(pem))
-        .map_err(|e| PrivateEncryptDecryptError::Pkcs8(e.into()))?
+        .map_err(|e| {
+          PrivateEncryptDecryptError::Pkcs8(pkcs1_to_pkcs8_error(e))
+        })?
     }
     Err(_) => RsaPrivateKey::from_pkcs8_der(&key).or_else(|_| {
-      RsaPrivateKey::from_pkcs1_der(&key).map_err(pkcs8::Error::from)
+      RsaPrivateKey::from_pkcs1_der(&key).map_err(pkcs1_to_pkcs8_error)
     })?,
   };
 
   let k = key.size();
-  let mut rng = rand::thread_rng();
+  let mut rng = rng_compat::sys_rng();
   match padding {
     1 => Ok(key.decrypt(Pkcs1v15Encrypt, &msg)?.into()),
     3 => {
       // RSA_NO_PADDING: raw private-key exponentiation
-      let int = BigUint::from_bytes_be(&msg);
+      let int = rsa_uint(&msg, &key)?;
       let result = rsa_decrypt_and_check(&key, Some(&mut rng), &int)?;
-      let mut result_bytes = result.to_bytes_be();
-      while result_bytes.len() < k {
-        result_bytes.insert(0, 0);
-      }
-      Ok(result_bytes.into())
+      Ok(rsa_uint_to_bytes(&result, k).into())
     }
-    4 => {
-      let oaep = create_oaep(oaep_hash.as_deref(), oaep_label.as_deref())?;
+    4 => with_oaep!(oaep_hash.as_deref(), oaep_label.as_deref(), |oaep| {
       key
         .decrypt(oaep, &msg)
         .map(|v| v.into())
         .map_err(|_| PrivateEncryptDecryptError::OaepDecodingError)
-    }
+    }),
     _ => Err(PrivateEncryptDecryptError::UnknownPadding),
   }
 }
@@ -484,22 +497,22 @@ pub fn op_node_private_decrypt(
 fn rsa_pub_key_from_cert_pem(pem: &str) -> Result<RsaPublicKey, pkcs8::Error> {
   use x509_parser::prelude::FromDer;
   let (_, pem_obj) = x509_parser::pem::parse_x509_pem(pem.as_bytes())
-    .map_err(|_| pkcs8::Error::KeyMalformed)?;
+    .map_err(|_| pkcs8::Error::KeyMalformed(pkcs8::KeyError::Invalid))?;
   let spki_der = {
     let (_, cert) =
       x509_parser::prelude::X509Certificate::from_der(&pem_obj.contents)
-        .map_err(|_| pkcs8::Error::KeyMalformed)?;
+        .map_err(|_| pkcs8::Error::KeyMalformed(pkcs8::KeyError::Invalid))?;
     cert.tbs_certificate.subject_pki.raw.to_vec()
   };
-  RsaPublicKey::from_public_key_der(&spki_der)
-    .map_err(|_| pkcs8::Error::KeyMalformed)
+  keys::rsa_public_key_from_spki_der(&spki_der)
+    .map_err(|_| pkcs8::Error::KeyMalformed(pkcs8::KeyError::Invalid))
 }
 
 #[op2(fast)]
 pub fn op_node_validate_oaep_hash(
   #[string] hash: &str,
 ) -> Result<(), PrivateEncryptDecryptError> {
-  create_oaep(Some(hash), None).map(|_| ())
+  with_oaep!(Some(hash), None, |_oaep| Ok(()))
 }
 
 #[op2]
@@ -511,26 +524,26 @@ pub fn op_node_public_encrypt(
   #[serde] oaep_label: Option<JsBuffer>,
 ) -> Result<Uint8Array, PrivateEncryptDecryptError> {
   let key = match std::str::from_utf8(&key) {
-    Ok(pem) => RsaPublicKey::from_public_key_pem(pem)
-      .or_else(|_| rsa::pkcs1::DecodeRsaPublicKey::from_pkcs1_pem(pem))
+    Ok(pem) => keys::rsa_public_key_from_spki_pem(pem)
+      .or_else(|_| keys::rsa_public_key_from_pkcs1_pem(pem))
       .or_else(|_| {
         RsaPrivateKey::from_pkcs8_pem(pem)
           .or_else(|_| {
             rsa::pkcs1::DecodeRsaPrivateKey::from_pkcs1_pem(pem)
-              .map_err(pkcs8::Error::from)
+              .map_err(pkcs1_to_pkcs8_error)
           })
           .map(|k| k.to_public_key())
       })
       .or_else(|_| rsa_pub_key_from_cert_pem(pem))
       .map_err(|e| PrivateEncryptDecryptError::Spki(e.into()))?,
-    Err(_) => RsaPublicKey::from_public_key_der(&key)
+    Err(_) => keys::rsa_public_key_from_spki_der(&key)
       .or_else(|_| {
-        RsaPublicKey::from_pkcs1_der(&key).map_err(spki::Error::from)
+        keys::rsa_public_key_from_pkcs1_der(&key).map_err(pkcs1_to_spki_error)
       })
       .or_else(|_| {
         RsaPrivateKey::from_pkcs8_der(&key)
           .or_else(|_| {
-            RsaPrivateKey::from_pkcs1_der(&key).map_err(pkcs8::Error::from)
+            RsaPrivateKey::from_pkcs1_der(&key).map_err(pkcs1_to_pkcs8_error)
           })
           .map(|k| k.to_public_key())
           .map_err(spki::Error::from)
@@ -538,7 +551,7 @@ pub fn op_node_public_encrypt(
   };
 
   let k = key.size();
-  let mut rng = rand::thread_rng();
+  let mut rng = rng_compat::sys_rng();
   match padding {
     1 => Ok(key.encrypt(&mut rng, Pkcs1v15Encrypt, &msg)?.into()),
     3 => {
@@ -546,18 +559,13 @@ pub fn op_node_public_encrypt(
       let mut padded = vec![0u8; k];
       let copy_len = msg.len().min(k);
       padded[k - copy_len..].copy_from_slice(&msg[msg.len() - copy_len..]);
-      let int = BigUint::from_bytes_be(&padded);
+      let int = rsa_uint(&padded, &key)?;
       let result = rsa_encrypt(&key, &int)?;
-      let mut result_bytes = result.to_bytes_be();
-      while result_bytes.len() < k {
-        result_bytes.insert(0, 0);
-      }
-      Ok(result_bytes.into())
+      Ok(rsa_uint_to_bytes(&result, k).into())
     }
-    4 => {
-      let oaep = create_oaep(oaep_hash.as_deref(), oaep_label.as_deref())?;
+    4 => with_oaep!(oaep_hash.as_deref(), oaep_label.as_deref(), |oaep| {
       Ok(key.encrypt(&mut rng, oaep, &msg)?.into())
-    }
+    }),
     _ => Err(PrivateEncryptDecryptError::UnknownPadding),
   }
 }
@@ -569,26 +577,26 @@ pub fn op_node_public_decrypt(
   #[smi] padding: u32,
 ) -> Result<Uint8Array, PrivateEncryptDecryptError> {
   let key = match std::str::from_utf8(&key) {
-    Ok(pem) => RsaPublicKey::from_public_key_pem(pem)
-      .or_else(|_| rsa::pkcs1::DecodeRsaPublicKey::from_pkcs1_pem(pem))
+    Ok(pem) => keys::rsa_public_key_from_spki_pem(pem)
+      .or_else(|_| keys::rsa_public_key_from_pkcs1_pem(pem))
       .or_else(|_| {
         RsaPrivateKey::from_pkcs8_pem(pem)
           .or_else(|_| {
             rsa::pkcs1::DecodeRsaPrivateKey::from_pkcs1_pem(pem)
-              .map_err(pkcs8::Error::from)
+              .map_err(pkcs1_to_pkcs8_error)
           })
           .map(|k| k.to_public_key())
       })
       .or_else(|_| rsa_pub_key_from_cert_pem(pem))
       .map_err(|e| PrivateEncryptDecryptError::Spki(e.into()))?,
-    Err(_) => RsaPublicKey::from_public_key_der(&key)
+    Err(_) => keys::rsa_public_key_from_spki_der(&key)
       .or_else(|_| {
-        RsaPublicKey::from_pkcs1_der(&key).map_err(spki::Error::from)
+        keys::rsa_public_key_from_pkcs1_der(&key).map_err(pkcs1_to_spki_error)
       })
       .or_else(|_| {
         RsaPrivateKey::from_pkcs8_der(&key)
           .or_else(|_| {
-            RsaPrivateKey::from_pkcs1_der(&key).map_err(pkcs8::Error::from)
+            RsaPrivateKey::from_pkcs1_der(&key).map_err(pkcs1_to_pkcs8_error)
           })
           .map(|k| k.to_public_key())
           .map_err(spki::Error::from)
@@ -599,13 +607,9 @@ pub fn op_node_public_decrypt(
   match padding {
     1 => {
       // Raw RSA with public key, then remove PKCS1 type 1 padding
-      let int = num_bigint_dig::BigUint::from_bytes_be(&msg);
+      let int = rsa_uint(&msg, &key)?;
       let result = rsa_encrypt(&key, &int)?;
-      let mut em = result.to_bytes_be();
-      // Left-pad with zeros to key size
-      while em.len() < k {
-        em.insert(0, 0);
-      }
+      let em = rsa_uint_to_bytes(&result, k);
       Ok(pkcs1v15_type1_unpad(&em, k)?.into())
     }
     4 => {
@@ -889,6 +893,11 @@ fn pbkdf2_sync(
       pbkdf2::pbkdf2_hmac::<D>(password, salt, iterations, derived_key);
       Ok(())
     },
+    sha3: fn <D>() {
+      pbkdf2::pbkdf2::<hmac::SimpleHmac<D>>(password, salt, iterations, derived_key)
+        .expect("HMAC can be initialized with any key length");
+      Ok(())
+    },
     _ => {
       Err(Pbkdf2Error::UnsupportedDigest(algorithm_name.to_string()))
     }
@@ -940,14 +949,14 @@ pub async fn op_node_pbkdf2_async(
 
 #[op2(fast)]
 pub fn op_node_fill_random(#[buffer] buf: &mut [u8]) {
-  rand::thread_rng().fill(buf);
+  rand::rng().fill(buf);
 }
 
 #[op2]
 pub async fn op_node_fill_random_async(#[smi] len: i32) -> Uint8Array {
   spawn_blocking(move || {
     let mut buf = vec![0u8; len as usize];
-    rand::thread_rng().fill(&mut buf[..]);
+    rand::rng().fill(&mut buf[..]);
     buf.into()
   })
   .await
@@ -985,6 +994,11 @@ fn hkdf_sync(
     digest_algorithm,
     fn <D>() {
       let hk = Hkdf::<D>::new(Some(salt), ikm);
+      hk.expand(info, okm)
+        .map_err(|_| HkdfError::HkdfExpandFailed)
+    },
+    sha3: fn <D>() {
+      let hk = hkdf::SimpleHkdf::<D>::new(Some(salt), ikm);
       hk.expand(info, okm)
         .map_err(|_| HkdfError::HkdfExpandFailed)
     },
@@ -1039,10 +1053,10 @@ pub fn op_node_dh_compute_secret(
 #[op2(fast)]
 #[number]
 pub fn op_node_random_int(#[number] min: i64, #[number] max: i64) -> i64 {
-  let mut rng = rand::thread_rng();
+  let mut rng = rand::rng();
   // Uniform distribution is required to avoid Modulo Bias
   // https://en.wikipedia.org/wiki/Fisher–Yates_shuffle#Modulo_bias
-  let dist = Uniform::from(min..max);
+  let dist = Uniform::try_from(min..max).unwrap();
 
   dist.sample(&mut rng)
 }
@@ -1186,75 +1200,58 @@ pub fn op_node_ecdh_encode_pubkey(
   #[buffer] pubkey: &[u8],
   compress: bool,
 ) -> Result<Uint8Array, EcdhEncodePubKey> {
-  use elliptic_curve::sec1::FromEncodedPoint;
+  use elliptic_curve::sec1::FromSec1Point;
 
   match curve {
     "secp256k1" => {
-      let pubkey =
-        elliptic_curve::PublicKey::<k256::Secp256k1>::from_encoded_point(
-          &elliptic_curve::sec1::EncodedPoint::<k256::Secp256k1>::from_bytes(
-            pubkey,
-          )?,
-        );
-      // CtOption does not expose its variants.
-      if pubkey.is_none().into() {
-        return Err(EcdhEncodePubKey::InvalidPublicKey);
-      }
-
-      let pubkey = pubkey.unwrap();
-
-      Ok(pubkey.to_encoded_point(compress).as_ref().to_vec().into())
-    }
-    "prime256v1" | "secp256r1" => {
-      let pubkey = elliptic_curve::PublicKey::<NistP256>::from_encoded_point(
-        &elliptic_curve::sec1::EncodedPoint::<NistP256>::from_bytes(pubkey)?,
-      );
-      // CtOption does not expose its variants.
-      if pubkey.is_none().into() {
-        return Err(EcdhEncodePubKey::InvalidPublicKey);
-      }
-
-      let pubkey = pubkey.unwrap();
-
-      Ok(pubkey.to_encoded_point(compress).as_ref().to_vec().into())
-    }
-    "secp384r1" => {
-      let pubkey = elliptic_curve::PublicKey::<NistP384>::from_encoded_point(
-        &elliptic_curve::sec1::EncodedPoint::<NistP384>::from_bytes(pubkey)?,
-      );
-      // CtOption does not expose its variants.
-      if pubkey.is_none().into() {
-        return Err(EcdhEncodePubKey::InvalidPublicKey);
-      }
-
-      let pubkey = pubkey.unwrap();
-
-      Ok(pubkey.to_encoded_point(compress).as_ref().to_vec().into())
-    }
-    "secp521r1" => {
-      let Some(pubkey): Option<elliptic_curve::PublicKey<NistP521>> =
-        elliptic_curve::PublicKey::<NistP521>::from_encoded_point(
-          &elliptic_curve::sec1::EncodedPoint::<NistP521>::from_bytes(pubkey)?,
-        )
-        .into()
+      let Some(pubkey): Option<k256::PublicKey> =
+        k256::PublicKey::from_sec1_point(&k256::Sec1Point::from_bytes(pubkey)?)
+          .into_option()
       else {
         return Err(EcdhEncodePubKey::InvalidPublicKey);
       };
 
-      Ok(pubkey.to_encoded_point(compress).as_ref().to_vec().into())
+      Ok(pubkey.to_sec1_point(compress).as_bytes().to_vec().into())
+    }
+    "prime256v1" | "secp256r1" => {
+      let Some(pubkey): Option<p256::PublicKey> =
+        p256::PublicKey::from_sec1_point(&p256::Sec1Point::from_bytes(pubkey)?)
+          .into_option()
+      else {
+        return Err(EcdhEncodePubKey::InvalidPublicKey);
+      };
+
+      Ok(pubkey.to_sec1_point(compress).as_bytes().to_vec().into())
+    }
+    "secp384r1" => {
+      let Some(pubkey): Option<p384::PublicKey> =
+        p384::PublicKey::from_sec1_point(&p384::Sec1Point::from_bytes(pubkey)?)
+          .into_option()
+      else {
+        return Err(EcdhEncodePubKey::InvalidPublicKey);
+      };
+
+      Ok(pubkey.to_sec1_point(compress).as_bytes().to_vec().into())
+    }
+    "secp521r1" => {
+      let Some(pubkey): Option<p521::PublicKey> =
+        p521::PublicKey::from_sec1_point(&p521::Sec1Point::from_bytes(pubkey)?)
+          .into_option()
+      else {
+        return Err(EcdhEncodePubKey::InvalidPublicKey);
+      };
+
+      Ok(pubkey.to_sec1_point(compress).as_bytes().to_vec().into())
     }
     "secp224r1" => {
-      let pubkey = elliptic_curve::PublicKey::<NistP224>::from_encoded_point(
-        &elliptic_curve::sec1::EncodedPoint::<NistP224>::from_bytes(pubkey)?,
-      );
-      // CtOption does not expose its variants.
-      if pubkey.is_none().into() {
+      let Some(pubkey): Option<p224::PublicKey> =
+        p224::PublicKey::from_sec1_point(&p224::Sec1Point::from_bytes(pubkey)?)
+          .into_option()
+      else {
         return Err(EcdhEncodePubKey::InvalidPublicKey);
-      }
+      };
 
-      let pubkey = pubkey.unwrap();
-
-      Ok(pubkey.to_encoded_point(compress).as_ref().to_vec().into())
+      Ok(pubkey.to_sec1_point(compress).as_bytes().to_vec().into())
     }
     &_ => Err(EcdhEncodePubKey::UnsupportedCurve),
   }
@@ -1267,47 +1264,46 @@ pub fn op_node_ecdh_generate_keys(
   #[buffer] privbuf: &mut [u8],
   #[string] format: &str,
 ) -> Result<(), JsErrorBox> {
-  let mut rng = rand::thread_rng();
+  let mut rng = rng_compat::sys_rng();
   let compress = format == "compressed";
   match curve {
     "secp256k1" => {
-      let privkey =
-        elliptic_curve::SecretKey::<k256::Secp256k1>::random(&mut rng);
+      let privkey = k256::SecretKey::generate_from_rng(&mut rng);
       let pubkey = privkey.public_key();
-      pubbuf.copy_from_slice(pubkey.to_encoded_point(compress).as_ref());
-      privbuf.copy_from_slice(privkey.to_nonzero_scalar().to_bytes().as_ref());
+      pubbuf.copy_from_slice(pubkey.to_sec1_point(compress).as_bytes());
+      privbuf.copy_from_slice(&privkey.to_bytes());
 
       Ok(())
     }
     "prime256v1" | "secp256r1" => {
-      let privkey = elliptic_curve::SecretKey::<NistP256>::random(&mut rng);
+      let privkey = p256::SecretKey::generate_from_rng(&mut rng);
       let pubkey = privkey.public_key();
-      pubbuf.copy_from_slice(pubkey.to_encoded_point(compress).as_ref());
-      privbuf.copy_from_slice(privkey.to_nonzero_scalar().to_bytes().as_ref());
+      pubbuf.copy_from_slice(pubkey.to_sec1_point(compress).as_bytes());
+      privbuf.copy_from_slice(&privkey.to_bytes());
 
       Ok(())
     }
     "secp384r1" => {
-      let privkey = elliptic_curve::SecretKey::<NistP384>::random(&mut rng);
+      let privkey = p384::SecretKey::generate_from_rng(&mut rng);
       let pubkey = privkey.public_key();
-      pubbuf.copy_from_slice(pubkey.to_encoded_point(compress).as_ref());
-      privbuf.copy_from_slice(privkey.to_nonzero_scalar().to_bytes().as_ref());
+      pubbuf.copy_from_slice(pubkey.to_sec1_point(compress).as_bytes());
+      privbuf.copy_from_slice(&privkey.to_bytes());
 
       Ok(())
     }
     "secp521r1" => {
-      let privkey = elliptic_curve::SecretKey::<NistP521>::random(&mut rng);
+      let privkey = p521::SecretKey::generate_from_rng(&mut rng);
       let pubkey = privkey.public_key();
-      pubbuf.copy_from_slice(pubkey.to_encoded_point(compress).as_ref());
-      privbuf.copy_from_slice(privkey.to_nonzero_scalar().to_bytes().as_ref());
+      pubbuf.copy_from_slice(pubkey.to_sec1_point(compress).as_bytes());
+      privbuf.copy_from_slice(&privkey.to_bytes());
 
       Ok(())
     }
     "secp224r1" => {
-      let privkey = elliptic_curve::SecretKey::<NistP224>::random(&mut rng);
+      let privkey = p224::SecretKey::generate_from_rng(&mut rng);
       let pubkey = privkey.public_key();
-      pubbuf.copy_from_slice(pubkey.to_encoded_point(compress).as_ref());
-      privbuf.copy_from_slice(privkey.to_nonzero_scalar().to_bytes().as_ref());
+      pubbuf.copy_from_slice(pubkey.to_sec1_point(compress).as_bytes());
+      privbuf.copy_from_slice(&privkey.to_bytes());
 
       Ok(())
     }
@@ -1345,117 +1341,83 @@ pub fn op_node_ecdh_compute_secret(
   let this_priv = this_priv.ok_or(EcdhError::InvalidPrivateKey)?;
   match curve {
     "secp256k1" => {
-      let their_public_key =
-        elliptic_curve::PublicKey::<k256::Secp256k1>::from_sec1_bytes(
-          their_pub,
-        )
+      let their_public_key = k256::PublicKey::from_sec1_bytes(their_pub)
         .map_err(|_| EcdhError::InvalidPublicKey)?;
-      let this_private_key =
-        elliptic_curve::SecretKey::<k256::Secp256k1>::from_slice(&this_priv)
-          .map_err(|_| EcdhError::InvalidPrivateKey)?;
+      let this_private_key = k256::SecretKey::from_slice(&this_priv)
+        .map_err(|_| EcdhError::InvalidPrivateKey)?;
       if let Some(this_pub) = this_pub {
         let derived = this_private_key.public_key();
-        let stored =
-          elliptic_curve::PublicKey::<k256::Secp256k1>::from_sec1_bytes(
-            &this_pub,
-          )
+        let stored = k256::PublicKey::from_sec1_bytes(&this_pub)
           .map_err(|_| EcdhError::InvalidKeyPair)?;
         if derived != stored {
           return Err(EcdhError::InvalidKeyPair);
         }
       }
-      let shared_secret = elliptic_curve::ecdh::diffie_hellman(
-        this_private_key.to_nonzero_scalar(),
-        their_public_key.as_affine(),
-      );
+      let shared_secret = this_private_key.diffie_hellman(&their_public_key);
       secret.copy_from_slice(shared_secret.raw_secret_bytes());
     }
     "prime256v1" | "secp256r1" => {
-      let their_public_key =
-        elliptic_curve::PublicKey::<NistP256>::from_sec1_bytes(their_pub)
-          .map_err(|_| EcdhError::InvalidPublicKey)?;
-      let this_private_key =
-        elliptic_curve::SecretKey::<NistP256>::from_slice(&this_priv)
-          .map_err(|_| EcdhError::InvalidPrivateKey)?;
+      let their_public_key = p256::PublicKey::from_sec1_bytes(their_pub)
+        .map_err(|_| EcdhError::InvalidPublicKey)?;
+      let this_private_key = p256::SecretKey::from_slice(&this_priv)
+        .map_err(|_| EcdhError::InvalidPrivateKey)?;
       if let Some(this_pub) = this_pub {
         let derived = this_private_key.public_key();
-        let stored =
-          elliptic_curve::PublicKey::<NistP256>::from_sec1_bytes(&this_pub)
-            .map_err(|_| EcdhError::InvalidKeyPair)?;
+        let stored = p256::PublicKey::from_sec1_bytes(&this_pub)
+          .map_err(|_| EcdhError::InvalidKeyPair)?;
         if derived != stored {
           return Err(EcdhError::InvalidKeyPair);
         }
       }
-      let shared_secret = elliptic_curve::ecdh::diffie_hellman(
-        this_private_key.to_nonzero_scalar(),
-        their_public_key.as_affine(),
-      );
+      let shared_secret = this_private_key.diffie_hellman(&their_public_key);
       secret.copy_from_slice(shared_secret.raw_secret_bytes());
     }
     "secp384r1" => {
-      let their_public_key =
-        elliptic_curve::PublicKey::<NistP384>::from_sec1_bytes(their_pub)
-          .map_err(|_| EcdhError::InvalidPublicKey)?;
-      let this_private_key =
-        elliptic_curve::SecretKey::<NistP384>::from_slice(&this_priv)
-          .map_err(|_| EcdhError::InvalidPrivateKey)?;
+      let their_public_key = p384::PublicKey::from_sec1_bytes(their_pub)
+        .map_err(|_| EcdhError::InvalidPublicKey)?;
+      let this_private_key = p384::SecretKey::from_slice(&this_priv)
+        .map_err(|_| EcdhError::InvalidPrivateKey)?;
       if let Some(this_pub) = this_pub {
         let derived = this_private_key.public_key();
-        let stored =
-          elliptic_curve::PublicKey::<NistP384>::from_sec1_bytes(&this_pub)
-            .map_err(|_| EcdhError::InvalidKeyPair)?;
+        let stored = p384::PublicKey::from_sec1_bytes(&this_pub)
+          .map_err(|_| EcdhError::InvalidKeyPair)?;
         if derived != stored {
           return Err(EcdhError::InvalidKeyPair);
         }
       }
-      let shared_secret = elliptic_curve::ecdh::diffie_hellman(
-        this_private_key.to_nonzero_scalar(),
-        their_public_key.as_affine(),
-      );
+      let shared_secret = this_private_key.diffie_hellman(&their_public_key);
       secret.copy_from_slice(shared_secret.raw_secret_bytes());
     }
     "secp521r1" => {
-      let their_public_key =
-        elliptic_curve::PublicKey::<NistP521>::from_sec1_bytes(their_pub)
-          .map_err(|_| EcdhError::InvalidPublicKey)?;
-      let this_private_key =
-        elliptic_curve::SecretKey::<NistP521>::from_slice(&this_priv)
-          .map_err(|_| EcdhError::InvalidPrivateKey)?;
+      let their_public_key = p521::PublicKey::from_sec1_bytes(their_pub)
+        .map_err(|_| EcdhError::InvalidPublicKey)?;
+      let this_private_key = p521::SecretKey::from_slice(&this_priv)
+        .map_err(|_| EcdhError::InvalidPrivateKey)?;
       if let Some(this_pub) = this_pub {
         let derived = this_private_key.public_key();
-        let stored =
-          elliptic_curve::PublicKey::<NistP521>::from_sec1_bytes(&this_pub)
-            .map_err(|_| EcdhError::InvalidKeyPair)?;
+        let stored = p521::PublicKey::from_sec1_bytes(&this_pub)
+          .map_err(|_| EcdhError::InvalidKeyPair)?;
         if derived != stored {
           return Err(EcdhError::InvalidKeyPair);
         }
       }
-      let shared_secret = elliptic_curve::ecdh::diffie_hellman(
-        this_private_key.to_nonzero_scalar(),
-        their_public_key.as_affine(),
-      );
+      let shared_secret = this_private_key.diffie_hellman(&their_public_key);
       secret.copy_from_slice(shared_secret.raw_secret_bytes());
     }
     "secp224r1" => {
-      let their_public_key =
-        elliptic_curve::PublicKey::<NistP224>::from_sec1_bytes(their_pub)
-          .map_err(|_| EcdhError::InvalidPublicKey)?;
-      let this_private_key =
-        elliptic_curve::SecretKey::<NistP224>::from_slice(&this_priv)
-          .map_err(|_| EcdhError::InvalidPrivateKey)?;
+      let their_public_key = p224::PublicKey::from_sec1_bytes(their_pub)
+        .map_err(|_| EcdhError::InvalidPublicKey)?;
+      let this_private_key = p224::SecretKey::from_slice(&this_priv)
+        .map_err(|_| EcdhError::InvalidPrivateKey)?;
       if let Some(this_pub) = this_pub {
         let derived = this_private_key.public_key();
-        let stored =
-          elliptic_curve::PublicKey::<NistP224>::from_sec1_bytes(&this_pub)
-            .map_err(|_| EcdhError::InvalidKeyPair)?;
+        let stored = p224::PublicKey::from_sec1_bytes(&this_pub)
+          .map_err(|_| EcdhError::InvalidKeyPair)?;
         if derived != stored {
           return Err(EcdhError::InvalidKeyPair);
         }
       }
-      let shared_secret = elliptic_curve::ecdh::diffie_hellman(
-        this_private_key.to_nonzero_scalar(),
-        their_public_key.as_affine(),
-      );
+      let shared_secret = this_private_key.diffie_hellman(&their_public_key);
       secret.copy_from_slice(shared_secret.raw_secret_bytes());
     }
     _ => return Err(EcdhError::UnsupportedCurve),
@@ -1471,39 +1433,34 @@ pub fn op_node_ecdh_compute_public_key(
 ) -> Result<(), EcdhError> {
   match curve {
     "secp256k1" => {
-      let this_private_key =
-        elliptic_curve::SecretKey::<k256::Secp256k1>::from_slice(privkey)
-          .map_err(|_| EcdhError::InvalidPrivateKey)?;
+      let this_private_key = k256::SecretKey::from_slice(privkey)
+        .map_err(|_| EcdhError::InvalidPrivateKey)?;
       let public_key = this_private_key.public_key();
-      pubkey.copy_from_slice(public_key.to_encoded_point(false).as_ref());
+      pubkey.copy_from_slice(public_key.to_sec1_point(false).as_bytes());
     }
     "prime256v1" | "secp256r1" => {
-      let this_private_key =
-        elliptic_curve::SecretKey::<NistP256>::from_slice(privkey)
-          .map_err(|_| EcdhError::InvalidPrivateKey)?;
+      let this_private_key = p256::SecretKey::from_slice(privkey)
+        .map_err(|_| EcdhError::InvalidPrivateKey)?;
       let public_key = this_private_key.public_key();
-      pubkey.copy_from_slice(public_key.to_encoded_point(false).as_ref());
+      pubkey.copy_from_slice(public_key.to_sec1_point(false).as_bytes());
     }
     "secp384r1" => {
-      let this_private_key =
-        elliptic_curve::SecretKey::<NistP384>::from_slice(privkey)
-          .map_err(|_| EcdhError::InvalidPrivateKey)?;
+      let this_private_key = p384::SecretKey::from_slice(privkey)
+        .map_err(|_| EcdhError::InvalidPrivateKey)?;
       let public_key = this_private_key.public_key();
-      pubkey.copy_from_slice(public_key.to_encoded_point(false).as_ref());
+      pubkey.copy_from_slice(public_key.to_sec1_point(false).as_bytes());
     }
     "secp521r1" => {
-      let this_private_key =
-        elliptic_curve::SecretKey::<NistP521>::from_slice(privkey)
-          .map_err(|_| EcdhError::InvalidPrivateKey)?;
+      let this_private_key = p521::SecretKey::from_slice(privkey)
+        .map_err(|_| EcdhError::InvalidPrivateKey)?;
       let public_key = this_private_key.public_key();
-      pubkey.copy_from_slice(public_key.to_encoded_point(false).as_ref());
+      pubkey.copy_from_slice(public_key.to_sec1_point(false).as_bytes());
     }
     "secp224r1" => {
-      let this_private_key =
-        elliptic_curve::SecretKey::<NistP224>::from_slice(privkey)
-          .map_err(|_| EcdhError::InvalidPrivateKey)?;
+      let this_private_key = p224::SecretKey::from_slice(privkey)
+        .map_err(|_| EcdhError::InvalidPrivateKey)?;
       let public_key = this_private_key.public_key();
-      pubkey.copy_from_slice(public_key.to_encoded_point(false).as_ref());
+      pubkey.copy_from_slice(public_key.to_sec1_point(false).as_bytes());
     }
     _ => return Err(EcdhError::UnsupportedCurve),
   }
@@ -1516,21 +1473,11 @@ pub fn op_node_ecdh_validate_private_key(
   #[buffer] privkey: &[u8],
 ) -> bool {
   match curve {
-    "secp256k1" => {
-      elliptic_curve::SecretKey::<k256::Secp256k1>::from_slice(privkey).is_ok()
-    }
-    "prime256v1" | "secp256r1" => {
-      elliptic_curve::SecretKey::<NistP256>::from_slice(privkey).is_ok()
-    }
-    "secp384r1" => {
-      elliptic_curve::SecretKey::<NistP384>::from_slice(privkey).is_ok()
-    }
-    "secp521r1" => {
-      elliptic_curve::SecretKey::<NistP521>::from_slice(privkey).is_ok()
-    }
-    "secp224r1" => {
-      elliptic_curve::SecretKey::<NistP224>::from_slice(privkey).is_ok()
-    }
+    "secp256k1" => k256::SecretKey::from_slice(privkey).is_ok(),
+    "prime256v1" | "secp256r1" => p256::SecretKey::from_slice(privkey).is_ok(),
+    "secp384r1" => p384::SecretKey::from_slice(privkey).is_ok(),
+    "secp521r1" => p521::SecretKey::from_slice(privkey).is_ok(),
+    "secp224r1" => p224::SecretKey::from_slice(privkey).is_ok(),
     _ => false,
   }
 }
@@ -1540,61 +1487,47 @@ pub fn op_node_ecdh_validate_public_key(
   #[string] curve: &str,
   #[buffer] pubkey: &[u8],
 ) -> bool {
-  use elliptic_curve::sec1::FromEncodedPoint;
+  use elliptic_curve::sec1::FromSec1Point;
   match curve {
     "secp256k1" => {
-      let Ok(point) =
-        elliptic_curve::sec1::EncodedPoint::<k256::Secp256k1>::from_bytes(
-          pubkey,
-        )
-      else {
+      let Ok(point) = k256::Sec1Point::from_bytes(pubkey) else {
         return false;
       };
-      let pk = elliptic_curve::PublicKey::<k256::Secp256k1>::from_encoded_point(
-        &point,
-      );
-      bool::from(pk.is_some())
+      k256::PublicKey::from_sec1_point(&point)
+        .into_option()
+        .is_some()
     }
     "prime256v1" | "secp256r1" => {
-      let Ok(point) =
-        elliptic_curve::sec1::EncodedPoint::<NistP256>::from_bytes(pubkey)
-      else {
+      let Ok(point) = p256::Sec1Point::from_bytes(pubkey) else {
         return false;
       };
-      let pk =
-        elliptic_curve::PublicKey::<NistP256>::from_encoded_point(&point);
-      bool::from(pk.is_some())
+      p256::PublicKey::from_sec1_point(&point)
+        .into_option()
+        .is_some()
     }
     "secp384r1" => {
-      let Ok(point) =
-        elliptic_curve::sec1::EncodedPoint::<NistP384>::from_bytes(pubkey)
-      else {
+      let Ok(point) = p384::Sec1Point::from_bytes(pubkey) else {
         return false;
       };
-      let pk =
-        elliptic_curve::PublicKey::<NistP384>::from_encoded_point(&point);
-      bool::from(pk.is_some())
+      p384::PublicKey::from_sec1_point(&point)
+        .into_option()
+        .is_some()
     }
     "secp521r1" => {
-      let Ok(point) =
-        elliptic_curve::sec1::EncodedPoint::<NistP521>::from_bytes(pubkey)
-      else {
+      let Ok(point) = p521::Sec1Point::from_bytes(pubkey) else {
         return false;
       };
-      let pk: Option<elliptic_curve::PublicKey<NistP521>> =
-        elliptic_curve::PublicKey::<NistP521>::from_encoded_point(&point)
-          .into();
-      pk.is_some()
+      p521::PublicKey::from_sec1_point(&point)
+        .into_option()
+        .is_some()
     }
     "secp224r1" => {
-      let Ok(point) =
-        elliptic_curve::sec1::EncodedPoint::<NistP224>::from_bytes(pubkey)
-      else {
+      let Ok(point) = p224::Sec1Point::from_bytes(pubkey) else {
         return false;
       };
-      let pk =
-        elliptic_curve::PublicKey::<NistP224>::from_encoded_point(&point);
-      bool::from(pk.is_some())
+      p224::PublicKey::from_sec1_point(&point)
+        .into_option()
+        .is_some()
     }
     _ => false,
   }
@@ -1836,7 +1769,7 @@ pub fn op_node_diffie_hellman(
 
       // Pad to the byte length of the prime, matching OpenSSL's
       // DH_compute_key_padded behaviour used by EVP_PKEY_derive.
-      let prime_len = priv_prime.bits().div_ceil(8);
+      let prime_len = priv_prime.bits().div_ceil(8) as usize;
       let secret_bytes = shared_secret.to_bytes_be();
       if secret_bytes.len() < prime_len {
         let mut padded = vec![0u8; prime_len];

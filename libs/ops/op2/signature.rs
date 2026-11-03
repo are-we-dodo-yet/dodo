@@ -1911,7 +1911,8 @@ pub(crate) fn parse_type(
       }
     }
     Type::Ptr(of) => {
-      let mut_type = if of.mutability.is_some() {
+      let mut_type = if matches!(of.mutability, syn::PointerMutability::Mut(_))
+      {
         RefType::Mut
       } else {
         RefType::Ref
