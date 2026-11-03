@@ -1677,9 +1677,9 @@ const buildJobs = buildItems.map((rawBuildItem) => {
             if: isDebug,
             env: { DENO_BIN: "./target/debug/deno" },
             run: [
-              "dodo run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json \\",
+              "deno run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json \\",
               "    ./tests/wpt/wpt.ts setup",
-              "dodo run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json --unsafely-ignore-certificate-errors \\",
+              "deno run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json --unsafely-ignore-certificate-errors \\",
               '    ./tests/wpt/wpt.ts run --all --quiet --binary="$DENO_BIN"',
             ],
           },
@@ -1690,9 +1690,9 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               DENO_BIN: "./target/release/deno",
             },
             run: [
-              "dodo run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json \\",
+              "deno run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json \\",
               "    ./tests/wpt/wpt.ts setup",
-              "dodo run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json --unsafely-ignore-certificate-errors \\",
+              "deno run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json --unsafely-ignore-certificate-errors \\",
               '    ./tests/wpt/wpt.ts run --all --quiet --release --binary="$DENO_BIN" --json=wpt.json --wptreport=wptreport.json',
             ],
           },
@@ -1916,19 +1916,19 @@ const lintJob = job("lint", {
         {
           name: "test_format.js",
           run:
-            "dodo run --allow-write --allow-read --allow-run --allow-net ./tools/format.js --check",
+            "deno run --allow-write --allow-read --allow-run --allow-net ./tools/format.js --check",
         },
         {
           name: "jsdoc_checker.js",
           run:
-            "dodo run --allow-read --allow-env --allow-sys ./tools/jsdoc_checker.js",
+            "deno run --allow-read --allow-env --allow-sys ./tools/jsdoc_checker.js",
         },
       ),
       {
         name: "lint.js",
         env: { GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}" },
         run:
-          "dodo run --allow-write --allow-read --allow-run --allow-net --allow-env ./tools/lint.js",
+          "deno run --allow-write --allow-read --allow-run --allow-net --allow-env ./tools/lint.js",
       },
       saveCacheStep,
     );
