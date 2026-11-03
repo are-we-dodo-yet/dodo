@@ -591,15 +591,15 @@ fn op_is_terminal(state: &mut OpState, #[smi] rid: ResourceId) -> bool {
   }
 }
 
-async fn do_load_job<'s, 'i>(
+async fn load_module_graph<'s, 'i>(
   scope: &mut v8::PinScope<'s, 'i>,
   module_map_rc: Rc<ModuleMap>,
   specifier: &str,
   code: Option<String>,
 ) -> Result<ModuleId, CoreError> {
-  let root_id = RecursiveModuleLoad::side(
+  RecursiveModuleLoad::side(
     specifier.to_string(),
-    module_map_rc.clone(),
+    module_map_rc,
     crate::modules::SideModuleKind::Sync,
     code,
   )
@@ -612,7 +612,17 @@ async fn do_load_job<'s, 'i>(
       .register_and_recurse(scope, request, source)
       .map_err(|e| e.into_error(scope, false, false)),
   })
-  .await?;
+  .await
+}
+
+async fn load_and_instantiate_module_graph<'s, 'i>(
+  scope: &mut v8::PinScope<'s, 'i>,
+  module_map_rc: Rc<ModuleMap>,
+  specifier: &str,
+  code: Option<String>,
+) -> Result<ModuleId, CoreError> {
+  let root_id =
+    load_module_graph(scope, module_map_rc.clone(), specifier, code).await?;
 
   let module = module_map_rc
     .get_module(scope, root_id)
@@ -735,12 +745,13 @@ fn op_import_sync<'s, 'i>(
   let module_map_rc = JsRealm::module_map_from(scope);
 
   // no js execution within block_on
-  let module_id = futures::executor::block_on(do_load_job(
-    scope,
-    module_map_rc.clone(),
-    specifier,
-    code,
-  ))?;
+  let module_id =
+    futures::executor::block_on(load_and_instantiate_module_graph(
+      scope,
+      module_map_rc.clone(),
+      specifier,
+      code,
+    ))?;
 
   // Check for re-entrant require() cycle: if this module is already on
   // the op_import_sync call stack, it means CJS code required an ESM
@@ -850,6 +861,13 @@ fn op_import_sync_with_source<'s, 'i>(
       None,
     )
     .map_err(|e| e.into_error(scope, false, false))?;
+
+  futures::executor::block_on(load_module_graph(
+    scope,
+    module_map_rc.clone(),
+    specifier,
+    None,
+  ))?;
 
   module_map_rc
     .instantiate_module(scope, module_id)
