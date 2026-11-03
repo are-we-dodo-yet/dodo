@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793738180353,
+  "lastUpdate": 1793738183297,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo",
   "entries": {
     "Execution Time": [
@@ -793,6 +793,95 @@ window.BENCHMARK_DATA = {
           {
             "name": "workers_startup",
             "value": 39834,
+            "unit": "syscalls"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "46793832+0xMax42@users.noreply.github.com",
+            "name": "Max P.",
+            "username": "0xMax42"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "d5d91316c3d5677e0c850f5d22b7ebd8651c3203",
+          "message": "docs: improve pull request template (#10)",
+          "timestamp": "2026-11-03T14:51:14-05:00",
+          "tree_id": "dce8afe65f508b3f2d32d62a88396d80a1312e4e",
+          "url": "https://github.com/are-we-dodo-yet/dodo/commit/d5d91316c3d5677e0c850f5d22b7ebd8651c3203"
+        },
+        "date": 1793738181943,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "cold_hello",
+            "value": 1857,
+            "unit": "syscalls"
+          },
+          {
+            "name": "cold_relative_import",
+            "value": 1876,
+            "unit": "syscalls"
+          },
+          {
+            "name": "error_001",
+            "value": 1946,
+            "unit": "syscalls"
+          },
+          {
+            "name": "hello",
+            "value": 1862,
+            "unit": "syscalls"
+          },
+          {
+            "name": "no_check_hello",
+            "value": 1855,
+            "unit": "syscalls"
+          },
+          {
+            "name": "relative_import",
+            "value": 1887,
+            "unit": "syscalls"
+          },
+          {
+            "name": "response_string",
+            "value": 2101,
+            "unit": "syscalls"
+          },
+          {
+            "name": "text_decoder",
+            "value": 1995,
+            "unit": "syscalls"
+          },
+          {
+            "name": "text_encoder",
+            "value": 2448,
+            "unit": "syscalls"
+          },
+          {
+            "name": "text_encoder_into",
+            "value": 1917,
+            "unit": "syscalls"
+          },
+          {
+            "name": "workers_large_message",
+            "value": 73931,
+            "unit": "syscalls"
+          },
+          {
+            "name": "workers_round_robin",
+            "value": 7896,
+            "unit": "syscalls"
+          },
+          {
+            "name": "workers_startup",
+            "value": 47745,
             "unit": "syscalls"
           }
         ]
