@@ -53,11 +53,14 @@ jobs:
       - id: deno_core_changes
         if: github.event_name == 'pull_request'
         run: |-
+          alias dodo="deno"
           git fetch --depth=1 origin ${{ github.event.pull_request.base.sha }}
           dodo run -A tools/check_deno_core_changes.js ${{ github.event.pull_request.base.sha }}
       - id: docs_only_changes
         if: github.event_name == 'pull_request'
-        run: 'dodo run -A tools/check_docs_only_changes.js ${{ github.event.pull_request.base.sha }}'
+        run: |-
+          alias dodo="deno"
+          dodo run -A tools/check_docs_only_changes.js ${{ github.event.pull_request.base.sha }}
   bench:
     name: bench release linux-x86_64
     needs:
