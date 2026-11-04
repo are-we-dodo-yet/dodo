@@ -25,7 +25,7 @@ harness = false
 
 [features]
 default = ["v8"]
-# The dependency named `v8` is the deno_v8 facade, retained under the existing
+# The dependency named `v8` is the v8x crate, retained under the existing
 # crate name so the engine integration does not require source-level churn.
 v8 = ["__runtime_defaults", "deno_core/v8", "v8/v8"]
 quickjs = ["__runtime_defaults", "deno_core/quickjs", "v8/quickjs"]

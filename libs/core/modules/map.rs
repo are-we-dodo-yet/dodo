@@ -1740,7 +1740,7 @@ impl ModuleMap {
       .get_handle(module_id)
       .expect("ModuleInfo not found");
 
-    let module = module_handle.open(scope);
+    let module = v8::Local::new(scope, &module_handle);
 
     if module.get_status() == v8::ModuleStatus::Errored {
       let exception = module.get_exception();
