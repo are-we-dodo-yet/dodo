@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793752481412,
+  "lastUpdate": 1793752484461,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo",
   "entries": {
     "Execution Time": [
@@ -1444,6 +1444,95 @@ window.BENCHMARK_DATA = {
           {
             "name": "workers_startup",
             "value": 412.926,
+            "unit": "MiB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b2ae86763db00426e263facd8a4f3e384f9a6fd0",
+          "message": "feat: sqlite web cache api expiration (#3)\n\nSigned-off-by: Yaroslav Bolyukin <iam@lach.pw>",
+          "timestamp": "2026-11-04T00:38:05+01:00",
+          "tree_id": "49af00bcaab3339d2054046420147bafa58d4c26",
+          "url": "https://github.com/are-we-dodo-yet/dodo/commit/b2ae86763db00426e263facd8a4f3e384f9a6fd0"
+        },
+        "date": 1793752483005,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "cold_hello",
+            "value": 47.496,
+            "unit": "MiB"
+          },
+          {
+            "name": "cold_relative_import",
+            "value": 47.918,
+            "unit": "MiB"
+          },
+          {
+            "name": "error_001",
+            "value": 47.566,
+            "unit": "MiB"
+          },
+          {
+            "name": "hello",
+            "value": 46.219,
+            "unit": "MiB"
+          },
+          {
+            "name": "no_check_hello",
+            "value": 44.098,
+            "unit": "MiB"
+          },
+          {
+            "name": "relative_import",
+            "value": 48.035,
+            "unit": "MiB"
+          },
+          {
+            "name": "response_string",
+            "value": 55.605,
+            "unit": "MiB"
+          },
+          {
+            "name": "text_decoder",
+            "value": 56.02,
+            "unit": "MiB"
+          },
+          {
+            "name": "text_encoder",
+            "value": 66.73,
+            "unit": "MiB"
+          },
+          {
+            "name": "text_encoder_into",
+            "value": 55,
+            "unit": "MiB"
+          },
+          {
+            "name": "workers_large_message",
+            "value": 424.668,
+            "unit": "MiB"
+          },
+          {
+            "name": "workers_round_robin",
+            "value": 92.086,
+            "unit": "MiB"
+          },
+          {
+            "name": "workers_startup",
+            "value": 416.625,
             "unit": "MiB"
           }
         ]
