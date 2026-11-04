@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793821435562,
+  "lastUpdate": 1793821438697,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo",
   "entries": {
     "Execution Time": [
@@ -1071,6 +1071,95 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/are-we-dodo-yet/dodo/commit/c5abd5f79361f8081932bc045ca043948d7a9306"
         },
         "date": 1793820788697,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "cold_hello",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "cold_relative_import",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "error_001",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "hello",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "no_check_hello",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "relative_import",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "response_string",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "text_decoder",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "text_encoder",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "text_encoder_into",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "workers_large_message",
+            "value": 58,
+            "unit": "threads"
+          },
+          {
+            "name": "workers_round_robin",
+            "value": 12,
+            "unit": "threads"
+          },
+          {
+            "name": "workers_startup",
+            "value": 59,
+            "unit": "threads"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "65c4a8589230c636d7d1179ebe1d7691c57f5233",
+          "message": "feat: update v8x to v152.2 (#12)\n\nSigned-off-by: Yaroslav Bolyukin <iam@lach.pw>\nCo-authored-by: Bartek Iwańczuk <biwanczuk@gmail.com>",
+          "timestamp": "2026-11-04T19:36:02+01:00",
+          "tree_id": "dca79cca16717a8c84c9a44a2227bdcd2ab8e3c8",
+          "url": "https://github.com/are-we-dodo-yet/dodo/commit/65c4a8589230c636d7d1179ebe1d7691c57f5233"
+        },
+        "date": 1793821437141,
         "tool": "customSmallerIsBetter",
         "benches": [
           {
