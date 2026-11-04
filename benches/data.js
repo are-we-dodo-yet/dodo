@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793752478393,
+  "lastUpdate": 1793752481412,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo",
   "entries": {
     "Execution Time": [
@@ -1086,6 +1086,95 @@ window.BENCHMARK_DATA = {
           {
             "name": "workers_startup",
             "value": 47745,
+            "unit": "syscalls"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b2ae86763db00426e263facd8a4f3e384f9a6fd0",
+          "message": "feat: sqlite web cache api expiration (#3)\n\nSigned-off-by: Yaroslav Bolyukin <iam@lach.pw>",
+          "timestamp": "2026-11-04T00:38:05+01:00",
+          "tree_id": "49af00bcaab3339d2054046420147bafa58d4c26",
+          "url": "https://github.com/are-we-dodo-yet/dodo/commit/b2ae86763db00426e263facd8a4f3e384f9a6fd0"
+        },
+        "date": 1793752479969,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "cold_hello",
+            "value": 1878,
+            "unit": "syscalls"
+          },
+          {
+            "name": "cold_relative_import",
+            "value": 1903,
+            "unit": "syscalls"
+          },
+          {
+            "name": "error_001",
+            "value": 1955,
+            "unit": "syscalls"
+          },
+          {
+            "name": "hello",
+            "value": 1873,
+            "unit": "syscalls"
+          },
+          {
+            "name": "no_check_hello",
+            "value": 1871,
+            "unit": "syscalls"
+          },
+          {
+            "name": "relative_import",
+            "value": 1891,
+            "unit": "syscalls"
+          },
+          {
+            "name": "response_string",
+            "value": 2112,
+            "unit": "syscalls"
+          },
+          {
+            "name": "text_decoder",
+            "value": 2029,
+            "unit": "syscalls"
+          },
+          {
+            "name": "text_encoder",
+            "value": 3012,
+            "unit": "syscalls"
+          },
+          {
+            "name": "text_encoder_into",
+            "value": 1943,
+            "unit": "syscalls"
+          },
+          {
+            "name": "workers_large_message",
+            "value": 72518,
+            "unit": "syscalls"
+          },
+          {
+            "name": "workers_round_robin",
+            "value": 7982,
+            "unit": "syscalls"
+          },
+          {
+            "name": "workers_startup",
+            "value": 46971,
             "unit": "syscalls"
           }
         ]
