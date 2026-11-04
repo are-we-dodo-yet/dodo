@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793752495773,
+  "lastUpdate": 1793820787592,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo",
   "entries": {
     "Execution Time": [
@@ -460,6 +460,121 @@ window.BENCHMARK_DATA = {
             "range": "± 9.285",
             "unit": "ms",
             "extra": "min 671.048 ms, max 699.474 ms, user 555.253 ms, system 291.727 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "c5abd5f79361f8081932bc045ca043948d7a9306",
+          "message": "ci: ensure the necessity of macos dyld hacks (#15)\n\nSigned-off-by: Yaroslav Bolyukin <iam@lach.pw>",
+          "timestamp": "2026-11-04T19:35:35+01:00",
+          "tree_id": "a5d788a5a1b8d0feaa5492a19093eb0262753b68",
+          "url": "https://github.com/are-we-dodo-yet/dodo/commit/c5abd5f79361f8081932bc045ca043948d7a9306"
+        },
+        "date": 1793820786145,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "cold_hello",
+            "value": 18.42,
+            "range": "± 1.538",
+            "unit": "ms",
+            "extra": "min 14.907 ms, max 22.453 ms, user 8.147 ms, system 13.081 ms"
+          },
+          {
+            "name": "cold_relative_import",
+            "value": 19.183,
+            "range": "± 4.523",
+            "unit": "ms",
+            "extra": "min 15.877 ms, max 59.084 ms, user 8.646 ms, system 13.359 ms"
+          },
+          {
+            "name": "error_001",
+            "value": 19.016,
+            "range": "± 2.938",
+            "unit": "ms",
+            "extra": "min 15.195 ms, max 49.076 ms, user 8.612 ms, system 13.52 ms"
+          },
+          {
+            "name": "hello",
+            "value": 18.304,
+            "range": "± 1.379",
+            "unit": "ms",
+            "extra": "min 14.148 ms, max 21.802 ms, user 8.284 ms, system 13.102 ms"
+          },
+          {
+            "name": "no_check_hello",
+            "value": 18.276,
+            "range": "± 1.542",
+            "unit": "ms",
+            "extra": "min 15.334 ms, max 23.527 ms, user 8.2 ms, system 12.9 ms"
+          },
+          {
+            "name": "relative_import",
+            "value": 18.226,
+            "range": "± 1.559",
+            "unit": "ms",
+            "extra": "min 14.192 ms, max 22.624 ms, user 8.093 ms, system 13.043 ms"
+          },
+          {
+            "name": "response_string",
+            "value": 26.116,
+            "range": "± 2.551",
+            "unit": "ms",
+            "extra": "min 21.313 ms, max 32.654 ms, user 16.743 ms, system 16.448 ms"
+          },
+          {
+            "name": "text_decoder",
+            "value": 27.82,
+            "range": "± 2.343",
+            "unit": "ms",
+            "extra": "min 23.264 ms, max 34.948 ms, user 16.901 ms, system 15.797 ms"
+          },
+          {
+            "name": "text_encoder",
+            "value": 77.789,
+            "range": "± 5.451",
+            "unit": "ms",
+            "extra": "min 71.09 ms, max 90.818 ms, user 63.517 ms, system 24.798 ms"
+          },
+          {
+            "name": "text_encoder_into",
+            "value": 45.545,
+            "range": "± 5.244",
+            "unit": "ms",
+            "extra": "min 38.55 ms, max 63.235 ms, user 38.726 ms, system 14.113 ms"
+          },
+          {
+            "name": "workers_large_message",
+            "value": 626.061,
+            "range": "± 23.445",
+            "unit": "ms",
+            "extra": "min 599.814 ms, max 676.035 ms, user 488.351 ms, system 388.291 ms"
+          },
+          {
+            "name": "workers_round_robin",
+            "value": 124.439,
+            "range": "± 2.891",
+            "unit": "ms",
+            "extra": "min 119.641 ms, max 131.032 ms, user 141.088 ms, system 65.829 ms"
+          },
+          {
+            "name": "workers_startup",
+            "value": 638.726,
+            "range": "± 15.744",
+            "unit": "ms",
+            "extra": "min 621.586 ms, max 665.1 ms, user 445.229 ms, system 355.003 ms"
           }
         ]
       }
