@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793820801592,
+  "lastUpdate": 1793820803875,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo",
   "entries": {
     "Execution Time": [
@@ -2604,6 +2604,55 @@ window.BENCHMARK_DATA = {
           {
             "name": "startup_shutdown",
             "value": 7,
+            "unit": "ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "c5abd5f79361f8081932bc045ca043948d7a9306",
+          "message": "ci: ensure the necessity of macos dyld hacks (#15)\n\nSigned-off-by: Yaroslav Bolyukin <iam@lach.pw>",
+          "timestamp": "2026-11-04T19:35:35+01:00",
+          "tree_id": "a5d788a5a1b8d0feaa5492a19093eb0262753b68",
+          "url": "https://github.com/are-we-dodo-yet/dodo/commit/c5abd5f79361f8081932bc045ca043948d7a9306"
+        },
+        "date": 1793820802707,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "big_file_edits",
+            "value": 2608,
+            "unit": "ms"
+          },
+          {
+            "name": "code_lens",
+            "value": 1119,
+            "unit": "ms"
+          },
+          {
+            "name": "deco_apps_edits_nav",
+            "value": 16343,
+            "unit": "ms"
+          },
+          {
+            "name": "find_replace",
+            "value": 12,
+            "unit": "ms"
+          },
+          {
+            "name": "startup_shutdown",
+            "value": 8,
             "unit": "ms"
           }
         ]
