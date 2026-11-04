@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793752490679,
+  "lastUpdate": 1793752493112,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo",
   "entries": {
     "Execution Time": [
@@ -1893,6 +1893,35 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/are-we-dodo-yet/dodo/commit/d5d91316c3d5677e0c850f5d22b7ebd8651c3203"
         },
         "date": 1793738193127,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "cargo_deps",
+            "value": 1170,
+            "unit": "dependencies"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b2ae86763db00426e263facd8a4f3e384f9a6fd0",
+          "message": "feat: sqlite web cache api expiration (#3)\n\nSigned-off-by: Yaroslav Bolyukin <iam@lach.pw>",
+          "timestamp": "2026-11-04T00:38:05+01:00",
+          "tree_id": "49af00bcaab3339d2054046420147bafa58d4c26",
+          "url": "https://github.com/are-we-dodo-yet/dodo/commit/b2ae86763db00426e263facd8a4f3e384f9a6fd0"
+        },
+        "date": 1793752492264,
         "tool": "customSmallerIsBetter",
         "benches": [
           {
