@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793821448948,
+  "lastUpdate": 1793821451445,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo",
   "entries": {
     "Execution Time": [
@@ -2856,6 +2856,35 @@ window.BENCHMARK_DATA = {
           {
             "name": "cargo_deps",
             "value": 1166,
+            "unit": "dependencies"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "65c4a8589230c636d7d1179ebe1d7691c57f5233",
+          "message": "feat: update v8x to v152.2 (#12)\n\nSigned-off-by: Yaroslav Bolyukin <iam@lach.pw>\nCo-authored-by: Bartek Iwańczuk <biwanczuk@gmail.com>",
+          "timestamp": "2026-11-04T19:36:02+01:00",
+          "tree_id": "dca79cca16717a8c84c9a44a2227bdcd2ab8e3c8",
+          "url": "https://github.com/are-we-dodo-yet/dodo/commit/65c4a8589230c636d7d1179ebe1d7691c57f5233"
+        },
+        "date": 1793821450504,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "cargo_deps",
+            "value": 1165,
             "unit": "dependencies"
           }
         ]
