@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793820792544,
+  "lastUpdate": 1793820794619,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo",
   "entries": {
     "Execution Time": [
@@ -1826,6 +1826,95 @@ window.BENCHMARK_DATA = {
           {
             "name": "workers_startup",
             "value": 416.625,
+            "unit": "MiB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "c5abd5f79361f8081932bc045ca043948d7a9306",
+          "message": "ci: ensure the necessity of macos dyld hacks (#15)\n\nSigned-off-by: Yaroslav Bolyukin <iam@lach.pw>",
+          "timestamp": "2026-11-04T19:35:35+01:00",
+          "tree_id": "a5d788a5a1b8d0feaa5492a19093eb0262753b68",
+          "url": "https://github.com/are-we-dodo-yet/dodo/commit/c5abd5f79361f8081932bc045ca043948d7a9306"
+        },
+        "date": 1793820793626,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "cold_hello",
+            "value": 47.801,
+            "unit": "MiB"
+          },
+          {
+            "name": "cold_relative_import",
+            "value": 48.277,
+            "unit": "MiB"
+          },
+          {
+            "name": "error_001",
+            "value": 47.238,
+            "unit": "MiB"
+          },
+          {
+            "name": "hello",
+            "value": 47.324,
+            "unit": "MiB"
+          },
+          {
+            "name": "no_check_hello",
+            "value": 47.816,
+            "unit": "MiB"
+          },
+          {
+            "name": "relative_import",
+            "value": 47.16,
+            "unit": "MiB"
+          },
+          {
+            "name": "response_string",
+            "value": 54.992,
+            "unit": "MiB"
+          },
+          {
+            "name": "text_decoder",
+            "value": 56.578,
+            "unit": "MiB"
+          },
+          {
+            "name": "text_encoder",
+            "value": 66.652,
+            "unit": "MiB"
+          },
+          {
+            "name": "text_encoder_into",
+            "value": 54.719,
+            "unit": "MiB"
+          },
+          {
+            "name": "workers_large_message",
+            "value": 421.547,
+            "unit": "MiB"
+          },
+          {
+            "name": "workers_round_robin",
+            "value": 92.012,
+            "unit": "MiB"
+          },
+          {
+            "name": "workers_startup",
+            "value": 417.492,
             "unit": "MiB"
           }
         ]
