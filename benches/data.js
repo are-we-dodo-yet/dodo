@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793820787592,
+  "lastUpdate": 1793820789876,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo",
   "entries": {
     "Execution Time": [
@@ -867,6 +867,95 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/are-we-dodo-yet/dodo/commit/b2ae86763db00426e263facd8a4f3e384f9a6fd0"
         },
         "date": 1793752477480,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "cold_hello",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "cold_relative_import",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "error_001",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "hello",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "no_check_hello",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "relative_import",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "response_string",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "text_decoder",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "text_encoder",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "text_encoder_into",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "workers_large_message",
+            "value": 58,
+            "unit": "threads"
+          },
+          {
+            "name": "workers_round_robin",
+            "value": 12,
+            "unit": "threads"
+          },
+          {
+            "name": "workers_startup",
+            "value": 59,
+            "unit": "threads"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "c5abd5f79361f8081932bc045ca043948d7a9306",
+          "message": "ci: ensure the necessity of macos dyld hacks (#15)\n\nSigned-off-by: Yaroslav Bolyukin <iam@lach.pw>",
+          "timestamp": "2026-11-04T19:35:35+01:00",
+          "tree_id": "a5d788a5a1b8d0feaa5492a19093eb0262753b68",
+          "url": "https://github.com/are-we-dodo-yet/dodo/commit/c5abd5f79361f8081932bc045ca043948d7a9306"
+        },
+        "date": 1793820788697,
         "tool": "customSmallerIsBetter",
         "benches": [
           {
