@@ -35,6 +35,7 @@ chrono.workspace = true
 dashmap = { workspace = true, optional = true }
 deno_ast = { workspace = true, features = ["cjs"], optional = true }
 deno_cache_dir.workspace = true
+deno_compat_resolver.workspace = true
 deno_config.workspace = true
 deno_error.workspace = true
 deno_graph = { workspace = true, optional = true }
@@ -67,7 +68,6 @@ sys_traits.workspace = true
 thiserror.workspace = true
 twox-hash.workspace = true
 url.workspace = true
-yaml_parser.workspace = true
 
 [dev-dependencies]
 node_resolver.workspace = true

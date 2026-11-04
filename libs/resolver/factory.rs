@@ -24,6 +24,7 @@ use deno_config::workspace::WorkspaceDirectoryRc;
 use deno_config::workspace::WorkspaceDiscoverError;
 use deno_config::workspace::WorkspaceDiscoverOptions;
 use deno_config::workspace::WorkspaceDiscoverStart;
+use deno_lockfile::Lockfile;
 use deno_maybe_sync::MaybeSend;
 use deno_maybe_sync::MaybeSync;
 use deno_maybe_sync::new_rc;
@@ -73,8 +74,8 @@ use crate::import_map::WorkspaceExternalImportMapLoaderRc;
 use crate::loader::AllowJsonImports;
 use crate::loader::DenoNpmModuleLoaderRc;
 use crate::loader::NpmModuleLoader;
+use crate::lockfile;
 use crate::lockfile::LockfileLock;
-use crate::lockfile::LockfileLockRc;
 use crate::npm::ByonmNpmResolverCreateOptions;
 use crate::npm::CreateInNpmPkgCheckerOptions;
 use crate::npm::DenoInNpmPackageChecker;
@@ -252,7 +253,6 @@ pub struct WorkspaceFactory<TSys: WorkspaceFactorySys> {
   global_http_cache: Deferred<GlobalHttpCacheRc<TSys>>,
   http_cache: Deferred<GlobalOrLocalHttpCache<TSys>>,
   jsr_url: Deferred<Url>,
-  lockfile: async_once_cell::OnceCell<Option<LockfileLockRc<TSys>>>,
   node_modules_dir_path: Deferred<Option<PathBuf>>,
   npm_cache_dir: Deferred<NpmCacheDirRc>,
   npmrc: Deferred<(ResolvedNpmRcRc, Option<PathBuf>)>,
@@ -279,7 +279,6 @@ impl<TSys: WorkspaceFactorySys> WorkspaceFactory<TSys> {
       global_http_cache: Default::default(),
       http_cache: Default::default(),
       jsr_url: Default::default(),
-      lockfile: Default::default(),
       node_modules_dir_path: Default::default(),
       npm_cache_dir: Default::default(),
       npmrc: Default::default(),
@@ -530,43 +529,64 @@ impl<TSys: WorkspaceFactorySys> WorkspaceFactory<TSys> {
   pub async fn maybe_lockfile(
     &self,
     npm_package_info_provider: &dyn deno_lockfile::NpmPackageInfoProvider,
-  ) -> Result<Option<&LockfileLockRc<TSys>>, anyhow::Error> {
-    self
-      .lockfile
-      .get_or_try_init(async move {
-        let workspace_directory = self.workspace_directory()?;
-        let maybe_external_import_map =
-          self.workspace_external_import_map_loader()?.get_or_load()?;
+  ) -> Result<Option<LockfileLock<TSys>>, anyhow::Error> {
+    let workspace_directory = self.workspace_directory()?;
+    let maybe_external_import_map =
+      self.workspace_external_import_map_loader()?.get_or_load()?;
 
-        let maybe_lock_file = LockfileLock::discover(
-          self.sys().clone(),
-          crate::lockfile::LockfileFlags {
-            no_lock: self.options.no_lock,
-            frozen_lockfile: self.options.frozen_lockfile,
-            lock: self.options.lock_arg.as_ref().map(|path| {
-              #[cfg(not(target_arch = "wasm32"))]
-              debug_assert!(path.is_absolute());
-              path.clone()
-            }),
-            skip_write: self.options.lockfile_skip_write,
-            no_config: matches!(
-              self.options.config_discovery,
-              ConfigDiscoveryOption::Disabled
-            ),
-            no_npm: self.options.no_npm,
-            import_npm_lockfile: self.options.import_npm_lockfile,
-          },
-          &workspace_directory.workspace,
-          maybe_external_import_map.as_ref().map(|v| &v.value),
-          npm_package_info_provider,
-        )
+    if self.options.no_lock {
+      return Ok(None);
+    }
+
+    let path = if let Some(path) = self.options.lock_arg.as_ref().map(|path| {
+      #[cfg(not(target_arch = "wasm32"))]
+      debug_assert!(path.is_absolute());
+      path.clone()
+    }) {
+      path
+    } else if let Some(path) =
+      workspace_directory.workspace.resolve_lockfile_path()?
+    {
+      path
+    } else {
+      return Ok(None);
+    };
+
+    let lock_file = if let Some(native) =
+      lockfile::read_from_path(self.sys(), &path, npm_package_info_provider)
         .await?
-        .map(deno_maybe_sync::new_rc);
+    {
+      native
+    } else if self.options.import_npm_lockfile
+      && let Some(compat) = deno_compat_resolver::import_npm_lockfile(
+        self.sys(),
+        &path,
+        npm_package_info_provider,
+      )
+      .await?
+    {
+      compat
+    } else {
+      Lockfile::new_empty(path, false)
+    };
 
-        Ok(maybe_lock_file)
-      })
-      .await
-      .map(|c| c.as_ref())
+    let maybe_lock_file = LockfileLock::from_lockfile(
+      self.sys().clone(),
+      &workspace_directory.workspace,
+      lock_file,
+      maybe_external_import_map.as_ref().map(|v| &v.value),
+      crate::lockfile::LockfileFlags {
+        frozen_lockfile: self.options.frozen_lockfile,
+        skip_write: self.options.lockfile_skip_write,
+        no_config: matches!(
+          self.options.config_discovery,
+          ConfigDiscoveryOption::Disabled
+        ),
+        no_npm: self.options.no_npm,
+      },
+    )?;
+
+    Ok(Some(maybe_lock_file))
   }
 
   pub fn npm_cache_dir(

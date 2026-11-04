@@ -66,9 +66,3 @@ harness = false
 name = "diff_specs"
 path = "tests/diff_specs_test.rs"
 harness = false
-
-[profile.release]
-codegen-units = 1
-incremental = true
-lto = true
-opt-level = "s"
