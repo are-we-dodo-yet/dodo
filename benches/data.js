@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793821441126,
+  "lastUpdate": 1793821443776,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo",
   "entries": {
     "Execution Time": [
@@ -2208,6 +2208,95 @@ window.BENCHMARK_DATA = {
           {
             "name": "workers_startup",
             "value": 417.492,
+            "unit": "MiB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "65c4a8589230c636d7d1179ebe1d7691c57f5233",
+          "message": "feat: update v8x to v152.2 (#12)\n\nSigned-off-by: Yaroslav Bolyukin <iam@lach.pw>\nCo-authored-by: Bartek Iwańczuk <biwanczuk@gmail.com>",
+          "timestamp": "2026-11-04T19:36:02+01:00",
+          "tree_id": "dca79cca16717a8c84c9a44a2227bdcd2ab8e3c8",
+          "url": "https://github.com/are-we-dodo-yet/dodo/commit/65c4a8589230c636d7d1179ebe1d7691c57f5233"
+        },
+        "date": 1793821442691,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "cold_hello",
+            "value": 48.035,
+            "unit": "MiB"
+          },
+          {
+            "name": "cold_relative_import",
+            "value": 48.191,
+            "unit": "MiB"
+          },
+          {
+            "name": "error_001",
+            "value": 46.234,
+            "unit": "MiB"
+          },
+          {
+            "name": "hello",
+            "value": 47.309,
+            "unit": "MiB"
+          },
+          {
+            "name": "no_check_hello",
+            "value": 47.633,
+            "unit": "MiB"
+          },
+          {
+            "name": "relative_import",
+            "value": 47.879,
+            "unit": "MiB"
+          },
+          {
+            "name": "response_string",
+            "value": 56.602,
+            "unit": "MiB"
+          },
+          {
+            "name": "text_decoder",
+            "value": 57.324,
+            "unit": "MiB"
+          },
+          {
+            "name": "text_encoder",
+            "value": 67.551,
+            "unit": "MiB"
+          },
+          {
+            "name": "text_encoder_into",
+            "value": 55.805,
+            "unit": "MiB"
+          },
+          {
+            "name": "workers_large_message",
+            "value": 424.203,
+            "unit": "MiB"
+          },
+          {
+            "name": "workers_round_robin",
+            "value": 93.934,
+            "unit": "MiB"
+          },
+          {
+            "name": "workers_startup",
+            "value": 413.789,
             "unit": "MiB"
           }
         ]
