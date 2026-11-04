@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793821438697,
+  "lastUpdate": 1793821441126,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo",
   "entries": {
     "Execution Time": [
@@ -1672,6 +1672,95 @@ window.BENCHMARK_DATA = {
           {
             "name": "workers_startup",
             "value": 46678,
+            "unit": "syscalls"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "65c4a8589230c636d7d1179ebe1d7691c57f5233",
+          "message": "feat: update v8x to v152.2 (#12)\n\nSigned-off-by: Yaroslav Bolyukin <iam@lach.pw>\nCo-authored-by: Bartek Iwańczuk <biwanczuk@gmail.com>",
+          "timestamp": "2026-11-04T19:36:02+01:00",
+          "tree_id": "dca79cca16717a8c84c9a44a2227bdcd2ab8e3c8",
+          "url": "https://github.com/are-we-dodo-yet/dodo/commit/65c4a8589230c636d7d1179ebe1d7691c57f5233"
+        },
+        "date": 1793821440269,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "cold_hello",
+            "value": 1845,
+            "unit": "syscalls"
+          },
+          {
+            "name": "cold_relative_import",
+            "value": 1877,
+            "unit": "syscalls"
+          },
+          {
+            "name": "error_001",
+            "value": 1967,
+            "unit": "syscalls"
+          },
+          {
+            "name": "hello",
+            "value": 1854,
+            "unit": "syscalls"
+          },
+          {
+            "name": "no_check_hello",
+            "value": 1851,
+            "unit": "syscalls"
+          },
+          {
+            "name": "relative_import",
+            "value": 1874,
+            "unit": "syscalls"
+          },
+          {
+            "name": "response_string",
+            "value": 2094,
+            "unit": "syscalls"
+          },
+          {
+            "name": "text_decoder",
+            "value": 2012,
+            "unit": "syscalls"
+          },
+          {
+            "name": "text_encoder",
+            "value": 2618,
+            "unit": "syscalls"
+          },
+          {
+            "name": "text_encoder_into",
+            "value": 1922,
+            "unit": "syscalls"
+          },
+          {
+            "name": "workers_large_message",
+            "value": 72557,
+            "unit": "syscalls"
+          },
+          {
+            "name": "workers_round_robin",
+            "value": 7916,
+            "unit": "syscalls"
+          },
+          {
+            "name": "workers_startup",
+            "value": 43564,
             "unit": "syscalls"
           }
         ]
