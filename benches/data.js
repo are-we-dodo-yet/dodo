@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1793820789876,
+  "lastUpdate": 1793820792544,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo",
   "entries": {
     "Execution Time": [
@@ -1379,6 +1379,95 @@ window.BENCHMARK_DATA = {
           {
             "name": "workers_startup",
             "value": 46971,
+            "unit": "syscalls"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "c5abd5f79361f8081932bc045ca043948d7a9306",
+          "message": "ci: ensure the necessity of macos dyld hacks (#15)\n\nSigned-off-by: Yaroslav Bolyukin <iam@lach.pw>",
+          "timestamp": "2026-11-04T19:35:35+01:00",
+          "tree_id": "a5d788a5a1b8d0feaa5492a19093eb0262753b68",
+          "url": "https://github.com/are-we-dodo-yet/dodo/commit/c5abd5f79361f8081932bc045ca043948d7a9306"
+        },
+        "date": 1793820790968,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "cold_hello",
+            "value": 1875,
+            "unit": "syscalls"
+          },
+          {
+            "name": "cold_relative_import",
+            "value": 1880,
+            "unit": "syscalls"
+          },
+          {
+            "name": "error_001",
+            "value": 1943,
+            "unit": "syscalls"
+          },
+          {
+            "name": "hello",
+            "value": 1853,
+            "unit": "syscalls"
+          },
+          {
+            "name": "no_check_hello",
+            "value": 1858,
+            "unit": "syscalls"
+          },
+          {
+            "name": "relative_import",
+            "value": 1894,
+            "unit": "syscalls"
+          },
+          {
+            "name": "response_string",
+            "value": 2106,
+            "unit": "syscalls"
+          },
+          {
+            "name": "text_decoder",
+            "value": 2016,
+            "unit": "syscalls"
+          },
+          {
+            "name": "text_encoder",
+            "value": 2622,
+            "unit": "syscalls"
+          },
+          {
+            "name": "text_encoder_into",
+            "value": 1952,
+            "unit": "syscalls"
+          },
+          {
+            "name": "workers_large_message",
+            "value": 71920,
+            "unit": "syscalls"
+          },
+          {
+            "name": "workers_round_robin",
+            "value": 7745,
+            "unit": "syscalls"
+          },
+          {
+            "name": "workers_startup",
+            "value": 46678,
             "unit": "syscalls"
           }
         ]
