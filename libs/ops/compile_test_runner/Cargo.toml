@@ -14,7 +14,7 @@ path = "lib.rs"
 
 [dev-dependencies]
 bytes.workspace = true
-# deno_core's default enables no JS engine backend (the deno_v8 facade requires
+# deno_core's default enables no JS engine backend (the v8x crate requires
 # exactly one of `v8`/`quickjs`); trybuild compiles the op2/webidl test cases as
 # their own crates against these deps, so select v8 or they fail to build.
 deno_core = { workspace = true, features = ["v8"] }

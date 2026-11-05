@@ -98,7 +98,7 @@ impl ModuleMap {
         }
 
         // No pending TLA, safe to resolve immediately
-        let resolver = resolver_handle.open(scope);
+        let resolver = v8::Local::new(scope, &resolver_handle);
         let module_namespace = module.get_module_namespace();
         resolver.resolve(scope, module_namespace).unwrap();
 
@@ -115,7 +115,7 @@ impl ModuleMap {
     {
       match self.lazy_load_esm_module(scope, module_specifier.as_str()) {
         Ok(module_ns) => {
-          let resolver = resolver_handle.open(scope);
+          let resolver = v8::Local::new(scope, &resolver_handle);
           let module_ns_local = v8::Local::new(scope, module_ns);
           resolver.resolve(scope, module_ns_local).unwrap();
           return false;
@@ -123,7 +123,7 @@ impl ModuleMap {
         Err(e) => {
           let exception = e.to_v8_error(scope);
           let exception_local = v8::Local::new(scope, exception);
-          let resolver = resolver_handle.open(scope);
+          let resolver = v8::Local::new(scope, &resolver_handle);
           resolver.reject(scope, exception_local).unwrap();
           return false;
         }
@@ -146,7 +146,7 @@ impl ModuleMap {
         .lazy_load_synthetic_esm_module(scope, module_specifier.as_str())
       {
         Ok(module_ns) => {
-          let resolver = resolver_handle.open(scope);
+          let resolver = v8::Local::new(scope, &resolver_handle);
           let module_ns_local = v8::Local::new(scope, module_ns);
           resolver.resolve(scope, module_ns_local).unwrap();
           return false;
@@ -154,7 +154,7 @@ impl ModuleMap {
         Err(e) => {
           let exception = e.to_v8_error(scope);
           let exception_local = v8::Local::new(scope, exception);
-          let resolver = resolver_handle.open(scope);
+          let resolver = v8::Local::new(scope, &resolver_handle);
           resolver.reject(scope, exception_local).unwrap();
           return false;
         }
@@ -210,7 +210,7 @@ impl ModuleMap {
     let module_handle = self.get_handle(id).expect("ModuleInfo not found");
 
     let status = {
-      let module = module_handle.open(scope);
+      let module = v8::Local::new(scope, &module_handle);
       module.get_status()
     };
 
@@ -306,7 +306,7 @@ impl ModuleMap {
     let mut resolved_any = false;
     let mut still_pending = vec![];
     for eval in pending {
-      let promise = eval.promise.open(scope);
+      let promise = v8::Local::new(scope, &eval.promise);
       match promise.state() {
         v8::PromiseState::Pending => {
           still_pending.push(eval);
@@ -341,7 +341,7 @@ impl ModuleMap {
       let module_namespace = module.get_module_namespace();
 
       for resolver_handle in waiters {
-        let resolver = resolver_handle.open(scope);
+        let resolver = v8::Local::new(scope, &resolver_handle);
         resolver.resolve(scope, module_namespace).unwrap();
       }
       if !JsRealm::state_from_scope(scope).has_tick_scheduled() {
@@ -361,7 +361,7 @@ impl ModuleMap {
     if let Some(waiters) = waiters {
       let exception = v8::Local::new(scope, exception);
       for resolver_handle in waiters {
-        let resolver = resolver_handle.open(scope);
+        let resolver = v8::Local::new(scope, &resolver_handle);
         resolver.reject(scope, exception).unwrap();
       }
       if !JsRealm::state_from_scope(scope).has_tick_scheduled() {
@@ -382,7 +382,7 @@ impl ModuleMap {
       .remove(&id)
       .expect("Invalid dynamic import id")
       .resolver;
-    let resolver = resolver_handle.open(scope);
+    let resolver = v8::Local::new(scope, &resolver_handle);
 
     let exception = v8::Local::new(scope, exception);
     resolver.reject(scope, exception).unwrap();
@@ -403,7 +403,7 @@ impl ModuleMap {
       .remove(&id)
       .expect("Invalid dynamic import id")
       .resolver;
-    let resolver = resolver_handle.open(scope);
+    let resolver = v8::Local::new(scope, &resolver_handle);
 
     let module = self
       .data
@@ -627,7 +627,7 @@ impl ModuleMap {
                     .remove(&dyn_import_id)
                     .expect("Invalid dynamic import id")
                     .resolver;
-                  let resolver = resolver_handle.open(tc_scope);
+                  let resolver = v8::Local::new(tc_scope, &resolver_handle);
                   resolver.resolve(tc_scope, module_namespace).unwrap();
                   tc_scope.perform_microtask_checkpoint();
                 }
@@ -675,7 +675,7 @@ impl ModuleMap {
                 let source = data.sources.get(&key).expect("Source had to have been inserted successfully, or recursion would error.");
                 v8::Local::new(scope, source).into()
               };
-              let resolver = state.resolver.open(scope);
+              let resolver = v8::Local::new(scope, &state.resolver);
               resolver.resolve(scope, source).unwrap();
             }
           }

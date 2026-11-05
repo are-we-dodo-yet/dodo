@@ -2187,7 +2187,6 @@ dependencies = [
  "deno_telemetry",
  "deno_terminal",
  "deno_tower_lsp",
- "deno_v8",
  "dhat",
  "dprint-core",
  "dprint-plugin-json",
@@ -2273,6 +2272,7 @@ dependencies = [
  "unicode-general-category",
  "unicode-width 0.2.2",
  "uuid",
+ "v8x",
  "walkdir",
  "wasm_dep_analyzer",
  "wasmparser",
@@ -2378,6 +2378,7 @@ dependencies = [
  "http",
  "http-body",
  "http-body-util",
+ "httpdate",
  "hyper",
  "hyper-util",
  "log",
@@ -2497,7 +2498,6 @@ dependencies = [
  "deno_ops",
  "deno_path_util",
  "deno_unsync",
- "deno_v8",
  "futures",
  "indexmap",
  "inventory",
@@ -2522,6 +2522,7 @@ dependencies = [
  "unicycle",
  "url",
  "uuid",
+ "v8x",
  "wasm_dep_analyzer",
  "windows-sys 0.59.0",
 ]
@@ -2768,7 +2769,7 @@ dependencies = [
  "deno_error",
  "deno_permissions",
  "denort_helper",
- "dlopen2 0.6.1",
+ "dlopen2",
  "libffi",
  "log",
  "memmap2",
@@ -3031,6 +3032,7 @@ dependencies = [
  "log",
  "node_resolver",
  "parking_lot",
+ "rustls-native-certs",
  "serde",
  "serde_json",
  "sys_traits",
@@ -3111,19 +3113,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "deno_native_certs"
-version = "0.3.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "86bc737e098a45aa5742d51ce694ac7236a1e69fb0d9df8c862e9b4c9583c5f9"
-dependencies = [
- "dlopen2 0.7.0",
- "dlopen2_derive",
- "once_cell",
- "rustls-native-certs 0.7.3",
- "rustls-pemfile",
-]
-
-[[package]]
 name = "deno_net"
 version = "0.251.0"
 dependencies = [
@@ -3169,7 +3158,6 @@ dependencies = [
  "deno_fs",
  "deno_inspector_server",
  "deno_io",
- "deno_native_certs",
  "deno_net",
  "deno_node_crypto",
  "deno_os",
@@ -3194,6 +3182,7 @@ dependencies = [
  "node_resolver",
  "node_shim",
  "rand 0.8.5",
+ "rustls-native-certs",
  "rustls-tokio-stream",
  "rustls-webpki",
  "serde",
@@ -3789,7 +3778,6 @@ version = "0.246.0"
 dependencies = [
  "deno_core",
  "deno_error",
- "deno_native_certs",
  "log",
  "rustls",
  "rustls-pemfile",
@@ -3854,14 +3842,6 @@ dependencies = [
 [[package]]
 name = "deno_url"
 version = "0.222.0"
-
-[[package]]
-name = "deno_v8"
-version = "0.4.0"
-dependencies = [
- "v8",
- "v8x",
-]
 
 [[package]]
 name = "deno_web"
@@ -4045,7 +4025,6 @@ dependencies = [
  "deno_snapshots",
  "deno_subprocess_windows",
  "deno_terminal",
- "deno_v8",
  "import_map",
  "indexmap",
  "jsonc-parser 0.32.4",
@@ -4063,6 +4042,7 @@ dependencies = [
  "thiserror 2.0.21",
  "tokio",
  "url",
+ "v8x",
 ]
 
 [[package]]
@@ -4075,7 +4055,6 @@ dependencies = [
  "deno_runtime",
  "deno_snapshots",
  "deno_terminal",
- "deno_v8",
  "denort",
  "laufey",
  "libc",
@@ -4086,6 +4065,7 @@ dependencies = [
  "serde_json",
  "tempfile",
  "tokio",
+ "v8x",
 ]
 
 [[package]]
@@ -4374,18 +4354,6 @@ name = "dlopen2"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6bc2c7ed06fd72a8513ded8d0d2f6fd2655a85d6885c48cae8625d80faf28c03"
-dependencies = [
- "dlopen2_derive",
- "libc",
- "once_cell",
- "winapi",
-]
-
-[[package]]
-name = "dlopen2"
-version = "0.7.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9e1297103d2bbaea85724fcee6294c2d50b1081f9ad47d0f6f6f61eda65315a6"
 dependencies = [
  "dlopen2_derive",
  "libc",
@@ -7722,12 +7690,6 @@ dependencies = [
 
 [[package]]
 name = "openssl-probe"
-version = "0.1.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d05e27ee213611ffe7d6348b942e8f942b37114c00cc03cec254295a4a17852e"
-
-[[package]]
-name = "openssl-probe"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7c87def4c32ab89d880effc9e097653c8da5d6ef28e6b539d313baaacfbafcbe"
@@ -9274,24 +9236,11 @@ dependencies = [
 
 [[package]]
 name = "rustls-native-certs"
-version = "0.7.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e5bfb394eeed242e909609f56089eecfe5fda225042e8b171791b9c95f5931e5"
-dependencies = [
- "openssl-probe 0.1.6",
- "rustls-pemfile",
- "rustls-pki-types",
- "schannel",
- "security-framework 2.11.1",
-]
-
-[[package]]
-name = "rustls-native-certs"
 version = "0.8.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4a073f5dc7469f984c52ad2752b63b0807745133b6de880b7b64c1ac4c48aec4"
 dependencies = [
- "openssl-probe 0.2.1",
+ "openssl-probe",
  "rustls-pki-types",
  "schannel",
  "security-framework 3.7.0",
@@ -9328,7 +9277,7 @@ dependencies = [
  "log",
  "once_cell",
  "rustls",
- "rustls-native-certs 0.8.5",
+ "rustls-native-certs",
  "rustls-platform-verifier-android",
  "rustls-webpki",
  "security-framework 3.7.0",
@@ -9692,7 +9641,6 @@ name = "serde_v8"
 version = "0.321.0"
 dependencies = [
  "deno_error",
- "deno_v8",
  "num-bigint",
  "serde",
  "serde_bytes",
@@ -9700,13 +9648,14 @@ dependencies = [
  "serde_v8_utilities",
  "smallvec",
  "thiserror 2.0.21",
+ "v8x",
 ]
 
 [[package]]
 name = "serde_v8_utilities"
 version = "0.28.0"
 dependencies = [
- "deno_v8",
+ "v8x",
 ]
 
 [[package]]
@@ -11993,9 +11942,9 @@ dependencies = [
 
 [[package]]
 name = "v8"
-version = "150.4.0"
+version = "152.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "42a978ff11f15b24e5c05a7123cf2b68f41e763546699781a924ef4e2cf43a49"
+checksum = "a10fe1a92da5c32c7c7f838ce36c0ccfcfd5edf0865b58bdde820aa64cea9888"
 dependencies = [
  "bindgen 0.72.1",
  "bitflags 2.13.2",
@@ -12025,9 +11974,8 @@ dependencies = [
 
 [[package]]
 name = "v8x"
-version = "149.4.0-rc.4"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3701ffb3692a24808503d17f758b0a3f688d2c451779247982566b5941033e63"
+version = "152.2.0-rc.1"
+source = "git+https://github.com/are-we-dodo-yet/v8x?rev=aa28e8e80d492494bfb17bf123fbcfb09da0ce44#aa28e8e80d492494bfb17bf123fbcfb09da0ce44"
 dependencies = [
  "bindgen 0.70.1",
  "bitflags 2.13.2",
@@ -12038,6 +11986,7 @@ dependencies = [
  "temporal_capi",
  "temporal_rs",
  "timezone_provider",
+ "v8",
 ]
 
 [[package]]

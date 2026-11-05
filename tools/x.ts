@@ -288,9 +288,9 @@ Usage:
 Under the hood:
   cargo nextest run --features "deno_core/default deno_core/unsafe_use_unprotected_platform deno_core/v8" \\
     --tests --examples \\
-    -p deno_core -p deno_v8 -p build-your-own-js-snapshot -p dcore -p deno_ops -p deno_ops_compile_test_runner -p serde_v8 -p deno_core_testing
-  cargo nextest run -p deno_ops_compile_test_runner -p deno_v8
-  cargo test --doc -p deno_core -p deno_v8 -p build-your-own-js-snapshot -p deno_ops -p serde_v8 -p deno_core_testing`,
+    -p deno_core -p build-your-own-js-snapshot -p dcore -p deno_ops -p deno_ops_compile_test_runner -p serde_v8 -p deno_core_testing
+  cargo nextest run -p deno_ops_compile_test_runner
+  cargo test --doc -p deno_core -p build-your-own-js-snapshot -p deno_ops -p serde_v8 -p deno_core_testing`,
       async fn(args: string[]) {
         const filterArgs = args.length > 0
           ? ["-E", `test(${args.join(" ")})`]
@@ -299,14 +299,14 @@ Under the hood:
         await $`cargo nextest run ${filterArgs}
           --features ${"deno_core/default deno_core/unsafe_use_unprotected_platform deno_core/v8"}
           --tests --examples
-          -p deno_core -p deno_v8 -p build-your-own-js-snapshot -p dcore -p deno_ops -p deno_ops_compile_test_runner -p serde_v8 -p deno_core_testing`
+          -p deno_core -p build-your-own-js-snapshot -p dcore -p deno_ops -p deno_ops_compile_test_runner -p serde_v8 -p deno_core_testing`
           .cwd(root);
         $.logStep("Running deno_ops compile test runner...");
-        await $`cargo nextest run ${filterArgs} -p deno_ops_compile_test_runner -p deno_v8`
+        await $`cargo nextest run ${filterArgs} -p deno_ops_compile_test_runner`
           .cwd(root);
         if (filterArgs.length === 0) {
           $.logStep("Running doc tests...");
-          await $`cargo test --doc -p deno_core -p deno_v8 -p build-your-own-js-snapshot -p deno_ops -p serde_v8 -p deno_core_testing`
+          await $`cargo test --doc -p deno_core -p build-your-own-js-snapshot -p deno_ops -p serde_v8 -p deno_core_testing`
             .cwd(root);
         }
         $.logStep("deno_core tests complete.");
