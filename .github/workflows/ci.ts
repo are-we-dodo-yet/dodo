@@ -1212,7 +1212,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               name: "Check dodo binary (in sysroot)",
               if: buildItem.use_sysroot,
               run:
-                `sudo chroot /sysroot "$(pwd)/target/${buildItem.profile}/deno" --version`,
+                `sudo chroot /sysroot "$(pwd)/target/${buildItem.profile}/dodo" --version`,
             },
             dodoArtifact.upload(),
             denortArtifact.upload(),

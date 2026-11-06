@@ -4736,7 +4736,7 @@ jobs:
           NO_COLOR: 1
         run: target/release/dodo eval "console.log(1+2)" | grep 3
       - name: Check dodo binary (in sysroot)
-        run: sudo chroot /sysroot "$(pwd)/target/release/deno" --version
+        run: sudo chroot /sysroot "$(pwd)/target/release/dodo" --version
       - name: Upload artifact release-linux-x86_64-dodo
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
@@ -5496,7 +5496,7 @@ jobs:
           NO_COLOR: 1
         run: target/debug/dodo eval "console.log(1+2)" | grep 3
       - name: Check dodo binary (in sysroot)
-        run: sudo chroot /sysroot "$(pwd)/target/debug/deno" --version
+        run: sudo chroot /sysroot "$(pwd)/target/debug/dodo" --version
       - name: Upload artifact debug-linux-x86_64-dodo
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         with:
@@ -6865,7 +6865,7 @@ jobs:
         run: target/release/dodo eval "console.log(1+2)" | grep 3
       - name: Check dodo binary (in sysroot)
         if: '!(!contains(github.event.pull_request.labels.*.name, ''ci-full'') && github.event_name == ''pull_request'')'
-        run: sudo chroot /sysroot "$(pwd)/target/release/deno" --version
+        run: sudo chroot /sysroot "$(pwd)/target/release/dodo" --version
       - name: Upload artifact release-linux-aarch64-dodo
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
         if: '!(!contains(github.event.pull_request.labels.*.name, ''ci-full'') && github.event_name == ''pull_request'')'
