@@ -7,7 +7,7 @@
 //! 1. Arg0 dispatch ([`maybe_rewrite_node_arg0`]): when the deno binary is
 //!    invoked through a file named `node` (a symlink/hardlink created below),
 //!    translate the Node.js CLI arguments to Deno arguments and run as if
-//!    `deno node ...` had been invoked.
+//!    `dodo node ...` had been invoked.
 //!
 //! 2. PATH injection ([`ensure_node_on_path`]): create a `node` executable
 //!    pointing back at the current deno binary in a cache directory and prepend
@@ -130,7 +130,7 @@ pub fn maybe_rewrite_node_arg0(args: Vec<OsString>) -> Vec<OsString> {
   // Resolve the entrypoint for the run path the same way the standalone shim
   // does, sharing a single implementation. `current_exe` resolves to the real
   // deno binary (not the `node` symlink), so the resolution subprocess runs as
-  // plain `deno eval` without re-entering arg0 dispatch.
+  // plain `dodo eval` without re-entering arg0 dispatch.
   #[allow(clippy::disallowed_methods, reason = "resolving the node shim exe")]
   let current_exe =
     std::env::current_exe().unwrap_or_else(|_| PathBuf::from("deno"));

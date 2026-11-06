@@ -164,7 +164,7 @@ pub fn root_path() -> PathRef {
 /// `tools/download_tsc.ts` materializes it under
 /// `<target>/.native_tsc/deno_dir/tsc/<version>/<platform>/lib/tsc`. The harness
 /// injects this per-test as `DENO_TSC_BIN` (see `TestContextBuilder::build`) so
-/// `deno check`/`run --check`/`cache --check` reuse it instead of downloading
+/// `dodo check`/`run --check`/`cache --check` reuse it instead of downloading
 /// the compiler into every test's fresh `DENO_DIR`. Returns `None` when it
 /// hasn't been downloaded yet.
 pub fn native_tsc_bin_path() -> Option<PathRef> {

@@ -1062,7 +1062,7 @@ pub struct SnapshotFromLockfileParams<'a> {
   /// [`SerializedNpmResolutionSnapshot::dedup_equivalent_peer_variants`]).
   /// This is a purely in-memory normalization of the loaded snapshot; it
   /// does not by itself rewrite the lockfile. It is safe to enable on the
-  /// `deno run` path: it lets lockfiles written by an older deno (whose
+  /// `dodo run` path: it lets lockfiles written by an older deno (whose
   /// peer-dep id encoding differs) still satisfy the requirements, so the
   /// graph isn't needlessly re-resolved against the registry (which would
   /// fail under `--cached-only`).
@@ -1291,7 +1291,7 @@ pub fn snapshot_from_lockfile(
     //
     // This also lets a lockfile written by an older deno (whose peer-dep
     // encoding differs from the current one) still satisfy the
-    // requirements, so `deno run` doesn't re-resolve the whole graph
+    // requirements, so `dodo run` doesn't re-resolve the whole graph
     // against the registry — which would fail offline under
     // `--cached-only`. The merge is in-memory only and doesn't rewrite the
     // lockfile unless a real resolution subsequently runs.

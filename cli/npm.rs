@@ -82,7 +82,7 @@ pub use deno_npm_cache::NpmPackumentRequestFormat;
 
 /// `Accept` header sent when fetching npm package metadata in the abbreviated
 /// install manifest format. Also used for metadata lookups done by
-/// `deno outdated`, `deno add`, etc. so registries that content-negotiate
+/// `dodo outdated`, `dodo add`, etc. so registries that content-negotiate
 /// (or redirect non-npm-client requests elsewhere) behave the same.
 const NPM_PACKAGE_INFO_ACCEPT: &str =
   "application/vnd.npm.install-v1+json; q=1.0, application/json; q=0.8, */*";
@@ -256,7 +256,7 @@ fn decompress_gzip(compressed: Vec<u8>) -> Result<Vec<u8>, JsErrorBox> {
 }
 
 /// Why fetching package metadata for a single package failed. Used to surface
-/// actionable diagnostics (e.g. in `deno outdated`) instead of silently
+/// actionable diagnostics (e.g. in `dodo outdated`) instead of silently
 /// dropping packages that live on unreachable or unauthorized registries.
 #[derive(Clone, Debug)]
 pub struct PackageInfoLoadError {
@@ -382,8 +382,8 @@ impl NpmFetchResolver {
     // serve package metadata to requests that send the npm `Accept` header and
     // otherwise redirect to registry.npmjs.org, which drops the auth header on
     // the cross-origin redirect and 404s for private packages. The npm install
-    // path sends this same header, so matching it keeps `deno outdated`/`deno
-    // add` working wherever `deno install` does.
+    // path sends this same header, so matching it keeps `dodo outdated`/`deno
+    // add` working wherever `dodo install` does.
     // See https://github.com/denoland/deno/issues/31924
     //
     // Mirror the install path's tradeoff: this header requests the abbreviated

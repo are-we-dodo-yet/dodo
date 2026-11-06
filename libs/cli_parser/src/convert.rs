@@ -113,7 +113,7 @@ fn parse_socket_addr(s: &str) -> Result<SocketAddr, CliError> {
 /// This is the main entry point matching Deno's `flags_from_vec`.
 pub fn flags_from_vec(args: Vec<String>) -> Result<Flags, CliError> {
   // Strip a trailing `\r` from each argument so that a shebang in a script
-  // saved with CRLF line endings (e.g. `#!/usr/bin/env -S deno run -A\r`)
+  // saved with CRLF line endings (e.g. `#!/usr/bin/env -S dodo run -A\r`)
   // doesn't poison the final shebang argument with a stray carriage return.
   let args: Vec<String> = args
     .into_iter()
@@ -384,7 +384,7 @@ fn default_parse(
       }
     }
 
-    // Bare run - same as `deno run` but with bare=true
+    // Bare run - same as `dodo run` but with bare=true
     runtime_args_parse(result, flags, true, true)?;
     ext_arg_parse(result, flags);
     flags.tunnel = result.get_bool("tunnel");
@@ -434,7 +434,7 @@ fn default_parse(
     if has_run_flags && !has_v8_help {
       return Err(CliError::new(
         CliErrorKind::MissingRequired,
-        "[SCRIPT_ARG] may only be omitted with --v8-flags=--help, else to use the repl with arguments, please use the `deno repl` subcommand\n\nUsage: deno [OPTIONS] [COMMAND] [SCRIPT_ARG]...",
+        "[SCRIPT_ARG] may only be omitted with --v8-flags=--help, else to use the repl with arguments, please use the `dodo repl` subcommand\n\nUsage: deno [OPTIONS] [COMMAND] [SCRIPT_ARG]...",
       ));
     }
 
@@ -1402,7 +1402,7 @@ fn run_parse(
 
   if let Some(script) = result.get_one("script_arg") {
     let mut watch = watch_arg_parse_with_paths(result);
-    // `deno watch` is an alias for `deno run --watch-hmr`, so enable hot
+    // `dodo watch` is an alias for `dodo run --watch-hmr`, so enable hot
     // module replacement watching by default when no explicit watch flag
     // was passed.
     if force_hmr {
@@ -1435,7 +1435,7 @@ fn run_parse(
       print_task_list: false,
     });
   } else if !flags.v8_flags.is_empty() {
-    // `deno run --v8-flags=--help` with no script
+    // `dodo run --v8-flags=--help` with no script
     flags.subcommand = DenoSubcommand::Run(RunFlags {
       script: "_".to_string(),
       bare: false,
@@ -1443,7 +1443,7 @@ fn run_parse(
       print_task_list: false,
     });
   } else {
-    // `deno run` with no script - show available tasks
+    // `dodo run` with no script - show available tasks
     flags.subcommand = DenoSubcommand::Run(RunFlags {
       script: String::new(),
       bare: false,
@@ -2291,7 +2291,7 @@ fn install_parse(
         return Err(CliError::new(
           CliErrorKind::InvalidValue,
           "Note: Permission flags can only be used in a global setting\n\
-             Use `deno install -g --allow-net jsr:@std/fs` instead",
+             Use `dodo install -g --allow-net jsr:@std/fs` instead",
         ));
       }
     }
@@ -2559,7 +2559,7 @@ fn normalize_create_package_name(
   } else {
     Err(CliError::new(
       CliErrorKind::InvalidValue,
-      "Missing `jsr:` or `npm:` prefix. For example: `deno create npm:vite`.",
+      "Missing `jsr:` or `npm:` prefix. For example: `dodo create npm:vite`.",
     ))
   }
 }
@@ -2613,7 +2613,7 @@ fn add_parse(result: &ParseResult, flags: &mut Flags) {
     Some(DefaultRegistry::Jsr)
   } else {
     // Default to npm when neither --npm nor --jsr is provided, so
-    // `deno add express` works without requiring an `npm:` prefix.
+    // `dodo add express` works without requiring an `npm:` prefix.
     Some(DefaultRegistry::Npm)
   };
 
@@ -2667,7 +2667,7 @@ fn desktop_parse(
     .map(|v| v.iter().map(|s| s.to_string()).collect::<Vec<_>>())
     .unwrap_or_default()
     .into_iter();
-  // The entrypoint is optional: bare `deno desktop` defaults to "." so
+  // The entrypoint is optional: bare `dodo desktop` defaults to "." so
   // framework detection runs against the current directory.
   let source_file = script.next().unwrap_or_else(|| ".".to_string());
   let args = script.collect();
@@ -2812,7 +2812,7 @@ fn remove_parse(result: &ParseResult, flags: &mut Flags) {
     .map(|v| v.iter().map(|s| s.to_string()).collect())
     .unwrap_or_default();
 
-  // `deno remove --global <name>...` is an alias for `deno uninstall
+  // `dodo remove --global <name>...` is an alias for `dodo uninstall
   // --global <name>...`: it removes globally installed executables rather
   // than dependencies from the configuration file, so route it through the
   // same subcommand the uninstaller uses.
@@ -3164,7 +3164,7 @@ fn node_inspect_addr(word: &str, flag: &str) -> Option<SocketAddr> {
 fn bundle_parse(result: &ParseResult, flags: &mut Flags) {
   compile_args_without_check_parse(result, flags);
   // `compile_args_without_check_parse` deliberately omits `--check`; apply it
-  // here so `deno bundle --check=all` type-checks (mirrors clap, #30159).
+  // here so `dodo bundle --check=all` type-checks (mirrors clap, #30159).
   check_arg_parse(result, flags);
   // `bundle` resolves a module graph but never runs it, so the only
   // permissions it takes are the import ones.

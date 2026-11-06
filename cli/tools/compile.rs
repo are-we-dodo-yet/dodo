@@ -129,7 +129,7 @@ async fn compile_inner(
         compile_flags.output = Some(dir_name.to_string_lossy().into_owned());
       }
       // Add framework build output to includes, resolved relative to the
-      // detected app directory so `deno compile ./myapp` picks up
+      // detected app directory so `dodo compile ./myapp` picks up
       // `./myapp/.next` rather than `./.next`.
       for inc in detection.include_paths {
         let resolved = dir.join(&inc).display().to_string();

@@ -40,7 +40,7 @@ pub enum LoadError {
 
 pub type DenoRtNativeAddonLoaderRc = Arc<dyn DenoRtNativeAddonLoader>;
 
-/// Loads native addons in `deno compile`.
+/// Loads native addons in `dodo compile`.
 ///
 /// The implementation should provide the bytes from the binary
 /// of the native file.

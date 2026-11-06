@@ -1226,7 +1226,7 @@ impl<TGraphContainer: ModuleGraphContainer>
       Ok(())
     }
 
-    // `deno eval` and piped stdin have no file on disk — their source is held
+    // `dodo eval` and piped stdin have no file on disk — their source is held
     // in memory under a synthetic `$deno$` specifier that is already fully
     // resolved. Neither the import map nor node resolution has anything to
     // contribute, and node resolution actively breaks it when the cwd is inside
@@ -1249,7 +1249,7 @@ impl<TGraphContainer: ModuleGraphContainer>
     // outside the project root (such as the npm cache) to live underneath the
     // project directory, breaking the load. Such a package-internal main
     // module is not a user source file and must not be remapped, so bypass the
-    // import map. A user-provided path entry (e.g. `deno run ./thing.ts`) is
+    // import map. A user-provided path entry (e.g. `dodo run ./thing.ts`) is
     // intentionally left to the import map.
     if matches!(kind, deno_core::ResolutionKind::MainModule)
       && let Ok(url) = ModuleSpecifier::parse(raw_specifier)

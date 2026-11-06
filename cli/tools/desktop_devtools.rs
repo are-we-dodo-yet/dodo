@@ -1,6 +1,6 @@
 // Copyright 2018-2026 the Deno authors. MIT license.
 
-//! CDP multiplexer for `deno desktop --inspect`.
+//! CDP multiplexer for `dodo desktop --inspect`.
 //!
 //! Architecture:
 //!

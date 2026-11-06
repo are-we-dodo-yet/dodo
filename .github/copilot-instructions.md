@@ -61,7 +61,7 @@ to JavaScript — for instance filesystem operations and networking.
 cargo check
 
 # Build debug binary
-cargo build --bin deno
+cargo build --bin dodo
 
 # Build release version (slow, optimized)
 cargo build --release

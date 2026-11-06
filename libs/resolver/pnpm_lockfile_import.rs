@@ -5,7 +5,7 @@
 //! Only the npm subset is translated. Targets pnpm lockfileVersion 6.x and
 //! 9.x (the formats produced by pnpm v8 and pnpm v9+ respectively).
 //!
-//! YAML is parsed with `yaml_parser` (the same parser `deno fmt` already
+//! YAML is parsed with `yaml_parser` (the same parser `dodo fmt` already
 //! depends on) to avoid pulling a new YAML crate into the dependency tree.
 //! `yaml_parser` is a lossless CST parser, so the helpers below adapt its
 //! syntax tree into a small `Node`/`MapNode` value model that is convenient

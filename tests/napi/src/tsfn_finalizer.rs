@@ -4,7 +4,7 @@
 //
 // A `napi_threadsafe_function` callback repeatedly wraps freshly created
 // objects with a `napi_wrap` finalizer, then churns allocations so the GC
-// runs while those wraps are still pending. Under `deno test`, the runner
+// runs while those wraps are still pending. Under `dodo test`, the runner
 // drains the NAPI finalizer queue at worker teardown; a wrap finalized there
 // but garbage collected afterwards must NOT have its finalizer invoked twice.
 // The finalizer below aborts on a double invocation so a regression fails the

@@ -85,7 +85,7 @@ pub fn resolve_file_patterns(
   })
 }
 
-/// The `--target` triple for `deno compile`, defaulting to the triple this
+/// The `--target` triple for `dodo compile`, defaulting to the triple this
 /// binary was built for.
 pub fn resolve_compile_target(flags: &CompileFlags) -> String {
   flags
@@ -558,7 +558,7 @@ impl FlagsExt for Flags {
         source_file: script,
         ..
       }) => resolve_single_folder_path(script, current_dir, |p| {
-        // The desktop entrypoint is commonly a directory (e.g. `deno desktop
+        // The desktop entrypoint is commonly a directory (e.g. `dodo desktop
         // .` for framework detection), in which case the config lives in that
         // directory itself — don't pop up to its parent. Only pop when the
         // entrypoint is a file.
@@ -630,7 +630,7 @@ pub fn flags_from_vec(args: Vec<OsString>) -> Result<Flags, CliError> {
 /// Strip a single trailing carriage return from an argument.
 ///
 /// When a script with CRLF line endings starts with a shebang like
-/// `#!/usr/bin/env -S deno run --allow-net`, the kernel passes the trailing
+/// `#!/usr/bin/env -S dodo run --allow-net`, the kernel passes the trailing
 /// `\r` as part of the final argument (e.g. `--allow-net\r`), which then
 /// fails clap parsing with a confusing "isn't valid in this context" error.
 /// Trimming a trailing CR here makes such scripts run as the author intended.
@@ -648,7 +648,7 @@ fn strip_trailing_cr(arg: OsString) -> OsString {
   }
 }
 
-/// Fast path for `deno run <file> [script args...]` with no deno-level flags
+/// Fast path for `dodo run <file> [script args...]` with no deno-level flags
 /// before the file. Building the parse tree / walking the parser costs a couple
 /// microseconds; for the overwhelmingly common bare-run case we skip it and
 /// build `RunFlags` directly. Any deno flag before the file (anything starting
@@ -718,7 +718,7 @@ pub fn flags_from_vec_with_initial_cwd(
     args
   };
 
-  // Fast path for the overwhelmingly common `deno run <file> [args...]` with no
+  // Fast path for the overwhelmingly common `dodo run <file> [args...]` with no
   // deno-level flags before the file: build `RunFlags` directly and skip the
   // parser entirely. `bare_run_fast_path` produces output identical to the full
   // parse (asserted by `fast_path_matches_full_parse`).
@@ -753,7 +753,7 @@ pub fn flags_from_vec_with_initial_cwd(
   }
 }
 
-/// Render the text printed by `deno --version` (`long`) and `deno -V` (short).
+/// Render the text printed by `dodo --version` (`long`) and `dodo -V` (short).
 /// Both forms are prefixed with the binary name and terminated by a newline,
 /// matching what clap's `render_long_version` / `render_version` used to emit.
 pub fn render_version(long: bool) -> String {
@@ -795,7 +795,7 @@ where
 /// Handle a dynamic-completion callback: the shell invoked us with
 /// `COMPLETE=<shell>` set and the words being completed passed after a `--`
 /// separator. Candidates are computed from the hand-written command tree via
-/// `deno_cli_parser::completions` (no clap), with `deno task` names supplied by
+/// `deno_cli_parser::completions` (no clap), with `dodo task` names supplied by
 /// [`dynamic_task_completer`].
 pub fn handle_shell_completion(_cwd: &Path) -> Result<(), AnyError> {
   let shell = std::env::var("COMPLETE").unwrap_or_default();
@@ -845,7 +845,7 @@ fn shell_completion_words() -> Vec<String> {
 }
 
 /// Positional-argument completer injected into the parser's completion engine.
-/// Completes `deno task <TAB>` with the available task names read from the
+/// Completes `dodo task <TAB>` with the available task names read from the
 /// resolved config (the only dynamic completion Deno offers). Kept CLI-side
 /// because the parser crate has no config/workspace access.
 fn dynamic_task_completer(
@@ -873,7 +873,7 @@ fn dynamic_task_completer(
 }
 
 /// Best-effort parse of the completion command line into `Flags`, used to pick
-/// up `deno task`'s `--config`/`--recursive`/`--filter` for task resolution.
+/// up `dodo task`'s `--config`/`--recursive`/`--filter` for task resolution.
 fn task_flags_for_completion() -> Option<Flags> {
   let words = shell_completion_words();
   // The last word is the partial being completed; if the full line doesn't
@@ -1085,7 +1085,7 @@ mod tests {
       ])
     );
 
-    // `deno desktop .` (and bare `deno desktop`) runs framework detection on
+    // `dodo desktop .` (and bare `dodo desktop`) runs framework detection on
     // the current directory, so config discovery must start in that directory
     // rather than its parent. See issue #35653.
     let flags = flags_from_vec(svec!["deno", "desktop", "."]).unwrap();
@@ -1099,7 +1099,7 @@ mod tests {
       flags_from_vec(svec!["deno", "desktop", "sub/main.ts"]).unwrap();
     assert_eq!(flags.config_path_args(&cwd), Some(vec![cwd.join("sub")]));
   }
-  /// `deno <sub> --help`, `deno <sub> -h` and `deno help <sub>` must all render
+  /// `dodo <sub> --help`, `dodo <sub> -h` and `dodo help <sub>` must all render
   /// the same text for every subcommand.
   #[test]
   fn equal_help_output() {
@@ -1126,9 +1126,9 @@ mod tests {
     }
   }
 
-  /// When `deno <subcommand>` is spawned via `node:child_process`, the args are
+  /// When `dodo <subcommand>` is spawned via `node:child_process`, the args are
   /// passed through unchanged only if node_shim recognizes the subcommand.
-  /// Otherwise it is misinterpreted as a script for `deno run` (see #35591).
+  /// Otherwise it is misinterpreted as a script for `dodo run` (see #35591).
   /// This test fails if a subcommand is added to the CLI without also adding it
   /// to `DENO_SUBCOMMANDS` in `libs/node_shim/lib.rs`.
   ///

@@ -139,7 +139,7 @@ pub trait LifecycleScriptsStrategy {
 /// that workspace-aware scripts such as `@sveltejs/kit`'s `postinstall` operate
 /// on each member.
 ///
-/// When `deno install` runs in a workspace whose root is a `deno.json` (no root
+/// When `dodo install` runs in a workspace whose root is a `deno.json` (no root
 /// `package.json`), tools that read the root `package.json` `workspaces` field
 /// (as npm/svelte-kit do) cannot discover the members. Running the script per
 /// member with the member as `INIT_CWD` reproduces what those tools would do in

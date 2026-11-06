@@ -107,7 +107,7 @@ pub async fn install_global(
     };
 
   // Validate every entry and default unprefixed bare package names to the npm
-  // registry (matching `deno add` and local `deno install`) before installing
+  // registry (matching `dodo add` and local `dodo install`) before installing
   // anything, so an error on entry N doesn't leave entries < N installed.
   let module_urls: Vec<String> = install_flags_global
     .module_urls
@@ -126,8 +126,8 @@ pub async fn install_global(
       {
         bail!(
           concat!(
-            "{} is missing a prefix. Deno 3.0 requires `--` before script arguments in `deno install -g`. ",
-            "Did you mean `deno install -g {} -- {}`? Or maybe provide a `jsr:` or `npm:` prefix?",
+            "{} is missing a prefix. Deno 3.0 requires `--` before script arguments in `dodo install -g`. ",
+            "Did you mean `dodo install -g {} -- {}`? Or maybe provide a `jsr:` or `npm:` prefix?",
           ),
           entry_text,
           &install_flags_global.module_urls[0],
@@ -366,7 +366,7 @@ async fn install_global_compiled(
     }
     // Remove the existing file so that the compile step doesn't
     // fail its own safety check (which guards against overwriting
-    // files not produced by `deno compile`).
+    // files not produced by `dodo compile`).
     std::fs::remove_file(&output_path).with_context(|| {
       format!(
         concat!(
@@ -591,7 +591,7 @@ async fn setup_config_dir(
 /// config keeps resolving `@scope/member` specifiers after the `workspace`
 /// field is stripped.
 ///
-/// `deno install -g -c deno.json` copies the workspace root config into a
+/// `dodo install -g -c deno.json` copies the workspace root config into a
 /// per-binary directory and removes the `workspace` field to stop workspace
 /// discovery. Without this, bare specifiers that point at workspace members
 /// (e.g. `import { x } from "@scope/member"`) can no longer be resolved. Each
@@ -627,7 +627,7 @@ fn workspace_member_import_entries(
 /// Builds import map entries for the dependencies declared in the closest
 /// package.json to a local file entrypoint.
 ///
-/// `deno install -g` copies the supplied config (or an empty one) into a
+/// `dodo install -g` copies the supplied config (or an empty one) into a
 /// per-binary directory and the installed command runs with that config, so
 /// dependencies declared in the project's package.json are not visible to it.
 /// Flatten them into the copied config's import map (e.g. `"@std/log":
@@ -706,7 +706,7 @@ fn package_json_dep_import_entries(module_url: &Url) -> Vec<(String, String)> {
 /// Rewrites `./` and `../` paths inside `imports` and `scopes` to absolute
 /// `file://` URLs anchored to the original config file's location.
 ///
-/// `deno install -g -c deno.json` copies the supplied config into a per-binary
+/// `dodo install -g -c deno.json` copies the supplied config into a per-binary
 /// directory. Relative specifiers / scope prefixes get resolved relative to
 /// that new directory by `deno_config`, so without rewriting them they end up
 /// pointing at non-existent paths under the install dir. See
@@ -837,7 +837,7 @@ fn resolve_native_binary_path(
   // ELF/Mach-O/PE. `node_resolver::read_bin_value` returns `Executable` for
   // any file whose first line isn't a recognized npx-style shebang (e.g.
   // `#!/usr/bin/env deno` scripts) — which would incorrectly cause us to
-  // generate an `exec`-the-file shim instead of a `deno run` shim. On
+  // generate an `exec`-the-file shim instead of a `dodo run` shim. On
   // Windows there is no shebang interpretation, so that breaks installs of
   // ordinary npm packages whose bin scripts use a non-Node shebang.
   use std::io::Read;
@@ -1139,7 +1139,7 @@ struct ShimData {
   file_path: PathBuf,
   args: Vec<String>,
   /// If set, the bin entry is a native binary and the shim should exec it
-  /// directly instead of wrapping with `deno run`.
+  /// directly instead of wrapping with `dodo run`.
   native_binary_path: Option<PathBuf>,
 }
 
@@ -2738,8 +2738,8 @@ mod tests {
   fn native_binary_not_detected_for_non_node_shebang_js() {
     // Regression: a JS bin script with a non-Node shebang (e.g.
     // `#!/usr/bin/env deno`) was being misclassified as a native binary,
-    // which broke `deno install -g` on Windows since the generated shim
-    // execed the .js file directly instead of running `deno run`.
+    // which broke `dodo install -g` on Windows since the generated shim
+    // execed the .js file directly instead of running `dodo run`.
     let temp_dir = TempDir::new();
     let bin_dir = temp_dir.path().join("bin").to_path_buf();
     let config_dir = bin_dir.join(".mytool");

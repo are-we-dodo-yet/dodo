@@ -90,7 +90,7 @@ pub struct LifecycleScriptsConfig {
   pub denied: Vec<PackageReq>,
   pub initial_cwd: PathBuf,
   pub root_dir: PathBuf,
-  /// Part of an explicit `deno install`
+  /// Part of an explicit `dodo install`
   pub explicit_install: bool,
 }
 
@@ -400,7 +400,7 @@ impl<TNpmCacheHttpClient: NpmCacheHttpClient, TSys: NpmInstallerSys>
     if uncached.is_empty() {
       // Even when every requested package is already cached we still need to
       // sync the node_modules directory for a full install (e.g. after
-      // `deno remove`), otherwise stale packages are left on disk. Only do this
+      // `dodo remove`), otherwise stale packages are left on disk. Only do this
       // for `All` caching so the hot path of running a script (which caches a
       // specific subset) keeps short-circuiting.
       if matches!(caching, PackageCaching::All) {
@@ -464,7 +464,7 @@ impl<TNpmCacheHttpClient: NpmCacheHttpClient, TSys: NpmInstallerSys>
       }
     }
     // A `workspace:<range>` whose member version doesn't satisfy the range is
-    // always a hard error, the same way `deno run` rejects it during
+    // always a hard error, the same way `dodo run` rejects it during
     // resolution.
     if let Some(err) = self
       .npm_install_deps_provider

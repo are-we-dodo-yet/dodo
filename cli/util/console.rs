@@ -260,7 +260,7 @@ mod windows_vt_input {
 
 /// A snapshot of the terminal mode that can be restored later.
 ///
-/// This is used by `deno task` so that a child process (for example a dev
+/// This is used by `dodo task` so that a child process (for example a dev
 /// server like `vite`) that switches the terminal into raw mode and is then
 /// terminated (e.g. via Ctrl+C) does not leave the user's terminal in a broken
 /// state with input echo and line editing disabled.

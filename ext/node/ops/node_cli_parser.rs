@@ -391,7 +391,7 @@ mod tests {
   #[test]
   fn test_translate_subcommand_passthrough() {
     // Deno subcommands spawned via node:child_process should be passed through
-    // unchanged rather than being treated as a script for `deno run`. See
+    // unchanged rather than being treated as a script for `dodo run`. See
     // #35591.
     for subcommand in ["bundle", "serve", "fmt", "compile", "lint"] {
       let parsed =

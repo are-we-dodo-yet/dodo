@@ -161,7 +161,7 @@ async fn run_subcommand(
     DenoSubcommand::Bundle(bundle_flags) => spawn_subcommand(async {
       log::warn!(
         "⚠️  {} is experimental and subject to changes",
-        colors::cyan("deno bundle")
+        colors::cyan("dodo bundle")
       );
       tools::bundle::bundle(Arc::new(flags), bundle_flags).await
     }),
@@ -219,7 +219,7 @@ async fn run_subcommand(
       spawn_subcommand(async move {
         log::warn!(
           "⚠️  {} is experimental and subject to changes",
-          colors::cyan("deno transpile")
+          colors::cyan("dodo transpile")
         );
         tools::transpile::transpile(Arc::new(flags), transpile_flags).await
       })
@@ -267,7 +267,7 @@ async fn run_subcommand(
   how to setup your favorite text editor.
 
   Press Ctrl+C to exit.
-        ", colors::cyan("deno lsp"));
+        ", colors::cyan("dodo lsp"));
       }
       lsp::start().await
     }),
@@ -516,13 +516,13 @@ async fn run_subcommand(
       log::warn!(
         "{}",
         colors::yellow(
-          "deno bump-version is experimental and subject to change"
+          "dodo bump-version is experimental and subject to change"
         )
       );
       tools::bump_version::bump_version_command(Arc::new(flags), version_flags)
     }),
     DenoSubcommand::Vendor => exit_with_message(
-      "⚠️  `deno vendor` was removed in Deno 2.\n\nSee the Deno 1.x to 2.x Migration Guide for migration instructions: https://docs.deno.com/runtime/manual/advanced/migrate_deprecations",
+      "⚠️  `dodo vendor` was removed in Deno 2.\n\nSee the Deno 1.x to 2.x Migration Guide for migration instructions: https://docs.deno.com/runtime/manual/advanced/migrate_deprecations",
       1,
     ),
     DenoSubcommand::Publish(publish_flags) => spawn_subcommand(async {
@@ -556,7 +556,7 @@ async fn run_subcommand(
   handle.await?
 }
 
-/// Determines whether a error encountered during `deno run`
+/// Determines whether a error encountered during `dodo run`
 /// should trigger fallback behavior, such as attempting to run a Deno task
 /// with the same name.
 ///
@@ -589,7 +589,7 @@ fn setup_panic_hook() {
   //   should be reported to us.
   let orig_hook = std::panic::take_hook();
   std::panic::set_hook(Box::new(move |panic_info| {
-    // Broken-pipe panics from `println!`/`eprintln!` (e.g. `deno | cls` on
+    // Broken-pipe panics from `println!`/`eprintln!` (e.g. `dodo | cls` on
     // Windows, where the reader closes the pipe before we finish writing) are
     // not bugs in Deno — they're a normal consequence of the downstream
     // process exiting. Exit silently rather than emitting the bug-report
@@ -770,7 +770,7 @@ fn exit_for_error(error: AnyError, initial_cwd: Option<&std::path::Path>) -> ! {
   // If this looks like a workspace/npm resolution failure and a
   // pnpm-workspace.yaml is nearby, convert it into the equivalent deno.json
   // fields and tell the user to run the command again, rather than leaving them
-  // with the misleading "run deno install" hint baked into the error.
+  // with the misleading "run dodo install" hint baked into the error.
   if let Some(hint) = util::pnpm_workspace::maybe_auto_migrate_pnpm_workspace(
     &error_string,
     initial_cwd,

@@ -171,9 +171,9 @@ pub async fn run(
     .create_custom_worker(
       WorkerExecutionMode::Repl,
       main_module.clone(),
-      // `deno repl` doesn't support preloading modules
+      // `dodo repl` doesn't support preloading modules
       vec![],
-      // `deno repl` doesn't support require modules
+      // `dodo repl` doesn't support require modules
       vec![],
       permissions.clone(),
       vec![crate::ops::testing::deno_test::init(test_event_sender)],
@@ -253,7 +253,7 @@ pub async fn run(
   if !cli_options.is_quiet() {
     let mut handle = io::stdout().lock();
 
-    writeln!(handle, "Deno {}", DENO_VERSION_INFO.deno)?;
+    writeln!(handle, "Dodo {}", DENO_VERSION_INFO.deno)?;
     writeln!(handle, "exit using ctrl+d, ctrl+c, or close()")?;
 
     if repl_flags.is_default_command {
@@ -264,7 +264,7 @@ pub async fn run(
       )?;
       writeln!(
         handle,
-        "To specify permissions, run `deno repl` with allow flags."
+        "To specify permissions, run `dodo repl` with allow flags."
       )?;
     }
   }

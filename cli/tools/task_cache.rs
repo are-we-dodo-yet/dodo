@@ -1,6 +1,6 @@
 // Copyright 2018-2026 the Deno authors. MIT license.
 
-//! Input-based caching for `deno task`.
+//! Input-based caching for `dodo task`.
 //!
 //! When a task declares `files`, Deno computes a fingerprint over the
 //! contents of those files, the command string (including any arguments
@@ -302,7 +302,7 @@ pub struct TaskCacheKey<'a> {
   pub task_name: &'a str,
   pub cwd: &'a Path,
   pub command: &'a str,
-  /// Arguments appended to the command on the CLI (`deno task build <argv>`).
+  /// Arguments appended to the command on the CLI (`dodo task build <argv>`).
   /// These change what actually runs, so they must be part of the
   /// fingerprint.
   pub argv: &'a [String],

@@ -307,7 +307,7 @@ mod tests {
 
   #[test]
   fn does_not_hide_non_example_code_lines() {
-    let html = render("```sh\n# install\ndeno install\n```");
+    let html = render("```sh\n# install\ndodo install\n```");
     let displayed = html.split("</code>").next().unwrap();
     assert!(displayed.contains("# install"));
   }

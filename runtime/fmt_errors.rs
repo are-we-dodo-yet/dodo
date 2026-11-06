@@ -648,7 +648,7 @@ fn get_message_suggestions_inner(
         ]),
         FixSuggestion::hint_multiline(&[
           "Add `\"nodeModulesDir\": \"auto\" option to `deno.json`, and then run",
-          "`deno install --allow-scripts=npm:<package> --entrypoint <script>` to setup `node_modules` directory.",
+          "`dodo install --allow-scripts=npm:<package> --entrypoint <script>` to setup `node_modules` directory.",
         ]),
       ];
     // Captures the error thrown by `ext/napi` when a native addon was built

@@ -261,7 +261,7 @@ impl TestRun {
     //     the CLI's `load_env_variables_from_env_files`.
     //   * Concurrent `deno/testRun` requests racing on the shared global env
     //     can interleave; this is the same hazard the CLI has when running
-    //     multiple `deno test` invocations in one process.
+    //     multiple `dodo test` invocations in one process.
     if let Some(env_files) = &flags.env_file {
       let cwd = resolve_cwd_or_fallback(flags.initial_cwd.as_deref());
       WatchEnvTracker::snapshot().load_env_variables_from_env_files(
@@ -563,7 +563,7 @@ impl TestRun {
     }
     // Inherit `--env-file` paths from the `test` task in deno.json when the
     // user hasn't already supplied one via `deno.testing.args`. Without this,
-    // running tests from VSCode wouldn't see env vars that `deno task test`
+    // running tests from VSCode wouldn't see env vars that `dodo task test`
     // loads (see https://github.com/denoland/deno/issues/28797).
     let has_env_file_arg = args.iter().any(|a| {
       let a = a.as_ref();
@@ -590,7 +590,7 @@ impl TestRun {
 
 /// Walks each unique scope reached by the queued specifiers and harvests
 /// `--env-file` paths from its deno.json `test` task. Each path is resolved
-/// against the deno.json's directory (matching how `deno task test` reads
+/// against the deno.json's directory (matching how `dodo task test` reads
 /// them) so the LSP process's cwd doesn't change the answer. Scopes are
 /// deduplicated so a workspace with one shared deno.json is processed once.
 fn collect_test_task_env_files(
@@ -1171,7 +1171,7 @@ mod tests {
 
   #[test]
   fn test_extract_env_files_from_command() {
-    // Plain `deno test --env-file=.env.test -A` (the case from
+    // Plain `dodo test --env-file=.env.test -A` (the case from
     // https://github.com/denoland/deno/issues/28797).
     assert_eq!(
       extract_env_files_from_command("deno test --env-file=.env.test -A"),

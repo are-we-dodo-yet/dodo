@@ -656,7 +656,7 @@ fn dynamic_import_unanalyzable() {
     .assert_exit_code(0);
 }
 
-// TODO(2.0): this test should first run `deno install`?
+// TODO(2.0): this test should first run `dodo install`?
 #[test]
 #[ignore]
 fn compile_npm_specifiers() {

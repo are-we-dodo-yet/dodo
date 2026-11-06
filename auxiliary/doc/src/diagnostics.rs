@@ -386,7 +386,7 @@ fn identifier_offset(text: &str, start: usize, name: &str) -> Option<usize> {
 /// Refines a declaration-start `location` to point at the declaration's
 /// identifier.
 ///
-/// `deno doc --lint` diagnostics are anchored at the start of a declaration,
+/// `dodo doc --lint` diagnostics are anchored at the start of a declaration,
 /// which for many forms (`export class Foo`, `get foo()`, `@deco foo`, …) is a
 /// keyword or a decorator rather than the symbol's name. Only trivia,
 /// decorators and modifier keywords separate a declaration's start from its

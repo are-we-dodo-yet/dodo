@@ -115,7 +115,7 @@ Under the hood:
       async fn(_args: string[]) {
         $.logStep("Setting up development environment...");
         $.logStep("Building deno and test_server...");
-        await $`cargo build --bin deno --bin test_server`.cwd(root);
+        await $`cargo build --bin dodo --bin test_server`.cwd(root);
         $.logStep("Setup complete.");
       },
     },
@@ -135,7 +135,7 @@ Under the hood:
   cargo build --bin deno`,
       async fn(_args: string[]) {
         $.logStep("Building Deno...");
-        await $`cargo build --bin deno`.cwd(root);
+        await $`cargo build --bin dodo`.cwd(root);
         $.logStep("Build complete.");
       },
     },

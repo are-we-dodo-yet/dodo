@@ -3231,9 +3231,9 @@ pub fn wrap_eval_code(source_code: &str) -> String {
 
 /// Deno subcommands - if the first arg is one of these, pass through unchanged.
 /// This must be kept in sync with the subcommands registered in
-/// `cli/args/flags.rs` so that spawning e.g. `deno bundle ...` via
+/// `cli/args/flags.rs` so that spawning e.g. `dodo bundle ...` via
 /// `node:child_process` is passed through instead of being treated as a script
-/// to `deno run`. The `subcommands_recognized_by_node_shim` test in
+/// to `dodo run`. The `subcommands_recognized_by_node_shim` test in
 /// `cli/args/flags.rs` enforces this. See #35591.
 const DENO_SUBCOMMANDS: &[&str] = &[
   "add",
@@ -3430,7 +3430,7 @@ pub fn resolve_entrypoint(
   }
 }
 
-/// For a translated `deno run ...` argv, resolve the entrypoint argument in
+/// For a translated `dodo run ...` argv, resolve the entrypoint argument in
 /// place using [`resolve_entrypoint`].
 ///
 /// No-op unless `deno_args` is a `run` invocation with an entrypoint (the first
@@ -3484,7 +3484,7 @@ pub fn translate_to_deno_args(
     let mut deno_args = parsed_args.remaining_args;
     // A spawned Node.js process has no permission model. When a tool detects it
     // is running under Deno and spawns an execution subcommand (e.g.
-    // `deno run <script>`) without any permission flags, grant `-A` so the
+    // `dodo run <script>`) without any permission flags, grant `-A` so the
     // child behaves like Node.js instead of tripping a permission prompt. Tools
     // that pass explicit permission flags (e.g. vitest workers spawn
     // `run -A ...`) are left untouched. See #35441.
@@ -5371,7 +5371,7 @@ mod tests {
 
   #[test]
   fn passthrough_run_without_perms_gets_allow_all() {
-    // Regression test for #35441: `deno run <script>` spawned without any
+    // Regression test for #35441: `dodo run <script>` spawned without any
     // permission flags must receive `-A` so the Node-compat child has full
     // access instead of prompting.
     assert_eq!(

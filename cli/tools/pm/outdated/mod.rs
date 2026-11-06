@@ -544,7 +544,7 @@ async fn update(
     // updated. The installer's re-resolution reads the npm registry cache with
     // the default `CacheSetting::Use`, so a stale cached packument can hide a
     // newer in-range version and leave the lockfile pinned to the old one --
-    // even though `deno outdated` (which fetches packuments fresh) reports the
+    // even though `dodo outdated` (which fetches packuments fresh) reports the
     // update. Adding each such npm package to the cache blocklist makes
     // `cache_setting()` return `ReloadSome`, refetching metadata for only those
     // packages. See #35348.

@@ -425,7 +425,7 @@ pub struct FmtOptionsConfig {
   pub angular_next_control_flow_same_line: Option<bool>,
   pub sort_named_imports: Option<SortOrder>,
   pub sort_named_exports: Option<SortOrder>,
-  /// Whether `deno fmt` should read `.editorconfig` files to fill in
+  /// Whether `dodo fmt` should read `.editorconfig` files to fill in
   /// options that are not otherwise set. Defaults to `true` when unset.
   pub use_editor_config: Option<bool>,
 }
@@ -801,8 +801,8 @@ impl BenchConfig {
   }
 }
 
-/// Minimum coverage percentages required for `deno coverage` and
-/// `deno test --coverage` to succeed. Modelled on Vitest's
+/// Minimum coverage percentages required for `dodo coverage` and
+/// `dodo test --coverage` to succeed. Modelled on Vitest's
 /// `coverage.thresholds`. A `None` value means the metric is not checked.
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct CoverageThresholds {

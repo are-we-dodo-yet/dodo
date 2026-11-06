@@ -1,6 +1,6 @@
 // Copyright 2018-2026 the Deno authors. MIT license.
 
-// The native `deno check` path that consumes this module lands on top of this
+// The native `dodo check` path that consumes this module lands on top of this
 // PR, so everything here is unused until then.
 #![allow(dead_code, reason = "Will be used in a follow up")]
 
@@ -32,8 +32,8 @@ use crate::tsc::DiagnosticCategory;
 use crate::tsc::Position;
 
 /// Pinned version of the native TypeScript compiler (`typescript@N`, the
-/// Go/`tsgo` line) that `deno check` runs. Bumping this constant is the only
-/// supported way to change the compiler; `deno check` never floats to the
+/// Go/`tsgo` line) that `dodo check` runs. Bumping this constant is the only
+/// supported way to change the compiler; `dodo check` never floats to the
 /// latest published version so that a given Deno release always type-checks
 /// with a known compiler.
 pub const TYPESCRIPT_VERSION: &str = "7.0.2";
@@ -154,7 +154,7 @@ pub async fn ensure_native_tsc(
 
   // Materialize `lib/` (the native binary plus the default lib `.d.ts` files it
   // resolves relative to itself) atomically: copy into a sibling temp dir and
-  // rename it into place. The rename is atomic, so a concurrent `deno check`
+  // rename it into place. The rename is atomic, so a concurrent `dodo check`
   // never observes a half-copied tree through the `exists()` check above.
   let version_dir = install_dir.parent().unwrap();
   std::fs::create_dir_all(version_dir).with_context(|| {
@@ -514,7 +514,7 @@ fn build_remote_url_map_from_config(config: &Value) -> HashMap<String, String> {
 }
 
 /// Best-effort remap of a path reported by the native compiler back onto the
-/// original module specifier. `deno check` runs tsc against a generated
+/// original module specifier. `dodo check` runs tsc against a generated
 /// tsconfig whose `paths` point jsr:/http(s): dependencies into mirror
 /// directories, so the compiler reports those mirror paths rather than the
 /// specifiers the user wrote.

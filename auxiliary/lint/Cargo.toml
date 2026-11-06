@@ -4,10 +4,10 @@ version = "0.84.1"
 authors = ["the Deno authors"]
 categories = ["development-tools"]
 edition = "2021"
-keywords = ["deno", "lint"]
+keywords = ["dodo", "lint"]
 license = "MIT"
 repository = "https://github.com/denoland/deno_lint"
-description = "lint for deno"
+description = "lint for dodo"
 
 [lib]
 name = "deno_lint"
