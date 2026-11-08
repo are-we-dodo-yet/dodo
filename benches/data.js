@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794178432158,
+  "lastUpdate": 1794178434391,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo",
   "entries": {
     "Execution Time": [
@@ -3125,6 +3125,35 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/are-we-dodo-yet/dodo/commit/65c4a8589230c636d7d1179ebe1d7691c57f5233"
         },
         "date": 1793821447772,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CLI_SNAPSHOT.bin",
+            "value": 1.692,
+            "unit": "MiB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "337f56337b1d92c832d6898dc056a1f824af0088",
+          "message": "fix: op_import_sync_with_source skips loading file imports (#18)\n\nSigned-off-by: Yaroslav Bolyukin <iam@lach.pw>",
+          "timestamp": "2026-11-08T22:19:59+01:00",
+          "tree_id": "fbef2b4aa34cc3ec7c44f12b56b029f1ad6fe45d",
+          "url": "https://github.com/are-we-dodo-yet/dodo/commit/337f56337b1d92c832d6898dc056a1f824af0088"
+        },
+        "date": 1794178433459,
         "tool": "customSmallerIsBetter",
         "benches": [
           {
