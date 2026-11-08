@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794178426716,
+  "lastUpdate": 1794178429546,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo",
   "entries": {
     "Execution Time": [
@@ -2590,6 +2590,95 @@ window.BENCHMARK_DATA = {
           {
             "name": "workers_startup",
             "value": 413.789,
+            "unit": "MiB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "337f56337b1d92c832d6898dc056a1f824af0088",
+          "message": "fix: op_import_sync_with_source skips loading file imports (#18)\n\nSigned-off-by: Yaroslav Bolyukin <iam@lach.pw>",
+          "timestamp": "2026-11-08T22:19:59+01:00",
+          "tree_id": "fbef2b4aa34cc3ec7c44f12b56b029f1ad6fe45d",
+          "url": "https://github.com/are-we-dodo-yet/dodo/commit/337f56337b1d92c832d6898dc056a1f824af0088"
+        },
+        "date": 1794178428041,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "cold_hello",
+            "value": 48.188,
+            "unit": "MiB"
+          },
+          {
+            "name": "cold_relative_import",
+            "value": 48.145,
+            "unit": "MiB"
+          },
+          {
+            "name": "error_001",
+            "value": 46.137,
+            "unit": "MiB"
+          },
+          {
+            "name": "hello",
+            "value": 48.668,
+            "unit": "MiB"
+          },
+          {
+            "name": "no_check_hello",
+            "value": 48.109,
+            "unit": "MiB"
+          },
+          {
+            "name": "relative_import",
+            "value": 48.258,
+            "unit": "MiB"
+          },
+          {
+            "name": "response_string",
+            "value": 56.168,
+            "unit": "MiB"
+          },
+          {
+            "name": "text_decoder",
+            "value": 56.68,
+            "unit": "MiB"
+          },
+          {
+            "name": "text_encoder",
+            "value": 67.586,
+            "unit": "MiB"
+          },
+          {
+            "name": "text_encoder_into",
+            "value": 56.535,
+            "unit": "MiB"
+          },
+          {
+            "name": "workers_large_message",
+            "value": 424.082,
+            "unit": "MiB"
+          },
+          {
+            "name": "workers_round_robin",
+            "value": 93.438,
+            "unit": "MiB"
+          },
+          {
+            "name": "workers_startup",
+            "value": 418.492,
             "unit": "MiB"
           }
         ]
