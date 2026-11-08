@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794178436787,
+  "lastUpdate": 1794178439662,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo",
   "entries": {
     "Execution Time": [
@@ -3660,6 +3660,55 @@ window.BENCHMARK_DATA = {
           {
             "name": "startup_shutdown",
             "value": 10,
+            "unit": "ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "337f56337b1d92c832d6898dc056a1f824af0088",
+          "message": "fix: op_import_sync_with_source skips loading file imports (#18)\n\nSigned-off-by: Yaroslav Bolyukin <iam@lach.pw>",
+          "timestamp": "2026-11-08T22:19:59+01:00",
+          "tree_id": "fbef2b4aa34cc3ec7c44f12b56b029f1ad6fe45d",
+          "url": "https://github.com/are-we-dodo-yet/dodo/commit/337f56337b1d92c832d6898dc056a1f824af0088"
+        },
+        "date": 1794178438095,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "big_file_edits",
+            "value": 2526,
+            "unit": "ms"
+          },
+          {
+            "name": "code_lens",
+            "value": 1065,
+            "unit": "ms"
+          },
+          {
+            "name": "deco_apps_edits_nav",
+            "value": 16199,
+            "unit": "ms"
+          },
+          {
+            "name": "find_replace",
+            "value": 12,
+            "unit": "ms"
+          },
+          {
+            "name": "startup_shutdown",
+            "value": 8,
             "unit": "ms"
           }
         ]
