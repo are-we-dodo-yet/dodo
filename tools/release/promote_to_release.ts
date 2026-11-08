@@ -16,7 +16,7 @@ const SUPPORTED_TARGETS = [
 ];
 
 const DENO_BINARIES = [
-  "deno",
+  "dodo",
   "denort",
 ];
 

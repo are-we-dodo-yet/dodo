@@ -1461,7 +1461,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
             ),
             run: [
               'DENO_BIN=""',
-              "for c in ./target/release/dodo ./target/release/deno.exe ./target/debug/dodo ./target/debug/deno.exe; do",
+              "for c in ./target/release/dodo ./target/release/dodo.exe ./target/debug/dodo ./target/debug/dodo.exe; do",
               '  [ -f "$c" ] && DENO_BIN="$c" && break',
               "done",
               '"$DENO_BIN" run -A ./tools/download_tsc.ts',

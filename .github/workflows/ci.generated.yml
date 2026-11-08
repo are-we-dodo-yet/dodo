@@ -732,7 +732,7 @@ jobs:
         if: '!startsWith(github.ref, ''refs/tags/'') && (matrix.shard_index == 0 || github.event_name == ''pull_request'') && (matrix.test_crate == ''integration'' || matrix.test_crate == ''specs'')'
         run: |-
           DENO_BIN=""
-          for c in ./target/release/dodo ./target/release/deno.exe ./target/debug/dodo ./target/debug/deno.exe; do
+          for c in ./target/release/dodo ./target/release/dodo.exe ./target/debug/dodo ./target/debug/dodo.exe; do
             [ -f "$c" ] && DENO_BIN="$c" && break
           done
           "$DENO_BIN" run -A ./tools/download_tsc.ts
@@ -1284,7 +1284,7 @@ jobs:
         if: '!startsWith(github.ref, ''refs/tags/'') && !(!contains(github.event.pull_request.labels.*.name, ''ci-full'') && github.event_name == ''pull_request'') && (matrix.shard_index == 0 || github.event_name == ''pull_request'') && (matrix.test_crate == ''integration'' || matrix.test_crate == ''specs'')'
         run: |-
           DENO_BIN=""
-          for c in ./target/release/dodo ./target/release/deno.exe ./target/debug/dodo ./target/debug/deno.exe; do
+          for c in ./target/release/dodo ./target/release/dodo.exe ./target/debug/dodo ./target/debug/dodo.exe; do
             [ -f "$c" ] && DENO_BIN="$c" && break
           done
           "$DENO_BIN" run -A ./tools/download_tsc.ts
@@ -1677,7 +1677,7 @@ jobs:
         if: '!startsWith(github.ref, ''refs/tags/'') && (matrix.shard_index == 0 || github.event_name == ''pull_request'') && (matrix.test_crate == ''integration'' || matrix.test_crate == ''specs'')'
         run: |-
           DENO_BIN=""
-          for c in ./target/release/dodo ./target/release/deno.exe ./target/debug/dodo ./target/debug/deno.exe; do
+          for c in ./target/release/dodo ./target/release/dodo.exe ./target/debug/dodo ./target/debug/dodo.exe; do
             [ -f "$c" ] && DENO_BIN="$c" && break
           done
           "$DENO_BIN" run -A ./tools/download_tsc.ts
@@ -2429,7 +2429,7 @@ jobs:
         if: '!startsWith(github.ref, ''refs/tags/'') && !(!contains(github.event.pull_request.labels.*.name, ''ci-full'') && github.event_name == ''pull_request'') && (matrix.shard_index == 0 || github.event_name == ''pull_request'') && (matrix.test_crate == ''integration'' || matrix.test_crate == ''specs'')'
         run: |-
           DENO_BIN=""
-          for c in ./target/release/dodo ./target/release/deno.exe ./target/debug/dodo ./target/debug/deno.exe; do
+          for c in ./target/release/dodo ./target/release/dodo.exe ./target/debug/dodo ./target/debug/dodo.exe; do
             [ -f "$c" ] && DENO_BIN="$c" && break
           done
           "$DENO_BIN" run -A ./tools/download_tsc.ts
@@ -2778,7 +2778,7 @@ jobs:
         if: '!startsWith(github.ref, ''refs/tags/'') && (matrix.shard_index == 0 || github.event_name == ''pull_request'') && (matrix.test_crate == ''integration'' || matrix.test_crate == ''specs'')'
         run: |-
           DENO_BIN=""
-          for c in ./target/release/dodo ./target/release/deno.exe ./target/debug/dodo ./target/debug/deno.exe; do
+          for c in ./target/release/dodo ./target/release/dodo.exe ./target/debug/dodo ./target/debug/dodo.exe; do
             [ -f "$c" ] && DENO_BIN="$c" && break
           done
           "$DENO_BIN" run -A ./tools/download_tsc.ts
@@ -3449,7 +3449,7 @@ jobs:
         if: '!startsWith(github.ref, ''refs/tags/'') && !(!contains(github.event.pull_request.labels.*.name, ''ci-full'') && github.event_name == ''pull_request'') && (matrix.shard_index == 0 || github.event_name == ''pull_request'') && (matrix.test_crate == ''integration'' || matrix.test_crate == ''specs'')'
         run: |-
           DENO_BIN=""
-          for c in ./target/release/dodo ./target/release/deno.exe ./target/debug/dodo ./target/debug/deno.exe; do
+          for c in ./target/release/dodo ./target/release/dodo.exe ./target/debug/dodo ./target/debug/dodo.exe; do
             [ -f "$c" ] && DENO_BIN="$c" && break
           done
           "$DENO_BIN" run -A ./tools/download_tsc.ts
@@ -3798,7 +3798,7 @@ jobs:
         if: '!startsWith(github.ref, ''refs/tags/'') && (matrix.shard_index == 0 || github.event_name == ''pull_request'') && (matrix.test_crate == ''integration'' || matrix.test_crate == ''specs'')'
         run: |-
           DENO_BIN=""
-          for c in ./target/release/dodo ./target/release/deno.exe ./target/debug/dodo ./target/debug/deno.exe; do
+          for c in ./target/release/dodo ./target/release/dodo.exe ./target/debug/dodo ./target/debug/dodo.exe; do
             [ -f "$c" ] && DENO_BIN="$c" && break
           done
           "$DENO_BIN" run -A ./tools/download_tsc.ts
@@ -4350,7 +4350,7 @@ jobs:
         if: '!startsWith(github.ref, ''refs/tags/'') && !(!contains(github.event.pull_request.labels.*.name, ''ci-full'') && github.event_name == ''pull_request'') && (matrix.shard_index == 0 || github.event_name == ''pull_request'') && (matrix.test_crate == ''integration'' || matrix.test_crate == ''specs'')'
         run: |-
           DENO_BIN=""
-          for c in ./target/release/dodo ./target/release/deno.exe ./target/debug/dodo ./target/debug/deno.exe; do
+          for c in ./target/release/dodo ./target/release/dodo.exe ./target/debug/dodo ./target/debug/dodo.exe; do
             [ -f "$c" ] && DENO_BIN="$c" && break
           done
           "$DENO_BIN" run -A ./tools/download_tsc.ts
@@ -5132,7 +5132,7 @@ jobs:
         if: '!startsWith(github.ref, ''refs/tags/'') && (matrix.shard_index == 0 || github.event_name == ''pull_request'') && (matrix.test_crate == ''integration'' || matrix.test_crate == ''specs'')'
         run: |-
           DENO_BIN=""
-          for c in ./target/release/dodo ./target/release/deno.exe ./target/debug/dodo ./target/debug/deno.exe; do
+          for c in ./target/release/dodo ./target/release/dodo.exe ./target/debug/dodo ./target/debug/dodo.exe; do
             [ -f "$c" ] && DENO_BIN="$c" && break
           done
           "$DENO_BIN" run -A ./tools/download_tsc.ts
@@ -5819,7 +5819,7 @@ jobs:
         if: '!startsWith(github.ref, ''refs/tags/'') && (matrix.shard_index == 0 || github.event_name == ''pull_request'') && (matrix.test_crate == ''integration'' || matrix.test_crate == ''specs'')'
         run: |-
           DENO_BIN=""
-          for c in ./target/release/dodo ./target/release/deno.exe ./target/debug/dodo ./target/debug/deno.exe; do
+          for c in ./target/release/dodo ./target/release/dodo.exe ./target/debug/dodo ./target/debug/dodo.exe; do
             [ -f "$c" ] && DENO_BIN="$c" && break
           done
           "$DENO_BIN" run -A ./tools/download_tsc.ts
@@ -6317,7 +6317,7 @@ jobs:
         if: '!startsWith(github.ref, ''refs/tags/'') && (matrix.shard_index == 0 || github.event_name == ''pull_request'') && (matrix.test_crate == ''integration'' || matrix.test_crate == ''specs'')'
         run: |-
           DENO_BIN=""
-          for c in ./target/release/dodo ./target/release/deno.exe ./target/debug/dodo ./target/debug/deno.exe; do
+          for c in ./target/release/dodo ./target/release/dodo.exe ./target/debug/dodo ./target/debug/dodo.exe; do
             [ -f "$c" ] && DENO_BIN="$c" && break
           done
           "$DENO_BIN" run -A ./tools/download_tsc.ts
@@ -7241,7 +7241,7 @@ jobs:
         if: '!startsWith(github.ref, ''refs/tags/'') && !(!contains(github.event.pull_request.labels.*.name, ''ci-full'') && github.event_name == ''pull_request'') && (matrix.shard_index == 0 || github.event_name == ''pull_request'') && (matrix.test_crate == ''integration'' || matrix.test_crate == ''specs'')'
         run: |-
           DENO_BIN=""
-          for c in ./target/release/dodo ./target/release/deno.exe ./target/debug/dodo ./target/debug/deno.exe; do
+          for c in ./target/release/dodo ./target/release/dodo.exe ./target/debug/dodo ./target/debug/dodo.exe; do
             [ -f "$c" ] && DENO_BIN="$c" && break
           done
           "$DENO_BIN" run -A ./tools/download_tsc.ts
