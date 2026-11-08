@@ -18,7 +18,7 @@ if (!result2.success) {
 
 console.log("deno fmt");
 
-const p3 = new Deno.Command("deno", {
+const p3 = new Deno.Command("dodo", {
   args: [
     "fmt",
     ...checkArgs,

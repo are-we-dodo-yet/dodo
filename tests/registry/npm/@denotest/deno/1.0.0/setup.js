@@ -13,7 +13,7 @@ if (process.platform === "win32") {
     JSON.stringify(pkgJson, null, 2),
   );
   fs.mkdirSync(binDir, { recursive: true });
-  fs.copyFileSync(process.execPath, path.join(binDir, "deno.exe"));
+  fs.copyFileSync(process.execPath, path.join(binDir, "dodo.exe"));
 } else {
   fs.mkdirSync(binDir, { recursive: true });
   fs.copyFileSync(process.execPath, path.join(binDir, "deno"));

@@ -769,7 +769,7 @@ mod tests {
     let processes = vec![
       LockingProcess {
         pid: 1234,
-        name: "deno".to_string(),
+        name: "dodo".to_string(),
         exe: Some(PathBuf::from("C:/Program Files/deno/deno.exe")),
         is_deno: true,
       },

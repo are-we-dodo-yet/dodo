@@ -258,7 +258,7 @@ pub fn detect_framework(
 fn deno_exe() -> String {
   std::env::current_exe()
     .map(|p| p.display().to_string())
-    .unwrap_or_else(|_| "deno".into())
+    .unwrap_or_else(|_| "dodo".into())
 }
 
 fn deno_task_build() -> Vec<String> {

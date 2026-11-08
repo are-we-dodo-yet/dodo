@@ -89,10 +89,10 @@ jobs:
         run: |-
           $SignTool = Get-ChildItem -Path "C:\Program Files*\Windows Kits\*\bin\*\x64\signtool.exe" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
           $SignToolPath = $SignTool.FullName
-          & $SignToolPath verify /pa /v "deno.exe"
+          & $SignToolPath verify /pa /v "dodo.exe"
       - name: Create archives
         run: |-
-          Compress-Archive -Path "deno.exe" -DestinationPath "deno-${{ matrix.target }}.zip" -Force
+          Compress-Archive -Path "dodo.exe" -DestinationPath "deno-${{ matrix.target }}.zip" -Force
           Compress-Archive -Path "denort.exe" -DestinationPath "denort-${{ matrix.target }}.zip" -Force
       - name: Upload Windows archives
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f

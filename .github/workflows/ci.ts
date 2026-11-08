@@ -875,7 +875,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               "trusted-signing-account-name": "deno-cli-code-signing",
               "certificate-profile-name": "deno-cli-code-signing-cert",
               "files-folder": "target/release",
-              "files-folder-filter": "deno.exe",
+              "files-folder-filter": "dodo.exe",
               "file-digest": "SHA256",
               "timestamp-rfc3161": "http://timestamp.acs.microsoft.com",
               "timestamp-digest": "SHA256",

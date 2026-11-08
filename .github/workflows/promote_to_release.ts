@@ -76,7 +76,7 @@ const windowsJob = job("promote-to-release-windows", {
         "trusted-signing-account-name": "deno-cli-code-signing",
         "certificate-profile-name": "deno-cli-code-signing-cert",
         "files-folder": ".",
-        "files-folder-filter": "deno.exe",
+        "files-folder-filter": "dodo.exe",
         "file-digest": "SHA256",
         "timestamp-rfc3161": "http://timestamp.acs.microsoft.com",
         "timestamp-digest": "SHA256",
@@ -95,13 +95,13 @@ const windowsJob = job("promote-to-release-windows", {
       run: [
         '$SignTool = Get-ChildItem -Path "C:\\Program Files*\\Windows Kits\\*\\bin\\*\\x64\\signtool.exe" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1',
         "$SignToolPath = $SignTool.FullName",
-        '& $SignToolPath verify /pa /v "deno.exe"',
+        '& $SignToolPath verify /pa /v "dodo.exe"',
       ],
     }),
     step({
       name: "Create archives",
       run: [
-        'Compress-Archive -Path "deno.exe" -DestinationPath "deno-${{ matrix.target }}.zip" -Force',
+        'Compress-Archive -Path "dodo.exe" -DestinationPath "deno-${{ matrix.target }}.zip" -Force',
         'Compress-Archive -Path "denort.exe" -DestinationPath "denort-${{ matrix.target }}.zip" -Force',
       ],
     }),

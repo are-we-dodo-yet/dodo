@@ -17,9 +17,9 @@ fn osvec(args: &[&str]) -> Vec<OsString> {
 }
 
 fn benches(c: &mut Criterion) {
-  let bare = osvec(&["deno", "run", "script.ts"]);
+  let bare = osvec(&["dodo", "run", "script.ts"]);
   let with_flags = osvec(&[
-    "deno",
+    "dodo",
     "run",
     "-A",
     "--no-check",
@@ -28,7 +28,7 @@ fn benches(c: &mut Criterion) {
     "arg2",
   ]);
   let complex = osvec(&[
-    "deno",
+    "dodo",
     "run",
     "--allow-read=/a,/b",
     "--allow-net=example.com",

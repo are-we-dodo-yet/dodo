@@ -10,7 +10,7 @@ if (CHANNEL !== "rc" && CHANNEL !== "lts") {
   throw new Error(`Invalid channel: ${CHANNEL}`);
 }
 
-const BINARIES = ["deno.exe", "denort.exe"];
+const BINARIES = ["dodo.exe", "denort.exe"];
 
 async function patchBinary(inputPath: string, channel: string) {
   console.log(`Patching ${inputPath}...`);
