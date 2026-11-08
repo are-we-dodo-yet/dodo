@@ -89,6 +89,7 @@ integration_test!(
   import_sync,
   import_sync_existing,
   import_sync_throw,
+  import_sync_with_source,
   main_module_handler,
   module_types,
   pending_unref_op_tla,
