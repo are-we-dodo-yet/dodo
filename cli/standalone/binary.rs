@@ -1477,7 +1477,7 @@ impl<'a> DenoCompileBinaryWriter<'a> {
               continue;
             }
             if path.ends_with("node_modules") {
-              builder.add_dir_recursive(&path)?;
+              builder.add_node_modules_dir_recursive(&path)?;
             } else {
               pending_dirs.push_back(path);
             }

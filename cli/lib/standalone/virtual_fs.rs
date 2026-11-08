@@ -524,6 +524,8 @@ pub struct VfsBuilder {
   /// - `None` = path is already canonical (no changes needed)
   /// - `Some(path)` = path was aliased, use this canonical form instead
   canonical_path_cache: HashMap<PathBuf, Option<PathBuf>>,
+  added_dirs: HashSet<PathBuf>,
+  include_symlinked_package_deps: bool,
 }
 
 impl Default for VfsBuilder {
@@ -553,6 +555,8 @@ impl VfsBuilder {
       },
       exclude_paths: Default::default(),
       canonical_path_cache: Default::default(),
+      added_dirs: Default::default(),
+      include_symlinked_package_deps: false,
     }
   }
 
@@ -621,11 +625,25 @@ impl VfsBuilder {
     self.add_dir_recursive_not_symlink(&canonical)
   }
 
+  pub fn add_node_modules_dir_recursive(
+    &mut self,
+    path: &Path,
+  ) -> Result<(), AnyError> {
+    let previous =
+      std::mem::replace(&mut self.include_symlinked_package_deps, true);
+    let result = self.add_dir_recursive(path);
+    self.include_symlinked_package_deps = previous;
+    result
+  }
+
   fn add_dir_recursive_not_symlink(
     &mut self,
     dir_path: &CanonicalPath,
   ) -> Result<(), AnyError> {
     if self.exclude_paths.contains(dir_path.as_ref()) {
+      return Ok(());
+    }
+    if !self.added_dirs.insert(dir_path.as_ref().to_path_buf()) {
       return Ok(());
     }
     self.add_dir_raw(dir_path);
@@ -673,7 +691,19 @@ impl VfsBuilder {
             self.add_file_at_path_not_symlink(&target.into_canonicalized())
           }
           SymlinkTarget::Dir(_) => {
-            self.add_dir_recursive_not_symlink(&target.into_canonicalized())
+            let target = target.into_canonicalized();
+            let package_node_modules_dir =
+              if self.include_symlinked_package_deps {
+                package_node_modules_dir(target.as_ref())
+              } else {
+                None
+              };
+            match package_node_modules_dir {
+              Some(dir) => self.add_dir_recursive_not_symlink(&CanonicalPath(
+                Cow::Borrowed(dir),
+              )),
+              None => self.add_dir_recursive_not_symlink(&target),
+            }
           }
         },
         Err(err) => {
@@ -1375,4 +1405,12 @@ impl SymlinkTarget {
     // the target will always be canonicalized
     CanonicalPath(Cow::Owned(self.into_path_buf()))
   }
+}
+
+fn package_node_modules_dir(package_dir: &Path) -> Option<&Path> {
+  let mut parent = package_dir.parent()?;
+  if parent.file_name()?.to_string_lossy().starts_with('@') {
+    parent = parent.parent()?;
+  }
+  (parent.file_name()? == "node_modules").then_some(parent)
 }
