@@ -37,7 +37,7 @@ function resolveDenoBin(): string {
   const fromEnv = Deno.env.get("DENO_BIN");
   if (fromEnv) return Deno.realPathSync(fromEnv);
   for (const profile of ["release", "debug"]) {
-    const candidate = `./target/${profile}/deno${exe}`;
+    const candidate = `./target/${profile}/dodo${exe}`;
     try {
       return Deno.realPathSync(candidate);
     } catch {
