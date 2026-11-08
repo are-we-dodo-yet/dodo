@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794178424321,
+  "lastUpdate": 1794178426716,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo",
   "entries": {
     "Execution Time": [
@@ -1965,6 +1965,95 @@ window.BENCHMARK_DATA = {
           {
             "name": "workers_startup",
             "value": 43564,
+            "unit": "syscalls"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "337f56337b1d92c832d6898dc056a1f824af0088",
+          "message": "fix: op_import_sync_with_source skips loading file imports (#18)\n\nSigned-off-by: Yaroslav Bolyukin <iam@lach.pw>",
+          "timestamp": "2026-11-08T22:19:59+01:00",
+          "tree_id": "fbef2b4aa34cc3ec7c44f12b56b029f1ad6fe45d",
+          "url": "https://github.com/are-we-dodo-yet/dodo/commit/337f56337b1d92c832d6898dc056a1f824af0088"
+        },
+        "date": 1794178425625,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "cold_hello",
+            "value": 1861,
+            "unit": "syscalls"
+          },
+          {
+            "name": "cold_relative_import",
+            "value": 1884,
+            "unit": "syscalls"
+          },
+          {
+            "name": "error_001",
+            "value": 1934,
+            "unit": "syscalls"
+          },
+          {
+            "name": "hello",
+            "value": 1858,
+            "unit": "syscalls"
+          },
+          {
+            "name": "no_check_hello",
+            "value": 1850,
+            "unit": "syscalls"
+          },
+          {
+            "name": "relative_import",
+            "value": 1876,
+            "unit": "syscalls"
+          },
+          {
+            "name": "response_string",
+            "value": 2089,
+            "unit": "syscalls"
+          },
+          {
+            "name": "text_decoder",
+            "value": 2015,
+            "unit": "syscalls"
+          },
+          {
+            "name": "text_encoder",
+            "value": 2646,
+            "unit": "syscalls"
+          },
+          {
+            "name": "text_encoder_into",
+            "value": 1923,
+            "unit": "syscalls"
+          },
+          {
+            "name": "workers_large_message",
+            "value": 75308,
+            "unit": "syscalls"
+          },
+          {
+            "name": "workers_round_robin",
+            "value": 7949,
+            "unit": "syscalls"
+          },
+          {
+            "name": "workers_startup",
+            "value": 52206,
             "unit": "syscalls"
           }
         ]
