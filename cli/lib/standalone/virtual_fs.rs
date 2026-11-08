@@ -625,6 +625,15 @@ impl VfsBuilder {
     self.add_dir_recursive_not_symlink(&canonical)
   }
 
+  pub fn add_npm_package_dir_recursive(
+    &mut self,
+    package_dir: &Path,
+  ) -> Result<(), AnyError> {
+    self.add_dir_recursive(
+      package_node_modules_dir(package_dir).unwrap_or(package_dir),
+    )
+  }
+
   pub fn add_node_modules_dir_recursive(
     &mut self,
     path: &Path,
@@ -691,19 +700,14 @@ impl VfsBuilder {
             self.add_file_at_path_not_symlink(&target.into_canonicalized())
           }
           SymlinkTarget::Dir(_) => {
-            let target = target.into_canonicalized();
-            let package_node_modules_dir =
-              if self.include_symlinked_package_deps {
-                package_node_modules_dir(target.as_ref())
-              } else {
-                None
-              };
-            match package_node_modules_dir {
-              Some(dir) => self.add_dir_recursive_not_symlink(&CanonicalPath(
-                Cow::Borrowed(dir),
-              )),
-              None => self.add_dir_recursive_not_symlink(&target),
-            }
+            let target = target.into_path_buf();
+            let dir = self
+              .include_symlinked_package_deps
+              .then(|| package_node_modules_dir(&target))
+              .flatten()
+              .unwrap_or(&target);
+            self
+              .add_dir_recursive_not_symlink(&CanonicalPath(Cow::Borrowed(dir)))
           }
         },
         Err(err) => {
@@ -1407,6 +1411,11 @@ impl SymlinkTarget {
   }
 }
 
+/// Given a canonical npm package folder (e.g.
+/// `<.deno>/<id>/node_modules/@scope/name`), walk up to the enclosing
+/// `node_modules/` directory. Embedding from there picks up sibling
+/// symlinks the deno linker creates for direct dependencies, which the
+/// canonical folder itself doesn't contain.
 fn package_node_modules_dir(package_dir: &Path) -> Option<&Path> {
   let mut parent = package_dir.parent()?;
   if parent.file_name()?.to_string_lossy().starts_with('@') {
