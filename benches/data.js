@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794178429546,
+  "lastUpdate": 1794178432158,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo",
   "entries": {
     "Execution Time": [
@@ -2905,6 +2905,45 @@ window.BENCHMARK_DATA = {
           {
             "name": "deno",
             "value": 343.554,
+            "unit": "MiB"
+          },
+          {
+            "name": "rusty_v8_rlib",
+            "value": 197.227,
+            "unit": "MiB"
+          },
+          {
+            "name": "swc_rlib",
+            "value": 90.804,
+            "unit": "MiB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "337f56337b1d92c832d6898dc056a1f824af0088",
+          "message": "fix: op_import_sync_with_source skips loading file imports (#18)\n\nSigned-off-by: Yaroslav Bolyukin <iam@lach.pw>",
+          "timestamp": "2026-11-08T22:19:59+01:00",
+          "tree_id": "fbef2b4aa34cc3ec7c44f12b56b029f1ad6fe45d",
+          "url": "https://github.com/are-we-dodo-yet/dodo/commit/337f56337b1d92c832d6898dc056a1f824af0088"
+        },
+        "date": 1794178430833,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "deno",
+            "value": 343.56,
             "unit": "MiB"
           },
           {
