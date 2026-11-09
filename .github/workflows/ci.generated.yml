@@ -923,7 +923,7 @@ jobs:
         run: |-
           target/release/dodo -A tools/release/create_symcache.ts ./deno.symcache
           du -h deno.symcache
-          du -h target/release/deno
+          du -h target/release/dodo
       - name: Install rust-codesign
         if: '!(!contains(github.event.pull_request.labels.*.name, ''ci-full'') && github.event_name == ''pull_request'') && github.repository == ''denoland/deno'''
         env:
@@ -999,7 +999,7 @@ jobs:
         if: '!(!contains(github.event.pull_request.labels.*.name, ''ci-full'') && github.event_name == ''pull_request'') && github.repository == ''denoland/deno'' && (github.ref == ''refs/heads/main'' || startsWith(github.ref, ''refs/tags/''))'
         run: |-
           du -hd1 "./target/release"
-          du -ha  "./target/release/deno"
+          du -ha  "./target/release/dodo"
           du -ha  "./target/release/denort"
       - name: Check dodo binary
         if: '!(!contains(github.event.pull_request.labels.*.name, ''ci-full'') && github.event_name == ''pull_request'')'
@@ -2054,7 +2054,7 @@ jobs:
         run: |-
           target/release/dodo -A tools/release/create_symcache.ts ./deno.symcache
           du -h deno.symcache
-          du -h target/release/deno
+          du -h target/release/dodo
       - name: Install rust-codesign
         if: '!(!contains(github.event.pull_request.labels.*.name, ''ci-full'') && github.event_name == ''pull_request'') && github.repository == ''denoland/deno'''
         env:
@@ -2130,7 +2130,7 @@ jobs:
         if: '!(!contains(github.event.pull_request.labels.*.name, ''ci-full'') && github.event_name == ''pull_request'') && github.repository == ''denoland/deno'' && (github.ref == ''refs/heads/main'' || startsWith(github.ref, ''refs/tags/''))'
         run: |-
           du -hd1 "./target/release"
-          du -ha  "./target/release/deno"
+          du -ha  "./target/release/dodo"
           du -ha  "./target/release/denort"
       - name: Check dodo binary
         if: '!(!contains(github.event.pull_request.labels.*.name, ''ci-full'') && github.event_name == ''pull_request'')'
@@ -3077,7 +3077,7 @@ jobs:
         run: |-
           target/release/dodo -A tools/release/create_symcache.ts ./deno.symcache
           du -h deno.symcache
-          du -h target/release/deno
+          du -h target/release/dodo
       - name: Authenticate with Azure (windows)
         uses: azure/login@a457da9ea143d694b1b9c7c869ebb04ebe844ef5
         if: '!(!contains(github.event.pull_request.labels.*.name, ''ci-full'') && github.event_name == ''pull_request'') && github.repository == ''denoland/deno'' && (github.ref == ''refs/heads/main'' || startsWith(github.ref, ''refs/tags/''))'
@@ -3094,7 +3094,7 @@ jobs:
           trusted-signing-account-name: deno-cli-code-signing
           certificate-profile-name: deno-cli-code-signing-cert
           files-folder: target/release
-          files-folder-filter: deno.exe
+          files-folder-filter: dodo.exe
           file-digest: SHA256
           timestamp-rfc3161: 'http://timestamp.acs.microsoft.com'
           timestamp-digest: SHA256
@@ -3173,7 +3173,7 @@ jobs:
         if: '!(!contains(github.event.pull_request.labels.*.name, ''ci-full'') && github.event_name == ''pull_request'') && github.repository == ''denoland/deno'' && (github.ref == ''refs/heads/main'' || startsWith(github.ref, ''refs/tags/''))'
         run: |-
           du -hd1 "./target/release"
-          du -ha  "./target/release/deno"
+          du -ha  "./target/release/dodo"
           du -ha  "./target/release/denort"
       - name: Check dodo binary
         if: '!(!contains(github.event.pull_request.labels.*.name, ''ci-full'') && github.event_name == ''pull_request'')'
@@ -3978,7 +3978,7 @@ jobs:
         run: |-
           target/release/dodo -A tools/release/create_symcache.ts ./deno.symcache
           du -h deno.symcache
-          du -h target/release/deno
+          du -h target/release/dodo
       - name: Authenticate with Azure (windows)
         uses: azure/login@a457da9ea143d694b1b9c7c869ebb04ebe844ef5
         if: '!(!contains(github.event.pull_request.labels.*.name, ''ci-full'') && github.event_name == ''pull_request'') && github.repository == ''denoland/deno'' && (github.ref == ''refs/heads/main'' || startsWith(github.ref, ''refs/tags/''))'
@@ -3995,7 +3995,7 @@ jobs:
           trusted-signing-account-name: deno-cli-code-signing
           certificate-profile-name: deno-cli-code-signing-cert
           files-folder: target/release
-          files-folder-filter: deno.exe
+          files-folder-filter: dodo.exe
           file-digest: SHA256
           timestamp-rfc3161: 'http://timestamp.acs.microsoft.com'
           timestamp-digest: SHA256
@@ -4074,7 +4074,7 @@ jobs:
         if: '!(!contains(github.event.pull_request.labels.*.name, ''ci-full'') && github.event_name == ''pull_request'') && github.repository == ''denoland/deno'' && (github.ref == ''refs/heads/main'' || startsWith(github.ref, ''refs/tags/''))'
         run: |-
           du -hd1 "./target/release"
-          du -ha  "./target/release/deno"
+          du -ha  "./target/release/dodo"
           du -ha  "./target/release/denort"
       - name: Check dodo binary
         if: '!(!contains(github.event.pull_request.labels.*.name, ''ci-full'') && github.event_name == ''pull_request'')'
@@ -4658,7 +4658,7 @@ jobs:
         run: |-
           target/release/dodo -A tools/release/create_symcache.ts ./deno.symcache
           du -h deno.symcache
-          du -h target/release/deno
+          du -h target/release/dodo
       - name: Pre-release (linux)
         if: github.repository == 'denoland/deno'
         run: |-
@@ -4729,7 +4729,7 @@ jobs:
         if: 'github.ref == ''refs/heads/main'' || startsWith(github.ref, ''refs/tags/'')'
         run: |-
           du -hd1 "./target/release"
-          du -ha  "./target/release/deno"
+          du -ha  "./target/release/dodo"
           du -ha  "./target/release/denort"
       - name: Check dodo binary
         env:
@@ -6785,7 +6785,7 @@ jobs:
         run: |-
           target/release/dodo -A tools/release/create_symcache.ts ./deno.symcache
           du -h deno.symcache
-          du -h target/release/deno
+          du -h target/release/dodo
       - name: Pre-release (linux)
         if: '!(!contains(github.event.pull_request.labels.*.name, ''ci-full'') && github.event_name == ''pull_request'') && github.repository == ''denoland/deno'''
         run: |-
@@ -6856,7 +6856,7 @@ jobs:
         if: '!(!contains(github.event.pull_request.labels.*.name, ''ci-full'') && github.event_name == ''pull_request'') && (github.ref == ''refs/heads/main'' || startsWith(github.ref, ''refs/tags/''))'
         run: |-
           du -hd1 "./target/release"
-          du -ha  "./target/release/deno"
+          du -ha  "./target/release/dodo"
           du -ha  "./target/release/denort"
       - name: Check dodo binary
         if: '!(!contains(github.event.pull_request.labels.*.name, ''ci-full'') && github.event_name == ''pull_request'')'

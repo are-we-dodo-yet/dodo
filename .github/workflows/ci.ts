@@ -1150,7 +1150,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               run: [
                 "target/release/dodo -A tools/release/create_symcache.ts ./deno.symcache",
                 "du -h deno.symcache",
-                "du -h target/release/deno",
+                "du -h target/release/dodo",
               ],
               env: { NO_COLOR: 1 },
             },
@@ -1160,7 +1160,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               if: isMainOrTag,
               run: [
                 `du -hd1 "./target/${buildItem.profile}"`,
-                `du -ha  "./target/${buildItem.profile}/deno"`,
+                `du -ha  "./target/${buildItem.profile}/dodo"`,
                 `du -ha  "./target/${buildItem.profile}/denort"`,
               ],
             },
