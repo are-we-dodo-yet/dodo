@@ -333,7 +333,7 @@ fn add_deps_from_deno_json(
     Ok(Some((import_map, import_map_kind))) => (import_map, import_map_kind),
     Ok(None) => return,
     Err(e) => {
-      log::warn!("failed to parse imports from {}: {e}", &deno_json.specifier);
+      log::warn!("failed to parse imports from {}: {e}", deno_json.specifier);
       return;
     }
   };
@@ -799,7 +799,7 @@ impl DepManager {
                 self.jsr_fetch_resolver.package_version_info(&nv).await
               {
                 let specifier =
-                  ModuleSpecifier::parse(&format!("jsr:/{}/", &dep.req))
+                  ModuleSpecifier::parse(&format!("jsr:/{}/", dep.req))
                     .unwrap();
                 return Ok(Some((specifier, info)));
               }

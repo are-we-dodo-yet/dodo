@@ -3646,7 +3646,7 @@ fn parse_code_actions(
               {
                 text_edit.new_text = format!(
                   "// @ts-types=\"{}\"\n{}",
-                  deno_types_specifier, &text_edit.new_text
+                  deno_types_specifier, text_edit.new_text
                 );
               }
             }
@@ -3937,7 +3937,7 @@ fn get_parameters_from_parts(parts: &[SymbolDisplayPart]) -> Vec<String> {
           parameters.push(format!(
             "${{{}:{}}}",
             parameters.len() + 1,
-            &part.text
+            part.text
           ));
         }
       }
@@ -4306,7 +4306,7 @@ impl CompletionEntry {
     } else if SUPPORTED_BUILTIN_NODE_MODULES
       .contains(&raw.module_specifier.as_str())
       && let Ok(normalized) =
-        resolve_url(&format!("node:{}", &raw.module_specifier))
+        resolve_url(&format!("node:{}", raw.module_specifier))
     {
       self.auto_import_data =
         Some(CompletionNormalizedAutoImportData { raw, normalized });

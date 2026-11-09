@@ -1449,7 +1449,7 @@ pub fn resolve_redirect_from_headers(
         maybe_source: Some(source.into()),
       })
     })?;
-    log::debug!("Redirecting to {:?}...", &location_string);
+    log::debug!("Redirecting to {:?}...", location_string);
     resolve_url_from_location(request_url, location_string).map_err(|source| {
       Box::new(RedirectHeaderParseError {
         request_url: request_url.clone(),

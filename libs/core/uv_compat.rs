@@ -357,7 +357,7 @@ impl UvLoopInner {
   }
 
   pub(crate) fn has_alive_handles(&self) -> bool {
-    for (_, handle_ptr) in self.timer_handles.borrow().iter() {
+    for handle_ptr in self.timer_handles.borrow().values() {
       // SAFETY: Handle pointers in timer_handles are kept valid by the C caller until uv_close.
       let handle = unsafe { &**handle_ptr };
       if handle.flags & UV_HANDLE_ACTIVE != 0

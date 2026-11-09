@@ -221,18 +221,16 @@ impl NpmOverrides {
             }
           }
         }
-        NpmOverrideValue::Removed => match &rule.selector {
-          None => return None,
-          Some(selector) => {
-            if let Some(version) = resolved_version
-              && selector.matches(version)
-            {
-              return None;
-            }
-            // has selector but no version provided or version doesn't
-            // match — skip this removal rule
+        NpmOverrideValue::Removed => {
+          let selector = rule.selector.as_ref()?;
+          if let Some(version) = resolved_version
+            && selector.matches(version)
+          {
+            return None;
           }
-        },
+          // has selector but no version provided or version doesn't
+          // match — skip this removal rule
+        }
         NpmOverrideValue::Inherited => {
           // no self-override, only children — skip
         }

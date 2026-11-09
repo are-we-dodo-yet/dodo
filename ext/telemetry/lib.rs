@@ -2030,29 +2030,28 @@ impl OtelTracer {
     } = OTEL_GLOBALS
       .get()
       .ok_or_else(|| JsErrorBox::generic("otel not initialized"))?;
-    let parent_span_id;
-    let trace_id;
-    let trace_state;
-    let parent_span_context;
-    match parent {
-      Some(parent) => {
-        let parent = parent.0.borrow();
-        let ctx = match &**parent {
-          OtelSpanState::Recording(span) => &span.span_context,
-          OtelSpanState::Done(span_context) => span_context,
-        };
-        trace_id = ctx.trace_id();
-        trace_state = ctx.trace_state().clone();
-        parent_span_id = ctx.span_id();
-        parent_span_context = Some(ctx.clone());
-      }
-      None => {
-        trace_id = id_generator.new_trace_id();
-        trace_state = TraceState::NONE;
-        parent_span_id = SpanId::INVALID;
-        parent_span_context = None;
-      }
-    }
+    let (trace_id, trace_state, parent_span_id, parent_span_context) =
+      match parent {
+        Some(parent) => {
+          let parent = parent.0.borrow();
+          let ctx = match &**parent {
+            OtelSpanState::Recording(span) => &span.span_context,
+            OtelSpanState::Done(span_context) => span_context,
+          };
+          (
+            ctx.trace_id(),
+            ctx.trace_state().clone(),
+            ctx.span_id(),
+            Some(ctx.clone()),
+          )
+        }
+        None => (
+          id_generator.new_trace_id(),
+          TraceState::NONE,
+          SpanId::INVALID,
+          None,
+        ),
+      };
     let sampled = sampler.should_sample(parent_span_context.as_ref(), trace_id);
     let span_context = SpanContext::new(
       trace_id,

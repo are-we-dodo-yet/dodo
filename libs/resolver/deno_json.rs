@@ -467,8 +467,7 @@ impl CompilerOptionsPaths {
       Some((
         paths.iter().filter_map(move |path| {
           if let Some(path_suffix) = &path.suffix_if_wildcard {
-            Url::parse(&format!("{}{matched}{}", &path.prefix, path_suffix))
-              .ok()
+            Url::parse(&format!("{}{matched}{}", path.prefix, path_suffix)).ok()
           } else {
             Url::parse(&path.prefix).ok()
           }

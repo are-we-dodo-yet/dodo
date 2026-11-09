@@ -1207,7 +1207,7 @@ pub fn prepend_whitespace(
       .find_map(|(i, c)| (!c.is_whitespace()).then_some(i))
       .unwrap_or(0);
     let whitespace = &line[0..whitespace_end];
-    format!("{}{}", &whitespace, content)
+    format!("{}{}", whitespace, content)
   } else {
     content
   }

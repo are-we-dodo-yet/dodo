@@ -222,11 +222,7 @@ impl PathTrie {
     let mut node = self.root;
 
     for component in components {
-      if let Some(nd) = self.nodes[node].children.get(component).copied() {
-        node = nd;
-      } else {
-        return None;
-      }
+      node = self.nodes[node].children.get(component).copied()?;
     }
 
     Some(if self.nodes[node].exact {
@@ -503,7 +499,7 @@ fn add_jsr_meta_paths(
   url_to_path: &dyn Fn(&Url) -> Result<Option<PathBuf>, AnyError>,
 ) -> Result<(), AnyError> {
   for package in graph.packages.mappings().values() {
-    let Ok(base_url) = jsr_url.join(&format!("{}/", &package.name)) else {
+    let Ok(base_url) = jsr_url.join(&format!("{}/", package.name)) else {
       continue;
     };
     let keep = url_to_path(&base_url.join("meta.json").unwrap())?;

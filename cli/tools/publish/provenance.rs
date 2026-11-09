@@ -166,7 +166,7 @@ impl Predicate {
     })?;
     let rel_ref = std::env::var("GITHUB_WORKFLOW_REF")
       .unwrap_or_default()
-      .replace(&format!("{}/", &repo), "");
+      .replace(&format!("{}/", repo), "");
 
     let (workflow_path, workflow_ref) = if let Some(delimn) = rel_ref.find('@')
     {
@@ -198,7 +198,7 @@ impl Predicate {
         external_parameters: ExternalParameters {
           workflow: GhaWorkflow {
             ref_: workflow_ref.to_string(),
-            repository: format!("{}/{}", server_url, &repo),
+            repository: format!("{}/{}", server_url, repo),
             path: workflow_path.to_string(),
           },
         },
@@ -212,7 +212,7 @@ impl Predicate {
           },
         },
         resolved_dependencies: [ResourceDescriptor {
-          uri: format!("git+{}/{}@{}", server_url, &repo, github_ref,),
+          uri: format!("git+{}/{}@{}", server_url, repo, github_ref,),
           digest: Some(GhaResourceDigest {
             git_commit: github_sha,
           }),
@@ -220,7 +220,7 @@ impl Predicate {
       },
       run_details: RunDetails {
         builder: Builder {
-          id: format!("{}/{}", &GITHUB_BUILDER_ID_PREFIX, runner_env),
+          id: format!("{}/{}", GITHUB_BUILDER_ID_PREFIX, runner_env),
         },
         metadata: Metadata {
           invocation_id: format!(

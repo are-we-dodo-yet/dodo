@@ -514,7 +514,7 @@ fn compute_document_lint_diagnostics(
     }
     Some(Err(_)) => Ok(Vec::new()),
     None => {
-      error!("Missing file contents for: {}", &module.specifier);
+      error!("Missing file contents for: {}", module.specifier);
       Ok(Vec::new())
     }
   }

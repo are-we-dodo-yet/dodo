@@ -768,14 +768,14 @@ pub fn patch_react_cves<'a>(
   'outer: for (index, _) in code2.match_indices(PROTOTYPE_THEN) {
     let index = index + offset;
 
-    let after_equals;
-    if modified[index + PROTOTYPE_THEN.len()..].starts_with(" =") {
-      after_equals = index + PROTOTYPE_THEN.len() + 2;
-    } else if modified[index + PROTOTYPE_THEN.len()..].starts_with("=") {
-      after_equals = index + PROTOTYPE_THEN.len() + 1;
-    } else {
-      continue;
-    };
+    let after_equals =
+      if modified[index + PROTOTYPE_THEN.len()..].starts_with(" =") {
+        index + PROTOTYPE_THEN.len() + 2
+      } else if modified[index + PROTOTYPE_THEN.len()..].starts_with("=") {
+        index + PROTOTYPE_THEN.len() + 1
+      } else {
+        continue;
+      };
 
     let Some((end, _)) = modified[index..].char_indices().nth(300) else {
       break;

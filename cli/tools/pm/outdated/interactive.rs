@@ -216,8 +216,8 @@ fn render_package(
   write!(
     f,
     "{formatted_name}{name_pad} {:<current_width$} -> {}",
-    &package.current_version_string,
-    &package.new_version_highlighted,
+    package.current_version_string,
+    package.new_version_highlighted,
     name_pad = name_pad,
     formatted_name = package.formatted_name,
     current_width = current_width

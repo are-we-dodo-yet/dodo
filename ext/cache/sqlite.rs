@@ -278,7 +278,7 @@ impl SqliteBackedCache {
     if let Some(resource) = resource {
       let body_key = hash(&format!(
         "{}_{}",
-        &request_response.request_url,
+        request_response.request_url,
         now.as_nanos()
       ));
       let responses_dir =

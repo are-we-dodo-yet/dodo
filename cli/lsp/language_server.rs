@@ -1854,7 +1854,7 @@ impl Inner {
         } else {
           error!(
             "Error getting document symbols for \"{}\" from TypeScript: {:#}",
-            &module.specifier, err,
+            module.specifier, err,
           );
           LspError::internal_error()
         }
@@ -2428,7 +2428,7 @@ impl Inner {
         } else {
           error!(
             "Error getting code actions for \"{}\" from TypeScript: {:#}",
-            &module.specifier, err,
+            module.specifier, err,
           );
           LspError::internal_error()
         }
@@ -2682,7 +2682,7 @@ impl Inner {
             } else {
               error!(
                 "Error getting test code lenses for \"{}\": {:#}",
-                &module.specifier, err
+                module.specifier, err
               );
               LspError::internal_error()
             }
@@ -2699,7 +2699,7 @@ impl Inner {
         } else {
           error!(
             "Error getting TypeScript code lenses for \"{}\": {:#}",
-            &module.specifier, err,
+            module.specifier, err,
           );
           LspError::internal_error()
         }
@@ -3199,7 +3199,7 @@ impl Inner {
           } else {
             error!(
               "Unable to generate diagnostics for \"{}\": {:#}",
-              &module.specifier, err
+              module.specifier, err
             );
             LspError::internal_error()
           }
