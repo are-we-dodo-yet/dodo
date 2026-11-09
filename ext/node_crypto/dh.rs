@@ -1,7 +1,7 @@
 // Copyright 2018-2026 the Deno authors. MIT license.
 
-use num_bigint_dig::BigUint;
-use num_bigint_dig::RandBigInt;
+use num_bigint::BigRng010 as _;
+use num_bigint::BigUint;
 use num_traits::FromPrimitive;
 
 use super::primes::Prime;
@@ -24,9 +24,9 @@ impl PublicKey {
 pub struct PrivateKey(BigUint);
 
 impl PrivateKey {
-  pub fn new(exponent_bits: usize) -> Self {
-    let mut rng = rand::thread_rng();
-    let exponent = rng.gen_biguint(exponent_bits);
+  pub fn new(exponent_bits: u64) -> Self {
+    let mut rng = rand::rng();
+    let exponent = rng.random_biguint(exponent_bits);
     Self(exponent)
   }
 
@@ -62,7 +62,7 @@ impl DiffieHellman {
   where
     G: DiffieHellmanGroup,
   {
-    let private_key = PrivateKey::new(G::EXPONENT_BITS);
+    let private_key = PrivateKey::new(G::EXPONENT_BITS as u64);
 
     let generator = BigUint::from_usize(G::GENERATOR).unwrap();
     // MODULUS arrays are stored as big-endian u32 words (matching RFCs).
@@ -313,7 +313,8 @@ mod tests {
     G: DiffieHellmanGroup,
   {
     assert_eq!(G::EXPONENT_BITS, expected_bits);
-    let exponent_bits = DiffieHellman::group::<G>().private_key.0.bits();
+    let exponent_bits =
+      DiffieHellman::group::<G>().private_key.0.bits() as usize;
     assert!(
       exponent_bits > expected_bits / 2,
       "expected an exponent near {expected_bits} bits, got {exponent_bits} bits"

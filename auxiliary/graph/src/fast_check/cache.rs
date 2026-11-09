@@ -120,8 +120,8 @@ mod test {
       },
     );
 
-    let data = bincode::serialize(&item).unwrap();
-    let result = bincode::deserialize(&data).unwrap();
+    let data = serde_json::to_vec(&item).unwrap();
+    let result = serde_json::from_slice(&data).unwrap();
     assert_eq!(item, result);
   }
 }

@@ -18,7 +18,7 @@ use test_util::test;
 use test_util::testdata_path;
 use test_util::url_to_notebook_cell_uri;
 use test_util::url_to_uri;
-use tower_lsp::lsp_types as lsp;
+use tower_lsp_server::ls_types as lsp;
 use url::Url;
 
 #[test(timeout = 300)]

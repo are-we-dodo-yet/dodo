@@ -1810,7 +1810,7 @@ impl<'a, TNpmRegistryApi: NpmRegistryApi>
     }
 
     // Update root_packages
-    for (_nv, root_node_id) in self.graph.root_packages.iter_mut() {
+    for root_node_id in self.graph.root_packages.values_mut() {
       if let Some(new_id) = mappings.get(root_node_id) {
         *root_node_id = *new_id;
       }
@@ -3256,7 +3256,7 @@ impl<'a, TNpmRegistryApi: NpmRegistryApi>
     // Update peer_fallbacks to point to consolidated versions.
     // Auto-installed peers may have been resolved to a version that
     // was consolidated away (e.g., package-peer@1.2.0 → 1.1.0).
-    for (_name, node_id) in self.peer_fallbacks.iter_mut() {
+    for node_id in self.peer_fallbacks.values_mut() {
       let current_nv = {
         let Some(resolved_id) = self.graph.resolved_node_ids.get(*node_id)
         else {

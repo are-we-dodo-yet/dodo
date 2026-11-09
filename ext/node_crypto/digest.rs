@@ -113,6 +113,9 @@ pub(crate) use match_fixed_digest;
 
 macro_rules! match_fixed_digest_with_eager_block_buffer {
   ($algorithm_name:expr, fn <$type:ident>() $body:block, _ => $other:block) => {
+    crate::digest::match_fixed_digest_with_eager_block_buffer!($algorithm_name, fn <$type>() $body, sha3: fn <$type>() $body, _ => $other)
+  };
+  ($algorithm_name:expr, fn <$type:ident>() $body:block, sha3: fn <$sha3_type:ident>() $sha3_body:block, _ => $other:block) => {
     match $algorithm_name {
       "rsa-sm3" | "sm3" | "sm3withrsaencryption" => {
         type $type = ::sm3::Sm3;
@@ -126,7 +129,7 @@ macro_rules! match_fixed_digest_with_eager_block_buffer {
         type $type = crate::md5_sha1::Md5Sha1;
         $body
       }
-      _ => crate::digest::match_fixed_digest_with_oid!($algorithm_name, fn <$type>() $body, _ => $other)
+      _ => crate::digest::match_fixed_digest_with_oid!($algorithm_name, fn <$type>() $body, sha3: fn <$sha3_type>() $sha3_body, _ => $other)
     }
   };
 }
@@ -134,6 +137,9 @@ pub(crate) use match_fixed_digest_with_eager_block_buffer;
 
 macro_rules! match_fixed_digest_with_oid {
   ($algorithm_name:expr, fn $(<$type:ident>)?($($hash_algorithm:ident: Option<RsaPssHashAlgorithm>)?) $body:block, _ => $other:block) => {
+    crate::digest::match_fixed_digest_with_oid!($algorithm_name, fn $(<$type>)?($($hash_algorithm: Option<RsaPssHashAlgorithm>)?) $body, sha3: fn $(<$type>)?($($hash_algorithm: Option<RsaPssHashAlgorithm>)?) $body, _ => $other)
+  };
+  ($algorithm_name:expr, fn $(<$type:ident>)?($($hash_algorithm:ident: Option<RsaPssHashAlgorithm>)?) $body:block, sha3: fn $(<$sha3_type:ident>)?($($sha3_hash_algorithm:ident: Option<RsaPssHashAlgorithm>)?) $sha3_body:block, _ => $other:block) => {
     match $algorithm_name {
       "rsa-md5" | "md5" | "md5withrsaencryption" | "ssl3-md5" => {
         $(let $hash_algorithm = None;)?
@@ -188,24 +194,24 @@ macro_rules! match_fixed_digest_with_oid {
         $body
       }
       "rsa-sha3-224" | "id-rsassa-pkcs1-v1_5-with-sha3-224" | "sha3-224" => {
-        $(let $hash_algorithm = None;)?
-        $(type $type = ::sha3::Sha3_224;)?
-        $body
+        $(let $sha3_hash_algorithm = None;)?
+        $(type $sha3_type = ::sha3::Sha3_224;)?
+        $sha3_body
       }
       "rsa-sha3-256" | "id-rsassa-pkcs1-v1_5-with-sha3-256" | "sha3-256" => {
-        $(let $hash_algorithm = None;)?
-        $(type $type = ::sha3::Sha3_256;)?
-        $body
+        $(let $sha3_hash_algorithm = None;)?
+        $(type $sha3_type = ::sha3::Sha3_256;)?
+        $sha3_body
       }
       "rsa-sha3-384" | "id-rsassa-pkcs1-v1_5-with-sha3-384" | "sha3-384" => {
-        $(let $hash_algorithm = None;)?
-        $(type $type = ::sha3::Sha3_384;)?
-        $body
+        $(let $sha3_hash_algorithm = None;)?
+        $(type $sha3_type = ::sha3::Sha3_384;)?
+        $sha3_body
       }
       "rsa-sha3-512" | "id-rsassa-pkcs1-v1_5-with-sha3-512" | "sha3-512" => {
-        $(let $hash_algorithm = None;)?
-        $(type $type = ::sha3::Sha3_512;)?
-        $body
+        $(let $sha3_hash_algorithm = None;)?
+        $(type $sha3_type = ::sha3::Sha3_512;)?
+        $sha3_body
       }
       _ => $other,
     }
@@ -217,8 +223,14 @@ pub(crate) use match_fixed_digest_with_oid;
 pub enum Hash {
   FixedSize(Box<dyn DynDigest>),
 
-  Shake128(Box<sha3::Shake128>, /* output_length: */ Option<usize>),
-  Shake256(Box<sha3::Shake256>, /* output_length: */ Option<usize>),
+  Shake128(
+    Box<shake::Shake128>,
+    /* output_length: */ Option<usize>,
+  ),
+  Shake256(
+    Box<shake::Shake256>,
+    /* output_length: */ Option<usize>,
+  ),
 }
 
 use Hash::*;

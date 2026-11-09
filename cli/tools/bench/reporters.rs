@@ -237,7 +237,7 @@ impl BenchReporter for ConsoleReporter {
             "{}",
             colors::yellow(format!(
               "Warning: start() and end() calls in \"{}\" are ignored because it averages less\nthan 10µs per iteration. Remove them for better results.",
-              &desc.name
+              desc.name
             ))
           );
         }

@@ -11,9 +11,10 @@
 
 use std::borrow::Cow;
 
-use aes_kw::KekAes128;
-use aes_kw::KekAes192;
-use aes_kw::KekAes256;
+use aes_kw::KeyInit;
+use aes_kw::KwAes128;
+use aes_kw::KwAes192;
+use aes_kw::KwAes256;
 use deno_core::v8;
 use deno_core::webidl::ContextFn;
 use deno_core::webidl::WebIdlConverter;
@@ -256,10 +257,17 @@ fn aes_kw_wrap(
     return Err(CryptoError::DataInvalidSize);
   }
   let key = wrapping_key.raw.as_secret_key()?;
-  let wrapped = match key.len() {
-    16 => KekAes128::new(key.into()).wrap_vec(data),
-    24 => KekAes192::new(key.into()).wrap_vec(data),
-    32 => KekAes256::new(key.into()).wrap_vec(data),
+  let mut wrapped = vec![0u8; data.len() + 8];
+  match key.len() {
+    16 => KwAes128::new_from_slice(key)
+      .map_err(|_| CryptoError::InvalidKeyLength)?
+      .wrap_key(data, &mut wrapped),
+    24 => KwAes192::new_from_slice(key)
+      .map_err(|_| CryptoError::InvalidKeyLength)?
+      .wrap_key(data, &mut wrapped),
+    32 => KwAes256::new_from_slice(key)
+      .map_err(|_| CryptoError::InvalidKeyLength)?
+      .wrap_key(data, &mut wrapped),
     _ => return Err(CryptoError::InvalidKeyLength),
   }
   .map_err(|_| CryptoError::EncryptionError)?;
@@ -274,10 +282,17 @@ fn aes_kw_unwrap(
     return Err(CryptoError::DataInvalidSize);
   }
   let key = unwrapping_key.raw.as_secret_key()?;
-  let unwrapped = match key.len() {
-    16 => KekAes128::new(key.into()).unwrap_vec(data),
-    24 => KekAes192::new(key.into()).unwrap_vec(data),
-    32 => KekAes256::new(key.into()).unwrap_vec(data),
+  let mut unwrapped = vec![0u8; data.len().saturating_sub(8)];
+  match key.len() {
+    16 => KwAes128::new_from_slice(key)
+      .map_err(|_| CryptoError::InvalidKeyLength)?
+      .unwrap_key(data, &mut unwrapped),
+    24 => KwAes192::new_from_slice(key)
+      .map_err(|_| CryptoError::InvalidKeyLength)?
+      .unwrap_key(data, &mut unwrapped),
+    32 => KwAes256::new_from_slice(key)
+      .map_err(|_| CryptoError::InvalidKeyLength)?
+      .unwrap_key(data, &mut unwrapped),
     _ => return Err(CryptoError::InvalidKeyLength),
   }
   .map_err(|_| CryptoError::DecryptionError)?;

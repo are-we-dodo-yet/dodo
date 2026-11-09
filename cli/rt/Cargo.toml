@@ -26,7 +26,9 @@ harness = false
 
 [features]
 default = ["v8"]
+jsc = ["deno_core/jsc", "v8/jsc"]
 quickjs = ["deno_core/quickjs", "v8/quickjs"]
+system_jsc = ["deno_core/system_jsc", "v8/system_jsc"]
 v8 = ["deno_core/v8", "v8/v8"]
 
 [build-dependencies]
@@ -36,7 +38,6 @@ v8.workspace = true
 
 [dependencies]
 async-trait.workspace = true
-bincode.workspace = true
 deno_ast = { workspace = true, features = ["cjs"] }
 deno_cache_dir = { workspace = true, features = ["sync"] }
 deno_config = { workspace = true, features = ["sync", "workspace"] }

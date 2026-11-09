@@ -15,7 +15,7 @@ use deno_lint::linter::LintConfig;
 use deno_resolver::deno_json::CompilerOptionsKey;
 use deno_runtime::tokio_util::create_basic_runtime;
 use once_cell::sync::Lazy;
-use tower_lsp::lsp_types as lsp;
+use tower_lsp_server::ls_types as lsp;
 
 use crate::args::LintFlags;
 use crate::args::LintOptions;

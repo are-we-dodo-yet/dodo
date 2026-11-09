@@ -13,9 +13,9 @@ use deno_core::serde_json::json;
 use deno_core::url::Url;
 use deno_runtime::tokio_util::create_basic_runtime;
 use tokio::sync::mpsc;
-use tower_lsp::jsonrpc::Error as LspError;
-use tower_lsp::jsonrpc::Result as LspResult;
-use tower_lsp::lsp_types as lsp;
+use tower_lsp_server::jsonrpc::Error as LspError;
+use tower_lsp_server::jsonrpc::Result as LspResult;
+use tower_lsp_server::ls_types as lsp;
 
 use super::definitions::TestModule;
 use super::execution::TestRun;

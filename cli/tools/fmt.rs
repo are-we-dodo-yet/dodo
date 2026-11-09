@@ -1706,6 +1706,7 @@ fn get_resolved_yaml_config(
     flow_map_prefer_single_line: None,
     trim_trailing_whitespaces: true,
     trim_trailing_zero: false,
+    prose_wrap: pretty_yaml::config::ProseWrap::Preserve,
     ignore_comment_directive: "deno-fmt-ignore".into(),
   };
 

@@ -2,11 +2,11 @@
 
 use std::marker::PhantomData;
 
-use digest::generic_array::ArrayLength;
+use digest::array::ArraySize;
 
 pub trait RingDigestAlgo {
   fn algorithm() -> &'static aws_lc_rs::digest::Algorithm;
-  type OutputSize: ArrayLength<u8> + 'static;
+  type OutputSize: ArraySize + 'static;
 }
 
 pub struct RingDigest<Algo: RingDigestAlgo> {

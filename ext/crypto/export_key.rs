@@ -6,7 +6,7 @@ use const_oid::AssociatedOid;
 use const_oid::ObjectIdentifier;
 use deno_core::ToV8;
 use deno_core::convert::Uint8Array;
-use elliptic_curve::sec1::ToEncodedPoint;
+use elliptic_curve::sec1::ToSec1Point;
 use p256::pkcs8::DecodePrivateKey;
 use rsa::pkcs1::der::Decode;
 use rsa::pkcs8::der::Encode;
@@ -183,7 +183,7 @@ pub(crate) fn export_key_rsa(
 
       // version is 0 when publickey is None
 
-      let pk_info = rsa::pkcs8::PrivateKeyInfo {
+      let pk_info = rsa::pkcs8::PrivateKeyInfoRef {
         public_key: None,
         algorithm: rsa::pkcs8::AlgorithmIdentifierRef {
           // rsaEncryption(1)
@@ -194,7 +194,7 @@ pub(crate) fn export_key_rsa(
             rsa::pkcs8::der::asn1::Null,
           )),
         },
-        private_key,
+        private_key: rsa::pkcs8::der::asn1::OctetStringRef::new(private_key)?,
       };
 
       // Infallible because we know the private key is valid.
@@ -205,7 +205,7 @@ pub(crate) fn export_key_rsa(
     }
     ExportKeyFormat::JwkPublic => {
       let public_key = key_data.as_rsa_public_key()?;
-      let public_key = rsa::pkcs1::RsaPublicKey::from_der(&public_key)
+      let public_key = rsa::pkcs1::RsaPublicKeyRef::from_der(&public_key)
         .map_err(|_| SharedError::FailedDecodePublicKey)?;
 
       Ok(ExportKeyResult::JwkPublicRsa {
@@ -215,7 +215,7 @@ pub(crate) fn export_key_rsa(
     }
     ExportKeyFormat::JwkPrivate => {
       let private_key = key_data.as_rsa_private_key()?;
-      let private_key = rsa::pkcs1::RsaPrivateKey::from_der(private_key)
+      let private_key = rsa::pkcs1::RsaPrivateKeyRef::from_der(private_key)
         .map_err(|_| SharedError::FailedDecodePrivateKey)?;
 
       Ok(ExportKeyResult::JwkPrivateRsa {
@@ -389,7 +389,7 @@ pub(crate) fn export_key_ec(
           let ec_key = p256::SecretKey::from_pkcs8_der(private_key)
             .map_err(|_| SharedError::FailedDecodePrivateKey)?;
 
-          let point = ec_key.public_key().to_encoded_point(false);
+          let point = ec_key.public_key().to_sec1_point(false);
           if let elliptic_curve::sec1::Coordinates::Uncompressed { x, y } =
             point.coordinates()
           {
@@ -407,7 +407,7 @@ pub(crate) fn export_key_ec(
           let ec_key = p384::SecretKey::from_pkcs8_der(private_key)
             .map_err(|_| SharedError::FailedDecodePrivateKey)?;
 
-          let point = ec_key.public_key().to_encoded_point(false);
+          let point = ec_key.public_key().to_sec1_point(false);
           if let elliptic_curve::sec1::Coordinates::Uncompressed { x, y } =
             point.coordinates()
           {
@@ -424,7 +424,7 @@ pub(crate) fn export_key_ec(
           let ec_key = p521::SecretKey::from_pkcs8_der(private_key)
             .map_err(|_| SharedError::FailedDecodePrivateKey)?;
 
-          let point = ec_key.public_key().to_encoded_point(false);
+          let point = ec_key.public_key().to_sec1_point(false);
           if let elliptic_curve::sec1::Coordinates::Uncompressed { x, y } =
             point.coordinates()
           {

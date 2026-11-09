@@ -3,40 +3,46 @@ use core::fmt;
 
 use digest::HashMarker;
 use digest::Output;
-use digest::Reset;
-use digest::core_api::AlgorithmName;
-use digest::core_api::BlockSizeUser;
-use digest::core_api::Buffer;
-use digest::core_api::BufferKindUser;
-use digest::core_api::CoreWrapper;
-use digest::core_api::FixedOutputCore;
-use digest::core_api::OutputSizeUser;
-use digest::core_api::UpdateCore;
+use digest::block_api::AlgorithmName;
+use digest::block_api::Block;
+use digest::block_api::BlockSizeUser;
+use digest::block_api::Buffer;
+use digest::block_api::BufferKindUser;
+use digest::block_api::Eager;
+use digest::block_api::FixedOutputCore;
+use digest::block_api::OutputSizeUser;
+use digest::block_api::Reset;
+use digest::block_api::UpdateCore;
+use md5::block_api::Md5Core;
+use sha1::block_api::Sha1Core;
 
-pub type Md5Sha1 = CoreWrapper<Md5Sha1Core>;
+digest::buffer_fixed!(
+  pub struct Md5Sha1(Md5Sha1Core);
+  impl: BaseFixedTraits AlgorithmName Default Clone HashMarker Reset FixedOutputReset;
+);
 
 pub struct Md5Sha1Core {
-  md5: md5::Md5Core,
-  sha1: sha1::Sha1Core,
+  md5: Md5Core,
+  sha1: Sha1Core,
 }
 
 impl HashMarker for Md5Sha1Core {}
 
 impl BlockSizeUser for Md5Sha1Core {
-  type BlockSize = sec1::consts::U64;
+  type BlockSize = digest::consts::U64;
 }
 
 impl BufferKindUser for Md5Sha1Core {
-  type BufferKind = digest::block_buffer::Eager;
+  type BufferKind = Eager;
 }
 
 impl OutputSizeUser for Md5Sha1Core {
-  type OutputSize = sec1::consts::U36;
+  type OutputSize = digest::consts::U36;
 }
 
 impl UpdateCore for Md5Sha1Core {
   #[inline]
-  fn update_blocks(&mut self, blocks: &[digest::core_api::Block<Self>]) {
+  fn update_blocks(&mut self, blocks: &[Block<Self>]) {
     self.md5.update_blocks(blocks);
     self.sha1.update_blocks(blocks);
   }
@@ -49,11 +55,11 @@ impl FixedOutputCore for Md5Sha1Core {
     buffer: &mut Buffer<Self>,
     out: &mut Output<Self>,
   ) {
-    let mut md5_output = Output::<md5::Md5Core>::default();
+    let mut md5_output = Output::<Md5Core>::default();
     self
       .md5
       .finalize_fixed_core(&mut buffer.clone(), &mut md5_output);
-    let mut sha1_output = Output::<sha1::Sha1Core>::default();
+    let mut sha1_output = Output::<Sha1Core>::default();
     self.sha1.finalize_fixed_core(buffer, &mut sha1_output);
     out[..16].copy_from_slice(&md5_output);
     out[16..].copy_from_slice(&sha1_output);

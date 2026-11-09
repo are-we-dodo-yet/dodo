@@ -102,7 +102,7 @@ pub fn format_test_for_summary(
 ) -> String {
   format!(
     "{} {}",
-    &desc.name,
+    desc.name,
     colors::gray(format!(
       "=> {}:{}:{}",
       to_relative_path_or_remote_url(cwd, &desc.location.file_name),
@@ -262,7 +262,7 @@ pub(super) fn report_summary(
       for (description, failure) in failures {
         if !failure.hide_in_summary() {
           let failure_title = format_test_for_summary(cwd, description);
-          writeln!(writer, "{}", &failure_title).ok();
+          writeln!(writer, "{}", failure_title).ok();
           writeln!(
             writer,
             "{}: {}",
@@ -279,7 +279,7 @@ pub(super) fn report_summary(
           "{} (uncaught error)",
           to_relative_path_or_remote_url(cwd, &origin)
         );
-        writeln!(writer, "{}", &failure_title).ok();
+        writeln!(writer, "{}", failure_title).ok();
         writeln!(
           writer,
           "{}: {}",

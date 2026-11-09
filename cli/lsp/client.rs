@@ -8,9 +8,9 @@ use deno_core::anyhow::bail;
 use deno_core::error::AnyError;
 use deno_core::serde_json::json;
 use deno_core::unsync::spawn;
-use lsp_types::Uri;
-use tower_lsp::lsp_types as lsp;
-use tower_lsp::lsp_types::ConfigurationItem;
+use tower_lsp_server::ls_types as lsp;
+use tower_lsp_server::ls_types::ConfigurationItem;
+use tower_lsp_server::ls_types::Uri;
 
 use super::config::SETTINGS_SECTION;
 use super::config::WorkspaceSettings;
@@ -35,7 +35,7 @@ impl std::fmt::Debug for Client {
 }
 
 impl Client {
-  pub fn from_tower(client: tower_lsp::Client) -> Self {
+  pub fn from_tower(client: tower_lsp_server::Client) -> Self {
     Self(Arc::new(TowerClient(client)))
   }
 
@@ -212,7 +212,7 @@ trait ClientTrait: Send + Sync {
 }
 
 #[derive(Clone)]
-struct TowerClient(tower_lsp::Client);
+struct TowerClient(tower_lsp_server::Client);
 
 #[async_trait]
 impl ClientTrait for TowerClient {

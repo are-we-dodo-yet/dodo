@@ -707,7 +707,7 @@ impl DiagnosticsByFolderRealIterator<'_> {
       if let Some(check_hash) = maybe_check_hash
         && self.type_check_cache.has_check_hash(check_hash)
       {
-        log::debug!("Already type checked {}", &check_group.referrer);
+        log::debug!("Already type checked {}", check_group.referrer);
         return Ok(Default::default());
       }
     }

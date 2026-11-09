@@ -171,6 +171,10 @@ impl<
     }
   }
 
+  #[allow(
+    clippy::result_large_err,
+    reason = "NpmModuleLoadError carries file path and referrer url"
+  )]
   pub async fn load<'a>(
     &self,
     specifier: Cow<'a, Url>,

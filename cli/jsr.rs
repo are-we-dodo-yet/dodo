@@ -190,7 +190,7 @@ impl JsrFetchResolver {
     }
     let fetch_package_version_info = || async {
       let meta_url = jsr_url()
-        .join(&format!("{}/{}_meta.json", &nv.name, &nv.version))
+        .join(&format!("{}/{}_meta.json", nv.name, nv.version))
         .ok()?;
       let file_fetcher = self.file_fetcher.clone();
       let file = file_fetcher

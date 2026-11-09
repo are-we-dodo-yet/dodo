@@ -3,8 +3,9 @@
 use base64::prelude::BASE64_URL_SAFE_NO_PAD;
 use curve25519_dalek::montgomery::MontgomeryPoint;
 use elliptic_curve::subtle::ConstantTimeEq;
-use rand::RngCore;
-use rand::rngs::OsRng;
+use rand::Rng;
+use rand::rand_core::UnwrapErr;
+use rand::rngs::SysRng;
 use spki::der::Encode;
 use spki::der::asn1::BitString;
 
@@ -27,7 +28,7 @@ const X25519_BASEPOINT_BYTES: [u8; 32] = [
 ];
 /// Rust-callable wrapper for [`op_crypto_generate_x25519_keypair`].
 pub fn generate_x25519_keypair(pkey: &mut [u8], pubkey: &mut [u8]) {
-  let mut rng = OsRng;
+  let mut rng = UnwrapErr(SysRng);
   rng.fill_bytes(pkey);
   let pkey: [u8; 32] = pkey.try_into().expect("Expected byteLength 32");
   pubkey.copy_from_slice(&x25519_dalek::x25519(pkey, X25519_BASEPOINT_BYTES));
@@ -84,13 +85,13 @@ pub(crate) fn export_spki_x25519(
 
 pub(crate) fn export_pkcs8_x25519(pkey: &[u8]) -> Result<Vec<u8>, X25519Error> {
   use rsa::pkcs1::der::Encode;
-  let pk_info = rsa::pkcs8::PrivateKeyInfo {
+  let pk_info = rsa::pkcs8::PrivateKeyInfoRef {
     public_key: None,
     algorithm: rsa::pkcs8::AlgorithmIdentifierRef {
       oid: X25519_OID,
       parameters: None,
     },
-    private_key: pkey,
+    private_key: rsa::pkcs8::der::asn1::OctetStringRef::new(pkey)?,
   };
   let mut buf = Vec::new();
   pk_info.encode_to_vec(&mut buf)?;

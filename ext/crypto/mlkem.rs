@@ -249,7 +249,7 @@ pub fn validate_public_key(variant: MlKemVariant, public_key: &[u8]) -> bool {
 }
 
 fn import_pkcs8(data: &[u8]) -> Result<MlKemPkcs8Import, MlKemError> {
-  let info = pkcs8::PrivateKeyInfo::from_der(data)
+  let info = pkcs8::PrivateKeyInfoRef::from_der(data)
     .map_err(|_| MlKemError::InvalidKeyData)?;
   let variant = MlKemVariant::from_oid(&info.algorithm.oid)
     .ok_or(MlKemError::InvalidKeyData)?;
@@ -257,7 +257,7 @@ fn import_pkcs8(data: &[u8]) -> Result<MlKemPkcs8Import, MlKemError> {
     return Err(MlKemError::InvalidKeyData);
   }
 
-  let seed = match decode_pkcs8_inner(info.private_key) {
+  let seed = match decode_pkcs8_inner(info.private_key.as_bytes()) {
     Some(Pkcs8Inner::Seed(seed)) => seed,
     Some(Pkcs8Inner::Both { seed, expanded }) => {
       // Consistency check: the seed must expand to exactly `expandedKey`.
@@ -414,19 +414,20 @@ fn encode_pkcs8_seed(
   let seed_octet =
     OctetStringRef::new(seed).map_err(|_| MlKemError::OperationFailed)?;
   let inner = ContextSpecific {
-    tag_number: TagNumber::N0,
+    tag_number: TagNumber(0),
     tag_mode: TagMode::Implicit,
     value: seed_octet,
   }
   .to_der()
   .map_err(|_| MlKemError::OperationFailed)?;
 
-  let info = pkcs8::PrivateKeyInfo {
+  let info = pkcs8::PrivateKeyInfoRef {
     algorithm: pkcs8::AlgorithmIdentifierRef {
       oid: variant.oid(),
       parameters: None,
     },
-    private_key: &inner,
+    private_key: OctetStringRef::new(&inner)
+      .map_err(|_| MlKemError::OperationFailed)?,
     public_key: None,
   };
   let mut buf = Vec::new();
@@ -486,9 +487,9 @@ mod tests {
     let seed = [3u8; ML_KEM_SEED_SIZE];
     let der = encode_pkcs8_seed(variant, &seed).unwrap();
     // The OID identifies the variant and the seed round-trips.
-    let info = pkcs8::PrivateKeyInfo::from_der(&der).unwrap();
+    let info = pkcs8::PrivateKeyInfoRef::from_der(&der).unwrap();
     assert_eq!(MlKemVariant::from_oid(&info.algorithm.oid), Some(variant));
-    match decode_pkcs8_inner(info.private_key).unwrap() {
+    match decode_pkcs8_inner(info.private_key.as_bytes()).unwrap() {
       Pkcs8Inner::Seed(decoded) => assert_eq!(decoded, seed),
       _ => panic!("expected seed form"),
     }
@@ -563,12 +564,12 @@ mod tests {
     let (expanded, _) = variant.expand_seed(&seed).unwrap();
 
     let wrap = |inner: &[u8]| -> Vec<u8> {
-      let info = pkcs8::PrivateKeyInfo {
+      let info = pkcs8::PrivateKeyInfoRef {
         algorithm: pkcs8::AlgorithmIdentifierRef {
           oid: variant.oid(),
           parameters: None,
         },
-        private_key: inner,
+        private_key: OctetStringRef::new(inner).unwrap(),
         public_key: None,
       };
       let mut buf = Vec::new();

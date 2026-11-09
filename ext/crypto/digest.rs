@@ -554,11 +554,6 @@ fn run_xof(
   algorithm: SubtleDigestXof,
   data: &[u8],
 ) -> Result<Vec<u8>, CryptoError> {
-  use sha3::digest::ExtendableOutput;
-  use sha3::digest::Update;
-  use sha3::digest::XofReader;
-  use sha3::digest::core_api::CoreWrapper;
-
   // Validate `outputLength` and `domainSeparation` per the JS body. The
   // JS code threw `OperationError` DOMExceptions for these; the
   // `InvalidXofParameters` variant maps to the same class.
@@ -609,44 +604,40 @@ fn run_xof(
       customization,
       ..
     } => {
-      let core = sha3::CShake128Core::new_with_function_name(
+      cshake::<168>(
         function_name.as_deref().unwrap_or(&[]),
         customization.as_deref().unwrap_or(&[]),
+        data,
+        &mut out,
       );
-      let mut h: sha3::CShake128 = CoreWrapper::from_core(core);
-      h.update(data);
-      h.finalize_xof().read(&mut out);
     }
     SubtleDigestXof::CShake256 {
       function_name,
       customization,
       ..
     } => {
-      let core = sha3::CShake256Core::new_with_function_name(
+      cshake::<136>(
         function_name.as_deref().unwrap_or(&[]),
         customization.as_deref().unwrap_or(&[]),
+        data,
+        &mut out,
       );
-      let mut h: sha3::CShake256 = CoreWrapper::from_core(core);
-      h.update(data);
-      h.finalize_xof().read(&mut out);
     }
     SubtleDigestXof::TurboShake128 {
       domain_separation, ..
     } => {
       let d = domain_separation.unwrap_or(0x1F);
-      let core = sha3::TurboShake128Core::new(d);
-      let mut h: sha3::TurboShake128 = CoreWrapper::from_core(core);
+      let mut h = KeccakSponge::<168>::turbo(d);
       h.update(data);
-      h.finalize_xof().read(&mut out);
+      h.squeeze(&mut out);
     }
     SubtleDigestXof::TurboShake256 {
       domain_separation, ..
     } => {
       let d = domain_separation.unwrap_or(0x1F);
-      let core = sha3::TurboShake256Core::new(d);
-      let mut h: sha3::TurboShake256 = CoreWrapper::from_core(core);
+      let mut h = KeccakSponge::<136>::turbo(d);
       h.update(data);
-      h.finalize_xof().read(&mut out);
+      h.squeeze(&mut out);
     }
     SubtleDigestXof::Kt128 { customization, .. }
     | SubtleDigestXof::KangarooTwelve { customization, .. } => {
@@ -707,14 +698,14 @@ fn kangaroo_twelve_turbo<const RATE: usize>(
   input.extend_from_slice(&encode_len(customization.len()));
 
   if input.len() <= KT_CHUNK_SIZE {
-    let mut h = TurboShakeNode::<RATE>::new(0x07);
+    let mut h = KeccakSponge::<RATE>::turbo(0x07);
     h.update(&input);
     h.squeeze(out);
     return;
   }
 
   let cv_len = if RATE == 168 { 32 } else { 64 };
-  let mut h = TurboShakeNode::<RATE>::new(0x06);
+  let mut h = KeccakSponge::<RATE>::turbo(0x06);
   h.update(&input[..KT_CHUNK_SIZE]);
   h.update(&[0x03, 0, 0, 0, 0, 0, 0, 0]);
 
@@ -722,7 +713,7 @@ fn kangaroo_twelve_turbo<const RATE: usize>(
   let mut tail = &input[KT_CHUNK_SIZE..];
   while !tail.is_empty() {
     let take = tail.len().min(KT_CHUNK_SIZE);
-    let mut inner = TurboShakeNode::<RATE>::new(0x0b);
+    let mut inner = KeccakSponge::<RATE>::turbo(0x0b);
     inner.update(&tail[..take]);
     let mut cv = vec![0u8; cv_len];
     inner.squeeze(&mut cv);
@@ -736,20 +727,76 @@ fn kangaroo_twelve_turbo<const RATE: usize>(
   h.squeeze(out);
 }
 
-struct TurboShakeNode<const RATE: usize> {
+fn left_encode(mut value: usize) -> Vec<u8> {
+  let mut bytes = Vec::new();
+  loop {
+    bytes.push((value & 0xff) as u8);
+    value >>= 8;
+    if value == 0 {
+      break;
+    }
+  }
+  bytes.push(bytes.len() as u8);
+  bytes.reverse();
+  bytes
+}
+
+fn cshake<const RATE: usize>(
+  function_name: &[u8],
+  customization: &[u8],
+  data: &[u8],
+  out: &mut [u8],
+) {
+  if function_name.is_empty() && customization.is_empty() {
+    let mut h = KeccakSponge::<RATE>::keccak(0x1F);
+    h.update(data);
+    h.squeeze(out);
+    return;
+  }
+
+  let mut h = KeccakSponge::<RATE>::keccak(0x04);
+  h.update(&left_encode(RATE));
+  h.update(&left_encode(function_name.len() * 8));
+  h.update(function_name);
+  h.update(&left_encode(customization.len() * 8));
+  h.update(customization);
+  h.pad_block();
+  h.update(data);
+  h.squeeze(out);
+}
+
+struct KeccakSponge<const RATE: usize> {
   state: [u64; 25],
   offset: usize,
   delim: u8,
   squeezing: bool,
+  permute: fn(&mut [u64; 25]),
 }
 
-impl<const RATE: usize> TurboShakeNode<RATE> {
-  fn new(delim: u8) -> Self {
+impl<const RATE: usize> KeccakSponge<RATE> {
+  fn turbo(delim: u8) -> Self {
+    Self::new(delim, tiny_keccak::keccakp)
+  }
+
+  fn keccak(delim: u8) -> Self {
+    Self::new(delim, tiny_keccak::keccakf)
+  }
+
+  fn new(delim: u8, permute: fn(&mut [u64; 25])) -> Self {
     Self {
       state: [0; 25],
       offset: 0,
       delim,
       squeezing: false,
+      permute,
+    }
+  }
+
+  fn pad_block(&mut self) {
+    debug_assert!(!self.squeezing);
+    if self.offset != 0 {
+      (self.permute)(&mut self.state);
+      self.offset = 0;
     }
   }
 
@@ -761,7 +808,7 @@ impl<const RATE: usize> TurboShakeNode<RATE> {
       self.offset += take;
       input = &input[take..];
       if self.offset == RATE {
-        tiny_keccak::keccakp(&mut self.state);
+        (self.permute)(&mut self.state);
         self.offset = 0;
       }
     }
@@ -771,14 +818,14 @@ impl<const RATE: usize> TurboShakeNode<RATE> {
     if !self.squeezing {
       xor_into_state(&mut self.state, self.offset, &[self.delim]);
       xor_into_state(&mut self.state, RATE - 1, &[0x80]);
-      tiny_keccak::keccakp(&mut self.state);
+      (self.permute)(&mut self.state);
       self.offset = 0;
       self.squeezing = true;
     }
 
     while !out.is_empty() {
       if self.offset == RATE {
-        tiny_keccak::keccakp(&mut self.state);
+        (self.permute)(&mut self.state);
         self.offset = 0;
       }
       let take = out.len().min(RATE - self.offset);

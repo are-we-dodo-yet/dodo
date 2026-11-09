@@ -39,31 +39,29 @@ const FIX_USE_IMPORT_DECL_DESC: &str = "Use an import declaration";
 #[allow(clippy::enum_variant_names)]
 #[derive(Display)]
 enum Message {
-  #[display(fmt = "All import identifiers are used in types")]
+  #[display("All import identifiers are used in types")]
   AllImportIdentsUsedInTypes,
-  #[display(fmt = "Import identifier only used in types")]
+  #[display("Import identifier only used in types")]
   ImportIdentUsedInTypes,
-  #[display(fmt = "All export identifiers are used in types")]
+  #[display("All export identifiers are used in types")]
   AllExportIdentsUsedInTypes,
-  #[display(fmt = "Export identifier only used in types")]
+  #[display("Export identifier only used in types")]
   ExportIdentUsedInTypes,
-  #[display(
-    fmt = "Empty export declaration elided without verbatim-module-syntax"
-  )]
+  #[display("Empty export declaration elided without verbatim-module-syntax")]
   ExportDeclarationElided,
 }
 
 #[derive(Display)]
 enum Hint {
   #[display(
-    fmt = "Change `import` to `import type` and optionally add an explicit side effect import"
+    "Change `import` to `import type` and optionally add an explicit side effect import"
   )]
   ChangeImportToImportType,
-  #[display(fmt = "Change `export` to `export type`")]
+  #[display("Change `export` to `export type`")]
   ChangeExportToExportType,
-  #[display(fmt = "Add a `type` keyword before the identifier")]
+  #[display("Add a `type` keyword before the identifier")]
   AddTypeKeyword,
-  #[display(fmt = "Change to side effect import for consistent behavior")]
+  #[display("Change to side effect import for consistent behavior")]
   ChangeSideEffectImport,
 }
 

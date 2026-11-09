@@ -8,12 +8,12 @@
 use std::ops::Index;
 use std::ops::IndexMut;
 
-use tower_lsp::lsp_types as lsp;
-use tower_lsp::lsp_types::SemanticToken;
-use tower_lsp::lsp_types::SemanticTokenModifier;
-use tower_lsp::lsp_types::SemanticTokenType;
-use tower_lsp::lsp_types::SemanticTokens;
-use tower_lsp::lsp_types::SemanticTokensLegend;
+use tower_lsp_server::ls_types as lsp;
+use tower_lsp_server::ls_types::SemanticToken;
+use tower_lsp_server::ls_types::SemanticTokenModifier;
+use tower_lsp_server::ls_types::SemanticTokenType;
+use tower_lsp_server::ls_types::SemanticTokens;
+use tower_lsp_server::ls_types::SemanticTokensLegend;
 
 pub const MODIFIER_MASK: u32 = 255;
 pub const TYPE_OFFSET: u32 = 8;

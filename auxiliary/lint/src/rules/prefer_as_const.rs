@@ -29,14 +29,14 @@ const CODE: &str = "prefer-as-const";
 #[derive(Display)]
 enum PreferAsConstMessage {
   #[display(
-    fmt = "Expected a `const` assertion instead of a literal type annotation"
+    "Expected a `const` assertion instead of a literal type annotation"
   )]
   ExpectedConstAssertion,
 }
 
 #[derive(Display)]
 enum PreferAsConstHint {
-  #[display(fmt = "Remove a literal type annotation and add `as const`")]
+  #[display("Remove a literal type annotation and add `as const`")]
   AddAsConst,
 }
 

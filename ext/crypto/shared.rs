@@ -5,11 +5,12 @@ use std::borrow::Cow;
 use deno_core::JsBuffer;
 use deno_core::ToV8;
 use deno_core::convert::Uint8Array;
-use elliptic_curve::sec1::ToEncodedPoint;
+use elliptic_curve::sec1::ToSec1Point;
 use p256::pkcs8::DecodePrivateKey;
-use rsa::RsaPrivateKey;
+use rsa::PrivateKey as RsaPrivateKey;
 use rsa::pkcs1::DecodeRsaPrivateKey;
 use rsa::pkcs1::EncodeRsaPublicKey;
+use rsa::rand_core::CryptoRng;
 use serde::Deserialize;
 use serde::Serialize;
 use sha1::Sha1;
@@ -17,6 +18,7 @@ use sha2::Digest;
 use sha2::Sha256;
 use sha2::Sha384;
 use sha2::Sha512;
+use sha2::digest::FixedOutputReset;
 use sha3::Sha3_256;
 use sha3::Sha3_384;
 use sha3::Sha3_512;
@@ -49,31 +51,71 @@ pub enum ShaHash {
   Sha3_512,
 }
 
-fn rsa_oaep_padding_for_digest<D>(label: &[u8]) -> rsa::Oaep
+fn rsa_oaep_padding<D>(label: &[u8]) -> rsa::Oaep<D>
 where
-  D: Digest + sha2::digest::DynDigest + Default + Send + Sync + 'static,
+  D: Digest + FixedOutputReset,
 {
-  let mut digest = D::default();
-  Digest::update(&mut digest, label);
+  rsa::Oaep::new_with_label(label)
+}
 
-  // `rsa::Oaep` only accepts string labels. Preloading the label bytes into
-  // the label digest and passing an empty label preserves arbitrary bytes.
-  rsa::Oaep {
-    digest: Box::new(digest),
-    mgf_digest: Box::<D>::default(),
-    label: None,
+pub(crate) fn rsa_oaep_encrypt<R: CryptoRng + ?Sized>(
+  public_key: &rsa::PublicKey,
+  rng: &mut R,
+  hash: ShaHash,
+  label: &[u8],
+  data: &[u8],
+) -> rsa::Result<Vec<u8>> {
+  match hash {
+    ShaHash::Sha1 => {
+      public_key.encrypt(rng, rsa_oaep_padding::<Sha1>(label), data)
+    }
+    ShaHash::Sha256 => {
+      public_key.encrypt(rng, rsa_oaep_padding::<Sha256>(label), data)
+    }
+    ShaHash::Sha384 => {
+      public_key.encrypt(rng, rsa_oaep_padding::<Sha384>(label), data)
+    }
+    ShaHash::Sha512 => {
+      public_key.encrypt(rng, rsa_oaep_padding::<Sha512>(label), data)
+    }
+    ShaHash::Sha3_256 => {
+      public_key.encrypt(rng, rsa_oaep_padding::<Sha3_256>(label), data)
+    }
+    ShaHash::Sha3_384 => {
+      public_key.encrypt(rng, rsa_oaep_padding::<Sha3_384>(label), data)
+    }
+    ShaHash::Sha3_512 => {
+      public_key.encrypt(rng, rsa_oaep_padding::<Sha3_512>(label), data)
+    }
   }
 }
 
-pub(crate) fn rsa_oaep_padding(hash: ShaHash, label: &[u8]) -> rsa::Oaep {
+pub(crate) fn rsa_oaep_decrypt(
+  private_key: &RsaPrivateKey,
+  hash: ShaHash,
+  label: &[u8],
+  data: &[u8],
+) -> rsa::Result<Vec<u8>> {
   match hash {
-    ShaHash::Sha1 => rsa_oaep_padding_for_digest::<Sha1>(label),
-    ShaHash::Sha256 => rsa_oaep_padding_for_digest::<Sha256>(label),
-    ShaHash::Sha384 => rsa_oaep_padding_for_digest::<Sha384>(label),
-    ShaHash::Sha512 => rsa_oaep_padding_for_digest::<Sha512>(label),
-    ShaHash::Sha3_256 => rsa_oaep_padding_for_digest::<Sha3_256>(label),
-    ShaHash::Sha3_384 => rsa_oaep_padding_for_digest::<Sha3_384>(label),
-    ShaHash::Sha3_512 => rsa_oaep_padding_for_digest::<Sha3_512>(label),
+    ShaHash::Sha1 => private_key.decrypt(rsa_oaep_padding::<Sha1>(label), data),
+    ShaHash::Sha256 => {
+      private_key.decrypt(rsa_oaep_padding::<Sha256>(label), data)
+    }
+    ShaHash::Sha384 => {
+      private_key.decrypt(rsa_oaep_padding::<Sha384>(label), data)
+    }
+    ShaHash::Sha512 => {
+      private_key.decrypt(rsa_oaep_padding::<Sha512>(label), data)
+    }
+    ShaHash::Sha3_256 => {
+      private_key.decrypt(rsa_oaep_padding::<Sha3_256>(label), data)
+    }
+    ShaHash::Sha3_384 => {
+      private_key.decrypt(rsa_oaep_padding::<Sha3_384>(label), data)
+    }
+    ShaHash::Sha3_512 => {
+      private_key.decrypt(rsa_oaep_padding::<Sha3_512>(label), data)
+    }
   }
 }
 
@@ -268,49 +310,43 @@ impl RawKeyData {
     }
   }
 
-  pub fn as_ec_public_key_p256(
-    &self,
-  ) -> Result<p256::EncodedPoint, SharedError> {
+  pub fn as_ec_public_key_p256(&self) -> Result<p256::Sec1Point, SharedError> {
     match self {
       RawKeyData::Public(data) => p256::PublicKey::from_sec1_bytes(data)
-        .map(|p| p.to_encoded_point(false))
+        .map(|p| p.to_sec1_point(false))
         .map_err(|_| SharedError::ExpectedValidPublicECKey),
       RawKeyData::Private(data) => {
         let signing_key = p256::SecretKey::from_pkcs8_der(data)
           .map_err(|_| SharedError::ExpectedValidPrivateECKey)?;
-        Ok(signing_key.public_key().to_encoded_point(false))
+        Ok(signing_key.public_key().to_sec1_point(false))
       }
       _ => unreachable!(),
     }
   }
 
-  pub fn as_ec_public_key_p384(
-    &self,
-  ) -> Result<p384::EncodedPoint, SharedError> {
+  pub fn as_ec_public_key_p384(&self) -> Result<p384::Sec1Point, SharedError> {
     match self {
       RawKeyData::Public(data) => p384::PublicKey::from_sec1_bytes(data)
-        .map(|p| p.to_encoded_point(false))
+        .map(|p| p.to_sec1_point(false))
         .map_err(|_| SharedError::ExpectedValidPublicECKey),
       RawKeyData::Private(data) => {
         let signing_key = p384::SecretKey::from_pkcs8_der(data)
           .map_err(|_| SharedError::ExpectedValidPrivateECKey)?;
-        Ok(signing_key.public_key().to_encoded_point(false))
+        Ok(signing_key.public_key().to_sec1_point(false))
       }
       _ => unreachable!(),
     }
   }
 
-  pub fn as_ec_public_key_p521(
-    &self,
-  ) -> Result<p521::EncodedPoint, SharedError> {
+  pub fn as_ec_public_key_p521(&self) -> Result<p521::Sec1Point, SharedError> {
     match self {
       RawKeyData::Public(data) => p521::PublicKey::from_sec1_bytes(data)
-        .map(|p| p.to_encoded_point(false))
+        .map(|p| p.to_sec1_point(false))
         .map_err(|_| SharedError::ExpectedValidPublicECKey),
       RawKeyData::Private(data) => {
         let signing_key = p521::SecretKey::from_pkcs8_der(data)
           .map_err(|_| SharedError::ExpectedValidPrivateECKey)?;
-        Ok(signing_key.public_key().to_encoded_point(false))
+        Ok(signing_key.public_key().to_sec1_point(false))
       }
       _ => unreachable!(),
     }
@@ -407,54 +443,48 @@ impl V8RawKeyData {
     }
   }
 
-  pub fn as_ec_public_key_p256(
-    &self,
-  ) -> Result<p256::EncodedPoint, SharedError> {
+  pub fn as_ec_public_key_p256(&self) -> Result<p256::Sec1Point, SharedError> {
     match self {
       V8RawKeyData::Public(data) => p256::PublicKey::from_sec1_bytes(data)
-        .map(|p| p.to_encoded_point(false))
+        .map(|p| p.to_sec1_point(false))
         .map_err(|_| SharedError::ExpectedValidPublicECKey),
       V8RawKeyData::Private(data) => {
         let signing_key = p256::SecretKey::from_pkcs8_der(data)
           .map_err(|_| SharedError::ExpectedValidPrivateECKey)?;
-        Ok(signing_key.public_key().to_encoded_point(false))
+        Ok(signing_key.public_key().to_sec1_point(false))
       }
       // Should never reach here.
       V8RawKeyData::Secret(_) => unreachable!(),
     }
   }
 
-  pub fn as_ec_public_key_p384(
-    &self,
-  ) -> Result<p384::EncodedPoint, SharedError> {
+  pub fn as_ec_public_key_p384(&self) -> Result<p384::Sec1Point, SharedError> {
     match self {
       V8RawKeyData::Public(data) => p384::PublicKey::from_sec1_bytes(data)
-        .map(|p| p.to_encoded_point(false))
+        .map(|p| p.to_sec1_point(false))
         .map_err(|_| SharedError::ExpectedValidPublicECKey),
       V8RawKeyData::Private(data) => {
         let signing_key = p384::SecretKey::from_pkcs8_der(data)
           .map_err(|_| SharedError::ExpectedValidPrivateECKey)?;
-        Ok(signing_key.public_key().to_encoded_point(false))
+        Ok(signing_key.public_key().to_sec1_point(false))
       }
       // Should never reach here.
       V8RawKeyData::Secret(_) => unreachable!(),
     }
   }
 
-  pub fn as_ec_public_key_p521(
-    &self,
-  ) -> Result<p521::EncodedPoint, SharedError> {
+  pub fn as_ec_public_key_p521(&self) -> Result<p521::Sec1Point, SharedError> {
     match self {
       V8RawKeyData::Public(data) => {
         // public_key is a serialized EncodedPoint
         p521::PublicKey::from_sec1_bytes(data)
-          .map(|p| p.to_encoded_point(false))
+          .map(|p| p.to_sec1_point(false))
           .map_err(|_| SharedError::ExpectedValidPublicECKey)
       }
       V8RawKeyData::Private(data) => {
         let signing_key = p521::SecretKey::from_pkcs8_der(data)
           .map_err(|_| SharedError::ExpectedValidPrivateECKey)?;
-        Ok(signing_key.public_key().to_encoded_point(false))
+        Ok(signing_key.public_key().to_sec1_point(false))
       }
       // Should never reach here.
       V8RawKeyData::Secret(_) => unreachable!(),

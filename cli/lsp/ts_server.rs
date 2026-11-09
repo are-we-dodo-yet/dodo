@@ -9,9 +9,9 @@ use deno_core::futures::future::Shared;
 use deno_resolver::deno_json::CompilerOptionsKey;
 use indexmap::IndexMap;
 use indexmap::IndexSet;
-use lsp_types::Uri;
 use tokio_util::sync::CancellationToken;
-use tower_lsp::lsp_types as lsp;
+use tower_lsp_server::ls_types as lsp;
+use tower_lsp_server::ls_types::Uri;
 
 use super::documents::DocumentModule;
 use super::language_server::StateSnapshot;
@@ -220,7 +220,7 @@ impl TsServer {
           .map_err(|err| {
             anyhow!(
               "Error getting navigation tree for \"{}\": {:#}",
-              &module.specifier,
+              module.specifier,
               err,
             )
           })?;
@@ -254,7 +254,7 @@ impl TsServer {
           .map_err(|err| {
             anyhow!(
               "Error getting navigation tree for \"{}\": {:#}",
-              &module.specifier,
+              module.specifier,
               err,
             )
           })?;

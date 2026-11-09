@@ -60,8 +60,10 @@ fn latin1_ascii_to_utf16le(source: &[u8]) -> Uint8Array {
 
 fn utf16le_to_utf8(source: &[u8]) -> Result<Uint8Array, JsErrorBox> {
   let ucs2_vec: Vec<u16> = source
-    .chunks_exact(2)
-    .map(|chunk| u16::from_le_bytes([chunk[0], chunk[1]]))
+    .as_chunks::<2>()
+    .0
+    .iter()
+    .map(|chunk| u16::from_le_bytes(*chunk))
     .collect();
   String::from_utf16(&ucs2_vec)
     .map(|utf8_string| utf8_string.into_bytes().into())

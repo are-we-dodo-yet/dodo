@@ -1554,7 +1554,7 @@ impl<TSys: NpmCacheSys> LocalSetupCache<TSys> {
     let previous = sys
       .fs_read(&file_path)
       .ok()
-      .and_then(|data| bincode::deserialize(&data).ok());
+      .and_then(|data| serde_json::from_slice(&data).ok());
     Self {
       file_path,
       previous,
@@ -1571,7 +1571,7 @@ impl<TSys: NpmCacheSys> LocalSetupCache<TSys> {
     }
 
     const CACHE_PERM: u32 = 0o644;
-    bincode::serialize(&self.current).ok().and_then(|data| {
+    serde_json::to_vec(&self.current).ok().and_then(|data| {
       atomic_write_file_with_retries(
         &self.sys,
         &self.file_path,

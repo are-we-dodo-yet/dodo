@@ -2001,7 +2001,7 @@ async fn run_desktop(
                 log::debug!(
                   "[desktop] Server ready after {} attempts, navigating to {}",
                   i + 1,
-                  &url
+                  url
                 );
                 server_ready = true;
                 break;

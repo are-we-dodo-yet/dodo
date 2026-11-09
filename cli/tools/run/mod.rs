@@ -369,7 +369,7 @@ pub async fn eval_command(
   // definitely ESM. If absent, we look for CJS patterns to decide.
   let flags = if flags.ext.is_none() {
     let source_code = if eval_flags.print {
-      format!("console.log({})", &eval_flags.code)
+      format!("console.log({})", eval_flags.code)
     } else {
       eval_flags.code.clone()
     };

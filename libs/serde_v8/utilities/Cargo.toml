@@ -11,7 +11,9 @@ path = "lib.rs"
 
 [features]
 default = ["v8"]
+jsc = ["v8/jsc"]
 quickjs = ["v8/quickjs"]
+system_jsc = ["v8/system_jsc"]
 v8 = ["v8/v8"]
 
 [dependencies]

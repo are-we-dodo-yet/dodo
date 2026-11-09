@@ -1008,7 +1008,7 @@ async fn find_package_and_select_version_for_req(
     Ok(PackageAndVersion::Selected(SelectedPackage {
       import_name: add_package_req.alias,
       package_name: prefixed_name,
-      version_req: format!("{}{}", range_symbol, &nv.version),
+      version_req: format!("{}{}", range_symbol, nv.version),
       selected_version: nv.version.to_custom_string::<StackString>(),
     }))
   }

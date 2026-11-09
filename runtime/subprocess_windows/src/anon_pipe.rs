@@ -35,9 +35,9 @@ use std::mem;
 use std::os::windows::prelude::*;
 use std::ptr;
 
-use rand::RngCore;
-use rand::rngs::OsRng;
-use windows_sys::Win32::Foundation::BOOL;
+use rand::Rng;
+use rand::rand_core::UnwrapErr;
+use rand::rngs::SysRng;
 use windows_sys::Win32::Foundation::ERROR_ACCESS_DENIED;
 use windows_sys::Win32::Foundation::ERROR_BROKEN_PIPE;
 use windows_sys::Win32::Foundation::ERROR_HANDLE_EOF;
@@ -69,6 +69,7 @@ use windows_sys::Win32::System::Threading::CreateEventW;
 use windows_sys::Win32::System::Threading::GetCurrentProcessId;
 use windows_sys::Win32::System::Threading::INFINITE;
 use windows_sys::Win32::System::Threading::WaitForMultipleObjects;
+use windows_sys::core::BOOL;
 
 pub type Handle = std::os::windows::io::OwnedHandle;
 
@@ -250,7 +251,7 @@ pub fn anon_pipe(
 }
 
 fn pipe_name(process_id: u32) -> String {
-  let mut rng = OsRng;
+  let mut rng = UnwrapErr(SysRng);
   format!(
     r"\\.\pipe\__rust_anonymous_pipe1__.{}.{:016x}{:016x}",
     process_id,

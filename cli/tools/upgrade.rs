@@ -304,7 +304,7 @@ async fn print_release_notes(
     colors::gray("Release notes:"),
     colors::bold(format!(
       "https://github.com/denoland/deno/releases/tag/v{}",
-      &new_version,
+      new_version,
     ))
   );
   log::info!(
@@ -1079,7 +1079,7 @@ pub async fn upgrade(
       "{}",
       colors::gray(format!(
         "Deno is upgrading to version {}",
-        &selected_version_to_upgrade.version_or_hash
+        selected_version_to_upgrade.version_or_hash
       ))
     );
 
@@ -1094,35 +1094,34 @@ pub async fn upgrade(
     new_exe_path
   } else {
     // Full download path (existing behavior)
-    let archive_data = if let Some(data) =
-      try_read_cached_binary(sys, &cache_path)
-    {
-      log::info!(
-        "{}",
-        colors::gray(format!(
-          "Using cached binary from {}",
-          cache_path.display()
-        ))
-      );
-      data
-    } else {
-      let download_url = get_download_url(
-        &selected_version_to_upgrade.version_or_hash,
-        requested_version.release_channel(),
-      )?;
-      log::info!("{}", colors::gray(format!("Downloading {}", &download_url)));
-      let Some(data) = download_package(&client, download_url).await? else {
-        log::error!("Download could not be found, aborting");
-        if requested_version.release_channel() == ReleaseChannel::Canary {
-          log::error!("Note: canary releases are only kept for 30 days.");
-        }
-        deno_runtime::exit(1)
+    let archive_data =
+      if let Some(data) = try_read_cached_binary(sys, &cache_path) {
+        log::info!(
+          "{}",
+          colors::gray(format!(
+            "Using cached binary from {}",
+            cache_path.display()
+          ))
+        );
+        data
+      } else {
+        let download_url = get_download_url(
+          &selected_version_to_upgrade.version_or_hash,
+          requested_version.release_channel(),
+        )?;
+        log::info!("{}", colors::gray(format!("Downloading {}", download_url)));
+        let Some(data) = download_package(&client, download_url).await? else {
+          log::error!("Download could not be found, aborting");
+          if requested_version.release_channel() == ReleaseChannel::Canary {
+            log::error!("Note: canary releases are only kept for 30 days.");
+          }
+          deno_runtime::exit(1)
+        };
+
+        store_cached_binary(sys, &cache_path, &data);
+
+        data
       };
-
-      store_cached_binary(sys, &cache_path, &data);
-
-      data
-    };
 
     // verify checksum if provided
     if let Some(expected_checksum) = &upgrade_flags.checksum {
@@ -1133,7 +1132,7 @@ pub async fn upgrade(
       "{}",
       colors::gray(format!(
         "Deno is upgrading to version {}",
-        &selected_version_to_upgrade.version_or_hash
+        selected_version_to_upgrade.version_or_hash
       ))
     );
 
@@ -1722,7 +1721,7 @@ async fn try_delta_upgrade(
     let delta_url = get_delta_download_url(src, dst).ok()?;
     log::info!(
       "{}",
-      colors::gray(format!("Downloading delta patch {}", &delta_url))
+      colors::gray(format!("Downloading delta patch {}", delta_url))
     );
     let delta_data = match download_package(client, delta_url).await {
       Ok(Some(data)) => data,

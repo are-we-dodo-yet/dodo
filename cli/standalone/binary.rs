@@ -829,7 +829,7 @@ impl<'a> DenoCompileBinaryWriter<'a> {
         asset_module_urls.swap_remove(module.specifier());
         let maybe_cjs_export_analysis = maybe_cjs_analysis
           .as_ref()
-          .map(bincode::serialize)
+          .map(serde_json::to_vec)
           .transpose()?;
         if module.specifier().scheme() == "file" {
           let file_path = deno_path_util::url_to_file_path(module.specifier())?;
@@ -1002,7 +1002,7 @@ impl<'a> DenoCompileBinaryWriter<'a> {
             CjsExportAnalysisEntry::Error(err.to_string())
           }
         };
-        to_add.push((file_path, bincode::serialize(&analysis)?));
+        to_add.push((file_path, serde_json::to_vec(&analysis)?));
       }
     }
     for (file_path, analysis) in to_add {

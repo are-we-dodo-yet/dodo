@@ -2,7 +2,7 @@
 
 use deno_core::serde::Deserialize;
 use deno_core::serde::Serialize;
-use tower_lsp::lsp_types as lsp;
+use tower_lsp_server::ls_types as lsp;
 
 pub const PERFORMANCE_REQUEST: &str = "deno/performance";
 pub const INFERRED_TYPE_REQUEST: &str = "deno/inferredType";

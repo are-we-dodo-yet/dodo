@@ -37,18 +37,18 @@ impl CacheControl {
         "private" => ret.cachability = Some(Cachability::Private),
         "no-cache" => ret.cachability = Some(Cachability::NoCache),
         "only-if-cached" => ret.cachability = Some(Cachability::OnlyIfCached),
-        "max-age" => match val.and_then(|v| v.parse().ok()) {
-          Some(secs) => ret.max_age = Some(Duration::from_secs(secs)),
-          None => return None,
-        },
-        "max-stale" => match val.and_then(|v| v.parse().ok()) {
-          Some(secs) => ret.max_stale = Some(Duration::from_secs(secs)),
-          None => return None,
-        },
-        "min-fresh" => match val.and_then(|v| v.parse().ok()) {
-          Some(secs) => ret.min_fresh = Some(Duration::from_secs(secs)),
-          None => return None,
-        },
+        "max-age" => {
+          let secs = val.and_then(|v| v.parse().ok())?;
+          ret.max_age = Some(Duration::from_secs(secs));
+        }
+        "max-stale" => {
+          let secs = val.and_then(|v| v.parse().ok())?;
+          ret.max_stale = Some(Duration::from_secs(secs));
+        }
+        "min-fresh" => {
+          let secs = val.and_then(|v| v.parse().ok())?;
+          ret.min_fresh = Some(Duration::from_secs(secs));
+        }
         _ => (),
       };
     }

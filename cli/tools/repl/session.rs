@@ -583,7 +583,7 @@ impl ReplSession {
     let wrapped_line = if line.trim_start().starts_with('{')
       && !line.trim_end().ends_with(';')
     {
-      format!("({})", &line)
+      format!("({})", line)
     } else {
       line.to_string()
     };

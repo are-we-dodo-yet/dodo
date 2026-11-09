@@ -910,8 +910,8 @@ async fn ensure_scopes_and_packages_exist(
     ring_bell();
     log::warn!(
       "'@{}/{}' doesn't exist yet. Visit {} to create the package",
-      &create_package_info.scope,
-      &create_package_info.package,
+      create_package_info.scope,
+      create_package_info.package,
       colors::cyan_with_underline(&create_package_info.create_url)
     );
     log::warn!("{}", colors::gray("Waiting..."));

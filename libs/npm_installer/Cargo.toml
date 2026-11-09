@@ -17,7 +17,6 @@ path = "lib.rs"
 anyhow.workspace = true
 async-once-cell.workspace = true
 async-trait.workspace = true
-bincode.workspace = true
 boxed_error.workspace = true
 capacity_builder.workspace = true
 deno_cache_dir.workspace = true

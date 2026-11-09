@@ -8,7 +8,7 @@ use deno_ast::SourceRangedForSpanned;
 use deno_ast::swc::ast;
 use deno_ast::swc::ecma_visit::Visit;
 use deno_ast::swc::ecma_visit::VisitWith;
-use tower_lsp::lsp_types as lsp;
+use tower_lsp_server::ls_types as lsp;
 
 use super::analysis::source_range_to_lsp_range;
 

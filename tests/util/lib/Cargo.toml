@@ -13,13 +13,14 @@ repository.workspace = true
 path = "lib.rs"
 
 [features]
-lsp = ["dep:lsp-types", "dep:indexmap", "dep:percent-encoding"]
+lsp = ["dep:tower-lsp-server", "dep:indexmap", "dep:percent-encoding"]
 
 [dependencies]
 anyhow.workspace = true
 console_static_text.workspace = true
 crossterm.workspace = true
 deno_path_util.workspace = true
+faster-hex.workspace = true
 file_test_runner.workspace = true
 fluent-uri.workspace = true
 inventory.workspace = true
@@ -43,8 +44,8 @@ url.workspace = true
 
 # optional deps behind "lsp" feature
 indexmap = { workspace = true, optional = true }
-lsp-types = { workspace = true, optional = true }
 percent-encoding = { workspace = true, optional = true }
+tower-lsp-server = { workspace = true, optional = true }
 
 [target.'cfg(windows)'.dependencies]
 windows-sys = { workspace = true, features = ["Win32_Foundation", "Win32_Storage_FileSystem", "Win32_System_Console", "Win32_System_Pipes", "Win32_System_SystemInformation", "Win32_System_Threading"] }

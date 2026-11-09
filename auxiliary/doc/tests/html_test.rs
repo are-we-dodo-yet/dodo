@@ -2041,10 +2041,10 @@ fn assert_generated_html_is_valid(
       .from_utf8()
       .read_from(&mut content.as_bytes())
       .unwrap();
+    let errors = dom.errors.borrow();
     assert!(
-      dom.errors.is_empty(),
-      "generated HTML for {name} is not valid: {:?}",
-      dom.errors
+      errors.is_empty(),
+      "generated HTML for {name} is not valid: {errors:?}",
     );
   }
 }

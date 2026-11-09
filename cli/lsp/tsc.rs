@@ -55,7 +55,6 @@ use deno_runtime::deno_node::SUPPORTED_BUILTIN_NODE_MODULES;
 use deno_runtime::tokio_util::create_basic_runtime;
 use indexmap::IndexSet;
 use lazy_regex::lazy_regex;
-use lsp_types::Uri;
 use node_resolver::NodeResolutionKind;
 use node_resolver::ResolutionMode;
 use node_resolver::cache::NodeResolutionThreadLocalCache;
@@ -70,8 +69,9 @@ use tokio::sync::mpsc;
 use tokio::sync::mpsc::UnboundedReceiver;
 use tokio::sync::oneshot;
 use tokio_util::sync::CancellationToken;
-use tower_lsp::jsonrpc::Error as LspError;
-use tower_lsp::lsp_types as lsp;
+use tower_lsp_server::jsonrpc::Error as LspError;
+use tower_lsp_server::ls_types as lsp;
+use tower_lsp_server::ls_types::Uri;
 
 use super::code_lens;
 use super::code_lens::CodeLensData;
@@ -3646,7 +3646,7 @@ fn parse_code_actions(
               {
                 text_edit.new_text = format!(
                   "// @ts-types=\"{}\"\n{}",
-                  deno_types_specifier, &text_edit.new_text
+                  deno_types_specifier, text_edit.new_text
                 );
               }
             }
@@ -3937,7 +3937,7 @@ fn get_parameters_from_parts(parts: &[SymbolDisplayPart]) -> Vec<String> {
           parameters.push(format!(
             "${{{}:{}}}",
             parameters.len() + 1,
-            &part.text
+            part.text
           ));
         }
       }
@@ -4306,7 +4306,7 @@ impl CompletionEntry {
     } else if SUPPORTED_BUILTIN_NODE_MODULES
       .contains(&raw.module_specifier.as_str())
       && let Ok(normalized) =
-        resolve_url(&format!("node:{}", &raw.module_specifier))
+        resolve_url(&format!("node:{}", raw.module_specifier))
     {
       self.auto_import_data =
         Some(CompletionNormalizedAutoImportData { raw, normalized });

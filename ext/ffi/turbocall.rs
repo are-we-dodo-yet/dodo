@@ -209,21 +209,12 @@ pub(crate) fn compile_trampoline(
 
     // Define variables
 
-    let mut vidx = 0;
     for pt in &sym.parameter_types {
-      let target_v = Variable::new(vidx);
-      vidx += 1;
-
-      let wrapper_v = Variable::new(vidx);
-      vidx += 1;
-
-      f.declare_var(target_v, convert(pt, false).value_type);
-      f.declare_var(wrapper_v, convert(pt, true).value_type);
+      f.declare_var(convert(pt, false).value_type);
+      f.declare_var(convert(pt, true).value_type);
     }
 
-    let options_v = Variable::new(vidx);
-    vidx += 1;
-    f.declare_var(options_v, ISIZE);
+    let options_v = f.declare_var(ISIZE);
 
     // Go!
 
@@ -343,7 +334,7 @@ pub(crate) fn compile_trampoline(
     }
   }
 
-  f.finalize();
+  f.finalize(isa.frontend_config());
 
   cranelift::codegen::verifier::verify_function(&ctx.func, isa.flags())?;
 

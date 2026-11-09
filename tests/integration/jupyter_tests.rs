@@ -200,6 +200,7 @@ impl JupyterMsg {
   // `to_frames` serializes them, and stores it as a lowercase hex string.
   fn sign(&mut self, key: &str) {
     use hmac::Hmac;
+    use hmac::KeyInit;
     use hmac::Mac;
     use sha2::Sha256;
 

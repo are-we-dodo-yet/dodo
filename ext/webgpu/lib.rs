@@ -53,6 +53,7 @@ pub fn print_linker_flags(name: &str) {
     let dlls = [
       // webgpu
       "d3dcompiler_47",
+      "dxgi",
       "OPENGL32",
       "gdi32",
       "setupapi",
@@ -199,6 +200,7 @@ impl GPU {
         .unwrap_or_default(),
       force_fallback_adapter: options.force_fallback_adapter,
       compatible_surface: None, // windowless
+      apply_limit_buckets: false,
     };
     let id = instance.request_adapter(&descriptor, backends, None).ok()?;
 
