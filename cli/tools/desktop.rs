@@ -2275,6 +2275,15 @@ fn extract_laufey_archive(
           String::from_utf8_lossy(entry.name_raw())
         );
       };
+      let raw_name = entry.name_raw();
+      if matches!(raw_name.first(), Some(b'/' | b'\\'))
+        || raw_name.get(1) == Some(&b':')
+      {
+        bail!(
+          "refusing zip entry with unsafe path: {}",
+          String::from_utf8_lossy(raw_name)
+        );
+      }
       // Defence in depth — re-check the components ourselves.
       if rel_path.components().any(|c| {
         matches!(

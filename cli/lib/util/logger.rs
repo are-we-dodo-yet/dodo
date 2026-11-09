@@ -100,6 +100,8 @@ pub fn init(options: InitLoggingOptions) {
   .filter_module("editpe", log::LevelFilter::Error)
   // too verbose
   .filter_module("cranelift_codegen", log::LevelFilter::Off)
+  .filter_module("zbus", log::LevelFilter::Off)
+  .filter_module("notify", log::LevelFilter::Warn)
   .write_style(if deno_terminal::colors::use_color() {
     env_logger::WriteStyle::Always
   } else {

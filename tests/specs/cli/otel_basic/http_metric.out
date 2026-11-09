@@ -377,7 +377,7 @@
             "timeUnixNano": "[WILDCARD]",
             "exemplars": [],
             "flags": 0,
-            "asInt": 0
+            "asInt": "0"
           }
         ],
         "aggregationTemporality": 2,

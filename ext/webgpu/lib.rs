@@ -53,6 +53,7 @@ pub fn print_linker_flags(name: &str) {
     let dlls = [
       // webgpu
       "d3dcompiler_47",
+      "dxgi",
       "OPENGL32",
       "gdi32",
       "setupapi",
