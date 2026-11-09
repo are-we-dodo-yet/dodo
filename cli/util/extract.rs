@@ -564,14 +564,14 @@ fn parse_shebang(shebang: &str) -> Shebang {
   let Some(tokens) = shlex::split(line) else {
     return invalid("tokenization failed, possibly due to unterminated quotes");
   };
-  // Find the `deno` executable in the shebang (e.g. `deno`, `/usr/bin/deno`).
+  // Find the `dodo` executable in the shebang (e.g. `dodo`, `/usr/bin/dodo`).
   let Some(deno_index) = tokens.iter().position(|token| {
     std::path::Path::new(token)
       .file_stem()
       .and_then(|stem| stem.to_str())
-      == Some("deno")
+      == Some("dodo")
   }) else {
-    return invalid("binary basename needs to be 'deno'");
+    return invalid("binary basename needs to be 'dodo'");
   };
   let mut args = vec![OsString::from("deno")];
   args.extend(tokens[deno_index + 1..].iter().cloned().map(OsString::from));
@@ -2055,7 +2055,7 @@ export function foo() {}
         expected: vec![Expected {
           source: r#"import { foo } from "file:///main.ts";
 Deno.test("file:///main.ts#3-7.ts", async ()=>{
-    throw new Error("invalid doc test hashbang: #!/bin/sh (binary basename needs to be 'deno')");
+    throw new Error("invalid doc test hashbang: #!/bin/sh (binary basename needs to be 'dodo')");
     foo();
 });
 "#,
