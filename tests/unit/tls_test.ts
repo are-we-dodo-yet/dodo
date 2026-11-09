@@ -829,6 +829,9 @@ async function tlsWithTcpFailureTestImpl(
 
       await tcpForwardingPromise1;
 
+      tcpForwardingInterruptDeferred2.resolve();
+      await tcpForwardingPromise2;
+
       switch (failureMode) {
         case "corruption":
           await sendBytes(tcpConn1, 0xff, 1 << 14 /* 16 kB */);
@@ -841,8 +844,6 @@ async function tlsWithTcpFailureTestImpl(
       }
       await tlsTrafficPromise1;
 
-      tcpForwardingInterruptDeferred2.resolve();
-      await tcpForwardingPromise2;
       await tcpConn2.closeWrite();
       await tlsTrafficPromise2;
 

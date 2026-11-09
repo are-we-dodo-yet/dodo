@@ -38,7 +38,7 @@ static NEXT_VIRTUAL_FD: AtomicI32 = AtomicI32::new(VIRTUAL_FD_START);
 
 fn next_virtual_fd() -> i32 {
   NEXT_VIRTUAL_FD
-    .fetch_update(Ordering::Relaxed, Ordering::Relaxed, |v| {
+    .try_update(Ordering::Relaxed, Ordering::Relaxed, |v| {
       Some(v.saturating_add(1))
     })
     .unwrap()

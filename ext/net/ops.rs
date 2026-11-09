@@ -1153,9 +1153,7 @@ pub async fn op_dns_resolve(
     }
     (ResolverConfig::from_name_servers(vec![ns]), {
       let mut opts = ResolverOpts::default();
-      if use_edns {
-        opts.edns0 = true;
-      }
+      opts.edns0 = use_edns;
       opts
     })
   } else {

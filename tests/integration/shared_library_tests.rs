@@ -54,9 +54,13 @@ fn macos_shared_libraries() {
   // 	/usr/lib/libobjc.A.dylib (compatibility version 1.0.0, current version 228.0.0)
 
   // path and whether its weak or not
-  const EXPECTED: [(&str, bool); 11] = [
+  const EXPECTED: [(&str, bool); 12] = [
     (
       "/System/Library/Frameworks/Security.framework/Versions/A/Security",
+      false,
+    ),
+    (
+      "/System/Library/Frameworks/SystemConfiguration.framework/Versions/A/SystemConfiguration",
       false,
     ),
     (

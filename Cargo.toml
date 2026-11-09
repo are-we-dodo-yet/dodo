@@ -602,6 +602,8 @@ opt-level = 3
 opt-level = 3
 [profile.dev.package.crypto-primes]
 opt-level = 3
+[profile.dev.package.num-bigint]
+opt-level = 3
 
 # rusty-v8 needs at least -O1 to not miscompile
 [profile.dev.package.v8]
@@ -677,6 +679,8 @@ opt-level = 3
 [profile.release.package.hyper]
 opt-level = 3
 [profile.release.package.miniz_oxide]
+opt-level = 3
+[profile.release.package.num-bigint]
 opt-level = 3
 [profile.release.package.rand]
 opt-level = 3
