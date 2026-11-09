@@ -29,6 +29,8 @@ default = ["v8"]
 # crate name so the engine integration does not require source-level churn.
 v8 = ["__runtime_defaults", "deno_core/v8", "v8/v8"]
 quickjs = ["__runtime_defaults", "deno_core/quickjs", "v8/quickjs"]
+jsc = ["__runtime_defaults", "deno_core/jsc", "v8/jsc"]
+system_jsc = ["__runtime_defaults", "deno_core/system_jsc", "v8/system_jsc"]
 __runtime_defaults = ["upgrade"]
 # A feature that enables heap profiling with dhat on Linux.
 # 1. Compile with `cargo build --profile=release-with-debug --features=dhat-heap`

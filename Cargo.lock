@@ -4378,9 +4378,9 @@ dependencies = [
 
 [[package]]
 name = "dodo-v8x"
-version = "152.2.0"
+version = "152.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "85549587fda08426563818800d067f5438bd94a5c2a8b2d1c2b6d11e0209f00a"
+checksum = "1c0b711024f4e80a5ef7204330b8a5b7674b07f5205d5879caac83ad3d2d430a"
 dependencies = [
  "bindgen 0.73.2",
  "bitflags 2.13.2",
