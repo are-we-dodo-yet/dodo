@@ -121,7 +121,7 @@ const { binCrates, libCrates } = resolveWorkspaceCrates(
 // Note that you may need to add more version to the `apt-get remove` line below if you change this
 const llvmVersion = 23;
 const installPkgsCommand =
-  `sudo apt-get install -y --no-install-recommends clang-${llvmVersion} lld-${llvmVersion} clang-tools-${llvmVersion} clang-format-${llvmVersion} clang-tidy-${llvmVersion}`;
+  `sudo apt-get install -y --no-install-recommends clang-${llvmVersion} clang-tools-${llvmVersion} clang-format-${llvmVersion} clang-tidy-${llvmVersion}`;
 const sysRootConfig = {
   name: "Set up incremental LTO and sysroot build",
   // This normally takes under a minute, but `apt-get update` has been seen to
@@ -129,6 +129,8 @@ const sysRootConfig = {
   // timeout before a single test runs. Fail fast instead.
   timeoutMinutes: 10,
   run: `# Setting up sysroot
+RUST_GCC_LD="$(rustc --print sysroot)/lib/rustlib/$(rustc -vV | sed -n 's/^host: //p')/bin/gcc-ld"
+test -x "$RUST_GCC_LD/ld.lld"
 export DEBIAN_FRONTEND=noninteractive
 # Avoid running man-db triggers, which sometimes takes several minutes
 # to complete.
@@ -184,7 +186,8 @@ CARGO_PROFILE_RELEASE_INCREMENTAL=false
 RUSTFLAGS<<__1
   -C linker-plugin-lto=true
   -C linker=clang-${llvmVersion}
-  -C link-arg=-fuse-ld=lld-${llvmVersion}
+  -C link-arg=-fuse-ld=lld
+  -C link-arg=-B$RUST_GCC_LD
   -C link-arg=-Wl,--icf=safe
   -C link-arg=-ldl
   -C link-arg=-Wl,--allow-shlib-undefined
@@ -203,7 +206,8 @@ __1
 RUSTDOCFLAGS<<__1
   -C linker-plugin-lto=true
   -C linker=clang-${llvmVersion}
-  -C link-arg=-fuse-ld=lld-${llvmVersion}
+  -C link-arg=-fuse-ld=lld
+  -C link-arg=-B$RUST_GCC_LD
   -C link-arg=-Wl,--icf=safe
   -C link-arg=-ldl
   -C link-arg=-Wl,--allow-shlib-undefined

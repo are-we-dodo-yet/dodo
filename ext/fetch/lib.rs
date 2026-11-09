@@ -1450,7 +1450,7 @@ const STAR_STAR: HeaderValue = HeaderValue::from_static("*/*");
 #[derive(Debug, deno_error::JsError)]
 #[class(type)]
 pub struct ClientSendError {
-  uri: Uri,
+  uri: Box<Uri>,
   pub source: hyper_util::client::legacy::Error,
 }
 
@@ -1549,11 +1549,10 @@ impl Client {
 
     let uri = req.uri().clone();
 
-    let resp = self
-      .inner
-      .oneshot(req)
-      .await
-      .map_err(|e| ClientSendError { uri, source: e })?;
+    let resp = self.inner.oneshot(req).await.map_err(|e| ClientSendError {
+      uri: Box::new(uri),
+      source: e,
+    })?;
     Ok(resp)
   }
 
@@ -1573,12 +1572,12 @@ impl Client {
     let uri = req.uri().clone();
 
     // .into_inner() unwraps the transparent decompression layer.
-    let resp = self
-      .inner
-      .into_inner()
-      .oneshot(req)
-      .await
-      .map_err(|e| ClientSendError { uri, source: e })?;
+    let resp = self.inner.into_inner().oneshot(req).await.map_err(|e| {
+      ClientSendError {
+        uri: Box::new(uri),
+        source: e,
+      }
+    })?;
     Ok(resp.map(box_raw_body))
   }
 }

@@ -665,7 +665,7 @@ fn url_to_local_sub_path<'a>(
     if sub.is_empty() {
       format!("#{}{}", &hash[..7], ext)
     } else {
-      format!("#{}_{}{}", &sub, &hash[..5], ext)
+      format!("#{}_{}{}", sub, &hash[..5], ext)
     }
   }
 

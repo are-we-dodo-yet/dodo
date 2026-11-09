@@ -301,7 +301,7 @@ fn replace_variable(
   if let StringOrNumber::String(name) = &variable.name {
     url_str
       .replace(&format!("${{{name}}}"), value)
-      .replace(&format! {"${{{{{name}}}}}"}, value)
+      .replace(&format!("${{{{{name}}}}}"), value)
   } else {
     url_str
   }

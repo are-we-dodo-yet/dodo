@@ -34,10 +34,11 @@ pub fn op_crypto_random_uuid_batch<'s>(
   rand::rng().fill(&mut entropy[..]);
 
   for (bytes, uuid_output) in entropy
-    .chunks_exact_mut(UUID_BYTES)
-    .zip(output.chunks_exact_mut(UUID_STRING_BYTES))
+    .as_chunks_mut::<UUID_BYTES>()
+    .0
+    .iter_mut()
+    .zip(output.as_chunks_mut::<UUID_STRING_BYTES>().0.iter_mut())
   {
-    let bytes: &mut [u8; UUID_BYTES] = bytes.try_into().unwrap();
     let uuid = fast_uuid_v4_bytes(bytes);
     uuid_output.copy_from_slice(&uuid);
   }
