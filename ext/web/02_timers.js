@@ -14,27 +14,20 @@ const { op_defer } = core.ops;
 const {
   createTimer,
   cancelTimer,
+  getTimer,
   refTimer: coreRefTimer,
   unrefTimer: coreUnrefTimer,
   getAsyncContext,
   setAsyncContext,
 } = core;
 const {
-  MapPrototypeDelete,
-  MapPrototypeGet,
-  MapPrototypeSet,
   PromisePrototypeThen,
   ReflectApply,
-  SafeMap,
   TypeError,
   indirectEval,
 } = primordials;
 
 const webidl = core.loadExtScript("ext:deno_webidl/00_webidl.js");
-
-// Map numeric timer IDs to internal core timer objects so clearTimeout /
-// clearInterval / refTimer / unrefTimer can look them up by id.
-const activeTimers = new SafeMap();
 
 // WHATWG timer nesting depth tracking.
 let timerDepth = 0;
@@ -57,7 +50,6 @@ function setTimeout(callback, timeout = 0, ...args) {
   const unboundCallback = callback;
   const asyncContext = getAsyncContext();
   const depth = timerDepth;
-  let id = 0;
   const wrappedCallback = function () {
     const oldContext = getAsyncContext();
     const prevDepth = timerDepth;
@@ -68,14 +60,11 @@ function setTimeout(callback, timeout = 0, ...args) {
     } finally {
       timerDepth = prevDepth;
       setAsyncContext(oldContext);
-      MapPrototypeDelete(activeTimers, id);
     }
   };
   timeout = webidl.converters.long(timeout);
   const timer = createTimer(wrappedCallback, timeout, undefined, false, true);
-  id = timer._timerId;
-  MapPrototypeSet(activeTimers, id, timer);
-  return id;
+  return timer._timerId;
 }
 
 /**
@@ -104,9 +93,16 @@ function setInterval(callback, timeout = 0, ...args) {
   };
   timeout = webidl.converters.long(timeout);
   const timer = createTimer(wrappedCallback, timeout, undefined, true, true);
-  const id = timer._timerId;
-  MapPrototypeSet(activeTimers, id, timer);
-  return id;
+  return timer._timerId;
+}
+
+function clearTimer(id) {
+  const timer = getTimer(id);
+  if (timer?._owner !== undefined) {
+    timer._owner.close();
+  } else if (timer !== undefined) {
+    cancelTimer(timer);
+  }
 }
 
 /**
@@ -115,11 +111,7 @@ function setInterval(callback, timeout = 0, ...args) {
 function clearTimeout(id = 0) {
   checkThis(this);
   id = webidl.converters.long(id);
-  const timer = MapPrototypeGet(activeTimers, id);
-  if (timer) {
-    cancelTimer(timer);
-    MapPrototypeDelete(activeTimers, id);
-  }
+  clearTimer(id);
 }
 
 /**
@@ -128,11 +120,7 @@ function clearTimeout(id = 0) {
 function clearInterval(id = 0) {
   checkThis(this);
   id = webidl.converters.long(id);
-  const timer = MapPrototypeGet(activeTimers, id);
-  if (timer) {
-    cancelTimer(timer);
-    MapPrototypeDelete(activeTimers, id);
-  }
+  clearTimer(id);
 }
 
 /**
@@ -144,8 +132,10 @@ function unrefTimer(id) {
     id?.unref?.();
     return;
   }
-  const timer = MapPrototypeGet(activeTimers, id);
-  if (timer) {
+  const timer = getTimer(id);
+  if (timer?._owner !== undefined) {
+    timer._owner.unref();
+  } else if (timer !== undefined) {
     coreUnrefTimer(timer);
   }
 }
@@ -158,8 +148,10 @@ function refTimer(id) {
     id?.ref?.();
     return;
   }
-  const timer = MapPrototypeGet(activeTimers, id);
-  if (timer) {
+  const timer = getTimer(id);
+  if (timer?._owner !== undefined) {
+    timer._owner.ref();
+  } else if (timer !== undefined) {
     coreRefTimer(timer);
   }
 }

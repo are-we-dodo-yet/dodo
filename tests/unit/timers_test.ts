@@ -640,6 +640,53 @@ Deno.test({
 });
 
 Deno.test({
+  name: "unrefTimer - numeric id",
+  permissions: { run: true, read: true },
+  fn: async () => {
+    const [statusCode, output] = await execCode(`
+      const timer = setTimeout(() => console.log("1"), 1);
+      Deno.unrefTimer(+timer);
+      console.log(timer.hasRef());
+    `);
+    assertEquals(statusCode, 0);
+    assertEquals(output, "false\n");
+  },
+});
+
+Deno.test({
+  name: "refTimer - numeric id",
+  permissions: { run: true, read: true },
+  fn: async () => {
+    const [statusCode, output] = await execCode(`
+      const timer = setTimeout(() => console.log("1"), 10);
+      timer.unref();
+      Deno.refTimer(+timer);
+      console.log(timer.hasRef());
+    `);
+    assertEquals(statusCode, 0);
+    assertEquals(output, "true\n1\n");
+  },
+});
+
+Deno.test({
+  name: "unrefTimer - numeric id of interval",
+  permissions: { run: true, read: true },
+  fn: async () => {
+    const [statusCode, output] = await execCode(`
+      let i = 0;
+      const timer = setInterval(() => {
+        console.log("1");
+        if (++i === 3) {
+          Deno.unrefTimer(+timer);
+        }
+      }, 10);
+    `);
+    assertEquals(statusCode, 0);
+    assertEquals(output, "1\n1\n1\n");
+  },
+});
+
+Deno.test({
   name: "unrefTimer - invalid calls do nothing",
   fn: () => {
     Deno.unrefTimer(NaN);
