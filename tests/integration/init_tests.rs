@@ -17,9 +17,9 @@ fn init_subcommand_without_dir() {
   let stderr = output.stderr();
   assert_contains!(stderr, "Project initialized");
   assert!(!stderr.contains("cd"));
-  assert_contains!(stderr, "deno run --allow-net main.ts");
-  assert_contains!(stderr, "deno task dev");
-  assert_contains!(stderr, "deno test");
+  assert_contains!(stderr, "dodo run --allow-net main.ts");
+  assert_contains!(stderr, "dodo task dev");
+  assert_contains!(stderr, "dodo test");
 
   assert!(cwd.join("deno.json").exists());
 
@@ -51,9 +51,9 @@ fn init_subcommand_with_dir_arg() {
   let stderr = output.stderr();
   assert_contains!(stderr, "Project initialized");
   assert_contains!(stderr, "cd my_dir");
-  assert_contains!(stderr, "deno run --allow-net main.ts");
-  assert_contains!(stderr, "deno task dev");
-  assert_contains!(stderr, "deno test");
+  assert_contains!(stderr, "dodo run --allow-net main.ts");
+  assert_contains!(stderr, "dodo task dev");
+  assert_contains!(stderr, "dodo test");
 
   assert!(cwd.join("my_dir/deno.json").exists());
 
@@ -117,13 +117,13 @@ fn init_subcommand_with_existing_file() {
 Run these commands to get started
 
   # Run the server
-  deno run --allow-net main.ts
+  dodo run --allow-net main.ts
 
   # Run the server and watch for file changes
-  deno task dev
+  dodo task dev
 
   # Run the tests
-  deno test
+  dodo test
 ",
   );
 
