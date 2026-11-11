@@ -1,8 +1,8 @@
 Download http://localhost:4545/echo.ts
 function echo(args: string[]) {
   const msg = args.join(", ");
-  Dodo.stdout.write(new TextEncoder().encode(msg));
+  Deno.stdout.write(new TextEncoder().encode(msg));
 }
 
-echo(Dodo.args);
+echo(Deno.args);
 

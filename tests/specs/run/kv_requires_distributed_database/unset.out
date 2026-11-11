@@ -1,2 +1,2 @@
 typeof openKv: undefined
-caught: Dodo.openKv is not a function
+caught: Deno.openKv is not a function

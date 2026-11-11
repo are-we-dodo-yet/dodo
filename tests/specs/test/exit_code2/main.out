@@ -1,10 +1,10 @@
 running 2 tests from ./main.js
-Dodo.exitCode ... FAILED ([WILDCARD])
+Deno.exitCode ... FAILED ([WILDCARD])
 success ... FAILED ([WILDCARD])
 
  ERRORS 
 
-Dodo.exitCode => ./main.js:1:6
+Deno.exitCode => ./main.js:1:6
 error: Error
   throw new Error("");
         ^
@@ -17,7 +17,7 @@ error: Error: Test case finished with exit code set to 5
 
  FAILURES 
 
-Dodo.exitCode => ./main.js:1:6
+Deno.exitCode => ./main.js:1:6
 success => ./main.js:6:6
 
 FAILED | 0 passed | 2 failed ([WILDCARD])

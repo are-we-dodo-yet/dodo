@@ -19,7 +19,7 @@ pub fn render_help(cmd: &CommandDef) -> String {
   if cmd.name == "deno" {
     out.push_str(&format!("Usage: {} [OPTIONS]", cmd.name));
   } else {
-    out.push_str(&format!("Usage: deno {} [OPTIONS]", cmd.name));
+    out.push_str(&format!("Usage: dodo {} [OPTIONS]", cmd.name));
   }
 
   let positionals: Vec<&ArgDef> =

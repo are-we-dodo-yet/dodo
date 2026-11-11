@@ -1,2 +1,2 @@
 typeof openKv: function
-caught: Dodo.openKv() failed: no KV database is attached to this app. Attach a KV database to your app in the Dodo Deploy dashboard, then redeploy.
+caught: Deno.openKv() failed: no KV database is attached to this app. Attach a KV database to your app in the Dodo Deploy dashboard, then redeploy.

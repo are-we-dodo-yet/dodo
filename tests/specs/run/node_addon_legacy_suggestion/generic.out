@@ -2,6 +2,6 @@ error: Uncaught (in promise) Error: Cannot load native addon at [WILDCARD]addon.
 [WILDCARD]
     info: This native addon uses the legacy V8/nan addon ABI, which depends
           on V8 internals that Dodo does not expose. Only Node-API (N-API)
-          addons can be loaded by Dodo.
+          addons can be loaded by Deno.
     hint: Switch to a package that uses Node-API (N-API), or ask the addon's
           authors to migrate it from the legacy `NODE_MODULE`/`nan` ABI.

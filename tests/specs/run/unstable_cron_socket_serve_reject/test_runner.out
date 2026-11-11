@@ -2,7 +2,7 @@
 [ISOLATE] Registering early-cron (before serve)
 [ISOLATE] early-cron registered successfully
 Listening on http://0.0.0.0:[WILDCARD]/ (http://localhost:[WILDCARD]/)
-[ISOLATE] Dodo.serve started
+[ISOLATE] Deno.serve started
 [CRON SERVER] Registered: early-cron
 [CONTROL CLIENT] Received Serving signal from Dodo
 [CRON SERVER] Sent rejection

@@ -1,17 +1,17 @@
 running 2 tests from ./main.js
-Dodo.exitCode ... FAILED ([WILDCARD])
+Deno.exitCode ... FAILED ([WILDCARD])
 success ... ok ([WILDCARD])
 
  ERRORS 
 
-Dodo.exitCode => ./main.js:1:6
+Deno.exitCode => ./main.js:1:6
 error: Error: Test case finished with exit code set to 42
     at exitSanitizer ([WILDLINE])
     at async outerWrapped ([WILDLINE])
 
  FAILURES 
 
-Dodo.exitCode => ./main.js:1:6
+Deno.exitCode => ./main.js:1:6
 
 FAILED | 1 passed | 1 failed ([WILDCARD])
 

@@ -276,7 +276,7 @@ async function createWindowsNamedPipeServer(spec: string): Promise<void> {
 const args = Deno.args;
 
 if (args.length !== 1) {
-  console.error("Usage: deno run -A broker.ts <socket_path>");
+  console.error("Usage: dodo run -A broker.ts <socket_path>");
   Deno.exit(1);
 }
 

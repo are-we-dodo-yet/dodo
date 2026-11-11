@@ -11,7 +11,7 @@ error[no-eval]: `eval` call is not allowed
 error[no-await-in-loop]: Unexpected `await` inside a loop.
  --> [WILDLINE]a.ts:4:3
   | 
-4 |   await Dodo.open("test");
+4 |   await Deno.open("test");
   |   ^^^^^^^^^^^^^^^^^^^^^^^
   = hint: Remove `await` in loop body, store all promises generated and then `await Promise.all(storedPromises)` after the loop
 

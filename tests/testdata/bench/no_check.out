@@ -1,5 +1,5 @@
 error: (in promise) TypeError: Cannot read properties of undefined (reading 'fn')
-Dodo.bench();
+Deno.bench();
      ^
     at [WILDCARD]
     at [WILDCARD]/bench/no_check.ts:1:6

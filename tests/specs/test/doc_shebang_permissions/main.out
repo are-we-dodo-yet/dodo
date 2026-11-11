@@ -11,7 +11,7 @@ running 1 test from ./main.ts#13-17.ts
 
 [WILDCARD]/main.ts#5-9.ts => ./main.ts#5-9.ts:1:6
 error: NotCapable: Requires env access, run again with the --allow-env flag
-    Dodo.env.toObject();
+    Deno.env.toObject();
              ^
 [WILDCARD]
 

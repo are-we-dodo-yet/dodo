@@ -7339,7 +7339,7 @@ fn bare_with_flag_no_file() {
   assert!(
     err
       .to_string()
-      .contains("Usage: deno [OPTIONS] [COMMAND] [SCRIPT_ARG]...")
+      .contains("Usage: dodo [OPTIONS] [COMMAND] [SCRIPT_ARG]...")
   );
 }
 
@@ -7604,7 +7604,7 @@ fn node_modules_dir_default() {
 
 #[test]
 fn flag_before_subcommand() {
-  // PORT-NOTE: clap appends a `Usage: deno repl [OPTIONS] [-- [ARGS]...]`
+  // PORT-NOTE: clap appends a `Usage: dodo repl [OPTIONS] [-- [ARGS]...]`
   // trailer; the new parser reports only the error and the tip.
   let r = flags_from_vec(svec!["deno", "--allow-net", "repl"]);
   assert_eq!(
@@ -7619,7 +7619,7 @@ fn flag_before_subcommand() {
 fn flag_before_subcommand_not_supported() {
   // `lint` does not accept `--allow-all`, so the error must not claim that
   // `lint --allow-all` exists (see issue #27336).
-  // PORT-NOTE: clap appends a `Usage: deno lint [OPTIONS] [files]...`
+  // PORT-NOTE: clap appends a `Usage: dodo lint [OPTIONS] [files]...`
   // trailer; the new parser reports only the error.
   let r = flags_from_vec(svec!["deno", "--allow-all", "lint"]);
   assert_eq!(

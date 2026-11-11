@@ -9,7 +9,7 @@ Available tasks:
 - strings
     dodo run main.ts && dodo eval "console.log(\"test\")"
 - piped
-    echo 12345 | (dodo eval 'const b = new Uint8Array(1);Dodo.stdin.readSync(b);console.log(b)' && dodo eval 'const b = new Uint8Array(1);Dodo.stdin.readSync(b);console.log(b)')
+    echo 12345 | (dodo eval 'const b = new Uint8Array(1);Deno.stdin.readSync(b);console.log(b)' && dodo eval 'const b = new Uint8Array(1);Deno.stdin.readSync(b);console.log(b)')
 - exit_code_5
     echo $(echo 10 ; exit 2) && exit 5
 - echo_cwd
