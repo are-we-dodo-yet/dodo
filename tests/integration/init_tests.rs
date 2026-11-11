@@ -155,9 +155,9 @@ fn init_subcommand_empty() {
   let stderr = output.stderr();
   assert_contains!(stderr, "Project initialized");
   assert!(!stderr.contains("cd"));
-  assert_contains!(stderr, "deno run main.ts");
-  assert_contains!(stderr, "deno task dev");
-  assert!(!stderr.contains("deno test"));
+  assert_contains!(stderr, "dodo run main.ts");
+  assert_contains!(stderr, "dodo task dev");
+  assert!(!stderr.contains("dodo test"));
 
   let deno_json_path = cwd.join("deno.json");
   assert!(deno_json_path.exists());

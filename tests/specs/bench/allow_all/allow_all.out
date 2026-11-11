@@ -1,7 +1,7 @@
 [WILDCARD]
 Check [WILDCARD]allow_all.ts
     CPU | [WILDLINE]
-Runtime | Deno [WILDLINE] ([WILDLINE])
+Runtime | Dodo [WILDLINE] ([WILDLINE])
 
 [WILDLINE]/allow_all.ts
 

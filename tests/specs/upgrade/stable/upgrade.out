@@ -1,12 +1,12 @@
-Current Deno version: [WILDCARD]
+Current Dodo version: [WILDCARD]
 Looking up stable version
 
 Found latest stable version [WILDCARD]
 [# The step is retried on failure, so how the new binary is obtained varies:]
 [# a full download, a delta patch, or -- once an earlier attempt populated]
-[# the deno dir -- the cached archive.]
+[# the dodo dir -- the cached archive.]
 [WILDCARD]
-Deno is upgrading to version [WILDCARD]
+Dodo is upgrading to version [WILDCARD]
 
-Upgraded successfully to Deno [WILDCARD] (stable)
+Upgraded successfully to Dodo [WILDCARD] (stable)
 [WILDCARD]

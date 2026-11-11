@@ -51,8 +51,8 @@ Docs: https://docs.deno.com/go/permissions
   --ignore-read[=<PATH>...]                 Ignore file system read access with a `NotFound` error. Optionally specify ignored paths.
                                             --ignore-read  |  --ignore-read=\"/etc,/var/log.txt\"
   DENO_TRACE_PERMISSIONS                    Environmental variable to enable stack traces in permission prompts.
-                                            DENO_TRACE_PERMISSIONS=1 deno run main.ts
+                                            DENO_TRACE_PERMISSIONS=1 dodo run main.ts
   DENO_AUDIT_PERMISSIONS                    Environmental variable to audit all permissions accesses. Set to a file path for JSONL output, or \"otel\" to emit as OpenTelemetry log events via the configured OTel exporter.
-                                            DENO_AUDIT_PERMISSIONS=./audit.jsonl deno run main.ts
-                                            DENO_AUDIT_PERMISSIONS=otel deno run main.ts
+                                            DENO_AUDIT_PERMISSIONS=./audit.jsonl dodo run main.ts
+                                            DENO_AUDIT_PERMISSIONS=otel dodo run main.ts
 ";

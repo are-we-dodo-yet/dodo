@@ -12,7 +12,7 @@ http://127.0.0.1:4250/@denotest/markdown/1.0.0/readme.md
 
 # Markdown Test Package
 
-A package for testing `deno doc` with markdown files from JSR.
+A package for testing `dodo doc` with markdown files from JSR.
 
 ## Features
 

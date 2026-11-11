@@ -1,4 +1,4 @@
-error: The lockfile is out of date. Run `deno install --frozen=false`, or rerun with `--frozen=false` to update it.
+error: The lockfile is out of date. Run `dodo install --frozen=false`, or rerun with `--frozen=false` to update it.
 changes:
  4 | +    "jsr:@denotest/add@0.2.0": "0.2.0",
    | ...

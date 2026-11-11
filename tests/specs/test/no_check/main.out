@@ -4,7 +4,7 @@ Uncaught error from ./main.ts FAILED
 
 ./main.ts (uncaught error)
 error: (in promise) TypeError: Cannot read properties of undefined (reading 'fn')
-Deno.test();
+Dodo.test();
      ^
     at [WILDCARD]
 This error was not caught from a test and caused the test runner to fail on the referenced module.

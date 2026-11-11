@@ -11,7 +11,7 @@ running 1 test from ./deny.ts#12-16.ts
 
 [WILDCARD]/deny.ts#12-16.ts => ./deny.ts#12-16.ts:1:6
 error: NotCapable: Requires env access, run again with the --allow-env flag
-    Deno.env.toObject();
+    Dodo.env.toObject();
              ^
 [WILDCARD]
 

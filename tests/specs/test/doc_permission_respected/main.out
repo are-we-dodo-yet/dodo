@@ -11,7 +11,7 @@ running 1 test from ./main.ts#8-11.ts
 
 [WILDCARD]/main.ts#8-11.ts => ./main.ts#8-11.ts:1:6
 error: NotCapable: Requires env access to "USER", run again with the --allow-env flag
-    const _user = Deno.env.get("USER");
+    const _user = Dodo.env.get("USER");
                            ^
     at Object.getEnv [as get] ([WILDCARD])
     at [WILDCARD]/main.ts#8-11.ts:2:28

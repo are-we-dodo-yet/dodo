@@ -1,7 +1,7 @@
-Test 1: Fork with Deno-style execArgv
+Test 1: Fork with Dodo-style execArgv
 With run -A --conditions=custom: ok
 
-Test 2: Fork with multiple Deno-style conditions
+Test 2: Fork with multiple Dodo-style conditions
 With multiple conditions: ok
 
 Test 3: Fork with Node-style execArgv

@@ -1,5 +1,5 @@
-Task build1 deno run ../build1.js
-Task build2 deno run ../build2.js
+Task build1 dodo run ../build1.js
+Task build2 dodo run ../build2.js
 [UNORDERED_START]
 [build1] Starting build1
 [build1] build1 performing more work...
@@ -8,5 +8,5 @@ Task build2 deno run ../build2.js
 [build2] build2 performing more work...
 [build2] build2 finished
 [UNORDERED_END]
-Task run deno run ../run.js
+Task run dodo run ../run.js
 run finished
