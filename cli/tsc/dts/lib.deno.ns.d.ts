@@ -961,7 +961,7 @@ declare namespace Deno {
     repeats?: number;
   }
 
-  /** Register a test which will be run when `deno test` is used on the command
+  /** Register a test which will be run when `dodo test` is used on the command
    * line and the containing module looks like a test module.
    *
    * `fn` can be async if required.
@@ -1007,7 +1007,7 @@ declare namespace Deno {
    * @category Testing
    */
   export interface DenoTest {
-    /** Register a test which will be run when `deno test` is used on the command
+    /** Register a test which will be run when `dodo test` is used on the command
      * line and the containing module looks like a test module.
      *
      * `fn` can be async if required.
@@ -1044,7 +1044,7 @@ declare namespace Deno {
      */
     (t: TestDefinition): void;
 
-    /** Register a test which will be run when `deno test` is used on the command
+    /** Register a test which will be run when `dodo test` is used on the command
      * line and the containing module looks like a test module.
      *
      * `fn` can be async if required.
@@ -1067,7 +1067,7 @@ declare namespace Deno {
      */
     (name: string, fn: (t: TestContext) => void | Promise<void>): void;
 
-    /** Register a test which will be run when `deno test` is used on the command
+    /** Register a test which will be run when `dodo test` is used on the command
      * line and the containing module looks like a test module.
      *
      * `fn` can be async if required. Declared function must have a name.
@@ -1090,7 +1090,7 @@ declare namespace Deno {
      */
     (fn: (t: TestContext) => void | Promise<void>): void;
 
-    /** Register a test which will be run when `deno test` is used on the command
+    /** Register a test which will be run when `dodo test` is used on the command
      * line and the containing module looks like a test module.
      *
      * `fn` can be async if required.
@@ -1117,7 +1117,7 @@ declare namespace Deno {
       fn: (t: TestContext) => void | Promise<void>,
     ): void;
 
-    /** Register a test which will be run when `deno test` is used on the command
+    /** Register a test which will be run when `dodo test` is used on the command
      * line and the containing module looks like a test module.
      *
      * `fn` can be async if required.
@@ -1155,7 +1155,7 @@ declare namespace Deno {
       fn: (t: TestContext) => void | Promise<void>,
     ): void;
 
-    /** Register a test which will be run when `deno test` is used on the command
+    /** Register a test which will be run when `dodo test` is used on the command
      * line and the containing module looks like a test module.
      *
      * `fn` can be async if required. Declared function must have a name.

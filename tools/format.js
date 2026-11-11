@@ -4,7 +4,7 @@ import { join, ROOT_PATH } from "./util.js";
 
 const subcommand = Deno.args.includes("--check") ? "check" : "fmt";
 const configFile = join(ROOT_PATH, ".dprint.json");
-const cmd = new Deno.Command("deno", {
+const cmd = new Deno.Command("dodo", {
   args: [
     "run",
     "-A",

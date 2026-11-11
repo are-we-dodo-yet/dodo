@@ -780,7 +780,7 @@ const userVisibleCore = ObjectFreeze(ObjectDefineProperties(
 ));
 ObjectAssign(internals, { core: userVisibleCore });
 const internalSymbol = Symbol("Deno.internal");
-// `Deno.test` and its sub-methods are no-ops outside of `deno test`, kept for
+// `Deno.test` and its sub-methods are no-ops outside of `dodo test`, kept for
 // compatibility so they don't error under `deno run`. Mirrors the surface of
 // the real `Deno.test` defined in cli/js/40_test.js.
 function noopTest() {}
@@ -806,13 +806,13 @@ const finalDenoNs = ObjectDefineProperties(
     [internalSymbol]: internals,
     // Deno.test, Deno.bench, Deno.lint are noops here, but kept for
     // compatibility; so that they don't cause errors when used outside of
-    // `deno test`/`deno bench`/`deno lint` contexts.
+    // `dodo test`/`deno bench`/`deno lint` contexts.
     test: noopTest,
     bench: () => {},
     lint: {
       runPlugin: () => {
         throw new Error(
-          "`Deno.lint.runPlugin` is only available in `deno test` subcommand.",
+          "`Deno.lint.runPlugin` is only available in `dodo test` subcommand.",
         );
       },
     },

@@ -1,5 +1,5 @@
 try {
-  await new Deno.Command("deno", {
+  await new Deno.Command("dodo", {
     args: ["eval", ""],
     env: { "LD_DENO_TEST": "1" },
   }).output();

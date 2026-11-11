@@ -3,7 +3,7 @@
 // A node:http server using the direct parser-consume path must be able to
 // start a nested node:http client request from its first request callback.
 // Older builds answered that first inbound request with a generated 400 under
-// `deno test`, while the outgoing proxy request never reached the target.
+// `dodo test`, while the outgoing proxy request never reached the target.
 
 import { strictEqual } from "node:assert";
 import http from "node:http";

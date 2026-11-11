@@ -48,7 +48,7 @@ The trace workloads cover:
 - a small TypeScript module;
 - an active timer;
 - `Deno.serve` plus one request;
-- `deno test`;
+- `dodo test`;
 - `node:crypto`; and
 - `deno fmt --check`.
 

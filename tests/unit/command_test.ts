@@ -1109,22 +1109,22 @@ Deno.test(
   { ignore: Deno.build.os !== "windows" },
   async function commandWindowsRawArguments() {
     let { success, stdout } = await new Deno.Command("cmd", {
-      args: ["/d", "/s", "/c", '"deno ^"--version^""'],
+      args: ["/d", "/s", "/c", '"dodo ^"--version^""'],
       windowsRawArguments: true,
     }).output();
     assert(success);
     let stdoutText = new TextDecoder().decode(stdout);
-    assertStringIncludes(stdoutText, "deno");
+    assertStringIncludes(stdoutText, "dodo");
     assertStringIncludes(stdoutText, "v8");
     assertStringIncludes(stdoutText, "typescript");
 
     ({ success, stdout } = new Deno.Command("cmd", {
-      args: ["/d", "/s", "/c", '"deno ^"--version^""'],
+      args: ["/d", "/s", "/c", '"dodo ^"--version^""'],
       windowsRawArguments: true,
     }).outputSync());
     assert(success);
     stdoutText = new TextDecoder().decode(stdout);
-    assertStringIncludes(stdoutText, "deno");
+    assertStringIncludes(stdoutText, "dodo");
     assertStringIncludes(stdoutText, "v8");
     assertStringIncludes(stdoutText, "typescript");
   },

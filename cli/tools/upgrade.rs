@@ -1014,7 +1014,7 @@ pub async fn upgrade(
   let requested_version =
     RequestedVersion::from_upgrade_flags(upgrade_flags.clone())?;
 
-  log::info!("Current Deno version: v{}", version::DENO_VERSION_INFO.deno);
+  log::info!("Current Dodo version: v{}", version::DENO_VERSION_INFO.deno);
 
   let maybe_selected_version_to_upgrade = match &requested_version {
     RequestedVersion::Latest(channel) => {

@@ -2143,7 +2143,7 @@ Deno.test("[node/http] upgraded socket closes when the server closed without clo
     });
   `;
 
-  const p = new Deno.Command("deno", { args: ["eval", server] }).spawn();
+  const p = new Deno.Command("dodo", { args: ["eval", server] }).spawn();
 
   // Wait for the server to respond
   await retry(async () => {

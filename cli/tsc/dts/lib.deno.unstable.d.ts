@@ -1711,7 +1711,7 @@ declare namespace Deno {
     /**
      * This API is useful for testing lint plugins.
      *
-     * It throws an error if it's not used in `deno test` subcommand.
+     * It throws an error if it's not used in `dodo test` subcommand.
      * @category Linter
      * @experimental
      */
