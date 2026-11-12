@@ -1078,7 +1078,7 @@ pub async fn upgrade(
     log::info!(
       "{}",
       colors::gray(format!(
-        "Deno is upgrading to version {}",
+        "Dodo is upgrading to version {}",
         &selected_version_to_upgrade.version_or_hash
       ))
     );
@@ -1132,7 +1132,7 @@ pub async fn upgrade(
     log::info!(
       "{}",
       colors::gray(format!(
-        "Deno is upgrading to version {}",
+        "Dodo is upgrading to version {}",
         &selected_version_to_upgrade.version_or_hash
       ))
     );

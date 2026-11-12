@@ -1904,19 +1904,19 @@ const lintJob = job("lint", {
         {
           name: "test_format.js",
           run:
-            "dodo run --allow-write --allow-read --allow-run --allow-net ./tools/format.js --check",
+            "deno run --allow-write --allow-read --allow-run --allow-net ./tools/format.js --check",
         },
         {
           name: "jsdoc_checker.js",
           run:
-            "dodo run --allow-read --allow-env --allow-sys ./tools/jsdoc_checker.js",
+            "deno run --allow-read --allow-env --allow-sys ./tools/jsdoc_checker.js",
         },
       ),
       {
         name: "lint.js",
         env: { GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}" },
         run:
-          "dodo run --allow-write --allow-read --allow-run --allow-net --allow-env ./tools/lint.js",
+          "deno run --allow-write --allow-read --allow-run --allow-net --allow-env ./tools/lint.js",
       },
       saveCacheStep,
     );
