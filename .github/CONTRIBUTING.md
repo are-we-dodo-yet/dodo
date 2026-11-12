@@ -261,7 +261,7 @@ cargo build -vv
 cargo clean && cargo build -vv
 
 # Run:
-./target/debug/deno run tests/testdata/run/002_hello.ts
+./target/debug/dodo run tests/testdata/run/002_hello.ts
 ```
 
 ### Running the Tests

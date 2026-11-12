@@ -50,7 +50,7 @@ The trace workloads cover:
 - `Deno.serve` plus one request;
 - `dodo test`;
 - `node:crypto`; and
-- `deno fmt --check`.
+- `dodo fmt --check`.
 
 Each generator creates temporary fixtures and a private `DENO_DIR`. The shared
 native runner suspends the generator while a workload executes so the
@@ -112,7 +112,7 @@ Generate the Linux order:
 ```sh
 TARGET="$(uname -m)-unknown-linux-gnu"
 ORDER="$PWD/target/release/startup-order-$TARGET.order"
-target/release/deno run -A \
+target/release/dodo run -A \
   tools/startup_order/generate_linux_function_orderfile.ts \
   --binary "$PWD/target/release/deno-before-startup-order" \
   --output "$ORDER" \
@@ -124,7 +124,7 @@ Generate the macOS order:
 
 ```sh
 ORDER="$PWD/target/release/startup-order-aarch64-apple-darwin.order"
-target/release/deno run -A \
+target/release/dodo run -A \
   tools/startup_order/generate_macos_function_orderfile.ts \
   --binary "$PWD/target/release/deno-before-startup-order" \
   --output "$ORDER" \
@@ -145,7 +145,7 @@ DENO_STARTUP_ORDER_FILE="$ORDER" \
 Verify the result before stripping the executable:
 
 ```sh
-target/release/deno run -A tools/startup_order/verify_orderfile.ts \
+target/release/dodo run -A tools/startup_order/verify_orderfile.ts \
   --baseline-binary target/release/deno-before-startup-order \
   --binary target/release/deno \
   --order "$ORDER" \

@@ -8,7 +8,7 @@ const format = Deno[Deno.internal].jupyter.formatInner;
 Deno.test("Deno.jupyter is not available", () => {
   assertThrows(
     () => Deno.jupyter,
-    "Deno.jupyter is only available in `deno jupyter` subcommand.",
+    "Deno.jupyter is only available in `dodo jupyter` subcommand.",
   );
 });
 

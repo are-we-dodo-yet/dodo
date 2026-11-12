@@ -1548,10 +1548,10 @@ fn lsp_deno_task() {
     "deno.jsonc",
     json!({
       "tasks": {
-        "build": "deno test",
+        "build": "dodo test",
         "serve": {
           "description": "Start the dev server",
-          "command": "deno run -RN server.ts",
+          "command": "dodo run -RN server.ts",
         },
       },
     })
@@ -1565,13 +1565,13 @@ fn lsp_deno_task() {
     json!([
       {
         "name": "build",
-        "command": "deno test",
+        "command": "dodo test",
         "description": null,
         "sourceUri": url_to_uri(&temp_dir.url().join("deno.jsonc").unwrap()).unwrap(),
       },
       {
         "name": "serve",
-        "command": "deno run -RN server.ts",
+        "command": "dodo run -RN server.ts",
         "description": "Start the dev server",
         "sourceUri": url_to_uri(&temp_dir.url().join("deno.jsonc").unwrap()).unwrap(),
       }
@@ -16639,7 +16639,7 @@ fn lsp_testing_api_inherits_test_task_env_file() {
     "./deno.json",
     json!({
       "tasks": {
-        "test": "deno test --env-file=.env.test -A",
+        "test": "dodo test --env-file=.env.test -A",
       },
     })
     .to_string(),
@@ -16705,7 +16705,7 @@ fn lsp_testing_api_test_task_env_file_conflicting_scopes_first_wins() {
       format!("./{dir}/deno.json"),
       json!({
         "tasks": {
-          "test": "deno test --env-file=.env.test -A",
+          "test": "dodo test --env-file=.env.test -A",
         },
       })
       .to_string(),

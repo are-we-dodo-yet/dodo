@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run --check --allow-write=. --allow-read=. --lock=./tools/deno.lock.json
+#!/usr/bin/env -S dodo run --check --allow-write=. --allow-read=. --lock=./tools/deno.lock.json
 // Copyright 2018-2026 the Deno authors. MIT license.
 import {
   conditions,
@@ -65,7 +65,7 @@ const runTests = step.dependsOn(installPython)({
     CI_SHARD_INDEX: matrix.shard_index,
     CI_SHARD_TOTAL: matrix.shard_total,
   },
-  run: "deno task --cwd tests/node_compat/runner test --report",
+  run: "dodo task --cwd tests/node_compat/runner test --report",
 });
 
 const gzipReport = step.dependsOn(runTests)({
@@ -139,7 +139,7 @@ const summaryInstallPython = step.dependsOn(summarySetupDeno)({
 const addDaySummary = step.dependsOn(summaryInstallPython)({
   name: "Add the day summary to the month summary",
   run:
-    "deno -A --config tests/config/deno.json tests/node_compat/add_day_summary_to_month_summary.ts",
+    "dodo -A --config tests/config/deno.json tests/node_compat/add_day_summary_to_month_summary.ts",
 });
 
 const gzipMonthSummary = step.dependsOn(addDaySummary)({
@@ -161,7 +161,7 @@ const uploadMonthSummary = step.dependsOn(gzipMonthSummary)({
 
 const postSlack = step.dependsOn(uploadMonthSummary)({
   name: "Post message to slack channel",
-  run: "deno -A --config tests/config/deno.json tests/node_compat/slack.ts",
+  run: "dodo -A --config tests/config/deno.json tests/node_compat/slack.ts",
   env: {
     SLACK_TOKEN: "${{ secrets.NODE_COMPAT_SLACK_TOKEN }}",
     SLACK_CHANNEL: "${{ secrets.NODE_COMPAT_SLACK_CHANNEL }}",

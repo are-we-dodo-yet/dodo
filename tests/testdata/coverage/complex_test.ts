@@ -5,7 +5,7 @@ Deno.test("complex", function () {
 });
 
 Deno.test("sub process with stdin", async () => {
-  // ensure launching deno run with stdin doesn't affect coverage
+  // ensure launching dodo run with stdin doesn't affect coverage
   const code = "console.log('5')";
   const command = new Deno.Command(Deno.execPath(), {
     args: ["run", "-"],

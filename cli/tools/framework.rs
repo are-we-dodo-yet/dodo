@@ -941,7 +941,7 @@ mod tests {
     fs::write(dir.path().join("fresh.gen.ts"), "").unwrap();
     fs::write(
       dir.path().join("deno.json"),
-      r#"{"tasks":{"start":"deno run -A main.ts"}}"#,
+      r#"{"tasks":{"start":"dodo run -A main.ts"}}"#,
     )
     .unwrap();
     let det = detect_framework(dir.path()).unwrap().unwrap();

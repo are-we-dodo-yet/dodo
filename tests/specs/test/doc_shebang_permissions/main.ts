@@ -3,7 +3,7 @@
  * permission is revoked and accessing the environment fails.
  *
  * ```ts
- * #!/usr/bin/env -S deno run --allow-read
+ * #!/usr/bin/env -S dodo run --allow-read
  * Deno.env.toObject();
  * ```
  *
@@ -11,7 +11,7 @@
  * access the environment.
  *
  * ```ts
- * #!/usr/bin/env -S deno run -A
+ * #!/usr/bin/env -S dodo run -A
  * Deno.env.toObject();
  * ```
  * @module doc

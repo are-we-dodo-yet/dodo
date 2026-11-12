@@ -760,7 +760,7 @@ pub fn render_version(long: bool) -> String {
   if long {
     debug_assert_eq!(DENO_VERSION_INFO.typescript, deno_snapshots::TS_VERSION);
     format!(
-      "deno {} ({}, {}, {})\nv8 {}\ntypescript {}\n",
+      "dodo {} ({}, {}, {})\nv8 {}\ntypescript {}\n",
       DENO_VERSION_INFO.deno,
       DENO_VERSION_INFO.release_channel.name(),
       env!("PROFILE"),
@@ -769,7 +769,7 @@ pub fn render_version(long: bool) -> String {
       DENO_VERSION_INFO.typescript,
     )
   } else {
-    format!("deno {}\n", DENO_VERSION_INFO.deno)
+    format!("dodo {}\n", DENO_VERSION_INFO.deno)
   }
 }
 

@@ -2810,7 +2810,7 @@ mod tests {
     let content = fs::read_to_string(&file_path).unwrap();
     assert!(
       content.contains(
-        "exec deno run --config 'path with spaces/deno.json' \
+        "exec dodo run --config 'path with spaces/deno.json' \
          'https://example.com/it'\\''s.ts' '$(echo hi);&|<>*?[]' \
          '%PATH%/100%' '' \"$@\""
       ),
@@ -2880,8 +2880,8 @@ mod tests {
     super::generate_executable_file(&shim_data).unwrap();
     let content = fs::read_to_string(&file_path).unwrap();
     assert!(
-      content.contains("exec deno run"),
-      "shim should use deno run, got: {content}"
+      content.contains("exec dodo run"),
+      "shim should use dodo run, got: {content}"
     );
   }
 }

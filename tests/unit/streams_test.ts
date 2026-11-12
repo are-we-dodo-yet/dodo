@@ -924,7 +924,7 @@ Deno.test(async function readableStreamEmittingManyChunks() {
 // (matching whatwg/streams#1367), so its type should be narrowed from
 // `ArrayBufferView | null` to `Uint8Array<ArrayBuffer> | null`. The runtime
 // check verifies the actual value, and the variable annotation acts as a
-// compile-time check via `deno check`.
+// compile-time check via `dodo check`.
 Deno.test("ReadableStreamBYOBRequest.view is a Uint8Array", async () => {
   let viewIsUint8Array = false;
   const stream = new ReadableStream({

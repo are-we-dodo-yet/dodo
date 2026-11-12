@@ -609,7 +609,7 @@ pub async fn run(flags: Arc<Flags>, x_flags: XFlags) -> Result<i32, AnyError> {
     || Path::new(&effective_command).extension().is_some();
   if is_file_like && Path::new(&effective_command).is_file() {
     return Err(anyhow::anyhow!(
-      "Use 'deno run' to run a local file directly, 'deno x' is intended for running commands from packages."
+      "Use 'dodo run' to run a local file directly, 'deno x' is intended for running commands from packages."
     ));
   }
 

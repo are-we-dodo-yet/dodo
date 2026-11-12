@@ -1,3 +1,3 @@
-#!/usr/bin/env -S deno run
+#!/usr/bin/env -S dodo run
 
 export default 42;

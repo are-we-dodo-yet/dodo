@@ -2905,7 +2905,7 @@ mod tests {
   fn verify_ed25519_accepts_real_signature() {
     use ed25519_dalek::Signer;
     let (sk, vk) = keypair_from_seed(&[1u8; 32]);
-    let message = b"deno desktop update v1.2.3";
+    let message = b"dodo desktop update v1.2.3";
     let sig = sk.sign(message);
     let ok =
       verify_ed25519_b64(&b64(&vk.to_bytes()), &b64(&sig.to_bytes()), message);
@@ -2916,10 +2916,10 @@ mod tests {
   fn verify_ed25519_rejects_tampered_message() {
     use ed25519_dalek::Signer;
     let (sk, vk) = keypair_from_seed(&[1u8; 32]);
-    let original = b"deno desktop update v1.2.3";
+    let original = b"dodo desktop update v1.2.3";
     let sig = sk.sign(original);
     // Flip a single byte of the message — a correct verifier must reject.
-    let tampered = b"deno desktop update v1.2.4";
+    let tampered = b"dodo desktop update v1.2.4";
     let ok =
       verify_ed25519_b64(&b64(&vk.to_bytes()), &b64(&sig.to_bytes()), tampered);
     assert!(!ok, "tampered message must fail verification");

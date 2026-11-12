@@ -54,7 +54,7 @@ fn main() {
   );
 
   if std::env::var("NODE_SHIM_DEBUG").is_ok() {
-    eprintln!("deno {:?}", deno_args);
+    eprintln!("dodo {:?}", deno_args);
     process::exit(0);
   }
 

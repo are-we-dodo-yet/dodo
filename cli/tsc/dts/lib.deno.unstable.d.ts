@@ -177,7 +177,7 @@ declare namespace Deno {
    * passed when running Deno:
    *
    * ```sh
-   * deno run --unstable-bundle main.ts
+   * dodo run --unstable-bundle main.ts
    * ```
    *
    * ```ts

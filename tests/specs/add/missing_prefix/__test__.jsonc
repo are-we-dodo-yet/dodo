@@ -1,7 +1,7 @@
 {
   "tempDir": true,
   "tests": {
-    // Unprefixed packages default to npm, so `deno add ajv` should work
+    // Unprefixed packages default to npm, so `dodo add ajv` should work
     "npm_default": {
       "steps": [
         {
@@ -15,7 +15,7 @@
       "steps": [
         {
           "args": "add @denotest/echo",
-          "output": "error: npm:@denotest/echo was not found, but a matching jsr package exists. Did you mean `deno add jsr:@denotest/echo`?\n",
+          "output": "error: npm:@denotest/echo was not found, but a matching jsr package exists. Did you mean `dodo add jsr:@denotest/echo`?\n",
           "exitCode": 1
         }
       ]

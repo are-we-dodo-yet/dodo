@@ -1796,7 +1796,7 @@ fn upgrade_parse(
 
   let (version_or_hash_or_channel, pr, branch) =
     if positional.as_deref() == Some("pr") {
-      // "deno upgrade pr <number>" - second positional is the PR number
+      // "dodo upgrade pr <number>" - second positional is the PR number
       let pr_str = pr_number_positional
         .as_deref()
         .or_else(|| result.get_one("pr"));
@@ -2328,7 +2328,7 @@ fn install_parse(
       if matches!(flags.config_flag, ConfigFlag::Disabled) {
         return Err(CliError::new(
           CliErrorKind::InvalidValue,
-          "deno install can't be used to add packages if `--no-config` is passed.",
+          "dodo install can't be used to add packages if `--no-config` is passed.",
         )
         .with_suggestion(
           "to cache the packages without adding to a config, pass the `--entrypoint` flag",

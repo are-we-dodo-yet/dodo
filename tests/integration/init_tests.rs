@@ -199,9 +199,9 @@ async fn init_subcommand_serve() {
 
   let stderr = output.stderr();
   assert_contains!(stderr, "Project initialized");
-  assert_contains!(stderr, "deno serve -R main.ts");
-  assert_contains!(stderr, "deno task dev");
-  assert_contains!(stderr, "deno test -R");
+  assert_contains!(stderr, "dodo serve -R main.ts");
+  assert_contains!(stderr, "dodo task dev");
+  assert_contains!(stderr, "dodo test -R");
 
   assert!(cwd.join("deno.json").exists());
 

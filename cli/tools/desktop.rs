@@ -4845,7 +4845,7 @@ fn create_windows_msi(
     summary.set_comments(format!("{app_name} desktop application"));
     summary.set_arch(arch);
     summary.set_languages(&[msi::Language::from_code(1033)]);
-    summary.set_creating_application("deno desktop");
+    summary.set_creating_application("dodo desktop");
     // Package code: a fresh GUID identifying this exact package build.
     summary.set_uuid(uuid::Uuid::new_v5(
       &MSI_GUID_NAMESPACE,

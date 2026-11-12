@@ -189,7 +189,7 @@ fn install_global_from_task_with_relative_import_map() {
     "deno.json",
     r#"{
   "tasks": {
-    "install": "deno install -A --global --root ./root --import-map imports.json -n test main.ts"
+    "install": "dodo install -A --global --root ./root --import-map imports.json -n test main.ts"
   }
 }
 "#,

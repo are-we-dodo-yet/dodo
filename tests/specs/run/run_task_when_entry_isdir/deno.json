@@ -1,5 +1,5 @@
 {
   "tasks": {
-    "backend": "deno run -A ./backend/mod.ts"
+    "backend": "dodo run -A ./backend/mod.ts"
   }
 }

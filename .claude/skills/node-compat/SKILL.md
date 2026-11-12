@@ -153,7 +153,7 @@ Reasons should be specific and actionable. Good examples:
 
 - "Tests Node.js internal C++ binding (internalBinding('zlib').Zlib) which is
   not implemented in Deno"
-- "requires `deno --interactive` flag (not yet implemented)"
+- "requires `dodo --interactive` flag (not yet implemented)"
 - "URL.createObjectURL does not throw ERR_INVALID_ARG_TYPE for non-Blob
   arguments"
 

@@ -97,7 +97,7 @@
         },
         "extraDenoArgs": {
           "type": "array",
-          "description": "Extra deno run/test CLI flags for this test only. Use sparingly — typically for security knobs like --unsafely-ignore-certificate-errors that one specific test requires.",
+          "description": "Extra dodo run/test CLI flags for this test only. Use sparingly — typically for security knobs like --unsafely-ignore-certificate-errors that one specific test requires.",
           "items": { "type": "string" }
         }
       },

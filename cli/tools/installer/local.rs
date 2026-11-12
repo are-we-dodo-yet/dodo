@@ -201,7 +201,7 @@ pub async fn ci_command(
   let factory = CliFactory::from_flags(flags.clone());
   if factory.maybe_lockfile().await?.is_none() {
     bail!(
-      "deno ci requires a lockfile, but none was found.\n  hint: run `dodo install` to create one."
+      "dodo ci requires a lockfile, but none was found.\n  hint: run `dodo install` to create one."
     );
   }
   if let Some(node_modules_dir) = factory.node_modules_dir_path()?

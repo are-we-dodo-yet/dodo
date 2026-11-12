@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run --allow-run
+#!/usr/bin/env -S dodo run --allow-run
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 const check = Deno.args.includes("--check");
 console.log("rustfmt");
@@ -16,7 +16,7 @@ if (!result2.success) {
   throw new Error(`Failed: rustfmt ${check ? "--check" : ""}`);
 }
 
-console.log("deno fmt");
+console.log("dodo fmt");
 
 const p3 = new Deno.Command("dodo", {
   args: [

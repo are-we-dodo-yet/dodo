@@ -1,9 +1,9 @@
-# Package management: `deno add` / `deno install`
+# Package management: `dodo add` / `dodo install`
 
 This is the map for how Deno adds dependencies to a project: how the CLI flags
 are parsed, how the configuration file is rewritten, and how packages are
 actually installed into `node_modules` and the lockfile. Read this before
-touching `deno add`, `deno install <pkg>`, or the flags that control where a
+touching `dodo add`, `dodo install <pkg>`, or the flags that control where a
 dependency is written (`--dev`, `--save-optional`, `--no-save`, `--save-exact`,
 `--package-json`).
 
@@ -79,7 +79,7 @@ limitation of the external `deno_package_json` crate: `PackageJsonDeps` /
 `resolve_local_package_json_deps()` expose only those two maps — there is no
 `optional_dependencies` in the resolved deps used by the installer. So a package
 written to `optionalDependencies` will **not** be materialized by the normal
-install path, even on a plain `deno install`.
+install path, even on a plain `dodo install`.
 
 To keep `--save-optional` at parity with `--save-dev` (which _does_ install on
 add), `add()` installs optional packages directly instead of relying on the

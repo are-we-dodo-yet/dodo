@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run --check --allow-write=. --allow-read=. --lock=./tools/deno.lock.json
+#!/usr/bin/env -S dodo run --check --allow-write=. --allow-read=. --lock=./tools/deno.lock.json
 // Copyright 2018-2026 the Deno authors. MIT license.
 import { conditions, createWorkflow, job, step } from "jsr:@david/gagen@0.3.1";
 
@@ -54,7 +54,7 @@ const windowsJob = job("promote-to-release-windows", {
     step({
       name: "Run patchver for Windows",
       run:
-        "deno run -A --minimum-dependency-age=0 ./tools/release/promote_to_release_windows.ts ${{github.event.inputs.releaseKind}}",
+        "dodo run -A --minimum-dependency-age=0 ./tools/release/promote_to_release_windows.ts ${{github.event.inputs.releaseKind}}",
     }),
     step({
       name: "Authenticate with Azure",
@@ -171,7 +171,7 @@ const workflow = createWorkflow({
             APPLE_CODESIGN_PASSWORD: "${{ secrets.APPLE_CODESIGN_PASSWORD }}",
           },
           run:
-            "deno run -A --minimum-dependency-age=0 ./tools/release/promote_to_release.ts ${{github.event.inputs.releaseKind}} ${{github.event.inputs.commitHash}}",
+            "dodo run -A --minimum-dependency-age=0 ./tools/release/promote_to_release.ts ${{github.event.inputs.releaseKind}} ${{github.event.inputs.commitHash}}",
         }),
         step({
           name: "Download Windows binaries",
@@ -240,9 +240,9 @@ const workflow = createWorkflow({
           run: [
             "# The latest.txt file lives at a stable URL but changes every",
             "# release, so the edge has to be told to drop it. Otherwise",
-            "# `deno upgrade` keeps serving the previous version until the",
+            "# `dodo upgrade` keeps serving the previous version until the",
             "# 4 hour TTL expires.",
-            "deno run -A --lock=tools/deno.lock.json tools/release/purge_cdn_cache.ts release-${{github.event.inputs.releaseKind}}-latest.txt",
+            "dodo run -A --lock=tools/deno.lock.json tools/release/purge_cdn_cache.ts release-${{github.event.inputs.releaseKind}}-latest.txt",
           ],
         }),
       ],

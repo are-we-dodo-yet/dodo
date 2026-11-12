@@ -6,7 +6,7 @@
 A Rust crate to generate documentation for JavaScript and TypeScript modules.
 
 This crate powers
-[`deno doc`](https://deno.land/manual/tools/documentation_generator), but is not
+[`dodo doc`](https://deno.land/manual/tools/documentation_generator), but is not
 Deno specific and can be used to write documentation generators for other
 targets like Node or the browser as well.
 
@@ -44,14 +44,14 @@ $ deno task test
 If you want to work on the HTML generation aspect of deno_doc, these things will
 help you:
 
-`deno task tailwind`: this regenerates the transpiled tailwind from the css
+`dodo task tailwind`: this regenerates the transpiled tailwind from the css
 files and mentions of classes across the codebases, be it in rust files or js
 files. This needs to always be run to do any updates to the styling.
 
-`deno task gen_html`: This generates a `generated_docs` directory which is the
+`dodo task gen_html`: This generates a `generated_docs` directory which is the
 HTML output based on the provided files.
 
-`deno task debug`: this calls the above tailwind task, and then the gen_html
+`dodo task debug`: this calls the above tailwind task, and then the gen_html
 task with all the files from `tests/testdata/multiple` passed.
 
 We recommend to use these tasks above to develop features or debug things,
@@ -79,7 +79,7 @@ Most of the HTML generated, except if its in very small fragments (ie a single
 element or two) is located in `src/html/templates`. This is also where scripts,
 CSS and icons live. The `page` directory in it is an extension to that which
 only relates to generation of a full-fledged documentation page (like
-`deno doc`), and is not used when just generating fragments (like
+`dodo doc`), and is not used when just generating fragments (like
 https://jsr.io).
 
 Rendering of a symbol is done in the `src/html/symbols` directory, in the
@@ -123,7 +123,7 @@ Before submitting, please make sure the following is done:
 
 1. That there is a related issue and it is referenced in the PR text.
 2. There are tests that cover the changes.
-3. Ensure `cargo test` and `deno task test` passes.
+3. Ensure `cargo test` and `dodo task test` passes.
 4. Format your code with `rustfmt --check src/lib.rs`
 5. Make sure `cargo clippy --all-targets --release --locked -- -D clippy::all`
    passes.

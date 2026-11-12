@@ -3,7 +3,7 @@
   "tests": {
     // Catalogs declared in the root package.json: a top-level `catalog` plus a
     // `catalogs` nested under the `workspaces` object (Bun/Yarn form). Both
-    // should be reported by `deno outdated`.
+    // should be reported by `dodo outdated`.
     "print_outdated_recursive": {
       "steps": [
         {
@@ -16,7 +16,7 @@
         }
       ]
     },
-    // `deno update --latest` should write back to both the top-level `catalog`
+    // `dodo update --latest` should write back to both the top-level `catalog`
     // entry and the `workspaces`-nested `catalogs` entry.
     "update_latest_recursive": {
       "steps": [

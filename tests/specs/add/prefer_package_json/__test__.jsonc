@@ -2,7 +2,7 @@
   "tempDir": true,
   "tests": {
     "prefers_package_json_from_config": {
-      // With "preferPackageJson": true in deno.json, `deno add` (no flag)
+      // With "preferPackageJson": true in deno.json, `dodo add` (no flag)
       // routes all packages into package.json.
       "steps": [
         {

@@ -1,6 +1,6 @@
 {
   "workspace": ["./subdir"],
   "tasks": {
-    "test-all": "deno task --recursive test"
+    "test-all": "dodo task --recursive test"
   }
 }

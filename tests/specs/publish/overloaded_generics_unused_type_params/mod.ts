@@ -2,8 +2,8 @@
 //
 // An overloaded generic function whose implementation signature declares type
 // parameters used only in its (removed) body would trip TS6205 ("All type
-// parameters are unused") during the public API type check that `deno publish`
-// performs, because fast check strips the implementation body. `deno check`
+// parameters are unused") during the public API type check that `dodo publish`
+// performs, because fast check strips the implementation body. `dodo check`
 // reported no error, so the two were inconsistent.
 
 export type Handler<R> = (req: R) => R;

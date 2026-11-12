@@ -521,7 +521,7 @@ const denoCoreChangesCheckStep = step({
   run: [
     // Fetch the base SHA so it's available even in shallow clones
     `git fetch --depth=1 origin \${{ github.event.pull_request.base.sha }}`,
-    `deno run -A tools/check_deno_core_changes.js \${{ github.event.pull_request.base.sha }}`,
+    `dodo run -A tools/check_deno_core_changes.js \${{ github.event.pull_request.base.sha }}`,
   ],
   outputs: ["skip_deno_core_test"] as const,
 });
@@ -533,7 +533,7 @@ const denoCoreChangesCheckStep = step({
 const docsOnlyChangesCheckStep = step({
   id: "docs_only_changes",
   run: [
-    `deno run -A tools/check_docs_only_changes.js \${{ github.event.pull_request.base.sha }}`,
+    `dodo run -A tools/check_docs_only_changes.js \${{ github.event.pull_request.base.sha }}`,
   ],
   outputs: ["docs_only"] as const,
 });
@@ -1665,9 +1665,9 @@ const buildJobs = buildItems.map((rawBuildItem) => {
             if: isDebug,
             env: { DENO_BIN: "./target/debug/deno" },
             run: [
-              "deno run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json \\",
+              "dodo run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json \\",
               "    ./tests/wpt/wpt.ts setup",
-              "deno run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json --unsafely-ignore-certificate-errors \\",
+              "dodo run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json --unsafely-ignore-certificate-errors \\",
               '    ./tests/wpt/wpt.ts run --all --quiet --binary="$DENO_BIN"',
             ],
           },
@@ -1678,9 +1678,9 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               DENO_BIN: "./target/release/deno",
             },
             run: [
-              "deno run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json \\",
+              "dodo run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json \\",
               "    ./tests/wpt/wpt.ts setup",
-              "deno run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json --unsafely-ignore-certificate-errors \\",
+              "dodo run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json --unsafely-ignore-certificate-errors \\",
               '    ./tests/wpt/wpt.ts run --all --quiet --release --binary="$DENO_BIN" --json=wpt.json --wptreport=wptreport.json',
             ],
           },
@@ -1904,19 +1904,19 @@ const lintJob = job("lint", {
         {
           name: "test_format.js",
           run:
-            "deno run --allow-write --allow-read --allow-run --allow-net ./tools/format.js --check",
+            "dodo run --allow-write --allow-read --allow-run --allow-net ./tools/format.js --check",
         },
         {
           name: "jsdoc_checker.js",
           run:
-            "deno run --allow-read --allow-env --allow-sys ./tools/jsdoc_checker.js",
+            "dodo run --allow-read --allow-env --allow-sys ./tools/jsdoc_checker.js",
         },
       ),
       {
         name: "lint.js",
         env: { GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}" },
         run:
-          "deno run --allow-write --allow-read --allow-run --allow-net --allow-env ./tools/lint.js",
+          "dodo run --allow-write --allow-read --allow-run --allow-net --allow-env ./tools/lint.js",
       },
       saveCacheStep,
     );

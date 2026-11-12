@@ -1,5 +1,5 @@
 # mod.ts
-#!/usr/bin/env -S deno run --allow-net --allow-read
+#!/usr/bin/env -S dodo run --allow-net --allow-read
 /**
  This module provides simple examples of a class, an interface, and a function.
  * @module MyModule

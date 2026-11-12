@@ -133,7 +133,7 @@ jobs:
           mkdir -p "$TEST_DIR"
           cd "$TEST_DIR"
           npm init -y
-          EXPECTED_VERSION="deno ${{ steps.publish-verdaccio.outputs.version }}"
+          EXPECTED_VERSION="dodo ${{ steps.publish-verdaccio.outputs.version }}"
           npm install deno@${{ steps.publish-verdaccio.outputs.version }}
           ACTUAL="$(npx deno -v)"
           echo "$ACTUAL"
@@ -153,7 +153,7 @@ jobs:
           DENO_SIMULATED_READONLY_FILE_SYSTEM=1 node node_modules/deno/bin.cjs -v
       - name: Test npm global install deno
         run: |-
-          EXPECTED_VERSION="deno ${{ steps.publish-verdaccio.outputs.version }}"
+          EXPECTED_VERSION="dodo ${{ steps.publish-verdaccio.outputs.version }}"
           npm install -g deno@${{ steps.publish-verdaccio.outputs.version }}
           ACTUAL="$(deno -v)"
           echo "$ACTUAL"
@@ -167,14 +167,14 @@ jobs:
           else
             DENO_LINK="$(which deno)"
             LINK_TARGET="$(readlink "$DENO_LINK")"
-            echo "deno symlink target: $LINK_TARGET"
+            echo "dodo symlink target: $LINK_TARGET"
             echo "$LINK_TARGET" | grep -q "bin.cjs" && { echo "ERROR: deno symlink still points to bin.cjs"; exit 1; }
-            echo "deno symlink correctly points to native binary"
+            echo "dodo symlink correctly points to native binary"
           fi
           npm uninstall -g deno
       - name: Test npm global install deno (--ignore-scripts)
         run: |-
-          EXPECTED_VERSION="deno ${{ steps.publish-verdaccio.outputs.version }}"
+          EXPECTED_VERSION="dodo ${{ steps.publish-verdaccio.outputs.version }}"
           npm install -g --ignore-scripts deno@${{ steps.publish-verdaccio.outputs.version }}
           ACTUAL="$(deno -v)"
           echo "$ACTUAL"
@@ -187,14 +187,14 @@ jobs:
           mkdir -p "$TEST_DIR"
           cd "$TEST_DIR"
           npm init -y
-          EXPECTED_VERSION="deno ${{ steps.publish-verdaccio.outputs.version }}"
+          EXPECTED_VERSION="dodo ${{ steps.publish-verdaccio.outputs.version }}"
           pnpm install --ignore-scripts deno@${{ steps.publish-verdaccio.outputs.version }} --registry http://localhost:4873/
           ACTUAL="$(node node_modules/deno/bin.cjs -v)"
           echo "$ACTUAL"
           [ "$ACTUAL" = "$EXPECTED_VERSION" ] || { echo "Version mismatch: expected '$EXPECTED_VERSION', got '$ACTUAL'"; exit 1; }
       - name: Test pnpm global install deno (without postinstall)
         run: |-
-          EXPECTED_VERSION="deno ${{ steps.publish-verdaccio.outputs.version }}"
+          EXPECTED_VERSION="dodo ${{ steps.publish-verdaccio.outputs.version }}"
           pnpm install -g --ignore-scripts deno@${{ steps.publish-verdaccio.outputs.version }} --registry http://localhost:4873/
           ACTUAL="$(deno -v)"
           echo "$ACTUAL"
@@ -207,7 +207,7 @@ jobs:
           cd "$TEST_DIR"
           npm init -y
           printf 'allowBuilds:\n  deno: true\n' > pnpm-workspace.yaml
-          EXPECTED_VERSION="deno ${{ steps.publish-verdaccio.outputs.version }}"
+          EXPECTED_VERSION="dodo ${{ steps.publish-verdaccio.outputs.version }}"
           pnpm install deno@${{ steps.publish-verdaccio.outputs.version }} --registry http://localhost:4873/
           # `pnpm exec` may print lockfile verification messages to stdout before
           # the command output, so only compare against the last line
@@ -219,7 +219,7 @@ jobs:
           GLOBAL_DIR="$(pnpm root -g)"
           mkdir -p "$GLOBAL_DIR"
           printf 'allowBuilds:\n  deno: true\n' > "$GLOBAL_DIR/pnpm-workspace.yaml"
-          EXPECTED_VERSION="deno ${{ steps.publish-verdaccio.outputs.version }}"
+          EXPECTED_VERSION="dodo ${{ steps.publish-verdaccio.outputs.version }}"
           pnpm install -g deno@${{ steps.publish-verdaccio.outputs.version }} --registry http://localhost:4873/
           ACTUAL="$(deno -v)"
           echo "$ACTUAL"

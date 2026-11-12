@@ -574,7 +574,7 @@ Deno.test(
   async () => {
     const cmdFinished = Promise.withResolvers<void>();
     let output = "";
-    const cp = spawn("cmd", ["/d", "/s", "/c", '"deno ^"--version^""'], {
+    const cp = spawn("cmd", ["/d", "/s", "/c", '"dodo ^"--version^""'], {
       stdio: "pipe",
       windowsVerbatimArguments: true,
     });

@@ -66,7 +66,7 @@ function bench(
   optionsOrFn,
   maybeFn,
 ) {
-  // No-op if we're not running in `deno bench` subcommand.
+  // No-op if we're not running in `dodo bench` subcommand.
   if (typeof op_register_bench !== "function") {
     return;
   }

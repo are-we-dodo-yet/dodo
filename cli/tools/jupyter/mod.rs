@@ -43,7 +43,7 @@ pub async fn kernel(
   jupyter_flags: JupyterFlags,
 ) -> Result<(), AnyError> {
   log::info!(
-    "{} \"deno jupyter\" is unstable and might change in the future.",
+    "{} \"dodo jupyter\" is unstable and might change in the future.",
     colors::yellow("Warning"),
   );
 

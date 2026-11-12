@@ -1174,23 +1174,23 @@ mod tests {
     // Plain `dodo test --env-file=.env.test -A` (the case from
     // https://github.com/denoland/deno/issues/28797).
     assert_eq!(
-      extract_env_files_from_command("deno test --env-file=.env.test -A"),
+      extract_env_files_from_command("dodo test --env-file=.env.test -A"),
       vec![".env.test".to_string()],
     );
     // Bare `--env-file` defaults to `.env` (matches CLI default).
     assert_eq!(
-      extract_env_files_from_command("deno test --env-file -A"),
+      extract_env_files_from_command("dodo test --env-file -A"),
       vec![".env".to_string()],
     );
     // `--env` alias.
     assert_eq!(
-      extract_env_files_from_command("deno test --env=.env.local"),
+      extract_env_files_from_command("dodo test --env=.env.local"),
       vec![".env.local".to_string()],
     );
     // Multiple env files, possibly amid other args.
     assert_eq!(
       extract_env_files_from_command(
-        "deno test --env-file=.env --env-file=.env.test -A"
+        "dodo test --env-file=.env --env-file=.env.test -A"
       ),
       vec![".env".to_string(), ".env.test".to_string()],
     );
@@ -1198,35 +1198,35 @@ mod tests {
     // intended for the test run.
     assert_eq!(
       extract_env_files_from_command(
-        "deno fmt && deno test --env-file=.env.test"
+        "dodo fmt && deno test --env-file=.env.test"
       ),
       vec![".env.test".to_string()],
     );
     // Env files belonging to other commands in a compound task are ignored.
     assert_eq!(
       extract_env_files_from_command(
-        "deno run --env-file=.env.prod setup.ts && deno test --env-file=.env.test"
+        "dodo run --env-file=.env.prod setup.ts && deno test --env-file=.env.test"
       ),
       vec![".env.test".to_string()],
     );
     assert!(
       extract_env_files_from_command(
-        "deno run --env-file=.env.prod setup.ts && deno test"
+        "dodo run --env-file=.env.prod setup.ts && deno test"
       )
       .is_empty()
     );
     // Quoted path containing whitespace is preserved by the shlex split.
     assert_eq!(
       extract_env_files_from_command(
-        "deno test --env-file=\"my env/.env.test\""
+        "dodo test --env-file=\"my env/.env.test\""
       ),
       vec!["my env/.env.test".to_string()],
     );
     // No env-file flag.
-    assert!(extract_env_files_from_command("deno test -A").is_empty());
+    assert!(extract_env_files_from_command("dodo test -A").is_empty());
     // Malformed command (unterminated quote) is treated as no env files.
     assert!(
-      extract_env_files_from_command("deno test --env-file=\"foo").is_empty()
+      extract_env_files_from_command("dodo test --env-file=\"foo").is_empty()
     );
   }
 }

@@ -2,7 +2,7 @@ import fs from "node:fs";
 import assert from "node:assert/strict";
 
 // `import.meta.filename` points at the embedded module inside the
-// `deno compile` virtual file system. Calling node:fs.fstatSync on a file
+// `dodo compile` virtual file system. Calling node:fs.fstatSync on a file
 // descriptor opened against it used to fail with `NotSupported` because the
 // VFS file's `stat_sync`/`stat_async` implementations were unimplemented.
 const selfPath = import.meta.filename!;

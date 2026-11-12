@@ -636,7 +636,7 @@ pub async fn add(
               add_req.package_name(),
               add_req.alias,
               crate::colors::yellow(format!(
-                "deno {cmd_name} my-alias@{}",
+                "dodo {cmd_name} my-alias@{}",
                 add_req.package_name()
               )),
             );
@@ -657,7 +657,7 @@ pub async fn add(
         {
           bail!(
             "{entry_text} is missing a prefix. Did you mean `{}`?",
-            crate::colors::yellow(format!("deno {cmd_name} jsr:{package_req}"))
+            crate::colors::yellow(format!("dodo {cmd_name} jsr:{package_req}"))
           )
         } else if npm_resolver
           .req_to_nv(&package_req)
@@ -668,7 +668,7 @@ pub async fn add(
         {
           bail!(
             "{entry_text} is missing a prefix. Did you mean `{}`?",
-            crate::colors::yellow(format!("deno {cmd_name} npm:{package_req}"))
+            crate::colors::yellow(format!("dodo {cmd_name} npm:{package_req}"))
           )
         } else {
           bail!(
@@ -712,14 +712,14 @@ pub async fn add(
           bail!(
             "{} was not found, but a matching npm package exists. Did you mean `{}`?",
             crate::colors::red(package_name),
-            crate::colors::yellow(format!("deno {cmd_name} npm:{package_req}"))
+            crate::colors::yellow(format!("dodo {cmd_name} npm:{package_req}"))
           );
         }
         Some(NotFoundHelp::JsrPackage) => {
           bail!(
             "{} was not found, but a matching jsr package exists. Did you mean `{}`?",
             crate::colors::red(package_name),
-            crate::colors::yellow(format!("deno {cmd_name} jsr:{package_req}"))
+            crate::colors::yellow(format!("dodo {cmd_name} jsr:{package_req}"))
           )
         }
         Some(NotFoundHelp::PreReleaseVersion(version)) => {
@@ -727,7 +727,7 @@ pub async fn add(
             "{} has only pre-release versions available. Try specifying a version: `{}`",
             crate::colors::red(&package_name),
             crate::colors::yellow(format!(
-              "deno {cmd_name} {package_name}@^{version}"
+              "dodo {cmd_name} {package_name}@^{version}"
             ))
           )
         }
@@ -1382,7 +1382,7 @@ fn link_hint_for_spec(cwd: &Path, spec: &str) -> Option<String> {
   Some(format!(
     "'{}' looks like a local package directory. Did you mean `{}`?",
     spec,
-    crate::colors::yellow(format!("deno link {spec}"))
+    crate::colors::yellow(format!("dodo link {spec}"))
   ))
 }
 

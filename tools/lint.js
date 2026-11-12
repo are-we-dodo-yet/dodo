@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run --allow-all --config=tests/config/deno.json
+#!/usr/bin/env -S dodo run --allow-all --config=tests/config/deno.json
 // Copyright 2018-2026 the Deno authors. MIT license.
 
 // deno-lint-ignore-file no-console
@@ -131,7 +131,7 @@ async function lintJS() {
             const decoder = new TextDecoder();
             console.log("\n------ deno lint ------");
             console.log(decoder.decode(stderr));
-            throw new Error("deno lint failed");
+            throw new Error("dodo lint failed");
           }
         }),
       );
@@ -210,7 +210,7 @@ async function lintBootstraps() {
             const decoder = new TextDecoder();
             console.log("\n------ deno lint bootstraps ------");
             console.log(decoder.decode(stderr));
-            throw new Error("deno lint bootstraps failed");
+            throw new Error("dodo lint bootstraps failed");
           }
         }),
       );
@@ -401,7 +401,7 @@ async function clippy() {
     "warnings",
     "--deny",
     "clippy::unused_async",
-    // the std print macros panic on broken pipes (ex. `deno test | head`);
+    // the std print macros panic on broken pipes (ex. `dodo test | head`);
     // prefer the `log` crate for diagnostics and deno_print's drop_println!
     // macros for stdout output, or ignore these print_* rules if necessary
     "--deny",
@@ -433,7 +433,7 @@ async function clippy() {
     const { code } = await child.status;
     if (/clippy::print[-_]std(out|err)/.test(stderrText)) {
       console.error(
-        "\nhint: the std print macros panic when the output pipe is closed (ex. `deno test | head`).",
+        "\nhint: the std print macros panic when the output pipe is closed (ex. `dodo test | head`).",
       );
       console.error(
         "      use deno_print's drop_println!/drop_eprintln! macros for command output or the `log` crate for diagnostics.",
@@ -588,7 +588,7 @@ async function ensureNoNonPermissionCapitalLetterShortFlags() {
   const expected = [
     // --allow-all
     "A",
-    // --dev flag for `deno install` (precedence: `npm install -D <package>`)
+    // --dev flag for `dodo install` (precedence: `npm install -D <package>`)
     "D",
     // --allow-env
     "E",
@@ -598,7 +598,7 @@ async function ensureNoNonPermissionCapitalLetterShortFlags() {
     "L",
     // --allow-net
     "N",
-    // --save-optional flag for `deno add`/`deno install`
+    // --save-optional flag for `dodo add`/`dodo install`
     // (precedence: `npm install -O <package>`)
     "O",
     // --permission-set

@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run -A --lock=tools/deno.lock.json
+#!/usr/bin/env -S dodo run -A --lock=tools/deno.lock.json
 // Copyright 2018-2026 the Deno authors. MIT license.
 import { DenoWorkspace } from "./deno_workspace.ts";
 import { $, createOctoKit, getGitHubRepository } from "./deps.ts";

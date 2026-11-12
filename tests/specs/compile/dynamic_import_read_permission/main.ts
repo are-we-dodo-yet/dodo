@@ -1,6 +1,6 @@
 // Local files that are not embedded in the binary must pass the read
 // permission check when loaded via `import()` or as a worker, as with
-// `deno run`.
+// `dodo run`.
 const cwd = Deno.cwd().replaceAll("\\", "/");
 const toUrl = (path: string) =>
   `file://${cwd.startsWith("/") ? "" : "/"}${cwd}/${path}`;

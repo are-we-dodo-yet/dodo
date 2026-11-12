@@ -761,7 +761,7 @@ function createTestContext(desc) {
     origin: desc.origin,
     /**
      * Asserts that `actual` matches the snapshot stored in the snapshot
-     * file. With `deno test --update-snapshots`, mismatching or missing
+     * file. With `dodo test --update-snapshots`, mismatching or missing
      * snapshots are written to the snapshot file instead.
      *
      * @param actual {unknown}

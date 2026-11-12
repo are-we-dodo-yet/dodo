@@ -186,7 +186,7 @@ async fn deno_serve_port_0() {
   assert_eq!(200, res.status());
 
   let body = res.text().await.unwrap();
-  assert_eq!(body, "deno serve --port 0 works!");
+  assert_eq!(body, "dodo serve --port 0 works!");
   client.kill();
 }
 
@@ -199,7 +199,7 @@ async fn deno_serve_no_args() {
   assert_eq!(200, res.status());
 
   let body = res.text().await.unwrap();
-  assert_eq!(body, "deno serve with no args in fetch() works!");
+  assert_eq!(body, "dodo serve with no args in fetch() works!");
 }
 
 #[test]
@@ -223,7 +223,7 @@ async fn deno_serve_parallel() {
       .unwrap();
     assert_eq!(200, response.status());
     let body = response.text().await.unwrap();
-    assert_eq!(body, "deno serve parallel");
+    assert_eq!(body, "dodo serve parallel");
     tokio::time::sleep(Duration::from_millis(1)).await;
   }
 

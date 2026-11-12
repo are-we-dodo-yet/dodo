@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run --check --allow-write=. --allow-read=. --lock=./tools/deno.lock.json
+#!/usr/bin/env -S dodo run --check --allow-write=. --allow-read=. --lock=./tools/deno.lock.json
 // Copyright 2018-2026 the Deno authors. MIT license.
 import {
   createWorkflow,
@@ -170,7 +170,7 @@ const testNpmInstall = step.dependsOn(publishVerdaccio)({
     'mkdir -p "$TEST_DIR"',
     'cd "$TEST_DIR"',
     "npm init -y",
-    'EXPECTED_VERSION="deno ${{ steps.publish-verdaccio.outputs.version }}"',
+    'EXPECTED_VERSION="dodo ${{ steps.publish-verdaccio.outputs.version }}"',
     "npm install deno@${{ steps.publish-verdaccio.outputs.version }}",
     'ACTUAL="$(npx deno -v)"',
     'echo "$ACTUAL"',
@@ -202,12 +202,12 @@ const testReadonlyFs = step.dependsOn(testBinCjs)({
 const testNpmGlobalInstall = step.dependsOn(testReadonlyFs)({
   name: "Test npm global install deno",
   run: [
-    'EXPECTED_VERSION="deno ${{ steps.publish-verdaccio.outputs.version }}"',
+    'EXPECTED_VERSION="dodo ${{ steps.publish-verdaccio.outputs.version }}"',
     "npm install -g deno@${{ steps.publish-verdaccio.outputs.version }}",
     'ACTUAL="$(deno -v)"',
     'echo "$ACTUAL"',
     '[ "$ACTUAL" = "$EXPECTED_VERSION" ] || { echo "Version mismatch: expected \'$EXPECTED_VERSION\', got \'$ACTUAL\'"; exit 1; }',
-    "deno eval \"console.log('global npm install works')\"",
+    "dodo eval \"console.log('global npm install works')\"",
     "# Verify the global bin entry points directly at the native binary, not bin.cjs",
     'if [ "$RUNNER_OS" = "Windows" ]; then',
     '  DENO_CMD="$(npm prefix -g)/deno.cmd"',
@@ -216,9 +216,9 @@ const testNpmGlobalInstall = step.dependsOn(testReadonlyFs)({
     "else",
     '  DENO_LINK="$(which deno)"',
     '  LINK_TARGET="$(readlink "$DENO_LINK")"',
-    '  echo "deno symlink target: $LINK_TARGET"',
+    '  echo "dodo symlink target: $LINK_TARGET"',
     '  echo "$LINK_TARGET" | grep -q "bin.cjs" && { echo "ERROR: deno symlink still points to bin.cjs"; exit 1; }',
-    '  echo "deno symlink correctly points to native binary"',
+    '  echo "dodo symlink correctly points to native binary"',
     "fi",
     "npm uninstall -g deno",
   ],
@@ -227,12 +227,12 @@ const testNpmGlobalInstall = step.dependsOn(testReadonlyFs)({
 const testNpmGlobalIgnoreScripts = step.dependsOn(testNpmGlobalInstall)({
   name: "Test npm global install deno (--ignore-scripts)",
   run: [
-    'EXPECTED_VERSION="deno ${{ steps.publish-verdaccio.outputs.version }}"',
+    'EXPECTED_VERSION="dodo ${{ steps.publish-verdaccio.outputs.version }}"',
     "npm install -g --ignore-scripts deno@${{ steps.publish-verdaccio.outputs.version }}",
     'ACTUAL="$(deno -v)"',
     'echo "$ACTUAL"',
     '[ "$ACTUAL" = "$EXPECTED_VERSION" ] || { echo "Version mismatch: expected \'$EXPECTED_VERSION\', got \'$ACTUAL\'"; exit 1; }',
-    "deno eval \"console.log('global npm install works')\"",
+    "dodo eval \"console.log('global npm install works')\"",
     "npm uninstall -g deno",
   ],
 });
@@ -244,7 +244,7 @@ const testPnpmLocalNoScripts = step.dependsOn(testNpmGlobalIgnoreScripts)({
     'mkdir -p "$TEST_DIR"',
     'cd "$TEST_DIR"',
     "npm init -y",
-    'EXPECTED_VERSION="deno ${{ steps.publish-verdaccio.outputs.version }}"',
+    'EXPECTED_VERSION="dodo ${{ steps.publish-verdaccio.outputs.version }}"',
     "pnpm install --ignore-scripts deno@${{ steps.publish-verdaccio.outputs.version }} --registry http://localhost:4873/",
     'ACTUAL="$(node node_modules/deno/bin.cjs -v)"',
     'echo "$ACTUAL"',
@@ -255,7 +255,7 @@ const testPnpmLocalNoScripts = step.dependsOn(testNpmGlobalIgnoreScripts)({
 const testPnpmGlobalNoScripts = step.dependsOn(testPnpmLocalNoScripts)({
   name: "Test pnpm global install deno (without postinstall)",
   run: [
-    'EXPECTED_VERSION="deno ${{ steps.publish-verdaccio.outputs.version }}"',
+    'EXPECTED_VERSION="dodo ${{ steps.publish-verdaccio.outputs.version }}"',
     "pnpm install -g --ignore-scripts deno@${{ steps.publish-verdaccio.outputs.version }} --registry http://localhost:4873/",
     'ACTUAL="$(deno -v)"',
     'echo "$ACTUAL"',
@@ -272,7 +272,7 @@ const testPnpmLocalWithScripts = step.dependsOn(testPnpmGlobalNoScripts)({
     'cd "$TEST_DIR"',
     "npm init -y",
     "printf 'allowBuilds:\\n  deno: true\\n' > pnpm-workspace.yaml",
-    'EXPECTED_VERSION="deno ${{ steps.publish-verdaccio.outputs.version }}"',
+    'EXPECTED_VERSION="dodo ${{ steps.publish-verdaccio.outputs.version }}"',
     "pnpm install deno@${{ steps.publish-verdaccio.outputs.version }} --registry http://localhost:4873/",
     "# `pnpm exec` may print lockfile verification messages to stdout before",
     "# the command output, so only compare against the last line",
@@ -288,12 +288,12 @@ const testPnpmGlobalWithScripts = step.dependsOn(testPnpmLocalWithScripts)({
     'GLOBAL_DIR="$(pnpm root -g)"',
     'mkdir -p "$GLOBAL_DIR"',
     "printf 'allowBuilds:\\n  deno: true\\n' > \"$GLOBAL_DIR/pnpm-workspace.yaml\"",
-    'EXPECTED_VERSION="deno ${{ steps.publish-verdaccio.outputs.version }}"',
+    'EXPECTED_VERSION="dodo ${{ steps.publish-verdaccio.outputs.version }}"',
     "pnpm install -g deno@${{ steps.publish-verdaccio.outputs.version }} --registry http://localhost:4873/",
     'ACTUAL="$(deno -v)"',
     'echo "$ACTUAL"',
     '[ "$ACTUAL" = "$EXPECTED_VERSION" ] || { echo "Version mismatch: expected \'$EXPECTED_VERSION\', got \'$ACTUAL\'"; exit 1; }',
-    "deno eval \"console.log('global pnpm install works')\"",
+    "dodo eval \"console.log('global pnpm install works')\"",
     "pnpm uninstall -g deno",
   ],
 });
@@ -315,8 +315,8 @@ const testNpmGlobalPowershell = step.dependsOn(testNpmLocalPowershell)({
   shell: "pwsh",
   run: [
     "npm install -g deno@${{ steps.publish-verdaccio.outputs.version }}",
-    "deno -v",
-    "deno eval \"console.log('PowerShell npm global install works')\"",
+    "dodo -v",
+    "dodo eval \"console.log('PowerShell npm global install works')\"",
     "npm uninstall -g deno",
   ],
 });
@@ -338,8 +338,8 @@ const testNpmGlobalCmd = step.dependsOn(testNpmLocalCmd)({
   shell: "cmd",
   run: [
     "npm install -g deno@${{ steps.publish-verdaccio.outputs.version }}",
-    "deno -v",
-    "deno eval \"console.log('cmd npm global install works')\"",
+    "dodo -v",
+    "dodo eval \"console.log('cmd npm global install works')\"",
     "npm uninstall -g deno",
   ],
 });

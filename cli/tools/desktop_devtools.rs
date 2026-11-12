@@ -1764,7 +1764,7 @@ mod tests {
         .as_str()
         .unwrap()
         .contains("js_app.html"),
-      "deno direct entry should launch js_app.html"
+      "dodo direct entry should launch js_app.html"
     );
     for page_entry in [&list[0], &list[2]] {
       assert!(

@@ -891,11 +891,11 @@ impl Default for DenoSubcommand {
 pub enum TypeCheckMode {
   /// Type-check all modules.
   All,
-  /// Skip type-checking of all modules. The default value for "deno run" and
+  /// Skip type-checking of all modules. The default value for "dodo run" and
   /// several other subcommands.
   #[default]
   None,
-  /// Only type-check local modules. The default value for "deno test" and
+  /// Only type-check local modules. The default value for "dodo test" and
   /// several other subcommands.
   Local,
 }

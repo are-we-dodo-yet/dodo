@@ -2,7 +2,7 @@
   "tempDir": true,
   "steps": [
     {
-      // No deno.lock, package-lock.json, or pnpm-lock.yaml. `deno install`
+      // No deno.lock, package-lock.json, or pnpm-lock.yaml. `dodo install`
       // should seed deno.lock from bun.lock, including the workspace member's
       // deps (bun records every workspace's requirements under `workspaces`).
       "args": "install",

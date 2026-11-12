@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run -A --lock=tools/deno.lock.json
+#!/usr/bin/env -S dodo run -A --lock=tools/deno.lock.json
 // Copyright 2018-2026 the Deno authors. MIT license.
 // deno-lint-ignore-file no-console
 
@@ -7,13 +7,13 @@
 // The `*-latest.txt` files live at a stable URL but change on every release,
 // and the edge caches them for 4 hours. If anything requests one between the
 // previous release and the new upload, the edge pins the old version and
-// `deno upgrade` keeps handing out the previous release until the TTL expires.
+// `dodo upgrade` keeps handing out the previous release until the TTL expires.
 //
 // Usage: purge_cdn_cache.ts <file>...
 
 const BASE_URL = "https://dl.deno.land";
 
-// `deno upgrade` appends `?lsp` when the check comes from the LSP
+// `dodo upgrade` appends `?lsp` when the check comes from the LSP
 // (see cli/tools/upgrade.rs). Cloudflare's cache key includes the query
 // string, so that variant is a separate entry and needs its own purge.
 const LSP_QUERY = "?lsp";

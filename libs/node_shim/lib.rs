@@ -3144,8 +3144,8 @@ pub fn parse_args(args: Vec<String>) -> Result<ParseResult, Vec<String>> {
 /// Options for controlling translation behavior
 #[derive(Debug, Clone, Default)]
 pub struct TranslateOptions {
-  /// Use "deno node" as base command (for standalone CLI)
-  /// When false, uses "deno run" (for child_process spawning)
+  /// Use "dodo node" as base command (for standalone CLI)
+  /// When false, uses "dodo run" (for child_process spawning)
   pub use_node_subcommand: bool,
   /// Add unstable Node.js compat flags (--unstable-bare-node-builtins,
   /// --unstable-detect-cjs)

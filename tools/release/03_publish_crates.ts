@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run -A --lock=tools/deno.lock.json
+#!/usr/bin/env -S dodo run -A --lock=tools/deno.lock.json
 // Copyright 2018-2026 the Deno authors. MIT license.
 
 // deno-lint-ignore-file no-console
