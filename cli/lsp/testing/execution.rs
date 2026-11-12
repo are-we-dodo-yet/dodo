@@ -1198,20 +1198,20 @@ mod tests {
     // intended for the test run.
     assert_eq!(
       extract_env_files_from_command(
-        "dodo fmt && deno test --env-file=.env.test"
+        "dodo fmt && dodo test --env-file=.env.test"
       ),
       vec![".env.test".to_string()],
     );
     // Env files belonging to other commands in a compound task are ignored.
     assert_eq!(
       extract_env_files_from_command(
-        "dodo run --env-file=.env.prod setup.ts && deno test --env-file=.env.test"
+        "dodo run --env-file=.env.prod setup.ts && dodo test --env-file=.env.test"
       ),
       vec![".env.test".to_string()],
     );
     assert!(
       extract_env_files_from_command(
-        "dodo run --env-file=.env.prod setup.ts && deno test"
+        "dodo run --env-file=.env.prod setup.ts && dodo test"
       )
       .is_empty()
     );

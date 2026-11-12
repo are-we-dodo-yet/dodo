@@ -583,7 +583,7 @@ Deno.test(
       output += data;
     });
     await cmdFinished.promise;
-    assertStringIncludes(output, "deno");
+    assertStringIncludes(output, "dodo");
     assertStringIncludes(output, "v8");
     assertStringIncludes(output, "typescript");
   },

@@ -141,7 +141,7 @@ label is sufficient. Do not over-label.
 | `runtime`                                                                                                                              | Runtime crate                    |
 | `permissions`                                                                                                                          | Permission system                |
 | `compile`                                                                                                                              | `dodo compile`                   |
-| `testing`                                                                                                                              | `dao test` and coverage         |
+| `testing`                                                                                                                              | `dodo test` and coverage         |
 | `task runner`                                                                                                                          | `dodo task`                      |
 | `install`                                                                                                                              | `dodo install` / `dodo add`      |
 | `tsc`                                                                                                                                  | TypeScript compiler              |
