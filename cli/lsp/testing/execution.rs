@@ -526,7 +526,7 @@ impl TestRun {
   }
 
   fn get_args(&self) -> Vec<Cow<'_, str>> {
-    let mut args = vec![Cow::Borrowed("deno"), Cow::Borrowed("test")];
+    let mut args = vec![Cow::Borrowed("dodo"), Cow::Borrowed("test")];
     args.extend(
       self
         .workspace_settings

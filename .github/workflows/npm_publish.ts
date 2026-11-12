@@ -276,7 +276,7 @@ const testPnpmLocalWithScripts = step.dependsOn(testPnpmGlobalNoScripts)({
     "pnpm install deno@${{ steps.publish-verdaccio.outputs.version }} --registry http://localhost:4873/",
     "# `pnpm exec` may print lockfile verification messages to stdout before",
     "# the command output, so only compare against the last line",
-    'ACTUAL="$(pnpm exec deno -v | tail -n 1)"',
+    'ACTUAL="$(pnpm exec dodo -v | tail -n 1)"',
     'echo "$ACTUAL"',
     '[ "$ACTUAL" = "$EXPECTED_VERSION" ] || { echo "Version mismatch: expected \'$EXPECTED_VERSION\', got \'$ACTUAL\'"; exit 1; }',
   ],

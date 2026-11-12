@@ -1663,11 +1663,11 @@ const buildJobs = buildItems.map((rawBuildItem) => {
           {
             name: "Run web platform tests (debug)",
             if: isDebug,
-            env: { DENO_BIN: "./target/debug/deno" },
+            env: { DENO_BIN: "./target/debug/dodo" },
             run: [
-              "dodo run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json \\",
+              "deno run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json \\",
               "    ./tests/wpt/wpt.ts setup",
-              "dodo run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json --unsafely-ignore-certificate-errors \\",
+              "deno run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json --unsafely-ignore-certificate-errors \\",
               '    ./tests/wpt/wpt.ts run --all --quiet --binary="$DENO_BIN"',
             ],
           },
@@ -1675,12 +1675,12 @@ const buildJobs = buildItems.map((rawBuildItem) => {
             name: "Run web platform tests (release)",
             if: isRelease,
             env: {
-              DENO_BIN: "./target/release/deno",
+              DENO_BIN: "./target/release/dodo",
             },
             run: [
-              "dodo run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json \\",
+              "deno run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json \\",
               "    ./tests/wpt/wpt.ts setup",
-              "dodo run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json --unsafely-ignore-certificate-errors \\",
+              "deno run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json --unsafely-ignore-certificate-errors \\",
               '    ./tests/wpt/wpt.ts run --all --quiet --release --binary="$DENO_BIN" --json=wpt.json --wptreport=wptreport.json',
             ],
           },
