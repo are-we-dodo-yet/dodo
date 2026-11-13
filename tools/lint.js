@@ -550,7 +550,7 @@ async function ensureWorkflowYmlsUpToDate() {
   ];
 
   for (const gen of generators) {
-    const cmd = new Deno.Command("dodo", {
+    const cmd = new Deno.Command("deno", {
       cwd: ROOT_PATH,
       args: ["run", "--allow-read=.", "--allow-net=jsr.io", gen, "--lint"],
       stderr: "piped",

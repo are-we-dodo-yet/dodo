@@ -649,7 +649,7 @@ fn extract_env_files_from_command(command: &str) -> Vec<String> {
   let mut env_files = Vec::new();
   let mut index = 0;
   while index + 1 < tokens.len() {
-    if tokens[index] == "deno" && tokens[index + 1] == "test" {
+    if tokens[index] == "dodo" && tokens[index + 1] == "test" {
       index += 2;
       while index < tokens.len() && !is_shell_command_separator(&tokens[index])
       {
