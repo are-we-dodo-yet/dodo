@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run --check --allow-write=. --allow-read=. --lock=./tools/deno.lock.json
+#!/usr/bin/env -S dodo run --check --allow-write=. --allow-read=. --lock=./tools/deno.lock.json
 // Copyright 2018-2026 the Deno authors. MIT license.
 import { createWorkflow, step } from "jsr:@david/gagen@0.3.1";
 
@@ -23,7 +23,7 @@ const workflow = createWorkflow({
         name: "Lint",
         env: { PR_TITLE: "${{ github.event.pull_request.title }}" },
         run:
-          'deno run https://raw.githubusercontent.com/denoland/deno/refs/heads/main/tools/verify_pr_title.js "$PR_TITLE"',
+          'dodo run https://raw.githubusercontent.com/denoland/deno/refs/heads/main/tools/verify_pr_title.js "$PR_TITLE"',
       }),
     ],
   }],

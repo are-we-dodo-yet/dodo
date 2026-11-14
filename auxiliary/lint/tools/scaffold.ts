@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run --allow-write=. --allow-read=.
+#!/usr/bin/env -S dodo run --allow-write=. --allow-read=.
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
 import { cyan, green, red } from "https://deno.land/std@0.106.0/fmt/colors.ts";

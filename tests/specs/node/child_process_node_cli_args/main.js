@@ -153,7 +153,7 @@ async function testDenoSubcommandPassthrough() {
 }
 
 async function testPermissionPassthrough() {
-  // Regression test for #35441: spawning `deno run <script>` (deno-style args)
+  // Regression test for #35441: spawning `dodo run <script>` (deno-style args)
   // without permission flags must still grant the Node-compat child full
   // permissions, instead of dropping to no permissions and prompting/erroring.
   const path = require("path");

@@ -5,7 +5,7 @@ import { browserslistToTargets, transform } from "lightningcss";
 const browsers = browserslist(">= 0.5%, not dead");
 
 const styles =
-  await $`deno run -A npm:tailwindcss@3.4.3 --input src/html/templates/styles.css`
+  await $`dodo run -A npm:tailwindcss@3.4.3 --input src/html/templates/styles.css`
     .text();
 const stylesWrapped = ".ddoc {" + styles + "}";
 const stylesFinal = transform({
@@ -18,7 +18,7 @@ const stylesFinal = transform({
 await Deno.writeFile("src/html/templates/styles.gen.css", stylesFinal.code);
 
 const page =
-  await $`deno run -A npm:tailwindcss@3.4.3 --config=./src/html/templates/pages/tailwind.config.ts --input src/html/templates/pages/page.css`
+  await $`dodo run -A npm:tailwindcss@3.4.3 --config=./src/html/templates/pages/tailwind.config.ts --input src/html/templates/pages/page.css`
     .bytes();
 const pageFinal = transform({
   filename: "./page.css",
@@ -30,7 +30,7 @@ const pageFinal = transform({
 await Deno.writeFile("src/html/templates/pages/page.gen.css", pageFinal.code);
 
 const reset =
-  await $`deno run -A npm:tailwindcss@3.4.3 --input src/html/templates/pages/reset.css`
+  await $`dodo run -A npm:tailwindcss@3.4.3 --input src/html/templates/pages/reset.css`
     .bytes();
 const resetFinal = transform({
   filename: "./reset.css",
@@ -42,7 +42,7 @@ const resetFinal = transform({
 await Deno.writeFile("src/html/templates/pages/reset.gen.css", resetFinal.code);
 
 const comrak =
-  await $`deno run -A npm:tailwindcss@3.4.3 --input src/html/templates/comrak.css`
+  await $`dodo run -A npm:tailwindcss@3.4.3 --input src/html/templates/comrak.css`
     .bytes();
 const comrakFinal = transform({
   filename: "./comrak.css",

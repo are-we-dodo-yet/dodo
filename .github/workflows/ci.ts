@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run --check --allow-write=. --allow-read=. --lock=./tools/deno.lock.json
+#!/usr/bin/env -S dodo run --check --allow-write=. --allow-read=. --lock=./tools/deno.lock.json
 // Copyright 2018-2026 the Deno authors. MIT license.
 import { parse as parseToml } from "jsr:@std/toml@1";
 import {
@@ -677,7 +677,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
     };
   };
 
-  const denoArtifact = createBinaryArtifact("deno");
+  const dodoArtifact = createBinaryArtifact("dodo");
   const denortArtifact = createBinaryArtifact("denort");
   const testServerArtifact = createBinaryArtifact("test_server");
   const env = {
@@ -749,14 +749,14 @@ const buildJobs = buildItems.map((rawBuildItem) => {
             if: isLinux.and(isDenoland),
             run: [
               "cd target/release",
-              `./deno -A ../../tools/release/create_symcache.ts deno-${buildItem.arch}-unknown-linux-gnu.symcache`,
+              `./dodo -A ../../tools/release/create_symcache.ts deno-${buildItem.arch}-unknown-linux-gnu.symcache`,
               "strip --remove-section=.eh_frame --remove-section=.eh_frame_hdr ./deno",
-              "if readelf -SW ./deno | grep -Eq '\\.eh_frame(_hdr)?'; then echo 'unwind sections remain in deno'; exit 1; fi",
-              "if readelf -lW ./deno | grep -q GNU_EH_FRAME; then echo 'PT_GNU_EH_FRAME remains in deno'; exit 1; fi",
-              `shasum -a 256 deno > deno-${buildItem.arch}-unknown-linux-gnu.sha256sum`,
+              "if readelf -SW ./dodo | grep -Eq '\\.eh_frame(_hdr)?'; then echo 'unwind sections remain in deno'; exit 1; fi",
+              "if readelf -lW ./dodo | grep -q GNU_EH_FRAME; then echo 'PT_GNU_EH_FRAME remains in deno'; exit 1; fi",
+              `shasum -a 256 dodo > deno-${buildItem.arch}-unknown-linux-gnu.sha256sum`,
               `zip -r deno-${buildItem.arch}-unknown-linux-gnu.zip deno`,
               `shasum -a 256 deno-${buildItem.arch}-unknown-linux-gnu.zip > deno-${buildItem.arch}-unknown-linux-gnu.zip.sha256sum`,
-              // denort is the `deno compile` base binary: libsui rewrites its
+              // denort is the `dodo compile` base binary: libsui rewrites its
               // ELF to embed user code, and that rewrite drops `.relr.dyn`
               // relative relocations when the symbol table is gone, producing a
               // compiled binary whose C++ static-init guards deadlock
@@ -772,7 +772,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               "if readelf -lW ./libdenort.so | grep -q GNU_EH_FRAME; then echo 'PT_GNU_EH_FRAME remains in libdenort.so'; exit 1; fi",
               `zip -r libdenort-${buildItem.arch}-unknown-linux-gnu.zip libdenort.so`,
               `shasum -a 256 libdenort-${buildItem.arch}-unknown-linux-gnu.zip > libdenort-${buildItem.arch}-unknown-linux-gnu.zip.sha256sum`,
-              // QuickJS denort/libdenort for `deno compile --engine quickjs`.
+              // QuickJS denort/libdenort for `dodo compile --engine quickjs`.
               // Reuse the same target dir (a second one would exceed runner
               // disk). Back up the v8 binaries and restore them even if the
               // QuickJS build fails so later release steps never see a partial
@@ -793,7 +793,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               `shasum -a 256 libdenort-quickjs-${buildItem.arch}-unknown-linux-gnu.zip > libdenort-quickjs-${buildItem.arch}-unknown-linux-gnu.zip.sha256sum`,
               "restore_v8_runtimes",
               "trap - EXIT",
-              "./deno types > lib.deno.d.ts",
+              "./dodo types > lib.deno.d.ts",
             ],
           },
           step.dependsOn(setupPrebuiltMacStep, installDenoStep)({
@@ -813,18 +813,18 @@ const buildJobs = buildItems.map((rawBuildItem) => {
                 "${{ secrets.APPLE_CODESIGN_PASSWORD }}",
             },
             run: [
-              `target/release/deno -A tools/release/create_symcache.ts target/release/deno-${buildItem.arch}-apple-darwin.symcache`,
+              `target/release/dodo -A tools/release/create_symcache.ts target/release/deno-${buildItem.arch}-apple-darwin.symcache`,
               "strip -x -S target/release/deno",
               'if [[ "$GITHUB_REF" == "refs/heads/main" || "$GITHUB_REF" == refs/tags/* ]]; then',
               '  echo "Key is $(echo $APPLE_CODESIGN_KEY | base64 -d | wc -c) bytes"',
-              "  rcodesign sign target/release/deno " +
+              "  rcodesign sign target/release/dodo " +
               "--code-signature-flags=runtime " +
               '--p12-password="$APPLE_CODESIGN_PASSWORD" ' +
               "--p12-file=<(echo $APPLE_CODESIGN_KEY | base64 -d) " +
               "--entitlements-xml-file=cli/entitlements.plist",
               "fi",
               "cd target/release",
-              `shasum -a 256 deno > deno-${buildItem.arch}-apple-darwin.sha256sum`,
+              `shasum -a 256 dodo > deno-${buildItem.arch}-apple-darwin.sha256sum`,
               `zip -r deno-${buildItem.arch}-apple-darwin.zip deno`,
               `shasum -a 256 deno-${buildItem.arch}-apple-darwin.zip > deno-${buildItem.arch}-apple-darwin.zip.sha256sum`,
               "strip -x -S ./denort",
@@ -833,7 +833,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               "strip -x -S ./libdenort.dylib",
               `zip -r libdenort-${buildItem.arch}-apple-darwin.zip libdenort.dylib`,
               `shasum -a 256 libdenort-${buildItem.arch}-apple-darwin.zip > libdenort-${buildItem.arch}-apple-darwin.zip.sha256sum`,
-              // QuickJS denort/libdenort for `deno compile --engine quickjs`
+              // QuickJS denort/libdenort for `dodo compile --engine quickjs`
               // (see the linux note).
               "restore_v8_runtimes() {",
               "  test ! -e denort.v8 || mv -f denort.v8 denort",
@@ -875,7 +875,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               "trusted-signing-account-name": "deno-cli-code-signing",
               "certificate-profile-name": "deno-cli-code-signing-cert",
               "files-folder": "target/release",
-              "files-folder-filter": "deno.exe",
+              "files-folder-filter": "dodo.exe",
               "file-digest": "SHA256",
               "timestamp-rfc3161": "http://timestamp.acs.microsoft.com",
               "timestamp-digest": "SHA256",
@@ -910,7 +910,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               `Get-FileHash target/release/denort-${buildItem.arch}-pc-windows-msvc.zip -Algorithm SHA256 | Format-List > target/release/denort-${buildItem.arch}-pc-windows-msvc.zip.sha256sum`,
               `Compress-Archive -CompressionLevel Optimal -Force -Path target/release/denort.dll -DestinationPath target/release/libdenort-${buildItem.arch}-pc-windows-msvc.zip`,
               `Get-FileHash target/release/libdenort-${buildItem.arch}-pc-windows-msvc.zip -Algorithm SHA256 | Format-List > target/release/libdenort-${buildItem.arch}-pc-windows-msvc.zip.sha256sum`,
-              // QuickJS denort/libdenort for `deno compile --engine quickjs`
+              // QuickJS denort/libdenort for `dodo compile --engine quickjs`
               // (see the linux note).
               "try {",
               "  Move-Item target/release/denort.exe target/release/denort.v8.exe",
@@ -949,7 +949,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               'echo "Generating delta from $PREV_VERSION for $TARGET"',
               'curl -fSL -o prev.zip "https://github.com/denoland/deno/releases/download/v${PREV_VERSION}/deno-${TARGET}.zip" || { echo "Previous release not found, skipping delta"; exit 0; }',
               "unzip -o prev.zip -d prev/",
-              './target/release/bsdiff_helper prev/deno target/release/deno "target/release/deno-${TARGET}.from-${PREV_VERSION}.bsdiff"',
+              './target/release/bsdiff_helper prev/dodo target/release/dodo "target/release/deno-${TARGET}.from-${PREV_VERSION}.bsdiff"',
               'cd target/release && shasum -a 256 "deno-${TARGET}.from-${PREV_VERSION}.bsdiff" > "deno-${TARGET}.from-${PREV_VERSION}.bsdiff.sha256sum"',
             ],
           },
@@ -963,7 +963,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               'echo "Generating delta from $PREV_VERSION for $TARGET"',
               'curl -fSL -o prev.zip "https://github.com/denoland/deno/releases/download/v${PREV_VERSION}/deno-${TARGET}.zip" || { echo "Previous release not found, skipping delta"; exit 0; }',
               "unzip -o prev.zip -d prev/",
-              './target/release/bsdiff_helper prev/deno target/release/deno "target/release/deno-${TARGET}.from-${PREV_VERSION}.bsdiff"',
+              './target/release/bsdiff_helper prev/dodo target/release/dodo "target/release/deno-${TARGET}.from-${PREV_VERSION}.bsdiff"',
               'cd target/release && shasum -a 256 "deno-${TARGET}.from-${PREV_VERSION}.bsdiff" > "deno-${TARGET}.from-${PREV_VERSION}.bsdiff.sha256sum"',
             ],
           },
@@ -999,7 +999,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
         );
         const packagesToBuild = ["deno", "denort", "test_server"]
           .map((name) => `-p ${name}`).join(" ");
-        const binsToBuild = ["deno", "denort", "test_server"]
+        const binsToBuild = ["dodo", "denort", "test_server"]
           .map((name) => `--bin ${name}`).join(" ");
         const cargoBuildReleaseCommand =
           `cargo build${buildStdArgs} --release --locked ${packagesToBuild} ${binsToBuild} --features=${panicTraceFeatures}`;
@@ -1064,16 +1064,16 @@ const buildJobs = buildItems.map((rawBuildItem) => {
                 if: runStartupOrder,
                 run: rawBuildItem.os === "macos"
                   ? [
-                    "cp -p target/release/deno target/release/deno-before-startup-order",
-                    "target/release/deno run -A tools/startup_order/generate_macos_function_orderfile.ts \\",
+                    "cp -p target/release/dodo target/release/deno-before-startup-order",
+                    "target/release/dodo run -A tools/startup_order/generate_macos_function_orderfile.ts \\",
                     "  --binary $GITHUB_WORKSPACE/target/release/deno-before-startup-order \\",
                     `  --output $GITHUB_WORKSPACE/${startupOrderPath} \\`,
                     "  --repeats 3 \\",
                     "  --workload-profile run-first",
                   ]
                   : [
-                    "cp -p target/release/deno target/release/deno-before-startup-order",
-                    "target/release/deno run -A tools/startup_order/generate_linux_function_orderfile.ts \\",
+                    "cp -p target/release/dodo target/release/deno-before-startup-order",
+                    "target/release/dodo run -A tools/startup_order/generate_linux_function_orderfile.ts \\",
                     "  --binary $GITHUB_WORKSPACE/target/release/deno-before-startup-order \\",
                     `  --output $GITHUB_WORKSPACE/${startupOrderPath} \\`,
                     "  --repeats 3 \\",
@@ -1081,7 +1081,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
                   ],
                 env: { NO_COLOR: 1 },
               }, {
-                name: "Relink release deno with startup order",
+                name: "Relink release dodo with startup order",
                 if: runStartupOrder,
                 run: cargoBuildReleaseCommand,
                 env: {
@@ -1094,9 +1094,9 @@ const buildJobs = buildItems.map((rawBuildItem) => {
                 name: "Verify startup order",
                 if: runStartupOrder,
                 run: [
-                  "target/release/deno run -A tools/startup_order/verify_orderfile.ts \\",
+                  "target/release/dodo run -A tools/startup_order/verify_orderfile.ts \\",
                   "  --baseline-binary target/release/deno-before-startup-order \\",
-                  "  --binary target/release/deno \\",
+                  "  --binary target/release/dodo \\",
                   `  --order ${startupOrderPath} \\`,
                   `  --output ${startupOrderPath}.verify.json`,
                 ],
@@ -1124,8 +1124,8 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               name: "Check release snapshot flags",
               if: isLinux,
               run: [
-                "if strings target/release/deno | grep -F -- '--no-lazy --no-lazy-eval --no-lazy-streaming'; then",
-                '  echo "release deno binary contains eager snapshot flags"',
+                "if strings target/release/dodo | grep -F -- '--no-lazy --no-lazy-eval --no-lazy-streaming'; then",
+                '  echo "release dodo binary contains eager snapshot flags"',
                 "  exit 1",
                 "fi",
               ],
@@ -1148,9 +1148,9 @@ const buildJobs = buildItems.map((rawBuildItem) => {
             {
               name: "Generate symcache",
               run: [
-                "target/release/deno -A tools/release/create_symcache.ts ./deno.symcache",
+                "target/release/dodo -A tools/release/create_symcache.ts ./deno.symcache",
                 "du -h deno.symcache",
-                "du -h target/release/deno",
+                "du -h target/release/dodo",
               ],
               env: { NO_COLOR: 1 },
             },
@@ -1160,7 +1160,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               if: isMainOrTag,
               run: [
                 `du -hd1 "./target/${buildItem.profile}"`,
-                `du -ha  "./target/${buildItem.profile}/deno"`,
+                `du -ha  "./target/${buildItem.profile}/dodo"`,
                 `du -ha  "./target/${buildItem.profile}/denort"`,
               ],
             },
@@ -1183,12 +1183,12 @@ const buildJobs = buildItems.map((rawBuildItem) => {
             {
               // The rest of CI only exercises the default v8 backend. Make sure the
               // experimental QuickJS backend (the v8x crate's quickjs engine)
-              // keeps compiling for the deno + denort binaries so `deno compile`
+              // keeps compiling for the dodo + denort binaries so `dodo compile`
               // and the desktop runtime don't silently regress (notably the
               // mutually-exclusive v8/quickjs feature guard). A `check` is enough to
               // catch feature/build-script breakage and does not clobber the v8
               // binary this job produces.
-              name: "Check QuickJS backend (deno + denort)",
+              name: "Check QuickJS backend (dodo + denort)",
               if: isDebug.and(
                 isLinux.and(buildItem.arch.equals("x86_64")).or(
                   isMacos.and(buildItem.arch.equals("aarch64")),
@@ -1202,19 +1202,19 @@ const buildJobs = buildItems.map((rawBuildItem) => {
             {
               // Run a minimal check to ensure that binary is not corrupted, regardless
               // of our build mode
-              name: "Check deno binary",
+              name: "Check dodo binary",
               run:
-                `target/${buildItem.profile}/deno eval "console.log(1+2)" | grep 3`,
+                `target/${buildItem.profile}/dodo eval "console.log(1+2)" | grep 3`,
               env: { NO_COLOR: 1 },
             },
             {
               // Verify that the binary actually works in the Ubuntu-16.04 sysroot.
-              name: "Check deno binary (in sysroot)",
+              name: "Check dodo binary (in sysroot)",
               if: buildItem.use_sysroot,
               run:
-                `sudo chroot /sysroot "$(pwd)/target/${buildItem.profile}/deno" --version`,
+                `sudo chroot /sysroot "$(pwd)/target/${buildItem.profile}/dodo" --version`,
             },
-            denoArtifact.upload(),
+            dodoArtifact.upload(),
             denortArtifact.upload(),
             testServerArtifact.upload(),
           );
@@ -1329,7 +1329,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               "echo '*** Cargo'",
               "command -v cargo && cargo --version || echo 'No cargo found or bad executable'",
               "echo '*** Deno'",
-              "command -v deno && deno --version || echo 'No deno found or bad executable'",
+              "command -v dodo && dodo --version || echo 'No dodo found or bad executable'",
               "echo '*** Node'",
               "command -v node && node --version || echo 'No node found or bad executable'",
               "echo '*** Installed packages'",
@@ -1416,7 +1416,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
           installRustStep,
           installLldStep,
           sysRootStep,
-          denoArtifact.download(),
+          dodoArtifact.download(),
           denortArtifact.download().if(
             testCrateNameExpr.equals("integration")
               .or(testCrateNameExpr.equals("specs")),
@@ -1449,19 +1449,19 @@ const buildJobs = buildItems.map((rawBuildItem) => {
             },
           },
           {
-            // Warm the cache with the compiler `deno check` uses (into the
+            // Warm the cache with the compiler `dodo check` uses (into the
             // default target/.native_tsc/deno_dir) so the test step doesn't
             // re-download it for every test's fresh DENO_DIR. The harness
             // resolves that path and injects DENO_TSC_BIN per-test itself (see
             // test_util::native_tsc_bin_path); no env export needed. Run it with
-            // the built deno binary (the test job has no system `deno` on PATH).
+            // the built dodo binary (the test job has no system `deno` on PATH).
             name: "Pre-download native tsc",
             if: testCrateNameExpr.equals("integration").or(
               testCrateNameExpr.equals("specs"),
             ),
             run: [
               'DENO_BIN=""',
-              "for c in ./target/release/deno ./target/release/deno.exe ./target/debug/deno ./target/debug/deno.exe; do",
+              "for c in ./target/release/dodo ./target/release/dodo.exe ./target/debug/dodo ./target/debug/dodo.exe; do",
               '  [ -f "$c" ] && DENO_BIN="$c" && break',
               "done",
               '"$DENO_BIN" run -A ./tools/download_tsc.ts',
@@ -1567,7 +1567,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
         installRustStep,
         installLldStep,
         sysRootStep,
-        denoArtifact.download(),
+        dodoArtifact.download(),
         testServerArtifact.download(),
         {
           name: "Test libs",
@@ -1654,7 +1654,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
           buildCacheSteps.restoreCacheStep,
           installDenoStep,
           installPythonStep,
-          denoArtifact.download(),
+          dodoArtifact.download(),
           {
             name: "Configure hosts file for WPT",
             run: "./wpt make-hosts-file | sudo tee -a /etc/hosts",
@@ -1663,7 +1663,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
           {
             name: "Run web platform tests (debug)",
             if: isDebug,
-            env: { DENO_BIN: "./target/debug/deno" },
+            env: { DENO_BIN: "./target/debug/dodo" },
             run: [
               "deno run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json \\",
               "    ./tests/wpt/wpt.ts setup",
@@ -1675,7 +1675,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
             name: "Run web platform tests (release)",
             if: isRelease,
             env: {
-              DENO_BIN: "./target/release/deno",
+              DENO_BIN: "./target/release/dodo",
             },
             run: [
               "deno run -RWNE --allow-run --lock=tools/deno.lock.json --config tests/config/deno.json \\",
@@ -1688,7 +1688,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
             name: "Autobahn testsuite",
             if: isRelease,
             run:
-              "target/release/deno run -A --config tests/config/deno.json ext/websocket/autobahn/fuzzingclient.js",
+              "target/release/dodo run -A --config tests/config/deno.json ext/websocket/autobahn/fuzzingclient.js",
           },
           step({
             name: "Upload wpt results to dl.deno.land",
@@ -1717,7 +1717,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               GITHUB_TOKEN: "${{ secrets.DENOBOT_PAT }}",
             },
             run: [
-              "./target/release/deno run --allow-all --lock=tools/deno.lock.json \\",
+              "./target/release/dodo run --allow-all --lock=tools/deno.lock.json \\",
               "    ./tools/upload_wptfyi.js $(git rev-parse HEAD) --ghstatus",
             ],
           },
@@ -1782,7 +1782,7 @@ const benchJob = job(
             "  hyperfine-v1.16.0-x86_64-unknown-linux-gnu/hyperfine",
           ],
         },
-        // We currently do a full deno build instead of getting this from the build
+        // We currently do a full dodo build instead of getting this from the build
         // job because the benchmarks inspect the target folder to see the sizes of
         // libraries like v8 and swc as well as the snapshot sizes. Maybe in the future
         // we could optimize this to not need this.
@@ -1801,7 +1801,7 @@ const benchJob = job(
           name: "Convert benchmarks for github-action-benchmark",
           if: isDodo.and(isMainBranch),
           run:
-            `./target/release/deno run --allow-read --allow-write ./tools/build_benchmark_jsons.ts target/release/bench.json ${benchResultsDir}`,
+            `./target/release/dodo run --allow-read --allow-write ./tools/build_benchmark_jsons.ts target/release/bench.json ${benchResultsDir}`,
         },
         benchResultsArtifact.upload({ path: benchResultsDir })
           .if(isDodo.and(isMainBranch)),
@@ -2250,8 +2250,8 @@ function ensureNoIntegrationTests(
     errors.push("has a tests/ folder");
   }
   const hasNonRunnerTests = cargoToml.test?.some(
-    // this path is allowed because it's only used by deno and denort
-    // to cause the deno and denort binaries to be built when running
+    // this path is allowed because it's only used by dodo and denort
+    // to cause the dodo and denort binaries to be built when running
     // tests, but it doesn't actually run any tests itself
     (t) => t.path !== "integration_tests_runner.rs",
   );

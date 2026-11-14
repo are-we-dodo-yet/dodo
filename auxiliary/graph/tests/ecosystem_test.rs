@@ -48,7 +48,7 @@ fn main() {
 
   if std::fs::metadata("./tests/ecosystem/jsr_mirror").is_err() {
     println!(
-      "skipping, ecosystem mirror not found. run `deno run -A ./tests/ecosystem/jsr_mirror.ts` to populate"
+      "skipping, ecosystem mirror not found. run `dodo run -A ./tests/ecosystem/jsr_mirror.ts` to populate"
     );
     return;
   }
@@ -413,7 +413,7 @@ async fn test_version(
     let tmpdir_specifier = Url::from_directory_path(&tmpdir_path).unwrap();
     let tmpdir_specifier_path =
       tmpdir_specifier.path().strip_suffix('/').unwrap();
-    let mut cmd = std::process::Command::new("deno");
+    let mut cmd = std::process::Command::new("dodo");
     cmd
       .arg("check")
       .arg(format!("--lock={}", lockfile_path.display()))

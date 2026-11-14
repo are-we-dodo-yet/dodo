@@ -191,7 +191,7 @@ pub struct LockfileFlags {
   pub no_npm: bool,
   /// When no `deno.lock` exists in the workspace, attempt to seed one by
   /// translating a sibling `package-lock.json`. Currently only set by
-  /// `deno install`.
+  /// `dodo install`.
   pub import_npm_lockfile: bool,
 }
 
@@ -580,7 +580,7 @@ impl<TSys: LockfileSys> LockfileLock<TSys> {
         }
       };
       Err(JsErrorBox::generic(format!(
-        "The lockfile is out of date. Run `deno install --frozen=false`, or rerun with `--frozen=false` to update it.\nchanges:\n{truncated_diff}"
+        "The lockfile is out of date. Run `dodo install --frozen=false`, or rerun with `--frozen=false` to update it.\nchanges:\n{truncated_diff}"
       )))
     } else {
       Ok(())

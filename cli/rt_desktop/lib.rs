@@ -1726,7 +1726,7 @@ async fn run_desktop(
   denort::load_env_vars(&data.metadata.env_vars_from_env_file);
 
   // Wire up the Deno-side inspector when launched under
-  // `deno desktop --inspect[-brk|-wait]`. The parent process binds the
+  // `dodo desktop --inspect[-brk|-wait]`. The parent process binds the
   // user-visible port and runs a multiplexer that fronts both this
   // inspector and the CEF renderer's debug port; we just listen on the
   // internal port that the parent allocated for us.
@@ -1767,7 +1767,7 @@ async fn run_desktop(
   // do it from here. `desktop_serve_port` is the port we put into it.
 
   // Enable HMR if DENO_DESKTOP_HMR is set to a directory path
-  // (set by `deno compile --desktop --hmr`).
+  // (set by `dodo compile --desktop --hmr`).
   let hmr_watch_dir = env::var("DENO_DESKTOP_HMR").ok().map(PathBuf::from);
 
   // Framework dev servers handle their own HMR via websocket.

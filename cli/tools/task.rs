@@ -64,7 +64,7 @@ pub async fn execute_script(
   let start_dir = &cli_options.start_dir;
   if !start_dir.has_deno_or_pkg_json() && !task_flags.eval {
     bail!(
-      "deno task couldn't find deno.json(c) or package.json. See https://docs.deno.com/go/config"
+      "dodo task couldn't find deno.json(c) or package.json. See https://docs.deno.com/go/config"
     )
   }
   let force_use_pkg_json =
@@ -872,7 +872,7 @@ impl<'a> TaskRunner<'a> {
     // npm sets a number of `npm_*` env vars when running a package.json script.
     // Build them once (the `npm_package_*` vars from the script's package.json
     // plus the process-level `npm_execpath`/`npm_node_execpath`/`npm_command`)
-    // so that `deno task` matches npm's behavior (see #35251, #35306). The
+    // so that `dodo task` matches npm's behavior (see #35251, #35306). The
     // per-script `npm_lifecycle_*` vars are overwritten in place each iteration,
     // so this single map is reused across the package's pre/run/post scripts.
     let pkg_json = self
@@ -1149,7 +1149,7 @@ fn matches_package(
   }
 
   // Fall back to matching the workspace member's directory name so that
-  // `deno task --filter <dir>` works when the package name diverges
+  // `dodo task --filter <dir>` works when the package name diverges
   // from the directory (#28620). Skip the workspace root so it is never
   // accidentally selected by `--filter *`.
   if !is_workspace_root
@@ -1174,8 +1174,8 @@ fn matches_package(
 ///   `npm-cli.js`; like pnpm/yarn point it at their own binary, we point it at
 ///   the running `deno` executable.
 /// - `npm_node_execpath`: the JS runtime executing the script. npm sets this to
-///   the `node` binary; under `deno task` the runtime is `deno` itself.
-/// - `npm_command`: the npm command being run. `deno task <name>` runs a script
+///   the `node` binary; under `dodo task` the runtime is `deno` itself.
+/// - `npm_command`: the npm command being run. `dodo task <name>` runs a script
 ///   the same way `npm run <name>` does, which npm reports as `run-script`.
 fn npm_script_env_vars(
   pkg_json: Option<&deno_package_json::PackageJson>,

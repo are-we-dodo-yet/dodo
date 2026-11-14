@@ -59,7 +59,7 @@ may change slightly over time, but in general the model is as follows:
 - I/O required to build an initial static module graph should always follow the
   permissions of its parent. If there is no parent, all permissions are granted.
   As an example, this means that the initial static module graph that is
-  constructed when doing `deno run`, does not have any permission restrictions.
+  constructed when doing `dodo run`, does not have any permission restrictions.
   However, the module graph constructed as the result of loading a web worker or
   dynamic import will be restricted to the permissions of the caller (the main
   worker most likely).

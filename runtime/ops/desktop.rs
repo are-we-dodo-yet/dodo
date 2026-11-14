@@ -1,6 +1,6 @@
 // Copyright 2018-2026 the Deno authors. MIT license.
 
-//! Desktop window management ops for `deno compile --desktop`.
+//! Desktop window management ops for `dodo compile --desktop`.
 //!
 //! These ops are included in the V8 snapshot so their external references
 //! are stable. When `DesktopApi` is not present in OpState (non-desktop
@@ -1602,7 +1602,7 @@ fn op_desktop_send_error_report(state: &mut OpState, #[string] body: &str) {
   // (`https://`) primitive that bypasses the `--allow-write`/`--allow-net`
   // permission checks every other fs/net op performs.
   let Some((url, _)) = error_report_config() else {
-    // No reporting URL configured (e.g. plain `deno run`, or a desktop app
+    // No reporting URL configured (e.g. plain `dodo run`, or a desktop app
     // that didn't set one) — there is nowhere to send, so do nothing.
     return;
   };
@@ -2905,7 +2905,7 @@ mod tests {
   fn verify_ed25519_accepts_real_signature() {
     use ed25519_dalek::Signer;
     let (sk, vk) = keypair_from_seed(&[1u8; 32]);
-    let message = b"deno desktop update v1.2.3";
+    let message = b"dodo desktop update v1.2.3";
     let sig = sk.sign(message);
     let ok =
       verify_ed25519_b64(&b64(&vk.to_bytes()), &b64(&sig.to_bytes()), message);
@@ -2916,10 +2916,10 @@ mod tests {
   fn verify_ed25519_rejects_tampered_message() {
     use ed25519_dalek::Signer;
     let (sk, vk) = keypair_from_seed(&[1u8; 32]);
-    let original = b"deno desktop update v1.2.3";
+    let original = b"dodo desktop update v1.2.3";
     let sig = sk.sign(original);
     // Flip a single byte of the message — a correct verifier must reject.
-    let tampered = b"deno desktop update v1.2.4";
+    let tampered = b"dodo desktop update v1.2.4";
     let ok =
       verify_ed25519_b64(&b64(&vk.to_bytes()), &b64(&sig.to_bytes()), tampered);
     assert!(!ok, "tampered message must fail verification");

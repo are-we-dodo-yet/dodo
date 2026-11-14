@@ -367,7 +367,7 @@ function testInner(
   maybeFn,
   overrides = { __proto__: null },
 ) {
-  // No-op if we're not running in `deno test` subcommand.
+  // No-op if we're not running in `dodo test` subcommand.
   if (typeof op_register_test !== "function") {
     return;
   }
@@ -530,7 +530,7 @@ test.only = function (
 };
 
 function registerHook(hookType, fn) {
-  // No-op if we're not running in `deno test` subcommand.
+  // No-op if we're not running in `dodo test` subcommand.
   if (typeof op_register_test_hook !== "function") {
     return;
   }
@@ -761,7 +761,7 @@ function createTestContext(desc) {
     origin: desc.origin,
     /**
      * Asserts that `actual` matches the snapshot stored in the snapshot
-     * file. With `deno test --update-snapshots`, mismatching or missing
+     * file. With `dodo test --update-snapshots`, mismatching or missing
      * snapshots are written to the snapshot file instead.
      *
      * @param actual {unknown}

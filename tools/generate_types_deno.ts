@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run -A
+#!/usr/bin/env -S dodo run -A
 // Copyright 2018-2026 the Deno authors. MIT license.
 
 // This script is used to generate the @types/deno package on DefinitelyTyped.
@@ -9,7 +9,7 @@ import * as semver from "jsr:@std/semver@1.0.3";
 
 const rootDir = $.path(import.meta.dirname!).parentOrThrow();
 const definitelyTypedDir = rootDir.join(
-  "../DefinitelyTyped/types/deno/",
+  "../DefinitelyTyped/types/dodo/",
 );
 
 if (!definitelyTypedDir.existsSync()) {
@@ -17,7 +17,7 @@ if (!definitelyTypedDir.existsSync()) {
 }
 
 const denoExec = rootDir.join(
-  "target/debug/deno" + (Deno.build.os === "windows" ? ".exe" : ""),
+  "target/debug/dodo" + (Deno.build.os === "windows" ? ".exe" : ""),
 );
 
 $.logStep("Building Deno executable...");
@@ -96,5 +96,5 @@ async function updatePkgJson() {
 
 async function getDenoVersion() {
   const text = await $`${denoExec} -v`.text();
-  return text.match(/deno (.*)/)![1];
+  return text.match(/dodo (.*)/)![1];
 }

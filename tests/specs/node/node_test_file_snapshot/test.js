@@ -5,7 +5,7 @@
 //
 // The test seeds each expected snapshot file inline with `fs.writeFileSync`
 // and then asserts that `fileSnapshot` reads it back and matches. That way
-// the spec runs hermetically in a single `deno test` invocation without
+// the spec runs hermetically in a single `dodo test` invocation without
 // depending on `--update-snapshots` behavior.
 
 import assert from "node:assert";

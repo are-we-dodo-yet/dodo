@@ -1,5 +1,5 @@
 {
   "tasks": {
-    "build": "deno run -A build.ts"
+    "build": "dodo run -A build.ts"
   }
 }

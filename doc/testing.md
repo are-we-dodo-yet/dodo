@@ -40,7 +40,7 @@ To create one:
 JavaScript/TypeScript tests for runtime and web APIs, named `*_test.ts`. Use
 these for behavior that is best asserted from inside the runtime (a Web API's
 semantics, a `Deno.*` method). They run under the cargo test harness, not under
-a bare `deno test`, because they rely on harness setup.
+a bare `dodo test`, because they rely on harness setup.
 
 ## Node compatibility tests
 

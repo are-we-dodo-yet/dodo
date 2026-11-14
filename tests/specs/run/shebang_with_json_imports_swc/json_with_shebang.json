@@ -1,4 +1,4 @@
-#!/usr/env -S deno run
+#!/usr/env -S dodo run
 {
   "test": null
 }

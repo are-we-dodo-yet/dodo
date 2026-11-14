@@ -1,4 +1,4 @@
-// `deno uninstall --global first second` should remove both executables from
+// `dodo uninstall --global first second` should remove both executables from
 // the bin dir in a single invocation.
 const binsDir = "./bins/bin";
 for await (const entry of Deno.readDir(binsDir)) {

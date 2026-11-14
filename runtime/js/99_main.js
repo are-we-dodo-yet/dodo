@@ -79,7 +79,7 @@ const {
   isNativeError,
 } = core;
 // Deno.serve (00_serve.ts) chains through 23_request/23_response/22_body
-// into the 208 KB web-streams polyfill. Only loaded if `deno serve` / a
+// into the 208 KB web-streams polyfill. Only loaded if `dodo serve` / a
 // declarative server export is actually used.
 let _serveMod;
 const lazyServeMod = () =>
@@ -780,8 +780,8 @@ const userVisibleCore = ObjectFreeze(ObjectDefineProperties(
 ));
 ObjectAssign(internals, { core: userVisibleCore });
 const internalSymbol = Symbol("Deno.internal");
-// `Deno.test` and its sub-methods are no-ops outside of `deno test`, kept for
-// compatibility so they don't error under `deno run`. Mirrors the surface of
+// `Deno.test` and its sub-methods are no-ops outside of `dodo test`, kept for
+// compatibility so they don't error under `dodo run`. Mirrors the surface of
 // the real `Deno.test` defined in cli/js/40_test.js.
 function noopTest() {}
 noopTest.ignore = () => {};
@@ -806,13 +806,13 @@ const finalDenoNs = ObjectDefineProperties(
     [internalSymbol]: internals,
     // Deno.test, Deno.bench, Deno.lint are noops here, but kept for
     // compatibility; so that they don't cause errors when used outside of
-    // `deno test`/`deno bench`/`deno lint` contexts.
+    // `dodo test`/`dodo bench`/`dodo lint` contexts.
     test: noopTest,
     bench: () => {},
     lint: {
       runPlugin: () => {
         throw new Error(
-          "`Deno.lint.runPlugin` is only available in `deno test` subcommand.",
+          "`Deno.lint.runPlugin` is only available in `dodo test` subcommand.",
         );
       },
     },
@@ -999,7 +999,7 @@ function bootstrapMainRuntime(runtimeOptions, warmup = false) {
           // have an unrelated `export default`, so that graph was being
           // compiled for programs that will never serve anything. Hoist the
           // guard here. `dflt == null` still calls through, so the TypeError
-          // `Object.hasOwn(null, ...)` raises under `deno serve` is unchanged.
+          // `Object.hasOwn(null, ...)` raises under `dodo serve` is unchanged.
           if (dflt == null || ObjectHasOwn(dflt, "fetch")) {
             try {
               serve = lazyServeMod().registerDeclarativeServer(dflt);
@@ -1016,7 +1016,7 @@ function bootstrapMainRuntime(runtimeOptions, warmup = false) {
             // Only error if main worker
             import.meta.log(
               "error",
-              `%cerror: %cdeno serve requires %cexport default { fetch }%c in the main module, did you mean to run \"deno run\"?`,
+              `%cerror: %cdeno serve requires %cexport default { fetch }%c in the main module, did you mean to run \"dodo run\"?`,
               "color: yellow;",
               "color: inherit;",
               "font-weight: bold;",
@@ -1030,7 +1030,7 @@ function bootstrapMainRuntime(runtimeOptions, warmup = false) {
           if (mode === executionModes.run && !autoServe) {
             import.meta.log(
               "error",
-              `%cwarning: %cDetected %cexport default { fetch }%c, did you mean to run \"deno serve\"?`,
+              `%cwarning: %cDetected %cexport default { fetch }%c, did you mean to run \"dodo serve\"?`,
               "color: yellow;",
               "color: inherit;",
               "font-weight: bold;",
@@ -1129,7 +1129,7 @@ function bootstrapMainRuntime(runtimeOptions, warmup = false) {
           return jupyterNs;
         }
         throw new Error(
-          "Deno.jupyter is only available in `deno jupyter` subcommand",
+          "Deno.jupyter is only available in `dodo jupyter` subcommand",
         );
       },
       set(val) {

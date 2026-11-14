@@ -164,7 +164,7 @@ pub fn root_path() -> PathRef {
 /// `tools/download_tsc.ts` materializes it under
 /// `<target>/.native_tsc/deno_dir/tsc/<version>/<platform>/lib/tsc`. The harness
 /// injects this per-test as `DENO_TSC_BIN` (see `TestContextBuilder::build`) so
-/// `deno check`/`run --check`/`cache --check` reuse it instead of downloading
+/// `dodo check`/`run --check`/`cache --check` reuse it instead of downloading
 /// the compiler into every test's fresh `DENO_DIR`. Returns `None` when it
 /// hasn't been downloaded yet.
 pub fn native_tsc_bin_path() -> Option<PathRef> {
@@ -294,8 +294,8 @@ pub fn deno_exe_path() -> PathRef {
   if let Ok(path) = std::env::var("DENO_TEST_UTIL_DENO_EXE") {
     return PathRef::new(PathBuf::from(path));
   }
-  // Something like /Users/rld/src/deno/target/debug/deps/deno
-  let mut p = target_dir().join("deno").to_path_buf();
+  // Something like /Users/rld/src/dodo/target/debug/deps/dodo
+  let mut p = target_dir().join("dodo").to_path_buf();
   if cfg!(windows) {
     p.set_extension("exe");
   }

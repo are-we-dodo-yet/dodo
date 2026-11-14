@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "echo": "deno eval 'console.log(1)'",
+    "echo": "dodo eval 'console.log(1)'",
     "bin": "bin hi && cli-esm testing this out && npx cli-cjs test"
   },
   "dependencies": {

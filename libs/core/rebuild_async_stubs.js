@@ -1,4 +1,4 @@
-#!/usr/bin/env deno run --allow-read --allow-write
+#!/usr/bin/env dodo run --allow-read --allow-write
 // Copyright 2018-2026 the Deno authors. MIT license.
 
 const doNotModify =

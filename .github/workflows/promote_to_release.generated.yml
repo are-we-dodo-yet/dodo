@@ -73,7 +73,7 @@ jobs:
           trusted-signing-account-name: deno-cli-code-signing
           certificate-profile-name: deno-cli-code-signing-cert
           files-folder: .
-          files-folder-filter: deno.exe
+          files-folder-filter: dodo.exe
           file-digest: SHA256
           timestamp-rfc3161: 'http://timestamp.acs.microsoft.com'
           timestamp-digest: SHA256
@@ -89,10 +89,10 @@ jobs:
         run: |-
           $SignTool = Get-ChildItem -Path "C:\Program Files*\Windows Kits\*\bin\*\x64\signtool.exe" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
           $SignToolPath = $SignTool.FullName
-          & $SignToolPath verify /pa /v "deno.exe"
+          & $SignToolPath verify /pa /v "dodo.exe"
       - name: Create archives
         run: |-
-          Compress-Archive -Path "deno.exe" -DestinationPath "deno-${{ matrix.target }}.zip" -Force
+          Compress-Archive -Path "dodo.exe" -DestinationPath "deno-${{ matrix.target }}.zip" -Force
           Compress-Archive -Path "denort.exe" -DestinationPath "denort-${{ matrix.target }}.zip" -Force
       - name: Upload Windows archives
         uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f
@@ -178,7 +178,7 @@ jobs:
         run: |-
           # The latest.txt file lives at a stable URL but changes every
           # release, so the edge has to be told to drop it. Otherwise
-          # `deno upgrade` keeps serving the previous version until the
+          # `dodo upgrade` keeps serving the previous version until the
           # 4 hour TTL expires.
           deno run -A --lock=tools/deno.lock.json tools/release/purge_cdn_cache.ts release-${{github.event.inputs.releaseKind}}-latest.txt
 

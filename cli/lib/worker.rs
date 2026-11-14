@@ -111,7 +111,7 @@ impl StorageKeyResolver {
   /// app gets a single persistent store, independent of the main module URL
   /// (which is not stable across differently named binaries). The `app:`
   /// prefix namespaces this key from URL-derived keys so a compiled app and a
-  /// `deno run` of the same origin can't collide in the shared, temp-backed
+  /// `dodo run` of the same origin can't collide in the shared, temp-backed
   /// `caches` directory (which is keyed by the hash of this string rather than
   /// by the per-app data directory).
   pub fn from_compile_app_name(app_name: &str) -> Self {
@@ -273,7 +273,7 @@ pub struct LibMainWorkerOptions {
   pub inspect_wait: bool,
   pub trace_ops: Option<Vec<String>>,
   pub is_inspecting: bool,
-  /// If this is a `deno compile`-ed executable.
+  /// If this is a `dodo compile`-ed executable.
   pub is_standalone: bool,
   // If the runtime should try to use `export default { fetch }`
   pub auto_serve: bool,

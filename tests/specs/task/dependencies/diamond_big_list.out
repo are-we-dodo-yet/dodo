@@ -1,15 +1,15 @@
 Available tasks:
 - a
-    deno run a.js
+    dodo run a.js
     depends on: b, c
 - b
-    deno run b.js
+    dodo run b.js
     depends on: e
 - c
-    deno run c.js
+    dodo run c.js
     depends on: d
 - d
-    deno run d.js
+    dodo run d.js
     depends on: e
 - e
-    deno run e.js
+    dodo run e.js

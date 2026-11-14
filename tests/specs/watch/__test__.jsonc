@@ -1,13 +1,13 @@
 {
   "tests": {
-    // `deno watch` is an alias for `deno run --watch-hmr`, so its help text
+    // `dodo watch` is an alias for `dodo run --watch-hmr`, so its help text
     // points at the same behavior.
     "help": {
       "args": "watch --help",
       "output": "help.out"
     },
     // Watching while reading the program from stdin is not supported, same as
-    // `deno run --watch-hmr -`.
+    // `dodo run --watch-hmr -`.
     "stdin_conflict": {
       "args": "watch -",
       "exitCode": 1,

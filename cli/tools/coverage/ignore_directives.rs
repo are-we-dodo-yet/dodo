@@ -373,7 +373,7 @@ mod tests {
     fn test_parse_global_ignore_directives_shebang() {
       let comments = parse(
         r#"
-          #!/usr/bin/env -S deno run
+          #!/usr/bin/env -S dodo run
           // deno-coverage-ignore-file
           const x = 42;
         "#
@@ -386,7 +386,7 @@ mod tests {
     fn test_parse_global_ignore_directives_shebang_no_code() {
       let comments = parse(
         r#"
-        #!/usr/bin/env -S deno run
+        #!/usr/bin/env -S dodo run
         // deno-coverage-ignore-file
         "#
         .trim_start(),

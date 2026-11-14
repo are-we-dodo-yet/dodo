@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run -A
+#!/usr/bin/env -S dodo run -A
 // Copyright 2018-2026 the Deno authors. MIT license.
 
 // deno-lint-ignore-file no-console
@@ -10,7 +10,7 @@ if (CHANNEL !== "rc" && CHANNEL !== "lts") {
   throw new Error(`Invalid channel: ${CHANNEL}`);
 }
 
-const BINARIES = ["deno.exe", "denort.exe"];
+const BINARIES = ["dodo.exe", "denort.exe"];
 
 async function patchBinary(inputPath: string, channel: string) {
   console.log(`Patching ${inputPath}...`);

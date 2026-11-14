@@ -1461,7 +1461,7 @@ impl<TSys: FsOpen + FsMetadata> LifecycleScriptsStrategy
         &mut output,
         "{}  Run \"{}\" to run build scripts.",
         colors::yellow("│"),
-        colors::bold("deno approve-scripts")
+        colors::bold("dodo approve-scripts")
       );
       _ = write!(&mut output, "{}", colors::yellow("╰─"));
 

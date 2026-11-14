@@ -127,9 +127,9 @@ fn get_deno_version() -> String {
     .unwrap();
 
   let stdout = String::from_utf8_lossy(&output.stdout);
-  // Parse: "deno 2.x.x (...)"
+  // Parse: "dodo 2.x.x (...)"
   let line = stdout.lines().next().unwrap();
-  let version = line.strip_prefix("deno ").unwrap();
+  let version = line.strip_prefix("dodo ").unwrap();
   let version = version.split_whitespace().next().unwrap();
   version.to_string()
 }

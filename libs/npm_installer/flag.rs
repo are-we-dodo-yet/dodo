@@ -56,7 +56,7 @@ mod inner {
   impl<TSys: LaxSingleProcessFsFlagSys> Drop for PollFile<TSys> {
     fn drop(&mut self) {
       // cleanup the poll file so the node_modules folder is more
-      // deterministic and so it doesn't end up in `deno compile`
+      // deterministic and so it doesn't end up in `dodo compile`
       _ = self.sys.fs_remove_file(&self.file_path);
     }
   }

@@ -11,7 +11,7 @@ let cachedIsMusl = undefined;
 module.exports = {
   replaceBinEntry,
   runInstall() {
-    const denoFileName = os.platform() === "win32" ? "deno.exe" : "deno";
+    const denoFileName = os.platform() === "win32" ? "dodo.exe" : "deno";
     const targetExecutablePath = path.join(
       __dirname,
       denoFileName,

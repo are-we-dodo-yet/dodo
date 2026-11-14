@@ -76,7 +76,7 @@ impl OpExitCallbacks {
 
 /// Holds the main isolate's handle so that `op_exit` (i.e. `Deno.exit()`) can
 /// terminate the current isolate instead of the whole process. Installed by
-/// `deno run --watch` / `deno serve --watch` so a script calling `Deno.exit()`
+/// `dodo run --watch` / `dodo serve --watch` so a script calling `Deno.exit()`
 /// ends the current run without killing the file watcher. See issue #7590.
 pub struct WatcherExitHandle(pub v8::IsolateHandle);
 
@@ -486,7 +486,7 @@ fn op_get_exit_code(state: &mut OpState) -> i32 {
 
 #[op2(fast)]
 fn op_exit(state: &mut OpState) {
-  // Under `deno run --watch`, terminate the current V8 isolate instead of
+  // Under `dodo run --watch`, terminate the current V8 isolate instead of
   // exiting the process so the file watcher survives and can restart the
   // script on the next file change. See issue #7590.
   //

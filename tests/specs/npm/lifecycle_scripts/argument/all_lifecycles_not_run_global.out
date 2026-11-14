@@ -5,6 +5,6 @@ Download [WILDCARD]
 │  npm:@denotest/node-lifecycle-scripts@1.0.0
 │
 │  Lifecycle scripts are only supported when using a `node_modules` directory.
-│  Enable it in your deno config file:
+│  Enable it in your dodo config file:
 │  "nodeModulesDir": "auto"
 ╰─

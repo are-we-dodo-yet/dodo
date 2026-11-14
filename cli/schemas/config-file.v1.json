@@ -124,7 +124,7 @@
     },
     "compile": {
       "type": "object",
-      "description": "Configuration for `deno compile`.",
+      "description": "Configuration for `dodo compile`.",
       "additionalProperties": false,
       "properties": {
         "include": {
@@ -148,7 +148,7 @@
     },
     "desktop": {
       "type": "object",
-      "description": "Configuration for `deno desktop`.",
+      "description": "Configuration for `dodo desktop`.",
       "additionalProperties": false,
       "properties": {
         "app": {
@@ -562,7 +562,7 @@
     },
     "deploy": {
       "type": "object",
-      "description": "Configuration for `deno deploy` and `deno sandbox`.",
+      "description": "Configuration for `dodo deploy` and `dodo sandbox`.",
       "additionalProperties": false,
       "properties": {
         "org": {
@@ -937,7 +937,7 @@
           "enum": ["maintain", "caseSensitive", "caseInsensitive"]
         },
         "useEditorConfig": {
-          "description": "Whether `deno fmt` reads `.editorconfig` files to fill in formatting options that are not otherwise set. Defaults to true.",
+          "description": "Whether `dodo fmt` reads `.editorconfig` files to fill in formatting options that are not otherwise set. Defaults to true.",
           "default": true,
           "type": "boolean"
         },
@@ -1021,7 +1021,7 @@
       "type": "boolean"
     },
     "preferPackageJson": {
-      "description": "When enabled, `deno add`, `deno install` and `deno remove` manage dependencies in package.json instead of deno.json, creating a package.json if one does not exist. Equivalent to passing `--package-json` to those commands.",
+      "description": "When enabled, `dodo add`, `dodo install` and `dodo remove` manage dependencies in package.json instead of deno.json, creating a package.json if one does not exist. Equivalent to passing `--package-json` to those commands.",
       "type": "boolean"
     },
     "tasks": {
@@ -1040,7 +1040,7 @@
               "properties": {
                 "description": {
                   "type": "string",
-                  "description": "Description of a task that will be shown when running `deno task` without a task name"
+                  "description": "Description of a task that will be shown when running `dodo task` without a task name"
                 },
                 "command": {
                   "type": "string",

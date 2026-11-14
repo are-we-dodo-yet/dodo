@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run --check --allow-write=. --allow-read=. --lock=./tools/deno.lock.json
+#!/usr/bin/env -S dodo run --check --allow-write=. --allow-read=. --lock=./tools/deno.lock.json
 // Copyright 2018-2026 the Deno authors. MIT license.
 import { conditions, createWorkflow, job, step } from "jsr:@david/gagen@0.3.1";
 
@@ -76,7 +76,7 @@ const windowsJob = job("promote-to-release-windows", {
         "trusted-signing-account-name": "deno-cli-code-signing",
         "certificate-profile-name": "deno-cli-code-signing-cert",
         "files-folder": ".",
-        "files-folder-filter": "deno.exe",
+        "files-folder-filter": "dodo.exe",
         "file-digest": "SHA256",
         "timestamp-rfc3161": "http://timestamp.acs.microsoft.com",
         "timestamp-digest": "SHA256",
@@ -95,13 +95,13 @@ const windowsJob = job("promote-to-release-windows", {
       run: [
         '$SignTool = Get-ChildItem -Path "C:\\Program Files*\\Windows Kits\\*\\bin\\*\\x64\\signtool.exe" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1',
         "$SignToolPath = $SignTool.FullName",
-        '& $SignToolPath verify /pa /v "deno.exe"',
+        '& $SignToolPath verify /pa /v "dodo.exe"',
       ],
     }),
     step({
       name: "Create archives",
       run: [
-        'Compress-Archive -Path "deno.exe" -DestinationPath "deno-${{ matrix.target }}.zip" -Force',
+        'Compress-Archive -Path "dodo.exe" -DestinationPath "deno-${{ matrix.target }}.zip" -Force',
         'Compress-Archive -Path "denort.exe" -DestinationPath "denort-${{ matrix.target }}.zip" -Force',
       ],
     }),
@@ -240,7 +240,7 @@ const workflow = createWorkflow({
           run: [
             "# The latest.txt file lives at a stable URL but changes every",
             "# release, so the edge has to be told to drop it. Otherwise",
-            "# `deno upgrade` keeps serving the previous version until the",
+            "# `dodo upgrade` keeps serving the previous version until the",
             "# 4 hour TTL expires.",
             "deno run -A --lock=tools/deno.lock.json tools/release/purge_cdn_cache.ts release-${{github.event.inputs.releaseKind}}-latest.txt",
           ],

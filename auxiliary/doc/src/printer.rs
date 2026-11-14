@@ -1540,8 +1540,8 @@ mod render_markdown_tests {
   #[test]
   fn code_block_hidden_lines_only_examples() {
     // Non-example languages are left untouched.
-    let output = render("```sh\n# install\ndeno install\n```");
-    assert_eq!(output, "```sh\n# install\ndeno install\n```\n");
+    let output = render("```sh\n# install\ndodo install\n```");
+    assert_eq!(output, "```sh\n# install\ndodo install\n```\n");
   }
 
   #[test]

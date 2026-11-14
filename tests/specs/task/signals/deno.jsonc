@@ -1,5 +1,5 @@
 {
   "tasks": {
-    "listener": "deno run listener.ts"
+    "listener": "dodo run listener.ts"
   }
 }

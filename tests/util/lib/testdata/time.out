@@ -1,5 +1,5 @@
 Hello
-    Command being timed: "./target/debug/deno tests/003_relative_import.ts"
+    Command being timed: "./target/debug/dodo tests/003_relative_import.ts"
     User time (seconds): 2.43
     System time (seconds): 0.05
     Percent of CPU this job got: 156%

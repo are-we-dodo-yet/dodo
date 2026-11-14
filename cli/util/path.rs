@@ -184,7 +184,7 @@ pub fn to_percent_decoded_str(s: &str) -> String {
 /// APIs do when opening a file: trailing spaces and dots are stripped from the
 /// final path component.
 ///
-/// Without this, `deno info ".\foo.tsx "` resolves to a `foo.tsx%20` specifier.
+/// Without this, `dodo info ".\foo.tsx "` resolves to a `foo.tsx%20` specifier.
 /// The file still loads on Windows (the OS trims the trailing space when
 /// opening it), but the trailing `%20` causes the media type to be misdetected
 /// (e.g. as TypeScript instead of TSX), leading to a confusing parse error.

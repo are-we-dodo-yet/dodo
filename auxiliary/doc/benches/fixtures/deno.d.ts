@@ -133,7 +133,7 @@ declare namespace Deno {
     sanitizeExit?: boolean;
   }
 
-  /** Register a test which will be run when `deno test` is used on the command
+  /** Register a test which will be run when `dodo test` is used on the command
    * line and the containing module looks like a test module.
    * `fn` can be async if required.
    * ```ts
@@ -166,7 +166,7 @@ declare namespace Deno {
    */
   export function test(t: TestDefinition): void;
 
-  /** Register a test which will be run when `deno test` is used on the command
+  /** Register a test which will be run when `dodo test` is used on the command
    * line and the containing module looks like a test module.
    * `fn` can be async if required.
    *
@@ -2249,7 +2249,7 @@ declare namespace Deno {
   /** Returns the script arguments to the program. If for example we run a
    * program:
    *
-   * deno run --allow-read https://deno.land/std/examples/cat.ts /etc/passwd
+   * dodo run --allow-read https://deno.land/std/examples/cat.ts /etc/passwd
    *
    * Then `Deno.args` will contain:
    *

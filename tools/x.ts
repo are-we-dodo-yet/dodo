@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run --allow-all
+#!/usr/bin/env -S dodo run --allow-all
 
 // Copyright 2018-2026 the Deno authors. MIT license.
 
@@ -76,10 +76,10 @@ You should run this before committing any changes. It is also included
 in the './x verify' pre-commit workflow.
 
 Under the hood:
-  deno run -A tools/format.js`,
+  dodo run -A tools/format.js`,
     async fn(_args: string[]) {
       $.logStep("Formatting code...");
-      await $`deno run -A tools/format.js`.cwd(root);
+      await $`dodo run -A tools/format.js`.cwd(root);
       $.logStep("Formatting complete.");
     },
   };
@@ -91,10 +91,10 @@ clippy. This is significantly faster than './x lint' when you have
 not modified any Rust code.
 
 Under the hood:
-  deno run -A tools/lint.js --js`,
+  dodo run -A tools/lint.js --js`,
     async fn(_args: string[]) {
       $.logStep("Linting JavaScript/TypeScript...");
-      await $`deno run -A tools/lint.js --js`.cwd(root);
+      await $`dodo run -A tools/lint.js --js`.cwd(root);
       $.logStep("JS lint complete.");
     },
   };
@@ -115,7 +115,7 @@ Under the hood:
       async fn(_args: string[]) {
         $.logStep("Setting up development environment...");
         $.logStep("Building deno and test_server...");
-        await $`cargo build --bin deno --bin test_server`.cwd(root);
+        await $`cargo build --bin dodo --bin test_server`.cwd(root);
         $.logStep("Setup complete.");
       },
     },
@@ -135,7 +135,7 @@ Under the hood:
   cargo build --bin deno`,
       async fn(_args: string[]) {
         $.logStep("Building Deno...");
-        await $`cargo build --bin deno`.cwd(root);
+        await $`cargo build --bin dodo`.cwd(root);
         $.logStep("Build complete.");
       },
     },
@@ -359,10 +359,10 @@ Use this when you have changed both JS/TS and Rust code. If you only
 changed JS/TS files, './x lint-js' is faster.
 
 Under the hood:
-  deno run -A tools/lint.js`,
+  dodo run -A tools/lint.js`,
       async fn(_args: string[]) {
         $.logStep("Linting code...");
-        await $`deno run -A tools/lint.js`.cwd(root);
+        await $`dodo run -A tools/lint.js`.cwd(root);
         $.logStep("Linting complete.");
       },
     },

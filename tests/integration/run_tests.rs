@@ -2631,7 +2631,7 @@ fn broken_stdout_repl() {
 }
 
 // Regression test for https://github.com/denoland/deno/issues/16308 — when
-// `println!` panics on a broken stdout pipe (e.g. `deno | cls` on Windows),
+// `println!` panics on a broken stdout pipe (e.g. `dodo | cls` on Windows),
 // the panic hook should exit cleanly instead of printing the bug-report banner.
 #[test]
 fn broken_stdout_no_panic_banner() {

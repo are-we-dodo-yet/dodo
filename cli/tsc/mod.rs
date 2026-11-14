@@ -544,7 +544,7 @@ pub struct Request {
 
   pub initial_cwd: PathBuf,
   /// When true, .d.ts and .d.ts.map files emitted by TSC will be captured
-  /// in the response. Only set this for `deno transpile --declaration`.
+  /// in the response. Only set this for `dodo transpile --declaration`.
   pub capture_emitted_files: bool,
 }
 

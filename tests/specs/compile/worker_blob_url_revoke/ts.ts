@@ -1,5 +1,5 @@
 // A TypeScript blob module worker must still transpile in the standalone
-// (`deno compile`) loader, even when the object URL is revoked synchronously
+// (`dodo compile`) loader, even when the object URL is revoked synchronously
 // after construction. Guards the captured-blob path in `EmbeddedModuleLoader`
 // against a regression where the root would be served as raw (un-transpiled)
 // TypeScript bytes.

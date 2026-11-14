@@ -2,11 +2,11 @@
   "tasks": {
     "build": {
       "description": "Build the project",
-      "command": "deno build"
+      "command": "dodo build"
     },
     "test": {
       "description": "Test the project",
-      "command": "deno test"
+      "command": "dodo test"
     },
     "dev": "echo dev"
   }

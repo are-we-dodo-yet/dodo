@@ -213,7 +213,7 @@ pub async fn info(
       deno_print::drop_write_stdout(output.as_bytes());
     }
   } else {
-    // If it was just "deno info" print location of caches and exit
+    // If it was just "dodo info" print location of caches and exit
     print_cache_info(
       &factory,
       info_flags.json,

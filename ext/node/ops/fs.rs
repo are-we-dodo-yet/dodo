@@ -31,7 +31,7 @@ use tokio::task::JoinError;
 use crate::ops::constant::UV_FS_COPYFILE_EXCL;
 
 /// Virtual file descriptors for files without a real OS fd (e.g. VFS files
-/// in `deno compile` binaries). These start at a high value to avoid
+/// in `dodo compile` binaries). These start at a high value to avoid
 /// collisions with real OS fds.
 const VIRTUAL_FD_START: i32 = 1_000_000_000;
 static NEXT_VIRTUAL_FD: AtomicI32 = AtomicI32::new(VIRTUAL_FD_START);

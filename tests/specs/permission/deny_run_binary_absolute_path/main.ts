@@ -1,5 +1,5 @@
 try {
-  new Deno.Command("deno", {
+  new Deno.Command("dodo", {
     args: ["--version"],
   }).outputSync();
 } catch (err) {

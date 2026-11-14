@@ -2,8 +2,8 @@
 
 // Test that napi_wrap finalizers run at shutdown even when the wrapped JS
 // object is still reachable and the wrapping happens inside a `Deno.test`.
-// This mirrors `wrap_leak.js` (which uses `deno run`) and guards against the
-// regression where `deno test` tore down the worker without draining the
+// This mirrors `wrap_leak.js` (which uses `dodo run`) and guards against the
+// regression where `dodo test` tore down the worker without draining the
 // NAPI finalizer queue (see #35692).
 
 import { loadTestLibrary } from "./common.js";

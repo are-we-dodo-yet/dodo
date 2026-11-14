@@ -1,4 +1,4 @@
-// `deno remove --global` is an alias for `deno uninstall --global`, so after
+// `dodo remove --global` is an alias for `dodo uninstall --global`, so after
 // it runs the globally installed executable should be gone from the bin dir.
 const binsDir = "./bins/bin";
 for await (const entry of Deno.readDir(binsDir)) {

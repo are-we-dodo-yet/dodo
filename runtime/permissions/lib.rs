@@ -79,7 +79,7 @@ pub struct PermissionDeniedError {
 fn format_permission_error(name: &'static str) -> String {
   if is_standalone() {
     format!(
-      "specify the required permissions during compilation using `deno compile --allow-{name}`"
+      "specify the required permissions during compilation using `dodo compile --allow-{name}`"
     )
   } else {
     format!("run again with the --allow-{name} flag")
@@ -1826,7 +1826,7 @@ pub enum HostParseError {
 /// `--allow-net=unix:<path>` rules.
 ///
 /// A leading `/` is an absolute POSIX path on every host, including
-/// `deno compile --target=<unix>` from Windows (`Path::is_absolute()` on
+/// `dodo compile --target=<unix>` from Windows (`Path::is_absolute()` on
 /// Windows requires a drive letter, so `/var/run/docker.sock` would be
 /// rejected). Otherwise fall back to host semantics so Windows named pipes
 /// (`\\.\pipe\foo`) remain expressible as a scoped rule.
@@ -8504,7 +8504,7 @@ mod tests {
         )),
       ),
       // Unix socket rules are POSIX paths on every host (including Windows
-      // `deno compile --target=linux`). Lexically normalize `.`/`..` at parse
+      // `dodo compile --target=linux`). Lexically normalize `.`/`..` at parse
       // time so the rule matches the call-side path.
       (
         "unix:/var/run/docker.sock",

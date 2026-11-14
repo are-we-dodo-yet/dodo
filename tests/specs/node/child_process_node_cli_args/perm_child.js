@@ -1,5 +1,5 @@
 // Child used by the #35441 regression test. Reading an env var requires
-// --allow-env; when spawned as `deno run <script>` (deno-style args) without
+// --allow-env; when spawned as `dodo run <script>` (deno-style args) without
 // permission flags, the Node-compat translation must still grant full
 // permissions, so this should print "env-ok" instead of throwing.
 let result;

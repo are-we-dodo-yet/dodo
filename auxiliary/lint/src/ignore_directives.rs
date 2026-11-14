@@ -366,7 +366,7 @@ const x = 42;
     );
 
     test_util::parse_and_then(
-      "#!/usr/bin/env -S deno run\n// deno-lint-ignore-file",
+      "#!/usr/bin/env -S dodo run\n// deno-lint-ignore-file",
       |program| {
         let file_directive =
           parse_file_ignore_directives("deno-lint-ignore-file", program)
@@ -376,7 +376,7 @@ const x = 42;
     );
 
     test_util::parse_and_then(
-      "#!/usr/bin/env -S deno run\n// deno-lint-ignore-file -- reason for ignoring",
+      "#!/usr/bin/env -S dodo run\n// deno-lint-ignore-file -- reason for ignoring",
       |program| {
         let file_directive =
           parse_file_ignore_directives("deno-lint-ignore-file", program)
@@ -386,7 +386,7 @@ const x = 42;
     );
 
     test_util::parse_and_then(
-      "#!/usr/bin/env -S deno run\n// deno-lint-ignore-file\nconst a = 42;",
+      "#!/usr/bin/env -S dodo run\n// deno-lint-ignore-file\nconst a = 42;",
       |program| {
         let file_directive =
           parse_file_ignore_directives("deno-lint-ignore-file", program)
@@ -396,7 +396,7 @@ const x = 42;
     );
 
     test_util::parse_and_then(
-      "#!/usr/bin/env -S deno run\n// deno-lint-ignore-file -- reason for ignoring\nconst a = 42;",
+      "#!/usr/bin/env -S dodo run\n// deno-lint-ignore-file -- reason for ignoring\nconst a = 42;",
       |program| {
         let file_directive =
           parse_file_ignore_directives("deno-lint-ignore-file", program)

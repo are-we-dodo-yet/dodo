@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run --allow-env --allow-read --allow-write=.
+#!/usr/bin/env -S dodo run --allow-env --allow-read --allow-write=.
 // Copyright 2018-2026 the Deno authors. MIT license.
 import {
   ModuleDeclarationKind,

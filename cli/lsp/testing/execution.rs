@@ -261,7 +261,7 @@ impl TestRun {
     //     the CLI's `load_env_variables_from_env_files`.
     //   * Concurrent `deno/testRun` requests racing on the shared global env
     //     can interleave; this is the same hazard the CLI has when running
-    //     multiple `deno test` invocations in one process.
+    //     multiple `dodo test` invocations in one process.
     if let Some(env_files) = &flags.env_file {
       let cwd = resolve_cwd_or_fallback(flags.initial_cwd.as_deref());
       WatchEnvTracker::snapshot().load_env_variables_from_env_files(
@@ -526,7 +526,7 @@ impl TestRun {
   }
 
   fn get_args(&self) -> Vec<Cow<'_, str>> {
-    let mut args = vec![Cow::Borrowed("deno"), Cow::Borrowed("test")];
+    let mut args = vec![Cow::Borrowed("dodo"), Cow::Borrowed("test")];
     args.extend(
       self
         .workspace_settings
@@ -563,7 +563,7 @@ impl TestRun {
     }
     // Inherit `--env-file` paths from the `test` task in deno.json when the
     // user hasn't already supplied one via `deno.testing.args`. Without this,
-    // running tests from VSCode wouldn't see env vars that `deno task test`
+    // running tests from VSCode wouldn't see env vars that `dodo task test`
     // loads (see https://github.com/denoland/deno/issues/28797).
     let has_env_file_arg = args.iter().any(|a| {
       let a = a.as_ref();
@@ -590,7 +590,7 @@ impl TestRun {
 
 /// Walks each unique scope reached by the queued specifiers and harvests
 /// `--env-file` paths from its deno.json `test` task. Each path is resolved
-/// against the deno.json's directory (matching how `deno task test` reads
+/// against the deno.json's directory (matching how `dodo task test` reads
 /// them) so the LSP process's cwd doesn't change the answer. Scopes are
 /// deduplicated so a workspace with one shared deno.json is processed once.
 fn collect_test_task_env_files(
@@ -649,7 +649,7 @@ fn extract_env_files_from_command(command: &str) -> Vec<String> {
   let mut env_files = Vec::new();
   let mut index = 0;
   while index + 1 < tokens.len() {
-    if tokens[index] == "deno" && tokens[index + 1] == "test" {
+    if tokens[index] == "dodo" && tokens[index + 1] == "test" {
       index += 2;
       while index < tokens.len() && !is_shell_command_separator(&tokens[index])
       {
@@ -1171,26 +1171,26 @@ mod tests {
 
   #[test]
   fn test_extract_env_files_from_command() {
-    // Plain `deno test --env-file=.env.test -A` (the case from
+    // Plain `dodo test --env-file=.env.test -A` (the case from
     // https://github.com/denoland/deno/issues/28797).
     assert_eq!(
-      extract_env_files_from_command("deno test --env-file=.env.test -A"),
+      extract_env_files_from_command("dodo test --env-file=.env.test -A"),
       vec![".env.test".to_string()],
     );
     // Bare `--env-file` defaults to `.env` (matches CLI default).
     assert_eq!(
-      extract_env_files_from_command("deno test --env-file -A"),
+      extract_env_files_from_command("dodo test --env-file -A"),
       vec![".env".to_string()],
     );
     // `--env` alias.
     assert_eq!(
-      extract_env_files_from_command("deno test --env=.env.local"),
+      extract_env_files_from_command("dodo test --env=.env.local"),
       vec![".env.local".to_string()],
     );
     // Multiple env files, possibly amid other args.
     assert_eq!(
       extract_env_files_from_command(
-        "deno test --env-file=.env --env-file=.env.test -A"
+        "dodo test --env-file=.env --env-file=.env.test -A"
       ),
       vec![".env".to_string(), ".env.test".to_string()],
     );
@@ -1198,35 +1198,35 @@ mod tests {
     // intended for the test run.
     assert_eq!(
       extract_env_files_from_command(
-        "deno fmt && deno test --env-file=.env.test"
+        "dodo fmt && dodo test --env-file=.env.test"
       ),
       vec![".env.test".to_string()],
     );
     // Env files belonging to other commands in a compound task are ignored.
     assert_eq!(
       extract_env_files_from_command(
-        "deno run --env-file=.env.prod setup.ts && deno test --env-file=.env.test"
+        "dodo run --env-file=.env.prod setup.ts && dodo test --env-file=.env.test"
       ),
       vec![".env.test".to_string()],
     );
     assert!(
       extract_env_files_from_command(
-        "deno run --env-file=.env.prod setup.ts && deno test"
+        "dodo run --env-file=.env.prod setup.ts && dodo test"
       )
       .is_empty()
     );
     // Quoted path containing whitespace is preserved by the shlex split.
     assert_eq!(
       extract_env_files_from_command(
-        "deno test --env-file=\"my env/.env.test\""
+        "dodo test --env-file=\"my env/.env.test\""
       ),
       vec!["my env/.env.test".to_string()],
     );
     // No env-file flag.
-    assert!(extract_env_files_from_command("deno test -A").is_empty());
+    assert!(extract_env_files_from_command("dodo test -A").is_empty());
     // Malformed command (unterminated quote) is treated as no env files.
     assert!(
-      extract_env_files_from_command("deno test --env-file=\"foo").is_empty()
+      extract_env_files_from_command("dodo test --env-file=\"foo").is_empty()
     );
   }
 }

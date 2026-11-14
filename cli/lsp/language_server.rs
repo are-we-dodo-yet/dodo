@@ -392,7 +392,7 @@ impl LanguageServer {
     }
   }
 
-  /// Similar to `deno install --entrypoint` on the command line, where modules will be cached
+  /// Similar to `dodo install --entrypoint` on the command line, where modules will be cached
   /// in the Deno cache, including any of their dependencies.
   #[cfg_attr(feature = "lsp-tracing", tracing::instrument(skip_all))]
   pub async fn cache(

@@ -403,8 +403,8 @@ Deno.test({
     assert(Array.isArray(argv));
     assert(Array.isArray(process.argv));
     assert(
-      process.argv[0].match(/[^/\\]*deno[^/\\]*$/),
-      "deno included in the file name of argv[0]",
+      process.argv[0].match(/[^/\\]*dodo[^/\\]*$/),
+      "dodo included in the file name of argv[0]",
     );
     assertEquals(
       process.argv[1],
@@ -434,20 +434,20 @@ Deno.test({
 
     assertEquals(typeof process.argv0, "string");
     assert(
-      process.argv0.match(/[^/\\]*deno[^/\\]*$/),
-      "deno included in the file name of argv[0]",
+      process.argv0.match(/[^/\\]*dodo[^/\\]*$/),
+      "dodo included in the file name of argv[0]",
     );
     assertEquals(typeof importedArgv0, "string");
     assert(
-      importedArgv0.match(/[^/\\]*deno[^/\\]*$/),
-      "deno included in the file name of argv[0]",
+      importedArgv0.match(/[^/\\]*dodo[^/\\]*$/),
+      "dodo included in the file name of argv[0]",
     );
 
     // Setting should be a noop
     process.argv0 = "foobar";
     assert(
-      process.argv0.match(/[^/\\]*deno[^/\\]*$/),
-      "deno included in the file name of argv[0]",
+      process.argv0.match(/[^/\\]*dodo[^/\\]*$/),
+      "dodo included in the file name of argv[0]",
     );
   },
 });

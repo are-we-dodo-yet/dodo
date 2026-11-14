@@ -36,18 +36,18 @@ use crate::util::console::confirm;
 use crate::util::draw_thread::DrawThread;
 use crate::util::fs::canonicalize_path;
 
-/// Renders the `--minimum-dependency-age` argument for the re-run `deno run`
+/// Renders the `--minimum-dependency-age` argument for the re-run `dodo run`
 /// subprocess, but only when the user passed the flag EXPLICITLY on the CLI.
 ///
-/// `deno x` executes the target as a `deno run <target>` subprocess in the
+/// `dodo x` executes the target as a `dodo run <target>` subprocess in the
 /// user's cwd, so it re-discovers the cwd `deno.json` `minimumDependencyAge`
 /// (including its `exclude`) and `.npmrc` policy exactly as a plain
-/// `deno run <target>` would. The only thing that subprocess can't observe is
+/// `dodo run <target>` would. The only thing that subprocess can't observe is
 /// an explicit CLI flag, so we forward just that — rendering the EXPLICIT value
 /// (never a computed effective policy). Forwarding a config-derived scalar
 /// would override the natively-discovered policy and drop its `exclude`,
-/// diverging from `deno run` (issue #35991). An explicit flag carries
-/// empty-`exclude` semantics, same as `deno run --minimum-dependency-age=...`.
+/// diverging from `dodo run` (issue #35991). An explicit flag carries
+/// empty-`exclude` semantics, same as `dodo run --minimum-dependency-age=...`.
 fn minimum_dependency_age_flag_arg(flags: &Flags) -> Option<String> {
   let value = match flags.minimum_dependency_age? {
     NewestDependencyDate::Disabled => "0".to_string(),
@@ -57,13 +57,13 @@ fn minimum_dependency_age_flag_arg(flags: &Flags) -> Option<String> {
 }
 
 /// Renders the user's explicit `--config`/`--no-config` selection for the re-run
-/// `deno run <target>` subprocess argv.
+/// `dodo run <target>` subprocess argv.
 ///
 /// The subprocess re-resolves the target from the user's cwd, so it only
 /// auto-discovers a cwd `deno.json`. When the user selected a config that is NOT
 /// auto-discoverable (an explicit `--config=<path>` outside cwd), that policy —
 /// including any `minimumDependencyAge` — would be dropped by the subprocess,
-/// diverging from `deno run --config=<path> <target>` (issue #35991). Forward it:
+/// diverging from `dodo run --config=<path> <target>` (issue #35991). Forward it:
 /// - `Path(p)` -> `--config=<abs>` (made absolute, but WITHOUT resolving
 ///   symlinks, so it is robust regardless of the child's cwd).
 /// - `Disabled` -> `--no-config`.
@@ -83,7 +83,7 @@ fn config_flag_arg(flags: &Flags, initial_cwd: &Path) -> Option<String> {
       // only). Canonicalizing would resolve a symlinked config to its target, so
       // relative config members (permission set paths, `imports`, lock path,
       // ...) would then resolve relative to the target's directory instead of
-      // the path the user supplied — diverging from `deno run --config=<path>`.
+      // the path the user supplied — diverging from `dodo run --config=<path>`.
       let abs = deno_path_util::normalize_path(abs);
       Some(format!("--config={}", abs.display()))
     }
@@ -99,7 +99,7 @@ fn config_flag_arg(flags: &Flags, initial_cwd: &Path) -> Option<String> {
 ///   installed file's directory, NEVER the user's cwd (it finds the internal
 ///   temp `deno.json` instead).
 /// - the jsr/URL re-run, which executes a `jsr:`/`data:`/`http(s):` main module:
-///   `deno run` disables config discovery entirely for a non-`file:`/non-`npm:`
+///   `dodo run` disables config discovery entirely for a non-`file:`/non-`npm:`
 ///   entrypoint, so the child would drop the cwd policy (`minimumDependencyAge`,
 ///   permission sets, ...) that the isolated install already honored.
 ///
@@ -123,13 +123,13 @@ fn config_flag_arg_carrying_discovered(
 }
 
 /// Renders the user's explicit `-P`/`--permission-set=<name>` selection for the
-/// re-run `deno run <target>` subprocess argv.
+/// re-run `dodo run <target>` subprocess argv.
 ///
 /// A permission set is resolved from the (discovered or explicit) config file at
 /// runtime and is NOT baked into `flags.permissions`, so `to_permission_args()`
 /// does not forward it. Without forwarding the selection, the subprocess would
 /// run with no permission set and fail with `NotCapable`, diverging from
-/// `deno run --permission-set=<name> <target>` (issue #35991). A bare `-P`
+/// `dodo run --permission-set=<name> <target>` (issue #35991). A bare `-P`
 /// resolves to `Some("")` (the default set), which round-trips as
 /// `--permission-set=`.
 fn permission_set_flag_arg(flags: &Flags) -> Option<String> {
@@ -139,7 +139,7 @@ fn permission_set_flag_arg(flags: &Flags) -> Option<String> {
     .map(|name| format!("--permission-set={}", name))
 }
 
-/// Computes the extra `deno run` arguments that carry the user's ORIGINAL CLI
+/// Computes the extra `dodo run` arguments that carry the user's ORIGINAL CLI
 /// selections into a re-run subprocess argv: the explicit
 /// `--minimum-dependency-age` flag, the `--config`/`--no-config` selection
 /// (passed in as `config_arg`, rendered by `config_flag_arg_carrying_discovered`),
@@ -315,7 +315,7 @@ pub(crate) fn run_bin_value(
   bin_value: BinValue,
   npm_process_state: Option<String>,
   unstable_args: &[String],
-  // Extra `deno run` args carrying the user's ORIGINAL CLI selections (config,
+  // Extra `dodo run` args carrying the user's ORIGINAL CLI selections (config,
   // minimum-dependency-age, permission-set). Computed by the caller from the
   // original flags/cwd via `forwarded_run_args`, NOT from `flags` here: in the
   // npm auto-install path `flags` is the internal runner flags whose
@@ -564,10 +564,10 @@ pub async fn run(flags: Arc<Flags>, x_flags: XFlags) -> Result<i32, AnyError> {
   let unstable_args = cli_options.unstable_args();
   let npm_resolver = factory.npm_resolver().await?;
   let node_resolver = factory.node_resolver().await?;
-  // Extra `deno run` args forwarded to every re-run subprocess, computed ONCE
+  // Extra `dodo run` args forwarded to every re-run subprocess, computed ONCE
   // from the user's ORIGINAL flags/cwd (never the internal npm-install runner
   // flags, whose `config_flag` points at a generated temp deno.json). See
-  // `forwarded_run_args` (issue #35991). Every `deno x` re-run site executes a
+  // `forwarded_run_args` (issue #35991). Every `dodo x` re-run site executes a
   // target whose child does NOT auto-discover the user's cwd `deno.json` — the
   // installed bin FILE anchors discovery on the install dir, and a jsr:/url main
   // module has config discovery disabled entirely — so an original `Discover` is
@@ -609,7 +609,7 @@ pub async fn run(flags: Arc<Flags>, x_flags: XFlags) -> Result<i32, AnyError> {
     || Path::new(&effective_command).extension().is_some();
   if is_file_like && Path::new(&effective_command).is_file() {
     return Err(anyhow::anyhow!(
-      "Use 'deno run' to run a local file directly, 'deno x' is intended for running commands from packages."
+      "Use 'dodo run' to run a local file directly, 'deno x' is intended for running commands from packages."
     ));
   }
 

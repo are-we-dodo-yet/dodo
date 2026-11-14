@@ -10,7 +10,7 @@ prerequisite to run this before code check in.
 To run formatting:
 
 ```sh
-deno run --allow-read --allow-write --allow-run ./tools/format.js
+dodo run --allow-read --allow-write --allow-run ./tools/format.js
 ```
 
 ## lint.js
@@ -21,7 +21,7 @@ prerequisite to run this before code check in.
 To run linting:
 
 ```sh
-deno run --allow-read --allow-write --allow-run ./tools/lint.js
+dodo run --allow-read --allow-write --allow-run ./tools/lint.js
 ```
 
 Tip: You can also use cargo to run the current or pending build of the deno
@@ -51,7 +51,7 @@ on top, somewhat similar to `git subtree`.
 To run the _copyright checker_:
 
 ```sh
-deno run --allow-read --allow-run  ./tools/copyright_checker.js
+dodo run --allow-read --allow-run  ./tools/copyright_checker.js
 ```
 
 Then it will check all code files in the repository and report any files that

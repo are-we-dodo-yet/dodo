@@ -2,7 +2,7 @@
   "tempDir": true,
   "tests": {
     // Catalog dependencies (referenced via the `catalog:` protocol) should be
-    // reported by `deno outdated`, resolving their version from the root
+    // reported by `dodo outdated`, resolving their version from the root
     // `catalog`/`catalogs`.
     "print_outdated_recursive": {
       "steps": [
@@ -16,7 +16,7 @@
         }
       ]
     },
-    // Catalogs are a workspace-root concept, so a non-recursive `deno outdated`
+    // Catalogs are a workspace-root concept, so a non-recursive `dodo outdated`
     // run from the root still reports them.
     "print_outdated_root": {
       "steps": [
@@ -30,7 +30,7 @@
         }
       ]
     },
-    // `deno update --latest` should write the new version requirement back to
+    // `dodo update --latest` should write the new version requirement back to
     // the catalog definition in the root config.
     "update_latest_recursive": {
       "steps": [

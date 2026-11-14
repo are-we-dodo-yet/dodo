@@ -12,7 +12,7 @@
           "-c",
           "tar -xzf test-shebang-1.0.0.tgz && head -1 package/mod.js"
         ],
-        "output": "#!/usr/bin/env -S deno run -A\n"
+        "output": "#!/usr/bin/env -S dodo run -A\n"
       }]
     }
   }

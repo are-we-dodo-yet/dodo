@@ -405,7 +405,7 @@ impl<
   /// snapshot, regardless of whether the referrer's `package.json` declares
   /// it.
   ///
-  /// `deno compile --bundle` follows `new Worker(new URL(...))` and similar
+  /// `dodo compile --bundle` follows `new Worker(new URL(...))` and similar
   /// references into modules that can live outside the entrypoint's package
   /// scope (e.g. a worker authored in a sibling source tree, pulled in
   /// alongside a `dist/`-rooted entrypoint). A bare npm import from such a
@@ -789,7 +789,7 @@ pub fn enhanced_resolution_error_message(
     get_import_prefix_missing_error(error).map(|specifier| {
       // If the specifier looks like a workspace member or linked package whose
       // declared name is scoped (e.g. importing "foo" when "@scope/foo" is
-      // linked), point at the real name instead of suggesting `deno add`.
+      // linked), point at the real name instead of suggesting `dodo add`.
       if let Some(name) =
         maybe_matching_bare_pkg_name(specifier, bare_importable_pkg_names)
       {
@@ -798,17 +798,17 @@ pub fn enhanced_resolution_error_message(
         )
       } else if specifier.starts_with("@std/") {
         format!(
-          "If you want to use the JSR package, try running `deno add jsr:{}`",
+          "If you want to use the JSR package, try running `dodo add jsr:{}`",
           specifier
         )
       } else if specifier.starts_with('@') {
         format!(
-          "If you want to use a JSR or npm package, try running `deno add jsr:{0}` or `deno add npm:{0}`",
+          "If you want to use a JSR or npm package, try running `dodo add jsr:{0}` or `dodo add npm:{0}`",
           specifier
         )
       } else {
         format!(
-          "If you want to use the npm package, try running `deno add npm:{0}`",
+          "If you want to use the npm package, try running `dodo add npm:{0}`",
           specifier
         )
       }
@@ -1049,7 +1049,7 @@ fn get_import_prefix_missing_error(error: &ResolutionError) -> Option<&str> {
 
   if let Some(specifier) = maybe_specifier {
     // NOTE(bartlomieju): For now, return None if a specifier contains a dot or a space. This is because
-    // suggesting to `deno add bad-module.ts` makes no sense and is worse than not providing
+    // suggesting to `dodo add bad-module.ts` makes no sense and is worse than not providing
     // a suggestion at all. This should be improved further in the future
     if specifier.contains('.') || specifier.contains(' ') {
       return None;

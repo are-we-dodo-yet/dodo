@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run --v8-flags=--jitless --allow-env --allow-read --allow-run --allow-write
+#!/usr/bin/env -S dodo run --v8-flags=--jitless --allow-env --allow-read --allow-run --allow-write
 // Copyright 2018-2026 the Deno authors. MIT license.
 // deno-lint-ignore-file no-console camelcase
 /**
@@ -176,34 +176,34 @@ async function writeFixtures(
   ]);
 
   const runEmpty = {
-    name: "deno run empty",
+    name: "dodo run empty",
     args: ["run", "--quiet", empty],
     cwd: root,
   };
   const runTimerFree = {
-    name: "deno run timer-free",
+    name: "dodo run timer-free",
     args: ["run", "--quiet", timerFree],
     cwd: root,
   };
   const remaining: Workload[] = [
-    { name: "deno run hello", args: ["run", "--quiet", hello], cwd: root },
+    { name: "dodo run hello", args: ["run", "--quiet", hello], cwd: root },
     {
-      name: "deno run timer",
+      name: "dodo run timer",
       args: ["run", "--quiet", timer],
       cwd: root,
     },
     {
-      name: "deno serve",
+      name: "dodo serve",
       args: ["run", "--quiet", "--allow-net", server],
       cwd: root,
     },
-    { name: "deno test", args: ["test", "--quiet", test], cwd: root },
+    { name: "dodo test", args: ["test", "--quiet", test], cwd: root },
     {
-      name: "deno node:crypto",
+      name: "dodo node:crypto",
       args: ["run", "--quiet", node],
       cwd: root,
     },
-    { name: "deno fmt", args: ["fmt", "--check", format], cwd: root },
+    { name: "dodo fmt", args: ["fmt", "--check", format], cwd: root },
   ];
   return profile === "run-first"
     ? [runEmpty, ...remaining]

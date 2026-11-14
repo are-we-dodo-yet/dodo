@@ -1,7 +1,7 @@
 {
   // A CJS npm package with a `default` export, embedded into a compiled
   // bundle. The default import resolves to the `module.exports` object (Node
-  // interop), matching `deno run`, so `cjsDefault.default()` is the callable.
+  // interop), matching `dodo run`, so `cjsDefault.default()` is the callable.
   "tempDir": true,
   "steps": [{
     "args": "install",

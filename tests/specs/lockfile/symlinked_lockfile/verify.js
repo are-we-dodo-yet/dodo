@@ -1,4 +1,4 @@
-// `deno add` must write through the symlink: the `deno.lock` symlink should be
+// `dodo add` must write through the symlink: the `deno.lock` symlink should be
 // preserved and the real target file should receive the update, instead of the
 // symlink being clobbered with a fresh regular file.
 console.log("deno.lock is symlink:", Deno.lstatSync("deno.lock").isSymlink);

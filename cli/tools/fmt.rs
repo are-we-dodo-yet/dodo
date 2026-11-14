@@ -234,7 +234,7 @@ fn maybe_show_format_confirmation(
     Ok(())
   } else {
     bail!(
-      "Did not format non-workspace directory. Run again specifying the current directory (ex. `deno fmt .`)"
+      "Did not format non-workspace directory. Run again specifying the current directory (ex. `dodo fmt .`)"
     )
   }
 }
@@ -1791,7 +1791,7 @@ where
 }
 
 /// This function is similar to is_supported_ext but adds additional extensions
-/// supported by `deno fmt`.
+/// supported by `dodo fmt`.
 fn is_supported_ext_fmt(path: &Path) -> bool {
   get_extension(path).is_some_and(|ext| {
     matches!(
