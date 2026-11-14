@@ -54,7 +54,7 @@ const windowsJob = job("promote-to-release-windows", {
     step({
       name: "Run patchver for Windows",
       run:
-        "dodo run -A --minimum-dependency-age=0 ./tools/release/promote_to_release_windows.ts ${{github.event.inputs.releaseKind}}",
+        "deno run -A --minimum-dependency-age=0 ./tools/release/promote_to_release_windows.ts ${{github.event.inputs.releaseKind}}",
     }),
     step({
       name: "Authenticate with Azure",
@@ -171,7 +171,7 @@ const workflow = createWorkflow({
             APPLE_CODESIGN_PASSWORD: "${{ secrets.APPLE_CODESIGN_PASSWORD }}",
           },
           run:
-            "dodo run -A --minimum-dependency-age=0 ./tools/release/promote_to_release.ts ${{github.event.inputs.releaseKind}} ${{github.event.inputs.commitHash}}",
+            "deno run -A --minimum-dependency-age=0 ./tools/release/promote_to_release.ts ${{github.event.inputs.releaseKind}} ${{github.event.inputs.commitHash}}",
         }),
         step({
           name: "Download Windows binaries",
@@ -242,7 +242,7 @@ const workflow = createWorkflow({
             "# release, so the edge has to be told to drop it. Otherwise",
             "# `dodo upgrade` keeps serving the previous version until the",
             "# 4 hour TTL expires.",
-            "dodo run -A --lock=tools/deno.lock.json tools/release/purge_cdn_cache.ts release-${{github.event.inputs.releaseKind}}-latest.txt",
+            "deno run -A --lock=tools/deno.lock.json tools/release/purge_cdn_cache.ts release-${{github.event.inputs.releaseKind}}-latest.txt",
           ],
         }),
       ],

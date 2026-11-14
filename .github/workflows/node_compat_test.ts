@@ -65,7 +65,7 @@ const runTests = step.dependsOn(installPython)({
     CI_SHARD_INDEX: matrix.shard_index,
     CI_SHARD_TOTAL: matrix.shard_total,
   },
-  run: "dodo task --cwd tests/node_compat/runner test --report",
+  run: "deno task --cwd tests/node_compat/runner test --report",
 });
 
 const gzipReport = step.dependsOn(runTests)({
@@ -139,7 +139,7 @@ const summaryInstallPython = step.dependsOn(summarySetupDeno)({
 const addDaySummary = step.dependsOn(summaryInstallPython)({
   name: "Add the day summary to the month summary",
   run:
-    "dodo -A --config tests/config/deno.json tests/node_compat/add_day_summary_to_month_summary.ts",
+    "deno -A --config tests/config/deno.json tests/node_compat/add_day_summary_to_month_summary.ts",
 });
 
 const gzipMonthSummary = step.dependsOn(addDaySummary)({
@@ -161,7 +161,7 @@ const uploadMonthSummary = step.dependsOn(gzipMonthSummary)({
 
 const postSlack = step.dependsOn(uploadMonthSummary)({
   name: "Post message to slack channel",
-  run: "dodo -A --config tests/config/deno.json tests/node_compat/slack.ts",
+  run: "deno -A --config tests/config/deno.json tests/node_compat/slack.ts",
   env: {
     SLACK_TOKEN: "${{ secrets.NODE_COMPAT_SLACK_TOKEN }}",
     SLACK_CHANNEL: "${{ secrets.NODE_COMPAT_SLACK_CHANNEL }}",
