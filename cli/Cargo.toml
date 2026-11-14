@@ -8,7 +8,7 @@ default-run = "dodo"
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Provides the deno executable"
+description = "Provides the dodo executable"
 
 [[bin]]
 name = "dodo"

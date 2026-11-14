@@ -37,7 +37,7 @@ const testJob = job("test", {
     }),
     step({
       name: "Run tests",
-      run: "dodo -A tools/ecosystem_compat_tests.ts",
+      run: "deno -A tools/ecosystem_compat_tests.ts",
     }),
     step({
       name: "Upload the report to dl.deno.land",
@@ -83,7 +83,7 @@ const workflow = createWorkflow({
         }),
         step({
           name: "Post message to slack channel",
-          run: "dodo -A tools/ecosystem_compat_slack.ts",
+          run: "deno -A tools/ecosystem_compat_slack.ts",
           env: {
             SLACK_TOKEN: "${{ secrets.NODE_COMPAT_SLACK_TOKEN }}",
             SLACK_CHANNEL: "${{ secrets.NODE_COMPAT_SLACK_CHANNEL }}",
