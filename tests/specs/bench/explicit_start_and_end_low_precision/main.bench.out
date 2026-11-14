@@ -1,5 +1,5 @@
     CPU | [WILDCARD]
-Runtime | Dodo [WILDCARD] ([WILDCARD])
+Runtime | Deno  [WILDCARD] ([WILDCARD])
 
 [WILDCARD]/main.bench.ts
 

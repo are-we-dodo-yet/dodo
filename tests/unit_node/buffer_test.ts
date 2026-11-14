@@ -575,7 +575,7 @@ Deno.test({
   name: "[node/buffer] Buffer to string base64",
   fn() {
     for (const encoding of ["base64", "BASE64"]) {
-      const buffer: Buffer = Buffer.from("dodo land");
+      const buffer: Buffer = Buffer.from("deno land");
       assertEquals(
         // deno-lint-ignore no-explicit-any
         buffer.toString(encoding as any),
@@ -592,7 +592,7 @@ Deno.test({
   name: "[node/buffer] Buffer to string hex",
   fn() {
     for (const encoding of ["hex", "HEX"]) {
-      const buffer: Buffer = Buffer.from("dodo land");
+      const buffer: Buffer = Buffer.from("deno land");
       assertEquals(
         // deno-lint-ignore no-explicit-any
         buffer.toString(encoding as any),

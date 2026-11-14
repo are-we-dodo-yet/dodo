@@ -88,7 +88,7 @@
  ],
  "metadata": {
   "kernelspec": {
-   "display_name": "Dodo",
+   "display_name": "Deno",
    "language": "typescript",
    "name": "deno"
   },

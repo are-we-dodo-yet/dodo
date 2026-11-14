@@ -36,7 +36,7 @@ Node esm importing node cjs
 }
 ===========================
 static method
-Dodo esm importing node cjs
+Deno esm importing node cjs
 ===========================
 {
   default: [Function (anonymous)],
@@ -59,7 +59,7 @@ Dodo esm importing node cjs
   named: [Function (anonymous)]
 }
 ===========================
-Dodo esm importing node esm
+Deno esm importing node esm
 ===========================
 [Function: default]
 [Module: null prototype] { default: [Function: default] }

@@ -1014,7 +1014,7 @@ pub async fn upgrade(
   let requested_version =
     RequestedVersion::from_upgrade_flags(upgrade_flags.clone())?;
 
-  log::info!("Current Dodo version: v{}", version::DENO_VERSION_INFO.deno);
+  log::info!("Current Deno version: v{}", version::DENO_VERSION_INFO.deno);
 
   let maybe_selected_version_to_upgrade = match &requested_version {
     RequestedVersion::Latest(channel) => {
@@ -1078,7 +1078,7 @@ pub async fn upgrade(
     log::info!(
       "{}",
       colors::gray(format!(
-        "Dodo is upgrading to version {}",
+        "Deno is upgrading to version {}",
         &selected_version_to_upgrade.version_or_hash
       ))
     );
@@ -1132,7 +1132,7 @@ pub async fn upgrade(
     log::info!(
       "{}",
       colors::gray(format!(
-        "Dodo is upgrading to version {}",
+        "Deno is upgrading to version {}",
         &selected_version_to_upgrade.version_or_hash
       ))
     );
@@ -1182,7 +1182,7 @@ pub async fn upgrade(
   check_windows_access_denied_error(output_result, output_exe_path)?;
 
   log::info!(
-    "\nUpgraded successfully to Dodo {} {}\n",
+    "\nUpgraded successfully to Deno {} {}\n",
     colors::green(selected_version_to_upgrade.display()),
     colors::gray(&format!(
       "({})",

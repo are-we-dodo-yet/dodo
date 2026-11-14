@@ -1,6 +1,6 @@
 Check [WILDCARD]exit_sanitizer.ts
     CPU | [WILDCARD]
-Runtime | Dodo [WILDCARD] ([WILDCARD])
+Runtime | Deno  [WILDCARD] ([WILDCARD])
 
 [WILDCARD]/exit_sanitizer.ts
 

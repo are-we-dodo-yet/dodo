@@ -1,6 +1,6 @@
 Check file:///[WILDCARD]testdata/bench/pass.ts
 {
-  "runtime": "Dodo/[WILDCARD]",
+  "runtime": "Deno/[WILDCARD]",
   "cpu": "[WILDCARD]",
   "benches": [
     {
