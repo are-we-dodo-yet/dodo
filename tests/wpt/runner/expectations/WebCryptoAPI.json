@@ -2798,30 +2798,8 @@
   "randomUUID.https.any.html": true,
   "randomUUID.https.any.worker.html": true,
   "sign_verify": {
-    "ecdsa.https.any.html": {
-      "expectedFailures": [
-        "ECDSA P-384 with SHA-1 verification",
-        "ECDSA P-384 with SHA-1 verification with altered signature during call",
-        "ECDSA P-384 with SHA-1 verification with altered signature after call",
-        "ECDSA P-384 with SHA-1 verification with transferred signature after call",
-        "ECDSA P-384 with SHA-1 with altered plaintext during call",
-        "ECDSA P-384 with SHA-1 with altered plaintext after call",
-        "ECDSA P-384 with SHA-1 with transferred plaintext after call",
-        "ECDSA P-384 with SHA-1 round trip"
-      ]
-    },
-    "ecdsa.https.any.worker.html": {
-      "expectedFailures": [
-        "ECDSA P-384 with SHA-1 verification",
-        "ECDSA P-384 with SHA-1 verification with altered signature during call",
-        "ECDSA P-384 with SHA-1 verification with altered signature after call",
-        "ECDSA P-384 with SHA-1 verification with transferred signature after call",
-        "ECDSA P-384 with SHA-1 with altered plaintext during call",
-        "ECDSA P-384 with SHA-1 with altered plaintext after call",
-        "ECDSA P-384 with SHA-1 with transferred plaintext after call",
-        "ECDSA P-384 with SHA-1 round trip"
-      ]
-    },
+    "ecdsa.https.any.html": true,
+    "ecdsa.https.any.worker.html": true,
     "hmac.https.any.html": true,
     "hmac.https.any.worker.html": true,
     "rsa_pkcs.https.any.html": true,
