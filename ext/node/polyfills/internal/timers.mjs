@@ -19,15 +19,10 @@ const {
   ArrayPrototypePush,
   DateNow,
   FunctionPrototypeCall,
-  MapPrototypeDelete,
-  MapPrototypeGet,
-  MapPrototypeSet,
   NumberIsFinite,
   NumberIsNaN,
   ObjectDefineProperty,
   ReflectApply,
-  SafeMapIterator,
-  SafeMap,
   Symbol,
   SymbolDispose,
   SymbolToPrimitive,
@@ -65,25 +60,18 @@ const kRefed = core.kRefed;
 const createTimer = Symbol("createTimer");
 
 /**
- * The keys in this map correspond to the key ID's in the spec's map of active
- * timers. The values are the timeout's status.
- *
- * @type {Map<number, Timeout>}
- */
-const activeTimers = new SafeMap();
-
-/**
  * @param {number} id
  * @returns {Timeout | undefined}
  */
 function getActiveTimer(id) {
-  return MapPrototypeGet(activeTimers, id);
+  return core.getTimer(id)?._owner;
 }
 
 function getActiveResourcesInfo() {
   const resources = [];
-  for (const { 1: timeout } of new SafeMapIterator(activeTimers)) {
-    if (timeout[kRefed]) {
+  const timers = core.getActiveTimers();
+  for (let i = 0; i < timers.length; i++) {
+    if (timers[i]._owner?.[kRefed]) {
       ArrayPrototypePush(resources, "Timeout");
     }
   }
@@ -211,10 +199,8 @@ Timeout.prototype[createTimer] = function () {
         }
       } else if (self._repeat) {
         // timeout was converted to interval inside callback
-        MapPrototypeDelete(activeTimers, self[kTimerId]);
         self[kTimerId] = self[createTimer]();
       } else {
-        MapPrototypeDelete(activeTimers, self[kTimerId]);
         self._destroyed = true;
       }
     }
@@ -256,6 +242,7 @@ Timeout.prototype[createTimer] = function () {
     this._repeat,
     this[kRefed],
     this[kSystem],
+    this,
   );
   ObjectDefineProperty(this, "_timer", {
     __proto__: null,
@@ -264,9 +251,7 @@ Timeout.prototype[createTimer] = function () {
     enumerable: false,
     configurable: true,
   });
-  const id = timer._timerId;
-  MapPrototypeSet(activeTimers, id, this);
-  return id;
+  return timer._timerId;
 };
 
 Timeout.prototype[kDestroy] = function () {
@@ -277,7 +262,6 @@ Timeout.prototype[kDestroy] = function () {
     this._idleStart = DateNow();
     this._onTimeout = null;
     cancelTimer_(this._timer);
-    MapPrototypeDelete(activeTimers, this[kTimerId]);
     if (
       this._asyncId !== undefined &&
       !this._asyncDestroyed &&
@@ -395,7 +379,6 @@ function suspendTimeout(timeout) {
     timeout[kSuspended] = true;
     timeout._idleStart = DateNow();
     cancelTimer_(timeout._timer);
-    MapPrototypeDelete(activeTimers, timeout[kTimerId]);
   }
 }
 
