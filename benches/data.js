@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794959718435,
+  "lastUpdate": 1794959720968,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo",
   "entries": {
     "Execution Time": [
@@ -1479,6 +1479,95 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/are-we-dodo-yet/dodo/commit/337f56337b1d92c832d6898dc056a1f824af0088"
         },
         "date": 1794178423399,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "cold_hello",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "cold_relative_import",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "error_001",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "hello",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "no_check_hello",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "relative_import",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "response_string",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "text_decoder",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "text_encoder",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "text_encoder_into",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "workers_large_message",
+            "value": 58,
+            "unit": "threads"
+          },
+          {
+            "name": "workers_round_robin",
+            "value": 12,
+            "unit": "threads"
+          },
+          {
+            "name": "workers_startup",
+            "value": 59,
+            "unit": "threads"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e54e8dd95a7fbb18d509d024db8470d0efcb49ae",
+          "message": "fix: handle timer tracking in core (#23)\n\nSigned-off-by: Yaroslav Bolyukin <iam@lach.pw>",
+          "timestamp": "2026-11-17T23:45:36+01:00",
+          "tree_id": "50016e41583b1f348243a18a877ede34641bf75e",
+          "url": "https://github.com/are-we-dodo-yet/dodo/commit/e54e8dd95a7fbb18d509d024db8470d0efcb49ae"
+        },
+        "date": 1794959719885,
         "tool": "customSmallerIsBetter",
         "benches": [
           {
