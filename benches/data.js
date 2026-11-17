@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794959720968,
+  "lastUpdate": 1794959723127,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo",
   "entries": {
     "Execution Time": [
@@ -2258,6 +2258,95 @@ window.BENCHMARK_DATA = {
           {
             "name": "workers_startup",
             "value": 52206,
+            "unit": "syscalls"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e54e8dd95a7fbb18d509d024db8470d0efcb49ae",
+          "message": "fix: handle timer tracking in core (#23)\n\nSigned-off-by: Yaroslav Bolyukin <iam@lach.pw>",
+          "timestamp": "2026-11-17T23:45:36+01:00",
+          "tree_id": "50016e41583b1f348243a18a877ede34641bf75e",
+          "url": "https://github.com/are-we-dodo-yet/dodo/commit/e54e8dd95a7fbb18d509d024db8470d0efcb49ae"
+        },
+        "date": 1794959722275,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "cold_hello",
+            "value": 1087,
+            "unit": "syscalls"
+          },
+          {
+            "name": "cold_relative_import",
+            "value": 1088,
+            "unit": "syscalls"
+          },
+          {
+            "name": "error_001",
+            "value": 1211,
+            "unit": "syscalls"
+          },
+          {
+            "name": "hello",
+            "value": 1060,
+            "unit": "syscalls"
+          },
+          {
+            "name": "no_check_hello",
+            "value": 1069,
+            "unit": "syscalls"
+          },
+          {
+            "name": "relative_import",
+            "value": 1082,
+            "unit": "syscalls"
+          },
+          {
+            "name": "response_string",
+            "value": 1318,
+            "unit": "syscalls"
+          },
+          {
+            "name": "text_decoder",
+            "value": 1237,
+            "unit": "syscalls"
+          },
+          {
+            "name": "text_encoder",
+            "value": 2829,
+            "unit": "syscalls"
+          },
+          {
+            "name": "text_encoder_into",
+            "value": 1142,
+            "unit": "syscalls"
+          },
+          {
+            "name": "workers_large_message",
+            "value": 77938,
+            "unit": "syscalls"
+          },
+          {
+            "name": "workers_round_robin",
+            "value": 7408,
+            "unit": "syscalls"
+          },
+          {
+            "name": "workers_startup",
+            "value": 40885,
             "unit": "syscalls"
           }
         ]
