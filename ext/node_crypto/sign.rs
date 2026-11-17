@@ -215,7 +215,7 @@ macro_rules! with_pss_scheme {
 }
 
 fn rsa_key_bits(key: &impl rsa::traits::PublicKeyParts) -> usize {
-  key.n().bits() as usize
+  key.n().bit_width() as usize
 }
 
 /// Recover the PSS salt length from a signature using AUTO detection.
@@ -440,7 +440,7 @@ impl KeyObjectHandle {
           Ok(signature.into())
         } else {
           let q_len =
-            key.verifying_key().components().q().bits().div_ceil(8) as usize;
+            key.verifying_key().components().q().bit_width().div_ceil(8) as usize;
           Ok(dsa_sig_to_p1363(&signature, q_len))
         }
       }
@@ -606,7 +606,7 @@ impl KeyObjectHandle {
           };
           sig
         } else {
-          let q_len = key.components().q().bits().div_ceil(8) as usize;
+          let q_len = key.components().q().bit_width().div_ceil(8) as usize;
           let Some(sig) = dsa_sig_from_p1363(signature, q_len) else {
             return Ok(false);
           };

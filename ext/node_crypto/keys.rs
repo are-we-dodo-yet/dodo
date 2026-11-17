@@ -2971,7 +2971,7 @@ pub fn op_node_get_asymmetric_key_details(
   match handle {
     KeyObjectHandle::AsymmetricPrivate(private_key) => match private_key {
       AsymmetricPrivateKey::Rsa(key) => {
-        let modulus_length = key.n().bits() as usize;
+        let modulus_length = key.n().bit_width() as usize;
         let public_exponent =
           BigInt::from_bytes_be(num_bigint::Sign::Plus, &key.e_bytes());
         Ok(AsymmetricKeyDetails::Rsa {
@@ -2980,7 +2980,7 @@ pub fn op_node_get_asymmetric_key_details(
         })
       }
       AsymmetricPrivateKey::RsaPss(key) => {
-        let modulus_length = key.key.n().bits() as usize;
+        let modulus_length = key.key.n().bit_width() as usize;
         let public_exponent =
           BigInt::from_bytes_be(num_bigint::Sign::Plus, &key.key.e_bytes());
         let public_exponent = public_exponent.into();
@@ -3001,8 +3001,8 @@ pub fn op_node_get_asymmetric_key_details(
       }
       AsymmetricPrivateKey::Dsa(key) => {
         let components = key.verifying_key().components();
-        let modulus_length = components.p().bits() as usize;
-        let divisor_length = components.q().bits() as usize;
+        let modulus_length = components.p().bit_width() as usize;
+        let divisor_length = components.q().bit_width() as usize;
         Ok(AsymmetricKeyDetails::Dsa {
           modulus_length,
           divisor_length,
@@ -3026,7 +3026,7 @@ pub fn op_node_get_asymmetric_key_details(
     },
     KeyObjectHandle::AsymmetricPublic(public_key) => match public_key {
       AsymmetricPublicKey::Rsa(key) => {
-        let modulus_length = key.n().bits() as usize;
+        let modulus_length = key.n().bit_width() as usize;
         let public_exponent =
           BigInt::from_bytes_be(num_bigint::Sign::Plus, &key.e_bytes());
         Ok(AsymmetricKeyDetails::Rsa {
@@ -3035,7 +3035,7 @@ pub fn op_node_get_asymmetric_key_details(
         })
       }
       AsymmetricPublicKey::RsaPss(key) => {
-        let modulus_length = key.key.n().bits() as usize;
+        let modulus_length = key.key.n().bit_width() as usize;
         let public_exponent =
           BigInt::from_bytes_be(num_bigint::Sign::Plus, &key.key.e_bytes());
         let public_exponent = public_exponent.into();
@@ -3056,8 +3056,8 @@ pub fn op_node_get_asymmetric_key_details(
       }
       AsymmetricPublicKey::Dsa(key) => {
         let components = key.components();
-        let modulus_length = components.p().bits() as usize;
-        let divisor_length = components.q().bits() as usize;
+        let modulus_length = components.p().bit_width() as usize;
+        let divisor_length = components.q().bit_width() as usize;
         Ok(AsymmetricKeyDetails::Dsa {
           modulus_length,
           divisor_length,
