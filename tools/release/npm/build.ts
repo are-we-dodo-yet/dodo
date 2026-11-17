@@ -108,7 +108,7 @@ if (!args["publish-only"]) {
     rootDir.join("LICENSE.md").copyFileSync(denoDir.join("LICENSE"));
     denoDir.join("README.md").writeTextSync(markdownText);
     // ensure the test files don't get published
-    denoDir.join(".npmignore").writeTextSync("deno\ndeno.exe\n");
+    denoDir.join(".npmignore").writeTextSync("dodo\ndodo.exe\n");
 
     // setup each binary package
     for (const pkg of packages) {

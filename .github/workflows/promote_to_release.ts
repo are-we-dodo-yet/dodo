@@ -67,7 +67,7 @@ const windowsJob = job("promote-to-release-windows", {
       },
     }),
     step({
-      name: "Code sign deno.exe",
+      name: "Code sign dodo.exe",
       uses: "Azure/artifact-signing-action@v0",
       with: {
         "cache-dependencies": false,

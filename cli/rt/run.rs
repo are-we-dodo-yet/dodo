@@ -1657,7 +1657,7 @@ pub async fn run_with_options(
         .jsr_pkgs
         .iter()
         .map(|pkg| ResolverWorkspaceJsrPackage {
-          is_link: false, // only used for enhancing the diagnostic, which isn't shown in deno compile
+          is_link: false, // only used for enhancing the diagnostic, which isn't shown in dodo compile
           base: root_dir_url.join(&pkg.relative_base).unwrap(),
           name: pkg.name.clone(),
           version: pkg.version.clone(),

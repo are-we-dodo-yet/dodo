@@ -460,7 +460,7 @@ impl<'a> DenoCompileBinaryWriter<'a> {
 
     // Used for testing.
     //
-    // Phase 2 of the 'min sized' deno compile RFC talks
+    // Phase 2 of the 'min sized' dodo compile RFC talks
     // about adding this as a flag.
     if let Some(path) = get_dev_binary_path() {
       if compile_flags.engine == JavaScriptEngine::QuickJs {

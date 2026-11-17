@@ -226,7 +226,7 @@ name = "flags"
 harness = false
 
 [package.metadata.winres]
-# This section defines the metadata that appears in the deno.exe PE header.
+# This section defines the metadata that appears in the dodo.exe PE header.
 OriginalFilename = "dodo.exe"
 LegalCopyright = "© Deno contributors & Deno Land Inc. MIT licensed."
 ProductName = "Deno"

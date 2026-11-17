@@ -524,7 +524,7 @@ exec "$SCRIPT_DIR/deno" x "$@"
     std::fs::write(
       out_path,
       r##"@echo off
-"%~dp0deno.exe" x %*
+"%~dp0dodo.exe" x %*
 exit /b %ERRORLEVEL%
 "##,
     )?;

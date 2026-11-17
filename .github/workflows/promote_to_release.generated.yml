@@ -64,7 +64,7 @@ jobs:
           tenant-id: '${{ secrets.AZURE_TENANT_ID }}'
           subscription-id: '${{ secrets.AZURE_SUBSCRIPTION_ID }}'
           enable-AzPSSession: true
-      - name: Code sign deno.exe
+      - name: Code sign dodo.exe
         uses: Azure/artifact-signing-action@1d365fec12862c4aa68fcac418143d73f0cea293
         with:
           cache-dependencies: false

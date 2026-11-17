@@ -1985,7 +1985,7 @@ fn kill_running_deno_lsp_processes() {
     .args([
       "-Command",
       r#"Get-WmiObject Win32_Process | Where-Object {
-    $_.Name -eq 'deno.exe' -and
+    $_.Name -eq 'dodo.exe' -and
     $_.CommandLine -match '^(?:\"[^\"]+\"|\S+)\s+lsp\b'
 } | ForEach-Object {
   if ($_.Terminate()) {

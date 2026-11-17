@@ -8585,21 +8585,21 @@ mod tests {
   fn test_denies_run_name() {
     let cases = [
       #[cfg(windows)]
-      ("deno", "C:\\deno.exe", true),
+      ("dodo", "C:\\dodo.exe", true),
       #[cfg(windows)]
-      ("deno", "C:\\sub\\deno.cmd", true),
+      ("dodo", "C:\\sub\\dodo.cmd", true),
       #[cfg(windows)]
-      ("deno", "C:\\sub\\DeNO.cmd", true),
+      ("dodo", "C:\\sub\\DoDO.cmd", true),
       #[cfg(windows)]
-      ("DEno", "C:\\sub\\deno.cmd", true),
+      ("DOdo", "C:\\sub\\dodo.cmd", true),
       #[cfg(windows)]
-      ("deno", "C:\\other\\sub\\deno.batch", true),
+      ("dodo", "C:\\other\\sub\\dodo.batch", true),
       #[cfg(windows)]
-      ("deno", "C:\\other\\sub\\deno", true),
+      ("dodo", "C:\\other\\sub\\dodo", true),
       #[cfg(windows)]
-      ("denort", "C:\\other\\sub\\deno.exe", false),
-      ("deno", "/home/test/deno", true),
-      ("deno", "/home/test/denot", false),
+      ("denort", "C:\\other\\sub\\dodo.exe", false),
+      ("dodo", "/home/test/dodo", true),
+      ("dodo", "/home/test/denot", false),
     ];
     for (name, cmd_path, denies) in cases {
       assert_eq!(

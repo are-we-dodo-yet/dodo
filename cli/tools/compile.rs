@@ -188,7 +188,7 @@ async fn compile_inner(
 
   let _bundle_cleanup = if compile_flags.bundle {
     log::warn!(
-      "{} deno compile --bundle is experimental and may change.",
+      "{} dodo compile --bundle is experimental and may change.",
       colors::yellow("Warning")
     );
     // Auto-include the closest `package.json` to the entrypoint, if any.
@@ -616,7 +616,7 @@ fn rewrite_absolute_bundle_paths_inner(
     };
   }
 
-  let prefix = r#"// Injected by deno compile --bundle: resolve absolute paths emitted by
+  let prefix = r#"// Injected by dodo compile --bundle: resolve absolute paths emitted by
 // esbuild's CJS-from-ESM wrapper against the bundle file's runtime
 // location instead of the build-time absolute path.
 import { fileURLToPath as __internalFileURLToPath } from "node:url";
@@ -762,7 +762,7 @@ pub async fn compile_binary(
     .await
     .with_context(|| {
       format!(
-        "Writing deno compile executable to temporary file '{}'",
+        "Writing dodo compile executable to temporary file '{}'",
         temp_path.display()
       )
     });
@@ -1055,7 +1055,7 @@ fn validate_output_path(output_path: &Path) -> Result<(), AnyError> {
       );
     }
 
-    // Remove file if it was indeed a deno compiled binary, to avoid corruption
+    // Remove file if it was indeed a dodo compiled binary, to avoid corruption
     // (see https://github.com/denoland/deno/issues/10310)
     std::fs::remove_file(output_path)?;
   } else {

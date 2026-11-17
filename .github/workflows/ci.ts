@@ -867,7 +867,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
             },
           },
           {
-            name: "Code sign deno.exe (windows)",
+            name: "Code sign dodo.exe (windows)",
             if: isWindows.and(isDenoland).and(isMainOrTag),
             uses: "Azure/artifact-signing-action@v0",
             with: {
@@ -895,7 +895,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
             run: [
               '$SignTool = Get-ChildItem -Path "C:\\Program Files*\\Windows Kits\\*\\bin\\*\\x64\\signtool.exe" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1',
               "$SignToolPath = $SignTool.FullName",
-              "& $SignToolPath verify /pa /v target\\release\\deno.exe",
+              "& $SignToolPath verify /pa /v target\\release\\dodo.exe",
             ],
           },
           {
@@ -903,8 +903,8 @@ const buildJobs = buildItems.map((rawBuildItem) => {
             if: isWindows.and(isDenoland),
             shell: "pwsh",
             run: [
-              `Get-FileHash target/release/deno.exe -Algorithm SHA256 | Format-List > target/release/deno-${buildItem.arch}-pc-windows-msvc.sha256sum`,
-              `Compress-Archive -CompressionLevel Optimal -Force -Path target/release/deno.exe -DestinationPath target/release/deno-${buildItem.arch}-pc-windows-msvc.zip`,
+              `Get-FileHash target/release/dodo.exe -Algorithm SHA256 | Format-List > target/release/deno-${buildItem.arch}-pc-windows-msvc.sha256sum`,
+              `Compress-Archive -CompressionLevel Optimal -Force -Path target/release/dodo.exe -DestinationPath target/release/deno-${buildItem.arch}-pc-windows-msvc.zip`,
               `Get-FileHash target/release/deno-${buildItem.arch}-pc-windows-msvc.zip -Algorithm SHA256 | Format-List > target/release/deno-${buildItem.arch}-pc-windows-msvc.zip.sha256sum`,
               `Compress-Archive -CompressionLevel Optimal -Force -Path target/release/denort.exe -DestinationPath target/release/denort-${buildItem.arch}-pc-windows-msvc.zip`,
               `Get-FileHash target/release/denort-${buildItem.arch}-pc-windows-msvc.zip -Algorithm SHA256 | Format-List > target/release/denort-${buildItem.arch}-pc-windows-msvc.zip.sha256sum`,
@@ -929,7 +929,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               "  if (Test-Path target/release/denort.v8.exe) { Move-Item -Force target/release/denort.v8.exe target/release/denort.exe }",
               "  if (Test-Path target/release/denort.v8.dll) { Move-Item -Force target/release/denort.v8.dll target/release/denort.dll }",
               "}",
-              `target/release/deno.exe -A tools/release/create_symcache.ts target/release/deno-${buildItem.arch}-pc-windows-msvc.symcache`,
+              `target/release/dodo.exe -A tools/release/create_symcache.ts target/release/deno-${buildItem.arch}-pc-windows-msvc.symcache`,
             ],
           },
           {
@@ -979,7 +979,7 @@ const buildJobs = buildItems.map((rawBuildItem) => {
               'try { Invoke-WebRequest -Uri "https://github.com/denoland/deno/releases/download/v$PrevVersion/deno-$Target.zip" -OutFile prev.zip } catch { Write-Host "Previous release not found, skipping delta"; exit 0 }',
               "Remove-Item -Recurse -Force prev -ErrorAction SilentlyContinue; New-Item -ItemType Directory -Path prev | Out-Null",
               "Expand-Archive -Force -Path prev.zip -DestinationPath prev",
-              '& .\\target\\release\\bsdiff_helper.exe "prev\\deno.exe" "target\\release\\deno.exe" "target\\release\\deno-$Target.from-$PrevVersion.bsdiff"',
+              '& .\\target\\release\\bsdiff_helper.exe "prev\\dodo.exe" "target\\release\\dodo.exe" "target\\release\\deno-$Target.from-$PrevVersion.bsdiff"',
               'Get-FileHash "target\\release\\deno-$Target.from-$PrevVersion.bsdiff" -Algorithm SHA256 | Format-List > "target\\release\\deno-$Target.from-$PrevVersion.bsdiff.sha256sum"',
             ],
           },

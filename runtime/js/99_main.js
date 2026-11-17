@@ -713,7 +713,7 @@ const NOT_IMPORTED_OPS = [
   "op_set_exit_code",
   "op_napi_open",
 
-  // Related to `Deno.desktop` API (deno compile --desktop)
+  // Related to `Deno.desktop` API (dodo compile --desktop)
   "BrowserWindow",
   "Dock",
   "Tray",
