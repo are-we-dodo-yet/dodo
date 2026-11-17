@@ -420,10 +420,7 @@ impl UvLoopInner {
         return true;
       }
     }
-    if !self.closing_handles.borrow().is_empty() {
-      return true;
-    }
-    false
+    !self.closing_handles.borrow().is_empty()
   }
 
   /// ### Safety

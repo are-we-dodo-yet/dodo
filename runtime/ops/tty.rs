@@ -468,7 +468,9 @@ deno_error::js_error_wrapper!(ReadlineError, JsReadlineError, |err| {
     ReadlineError::Eof => GENERIC_ERROR.into(),
     ReadlineError::Interrupted => GENERIC_ERROR.into(),
     #[cfg(unix)]
-    ReadlineError::Errno(e) => JsNixError(*e).get_class(),
+    ReadlineError::Errno(e) => {
+      JsNixError(nix::errno::Errno::from_raw(*e as i32)).get_class()
+    }
     _ => GENERIC_ERROR.into(),
   }
 });

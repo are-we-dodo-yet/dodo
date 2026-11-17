@@ -13,7 +13,7 @@ name = "deno_doc_wasm"
 path = "lib.rs"
 crate-type = ["cdylib"]
 
-[dependencies]
+[target.'cfg(target_arch = "wasm32")'.dependencies]
 anyhow.workspace = true
 console_error_panic_hook.workspace = true
 deno_doc = { workspace = true, default-features = false }

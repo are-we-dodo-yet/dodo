@@ -1687,13 +1687,8 @@ fn better_alternative_exists(position: Position, of: &TypePath) -> bool {
   }
 
   // If this type will parse with #[string], it is illegal to use this type with #[serde]/#[to_v8]/#[from_v8]
-  if parse_type_path(position, Attributes::string(), TypePathContext::None, of)
+  parse_type_path(position, Attributes::string(), TypePathContext::None, of)
     .is_ok()
-  {
-    return true;
-  }
-
-  false
 }
 
 pub(crate) fn parse_type(

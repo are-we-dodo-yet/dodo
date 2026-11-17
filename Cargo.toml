@@ -202,7 +202,6 @@ async-trait = "0.1.73"
 aws-lc-rs = { version = "1.16.3" }
 aws-lc-sys = { version = "0.47.0", features = ["prebuilt-nasm"] }
 backhand = { version = "0.25.1", default-features = false, features = ["zstd"] }
-base32 = "0.5.1"
 base64 = "0.23.1"
 bencher = "0.1"
 bit-set = "0.11.1"
@@ -229,7 +228,6 @@ encoding_rs = "0.8.35"
 error_reporter = "1"
 fast-socks5 = "1.0.0"
 faster-hex = "1.0.0"
-fastrand = "2"
 fastwebsockets = { version = "0.10.0", features = ["upgrade", "unstable-split"] }
 file_test_runner = "0.12.1"
 filetime = "0.2.16"
@@ -287,9 +285,7 @@ prettyplease = "0.3.0"
 proc-macro2 = "1.0"
 proptest = "1"
 prost = "0.14"
-prost-build = "0.14"
 qbsdiff = "1.4"
-quick-junit = "0.3.5"
 quinn = { version = "0.11.8", default-features = false }
 rand = "0.10.3"
 rayon = "1.11.0"
@@ -472,7 +468,7 @@ quote = "1"
 syn = { version = "3", features = ["full", "extra-traits"] }
 
 # unix deps
-nix = "0.31.3"
+nix = "0.32"
 tokio-vsock = "0.7"
 
 # windows deps
@@ -515,7 +511,6 @@ keyring = "4.2.0"
 laufey = "0.7.0"
 lazy_static = "1.5.0"
 libnghttp2 = "1.68.0"
-locked-tripwire = "=0.1.1"
 markup5ever_rcdom = "0.39.0"
 plist = "1"
 serde_v8_utilities = { path = "libs/serde_v8/utilities", default-features = false }

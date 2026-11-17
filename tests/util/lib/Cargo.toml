@@ -13,16 +13,14 @@ repository.workspace = true
 path = "lib.rs"
 
 [features]
-lsp = ["dep:tower-lsp-server", "dep:indexmap", "dep:percent-encoding"]
+lsp = ["dep:tower-lsp-server", "dep:indexmap", "dep:percent-encoding", "dep:deno_path_util", "dep:fluent-uri"]
 
 [dependencies]
 anyhow.workspace = true
 console_static_text.workspace = true
 crossterm.workspace = true
-deno_path_util.workspace = true
 faster-hex.workspace = true
 file_test_runner.workspace = true
-fluent-uri.workspace = true
 inventory.workspace = true
 jsonc-parser.workspace = true
 lazy-regex.workspace = true
@@ -43,6 +41,8 @@ twox-hash.workspace = true
 url.workspace = true
 
 # optional deps behind "lsp" feature
+deno_path_util = { workspace = true, optional = true }
+fluent-uri = { workspace = true, optional = true }
 indexmap = { workspace = true, optional = true }
 percent-encoding = { workspace = true, optional = true }
 tower-lsp-server = { workspace = true, optional = true }

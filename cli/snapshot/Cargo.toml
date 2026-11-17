@@ -18,3 +18,8 @@ disable = []
 
 [build-dependencies]
 deno_runtime = { workspace = true, features = ["snapshot"] }
+
+[lints.cargo]
+# deno_runtime is only used by build.rs when the `disable` feature is off;
+# tools/lint.js enables all workspace features, which makes it look unused.
+unused_dependencies = "allow"

@@ -3112,11 +3112,7 @@ impl RefactorActionInfo {
         false
       };
     }
-    if EXTRACT_TYPE.matches(&self.name) || EXTRACT_INTERFACE.matches(&self.name)
-    {
-      return true;
-    }
-    false
+    EXTRACT_TYPE.matches(&self.name) || EXTRACT_INTERFACE.matches(&self.name)
   }
 }
 

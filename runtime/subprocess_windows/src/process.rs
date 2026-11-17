@@ -663,13 +663,10 @@ pub fn spawn(options: &SpawnOptions) -> Result<ChildProcess, std::io::Error> {
     || (options.flags & uv_process_flags::WindowsHide) != 0
   {
     // Avoid creating console window if stdio is not inherited
-    let mut can_hide = true;
-    for i in 0..options.stdio.len() {
-      if matches!(options.stdio[i], StdioContainer::InheritFd(_)) {
-        can_hide = false;
-        break;
-      }
-    }
+    let can_hide = !options
+      .stdio
+      .iter()
+      .any(|s| matches!(s, StdioContainer::InheritFd(_)));
     if can_hide {
       process_flags |= CREATE_NO_WINDOW;
     }

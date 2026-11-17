@@ -51,7 +51,6 @@ indexmap = { workspace = true, features = ["serde"] }
 log.workspace = true
 monch.workspace = true
 once_cell.workspace = true
-parking_lot.workspace = true
 regex.workspace = true
 serde = { workspace = true, features = ["derive", "rc"] }
 serde_json = { workspace = true, features = ["preserve_order"] }
@@ -69,6 +68,7 @@ deno_unsync = { workspace = true, features = ["tokio"] }
 deno_terminal.workspace = true
 env_logger.workspace = true
 file_test_runner.workspace = true
+parking_lot.workspace = true
 pretty_assertions.workspace = true
 reqwest = { workspace = true, features = ["http2", "charset"] }
 sys_traits = { workspace = true, features = ["memory"] }
