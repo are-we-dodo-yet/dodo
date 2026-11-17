@@ -20,6 +20,7 @@ use deno_io::fs::FsError;
 use deno_io::fs::FsResult;
 use deno_io::fs::FsStat;
 use deno_io::fs::FsStatFs;
+use deno_io::fs::file_times;
 use deno_maybe_sync::new_rc;
 use deno_permissions::CheckedPath;
 use deno_permissions::CheckedPathBuf;
@@ -372,9 +373,8 @@ impl FileSystem for RealFs {
     mtime_secs: i64,
     mtime_nanos: u32,
   ) -> FsResult<()> {
-    let atime = filetime::FileTime::from_unix_time(atime_secs, atime_nanos);
-    let mtime = filetime::FileTime::from_unix_time(mtime_secs, mtime_nanos);
-    filetime::set_file_times(path, atime, mtime).map_err(Into::into)
+    let times = file_times(atime_secs, atime_nanos, mtime_secs, mtime_nanos)?;
+    fs::set_times(path, times).map_err(Into::into)
   }
   async fn utime_async(
     &self,
@@ -384,12 +384,9 @@ impl FileSystem for RealFs {
     mtime_secs: i64,
     mtime_nanos: u32,
   ) -> FsResult<()> {
-    let atime = filetime::FileTime::from_unix_time(atime_secs, atime_nanos);
-    let mtime = filetime::FileTime::from_unix_time(mtime_secs, mtime_nanos);
-    spawn_blocking(move || {
-      filetime::set_file_times(path, atime, mtime).map_err(Into::into)
-    })
-    .await?
+    let times = file_times(atime_secs, atime_nanos, mtime_secs, mtime_nanos)?;
+    spawn_blocking(move || fs::set_times(path, times).map_err(Into::into))
+      .await?
   }
 
   fn lutime_sync(
@@ -400,9 +397,8 @@ impl FileSystem for RealFs {
     mtime_secs: i64,
     mtime_nanos: u32,
   ) -> FsResult<()> {
-    let atime = filetime::FileTime::from_unix_time(atime_secs, atime_nanos);
-    let mtime = filetime::FileTime::from_unix_time(mtime_secs, mtime_nanos);
-    filetime::set_symlink_file_times(path, atime, mtime).map_err(Into::into)
+    let times = file_times(atime_secs, atime_nanos, mtime_secs, mtime_nanos)?;
+    fs::set_times_nofollow(path, times).map_err(Into::into)
   }
 
   async fn lutime_async(
@@ -413,10 +409,9 @@ impl FileSystem for RealFs {
     mtime_secs: i64,
     mtime_nanos: u32,
   ) -> FsResult<()> {
-    let atime = filetime::FileTime::from_unix_time(atime_secs, atime_nanos);
-    let mtime = filetime::FileTime::from_unix_time(mtime_secs, mtime_nanos);
+    let times = file_times(atime_secs, atime_nanos, mtime_secs, mtime_nanos)?;
     spawn_blocking(move || {
-      filetime::set_symlink_file_times(path, atime, mtime).map_err(Into::into)
+      fs::set_times_nofollow(path, times).map_err(Into::into)
     })
     .await?
   }

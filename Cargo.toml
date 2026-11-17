@@ -230,7 +230,6 @@ fast-socks5 = "1.0.0"
 faster-hex = "1.0.0"
 fastwebsockets = { version = "0.10.0", features = ["upgrade", "unstable-split"] }
 file_test_runner = "0.12.1"
-filetime = "0.2.16"
 flate2 = { version = "1.0.30", default-features = false, features = ["zlib-rs"] }
 fluent-uri = "0.4.1"
 fqdn = "0.5"
