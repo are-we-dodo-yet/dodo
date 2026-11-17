@@ -215,7 +215,7 @@ impl<THttpClient: NpmCacheHttpClient, TSys: NpmCacheSys>
           // provider, so capturing a strong `Arc<Self>` would form a reference
           // cycle (`self` -> `memory_cache` -> value creator -> `self`) that
           // keeps the whole provider — and every package's cached registry
-          // metadata — alive for the life of the process. Under `deno run
+          // metadata — alive for the life of the process. Under `dodo run
           // --watch` that leaks one full registry cache per reload (see
           // denoland/deno#35664). `create_load_future` re-clones a strong
           // reference for the duration of an in-flight load, which is fine.

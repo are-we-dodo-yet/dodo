@@ -8,21 +8,21 @@
   //   e
   "tasks": {
     "a": {
-      "command": "deno run a.js",
+      "command": "dodo run a.js",
       "dependencies": ["b", "c"]
     },
     "b": {
-      "command": "deno run b.js",
+      "command": "dodo run b.js",
       "dependencies": ["e"]
     },
     "c": {
-      "command": "deno run c.js",
+      "command": "dodo run c.js",
       "dependencies": ["d"]
     },
     "d": {
-      "command": "deno run d.js",
+      "command": "dodo run d.js",
       "dependencies": ["e"]
     },
-    "e": "deno run e.js"
+    "e": "dodo run e.js"
   }
 }

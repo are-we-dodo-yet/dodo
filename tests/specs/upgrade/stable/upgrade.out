@@ -4,7 +4,7 @@ Looking up stable version
 Found latest stable version [WILDCARD]
 [# The step is retried on failure, so how the new binary is obtained varies:]
 [# a full download, a delta patch, or -- once an earlier attempt populated]
-[# the deno dir -- the cached archive.]
+[# the dodo dir -- the cached archive.]
 [WILDCARD]
 Deno is upgrading to version [WILDCARD]
 

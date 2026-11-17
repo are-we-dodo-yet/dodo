@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run -A
+#!/usr/bin/env -S dodo run -A
 // Copyright 2018-2026 the Deno authors. MIT license.
 
 // deno-lint-ignore-file no-console
@@ -20,7 +20,7 @@ import {
 } from "jsr:@ts-morph/ts-morph@27.0.2";
 
 const rootDir = $.path(import.meta.url).parentOrThrow().parentOrThrow();
-// Single source of truth: the same pin `deno check` installs for projects that
+// Single source of truth: the same pin `dodo check` installs for projects that
 // don't bring their own @types/node.
 const typesNodeVersion = readPinnedTypesNodeVersion();
 const dtsDir = rootDir.join("cli/tsc/dts/");

@@ -534,7 +534,7 @@ pub struct CompilerOptionsOverrides {
   /// import that is re-exported without the `type` modifier
   /// (`import { type X }` + `export { X }`) is left as a dangling value
   /// export and crashes at runtime. Falling back to heuristic import
-  /// elision matches the `deno compile` runtime, which forces verbatim
+  /// elision matches the `dodo compile` runtime, which forces verbatim
   /// off too.
   pub force_disable_verbatim_module_syntax: bool,
 }
@@ -1150,7 +1150,7 @@ impl<
   }
 
   fn visit_reference(&mut self, ts_config: Rc<TsConfigData>) {
-    // `deno sync-types` generates referenced projects solely for stock
+    // `dodo sync-types` generates referenced projects solely for stock
     // TypeScript's resolver. They point into Deno's npm cache and must not
     // become Deno compiler-option scopes or project roots themselves.
     if ts_config.is_deno_generated {

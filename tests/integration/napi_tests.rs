@@ -182,8 +182,8 @@ fn napi_shared_data_finalizers_run_once() {
 
 /// Test that NAPI wrap finalizers are also called at shutdown when the
 /// wrapping happens inside a `Deno.test`. Regression test for #35692, where
-/// the `deno test` worker was torn down without draining the NAPI finalizer
-/// queue (unlike the `deno run` path).
+/// the `dodo test` worker was torn down without draining the NAPI finalizer
+/// queue (unlike the `dodo run` path).
 #[test_util::test]
 fn napi_wrap_leak_finalizer_on_test_shutdown() {
   napi_build();

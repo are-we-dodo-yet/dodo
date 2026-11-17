@@ -789,7 +789,7 @@ Deno.test("inspector_profile", async () => {
 Deno.test("inspector_profile_idle", async () => {
   const script = `${testdataPath}/idle.js`;
   // Use --inspect (not --inspect-brk) so the program runs straight into its
-  // idle loop, matching how the issue is reproduced (`deno run --inspect`).
+  // idle loop, matching how the issue is reproduced (`dodo run --inspect`).
   const tester = await InspectorTester.create(
     ["run", "-A", "--inspect=0", script],
     { notificationFilter: ignoreScriptParsed },
@@ -1718,7 +1718,7 @@ Deno.test("inspector_runtime_evaluate_does_not_crash", async () => {
 });
 
 // Regression test for "Promise was collected" CDP errors when an external
-// debugger sends `Runtime.evaluate({replMode: true})` to `deno repl --inspect`.
+// debugger sends `Runtime.evaluate({replMode: true})` to `dodo repl --inspect`.
 // V8 inspector wraps replMode evaluations in `(async () => EXPR)()` and tracks
 // the result promise via a weak handle — without an immediate microtask drain
 // after each event-loop poll, GC can collect the promise before its resolution
@@ -1847,7 +1847,7 @@ Deno.test("inspector_break_on_first_line_in_test", async () => {
 });
 
 // Regression test for https://github.com/denoland/deno/issues/19289.
-// `deno test --inspect-brk` must wait for an attached debugger that opted into
+// `dodo test --inspect-brk` must wait for an attached debugger that opted into
 // `NodeRuntime.notifyWhenWaitingForDisconnect` (as Chrome DevTools does)
 // before exiting; otherwise an in-progress Performance recording is dropped
 // the moment the test finishes.
@@ -1958,7 +1958,7 @@ Deno.test("inspector_test_coverage_does_not_block_shutdown", async () => {
     const stderr = new TextDecoder().decode(output.stderr);
     assert(
       !timedOut,
-      `deno test --coverage did not exit cleanly.\nstdout:\n${stdout}\nstderr:\n${stderr}`,
+      `dodo test --coverage did not exit cleanly.\nstdout:\n${stdout}\nstderr:\n${stderr}`,
     );
     assertEquals(output.code, 0, `stdout:\n${stdout}\nstderr:\n${stderr}`);
     assertStringIncludes(stdout, "basic test ... ok");

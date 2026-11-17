@@ -158,7 +158,7 @@ pub async fn transpile(
     };
 
     // Always apply the CLI source map mode. The built-in emit defaults
-    // have inlineSourceMap: true (for the runtime), but `deno transpile`
+    // have inlineSourceMap: true (for the runtime), but `dodo transpile`
     // should produce clean output by default. Users must pass --source-map
     // explicitly to enable source maps.
     let emit_options = EmitOptions {

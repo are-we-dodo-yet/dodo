@@ -65,7 +65,7 @@ impl NpmPackageInfo {
   ///
   /// The keys are `skip_deserializing` in the normal parse because only the LSP
   /// (npm import-specifier completion) reads them and retaining them for every
-  /// version of every package regressed `deno run` memory badly (see
+  /// version of every package regressed `dodo run` memory badly (see
   /// denoland/deno#35664). The LSP calls this to populate them for its own use;
   /// no other command pays for it.
   pub fn fill_export_keys(
@@ -728,7 +728,7 @@ fn is_export_completion_key(key: &str) -> bool {
 /// This is never deserialized as part of the normal packument parse (the
 /// `exports` field on [`NpmPackageVersionInfo`] is `skip_deserializing`).
 /// Retaining even the keys for the `exports` of every version of every npm
-/// package regressed `deno run` memory and leaked per `--watch` reload (see
+/// package regressed `dodo run` memory and leaked per `--watch` reload (see
 /// denoland/deno#35664), and only the LSP reads them. The LSP fills them in on
 /// demand via [`NpmPackageInfo::fill_export_keys`].
 #[derive(Debug, Default, Clone, PartialEq, Eq)]
@@ -847,7 +847,7 @@ impl<'de> Deserialize<'de> for NpmPackageExportKeys {
 pub struct NpmPackageVersionInfo {
   pub version: Version,
   /// Skipped during the normal parse — only the LSP consumes these keys, and
-  /// retaining them for every version of every package regressed `deno run`
+  /// retaining them for every version of every package regressed `dodo run`
   /// memory (see denoland/deno#35664). The LSP fills them in via
   /// [`NpmPackageInfo::fill_export_keys`].
   #[serde(
@@ -2633,7 +2633,7 @@ mod test {
 
   #[test]
   fn version_info_exports_skipped_by_default() {
-    // The normal parse (e.g. `deno run`) discards `exports` entirely — nothing
+    // The normal parse (e.g. `dodo run`) discards `exports` entirely — nothing
     // is retained, not even the subpath keys.
     let text = r#"{ "version": "1.0.0", "exports": { ".": "./index.js", "./client": "./client.js" } }"#;
     let info: NpmPackageVersionInfo = serde_json::from_str(text).unwrap();

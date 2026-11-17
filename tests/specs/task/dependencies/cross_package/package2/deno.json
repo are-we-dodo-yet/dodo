@@ -1,5 +1,5 @@
 {
   "tasks": {
-    "run": "deno run.js"
+    "run": "dodo run.js"
   }
 }

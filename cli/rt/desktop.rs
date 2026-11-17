@@ -1,6 +1,6 @@
 // Copyright 2018-2026 the Deno authors. MIT license.
 
-//! Desktop window management for `deno compile --desktop`.
+//! Desktop window management for `dodo compile --desktop`.
 //!
 //! The ops are defined in `deno_runtime::ops::desktop` and included in the
 //! V8 snapshot. This module re-exports the key types and provides the JS

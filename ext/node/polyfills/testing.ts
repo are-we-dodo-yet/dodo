@@ -276,7 +276,7 @@ function getPathForSnapshot() {
 
 // Resolve update-snapshot mode lazily so the env / Rust op is read at most
 // once. We accept either Deno's own `--update-snapshots` flag (when running
-// under `deno test`) or Node's `--test-update-snapshots` propagated via
+// under `dodo test`) or Node's `--test-update-snapshots` propagated via
 // NODE_OPTIONS, so the polyfill behaves the same way the rest of the Node
 // compat surface does for reporter detection above.
 //
@@ -295,7 +295,7 @@ function isFileSnapshotUpdateMode() {
         _fileSnapshotUpdateMode = true;
         return true;
       }
-    } catch { /* op not wired up; not running under `deno test` */ }
+    } catch { /* op not wired up; not running under `dodo test` */ }
   }
   let nodeOptions = "";
   try {

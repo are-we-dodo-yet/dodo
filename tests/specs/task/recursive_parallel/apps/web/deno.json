@@ -5,7 +5,7 @@
   "tasks": {
     "build": "echo 'web build'",
     "dev": {
-      "command": "deno run -A main.ts",
+      "command": "dodo run -A main.ts",
       "dependencies": ["build"]
     }
   }

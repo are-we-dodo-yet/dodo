@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run -A
+#!/usr/bin/env -S dodo run -A
 // Copyright 2018-2024 the Deno authors. All rights reserved. MIT license.
 
 import { $, Repo } from "@deno/rust-automation";

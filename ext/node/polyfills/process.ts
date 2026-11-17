@@ -1874,7 +1874,7 @@ internals.__bootstrapNodeProcess = function (
     // process.stdout / process.stderr are built lazily on first access.
     // Constructing them eagerly here pulls the node stream/net/tty closure
     // into the snapshot for every program (TTYWriteStream extends net.Socket;
-    // the pipe path builds a node Writable). Most `deno run` invocations never
+    // the pipe path builds a node Writable). Most `dodo run` invocations never
     // touch process.stdout (Deno's own `console` doesn't route through it), so
     // deferring construction keeps that closure out of the deserialized heap.
     const makeStdioWriteStream = (fd, ioStream, name) => {

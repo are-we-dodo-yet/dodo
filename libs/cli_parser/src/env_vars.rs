@@ -1,5 +1,5 @@
 // Copyright 2018-2026 the Deno authors. MIT license.
-//! Environment variables documented in `deno --help`.
+//! Environment variables documented in `dodo --help`.
 
 #[derive(serde::Serialize)]
 pub struct EnvVar {
@@ -113,7 +113,7 @@ pub static ENV_VARS: &[EnvVar] = &[
   },
   EnvVar {
     name: "DENO_AUTO_SERVE",
-    description: "If the entrypoint contains export default { fetch }, `deno run`\nbehaves like `deno serve`.",
+    description: "If the entrypoint contains export default { fetch }, `dodo run`\nbehaves like `dodo serve`.",
     example: None,
   },
   EnvVar {
@@ -133,7 +133,7 @@ pub static ENV_VARS: &[EnvVar] = &[
   },
   EnvVar {
     name: "DENO_TSC_BIN",
-    description: "Path to a prebuilt native TypeScript compiler (tsc/tsgo) for `deno check` to use instead of downloading the pinned one.",
+    description: "Path to a prebuilt native TypeScript compiler (tsc/tsgo) for `dodo check` to use instead of downloading the pinned one.",
     example: None,
   },
   EnvVar {

@@ -1,1 +1,1 @@
-error: deno serve requires export default { fetch } in the main module, did you mean to run "deno run"?
+error: dodo serve requires export default { fetch } in the main module, did you mean to run "dodo run"?

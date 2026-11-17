@@ -214,7 +214,7 @@ async fn private_npm_registry3_handler(
   // npm client (via the `Accept: application/vnd.npm.install-v1+json` header)
   // and otherwise redirects to the public npm registry, which doesn't have the
   // private package and 404s. This reproduces the behaviour from
-  // https://github.com/denoland/deno/issues/31924 where `deno outdated` dropped
+  // https://github.com/denoland/deno/issues/31924 where `dodo outdated` dropped
   // the package because it fetched metadata with `Accept: */*`.
   let uri_path = req.uri().path();
   let is_metadata = !uri_path.ends_with(".tgz");

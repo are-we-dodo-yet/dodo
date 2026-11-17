@@ -1,7 +1,7 @@
 // Simulate a stale npm registry metadata cache whose newest known version is
 // *older* than the version already pinned in the lockfile. The user installed
 // @denotest/has-patch-versions@0.2.0 (the newest, via the `*` range), but their
-// cached packument later went stale and no longer lists 0.2.0. `deno update
+// cached packument later went stale and no longer lists 0.2.0. `dodo update
 // --lockfile-only` must NOT downgrade the lockfile: it has to refetch metadata
 // for the package and keep 0.2.0. Before the fix the installer re-resolved
 // against the stale cache and silently downgraded 0.2.0 -> 0.1.1. See

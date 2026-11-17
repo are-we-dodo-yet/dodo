@@ -1,4 +1,4 @@
-// this was previously hanging in deno compile and wouldn't work
+// this was previously hanging in dodo compile and wouldn't work
 import { join } from "jsr:@std/url@0.220/join";
 import "jsr:@std/url@0.220/normalize";
 

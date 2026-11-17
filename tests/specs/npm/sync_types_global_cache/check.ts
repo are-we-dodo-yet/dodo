@@ -1,4 +1,4 @@
-// Asserts the output of `deno sync-types` in global-cache mode.
+// Asserts the output of `dodo sync-types` in global-cache mode.
 
 function fail(msg: string): never {
   throw new Error(msg);

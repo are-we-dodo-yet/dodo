@@ -73,7 +73,7 @@ fn unzip(
 
 pub struct UnpackArgs<'a> {
   /// The full file name of the file expected to be produced by unpacking the
-  /// archive (e.g. `deno`, `deno.exe`, `libdenort.dylib`).
+  /// archive (e.g. `dodo`, `dodo.exe`, `libdenort.dylib`).
   pub exe_name: &'a str,
   pub archive_name: &'a str,
   pub archive_data: &'a [u8],
@@ -169,14 +169,14 @@ mod tests {
   #[test]
   fn unpacks_executable_with_exe_extension() {
     let temp_dir = tempfile::TempDir::new().unwrap();
-    let data = make_zip("deno.exe", b"fake exe");
+    let data = make_zip("dodo.exe", b"fake exe");
     let path = unpack_into_dir(UnpackArgs {
-      exe_name: "deno.exe",
+      exe_name: "dodo.exe",
       archive_name: "deno-x86_64-pc-windows-msvc.zip",
       archive_data: &data,
       dest_path: temp_dir.path(),
     })
     .unwrap();
-    assert_eq!(path, temp_dir.path().join("deno.exe"));
+    assert_eq!(path, temp_dir.path().join("dodo.exe"));
   }
 }

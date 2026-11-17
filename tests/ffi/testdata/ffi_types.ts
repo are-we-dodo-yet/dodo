@@ -1,6 +1,6 @@
 // Copyright 2018-2026 the Deno authors. MIT license.
 // deno-lint-ignore-file
-// Only for testing types. Invoke with `deno install --entrypoint`
+// Only for testing types. Invoke with `dodo install --entrypoint`
 
 const remote = Deno.dlopen("dummy_lib.so", {
   method1: { parameters: ["usize", "bool"], result: "void" },

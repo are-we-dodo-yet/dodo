@@ -702,7 +702,7 @@ impl CliOptions {
     self.flags.eszip
   }
 
-  /// Set by `deno compile --bundle` after rewriting the bundle's absolute
+  /// Set by `dodo compile --bundle` after rewriting the bundle's absolute
   /// CJS paths; signals the standalone binary writer that the npm tree
   /// must still ship alongside the bundle.
   pub fn compile_bundle_embed_node_modules(&self) -> bool {
@@ -1240,7 +1240,7 @@ impl CliOptions {
   /// empty deny list: these rules decide whether code may be loaded at all, so
   /// failing to read them has to fail the command, not quietly load the code.
   /// Callers that build options whose config cannot see the user's `-P` set
-  /// (`deno x` generates a temp `deno.json`) are responsible for carrying the
+  /// (`dodo x` generates a temp `deno.json`) are responsible for carrying the
   /// resolved rules over themselves — see `x::resolve_import_deny_rules`.
   pub fn import_deny_permissions_options(
     &self,
@@ -1512,7 +1512,7 @@ impl CliOptions {
   /// This includes features from both CLI flags and config file. Features that
   /// are only valid in `deno.json` (e.g. `fmt-component`, `fmt-sql`) and don't
   /// have a registered CLI flag are filtered out, otherwise child processes
-  /// spawned with these args (e.g. via `deno x`) would reject them with
+  /// spawned with these args (e.g. via `dodo x`) would reject them with
   /// "unexpected argument".
   pub fn unstable_args(&self) -> Vec<String> {
     let cli_flag_names: std::collections::HashSet<&str> =

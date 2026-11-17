@@ -982,7 +982,7 @@ impl DepManager {
                 let lower_bound = &semver_compatible.as_ref()?.version;
                 // Only consider pre-release versions when the currently
                 // resolved version is itself a pre-release. Otherwise
-                // `deno outdated --latest` reports a pre-release (e.g.
+                // `dodo outdated --latest` reports a pre-release (e.g.
                 // 2.0.3-alpha.0) as the latest version even though JSR
                 // designates the newest stable release as latest. This mirrors
                 // npm packages, which resolve latest from the `latest`

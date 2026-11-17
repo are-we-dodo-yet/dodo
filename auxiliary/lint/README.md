@@ -6,7 +6,7 @@
 A Rust crate for writing JavaScript and TypeScript linters.
 
 This crate powers
-[`deno lint`](https://docs.deno.com/runtime/reference/cli/lint/), but is not
+[`dodo lint`](https://docs.deno.com/runtime/reference/cli/lint/), but is not
 Deno specific and can be used as a standalone crate.
 
 It ships with a set of built-in rules, including a `recommended` set that is
@@ -56,8 +56,8 @@ Before submitting, please make sure the following is done:
 1. That there is a related issue and it is referenced in the PR text.
 2. There are tests that cover the changes.
 3. Ensure `cargo test` passes.
-4. Format your code with `deno run --allow-run tools/format.ts`.
-5. Make sure `deno run --allow-run --allow-env tools/lint.ts` passes.
+4. Format your code with `dodo run --allow-run tools/format.ts`.
+5. Make sure `dodo run --allow-run --allow-env tools/lint.ts` passes.
 6. If you've added a new rule, open a PR to
    [denoland/docs](https://github.com/denoland/docs) with documentation for the
    rule.

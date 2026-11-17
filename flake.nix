@@ -92,7 +92,7 @@
       in
       {
         packages = {
-          deno = buildDenoBin { pname = "deno"; };
+          dodo = buildDenoBin { pname = "deno"; };
           denort = buildDenoBin { pname = "denort"; };
 
           default = self.packages.${system}.deno;

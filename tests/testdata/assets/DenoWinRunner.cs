@@ -33,7 +33,7 @@ public class DenoWinRunner
     /// <param name="pathToTestScript">Path to the script file Deno should run.</param>
     /// <param name="constraints">The constraints to apply to the Deno process</param>
     /// <param name="timeoutMilliseconds">How long to wait for the Deno process to exit</param>
-    /// <returns>The deno.exe exit code, or an exit code provided by the test runner</returns>
+    /// <returns>The dodo.exe exit code, or an exit code provided by the test runner</returns>
     public static int RunDenoScript(string pathToDenoExe, string pathToTestScript, DenoConstraints constraints, uint timeoutMilliseconds = 1000)
     {
         try

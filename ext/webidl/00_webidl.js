@@ -1645,7 +1645,7 @@ function setlikeObjectWrap(objPrototype, readonly) {
 
 internals.webidlBrand = brand;
 // The subset of webidl needed by post-bootstrap classic scripts that can't
-// `import` this module (e.g. the `deno desktop` init script, which defines
+// `import` this module (e.g. the `dodo desktop` init script, which defines
 // web interfaces like `navigator.clipboard`).
 //
 // `converters` is deliberately NOT exposed. It is the live registry backing

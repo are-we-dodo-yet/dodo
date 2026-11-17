@@ -33,7 +33,7 @@ pub fn check_permission_before_script(flags: &Flags) {
       crate::colors::yellow(
         r#"Permission flags have likely been incorrectly set after the script argument.
 To grant permissions, set them before the script argument. For example:
-    deno run --allow-read=. main.js"#
+    dodo run --allow-read=. main.js"#
       )
     );
   }
@@ -139,7 +139,7 @@ async fn try_run_npm_bin_executable(
     &unstable_args,
     // This path only ever resolves to `BinValue::Executable` (native npm
     // bins); the `JsFile` re-run arm — the only consumer of these forwarded
-    // `deno run` args — is never reached here, so pass an empty set.
+    // `dodo run` args — is never reached here, so pass an empty set.
     &[],
   )?;
   Ok(Some(exit_code))

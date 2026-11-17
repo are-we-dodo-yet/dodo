@@ -318,7 +318,7 @@ fn op_test_event_exit(state: &mut OpState, #[smi] exit_code: i32) {
   std::process::exit(exit_code);
 }
 
-/// Marker put into `OpState` by the test runner when `deno test` was invoked
+/// Marker put into `OpState` by the test runner when `dodo test` was invoked
 /// with `--update-snapshots`. Its presence is what authorizes
 /// `op_test_snapshot_write` - JS cannot enable update mode on its own.
 pub struct SnapshotUpdateMode;

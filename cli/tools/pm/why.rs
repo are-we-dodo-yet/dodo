@@ -62,7 +62,7 @@ pub async fn why(
 ) -> Result<(), AnyError> {
   let factory = CliFactory::from_flags(flags);
   let lockfile = factory.maybe_lockfile().await?.cloned().ok_or_else(|| {
-    deno_core::anyhow::anyhow!("No lockfile found. Run `deno install` first.")
+    deno_core::anyhow::anyhow!("No lockfile found. Run `dodo install` first.")
   })?;
 
   // Workspace-declared root dependency requirements (from deno.json `imports`,
@@ -224,7 +224,7 @@ pub async fn why(
 
     if paths.is_empty() && !root_specifier_to_pkg.contains_key(*id) {
       log::info!(
-        "  (no dependency path found -- try running `deno install` to refresh the lockfile)"
+        "  (no dependency path found -- try running `dodo install` to refresh the lockfile)"
       );
     }
 

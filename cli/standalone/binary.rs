@@ -153,7 +153,7 @@ impl CjsAnalysisSourceProvider for VfsCjsAnalysisSourceProvider<'_> {
   }
 }
 
-// `deno compile` is a trusted local build step, so sources absent from the
+// `dodo compile` is a trusted local build step, so sources absent from the
 // graph and VFS may be read directly to preserve compile-time CJS analysis.
 struct FileSystemCjsAnalysisSourceProvider<'a> {
   sys: &'a CliSys,
@@ -460,7 +460,7 @@ impl<'a> DenoCompileBinaryWriter<'a> {
 
     // Used for testing.
     //
-    // Phase 2 of the 'min sized' deno compile RFC talks
+    // Phase 2 of the 'min sized' dodo compile RFC talks
     // about adding this as a flag.
     if let Some(path) = get_dev_binary_path() {
       if compile_flags.engine == JavaScriptEngine::QuickJs {
@@ -1295,7 +1295,7 @@ impl<'a> DenoCompileBinaryWriter<'a> {
       .await
   }
 
-  /// Decide what to embed for `deno compile --bundle`. The bundle is
+  /// Decide what to embed for `dodo compile --bundle`. The bundle is
   /// always shipped; this controls the npm portion. We need it when
   /// either the CJS-from-ESM wrapper pointed at on-disk paths during
   /// rewriting, or the resolved tree has a native (`.node`) addon — in

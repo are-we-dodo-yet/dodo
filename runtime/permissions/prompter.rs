@@ -548,7 +548,7 @@ impl PermissionPrompter for TtyPrompter {
       writeln!(&mut output, "┠─ {}", colors::italic(&msg)).unwrap();
       let msg = if crate::is_standalone() {
         format!(
-          "Specify the required permissions during compile time using `deno compile --allow-{name}`."
+          "Specify the required permissions during compile time using `dodo compile --allow-{name}`."
         )
       } else {
         format!("Run again with --allow-{name} to bypass this prompt.")

@@ -1,4 +1,4 @@
-error: Uncaught (in promise) Error: `Deno.lint.runPlugin` is only available in `deno test` subcommand.
+error: Uncaught (in promise) Error: `Deno.lint.runPlugin` is only available in `dodo test` subcommand.
 Deno.lint.runPlugin(plugin, "source.ts", "export default {}");
           ^
     at Object.runPlugin ([WILDCARD])

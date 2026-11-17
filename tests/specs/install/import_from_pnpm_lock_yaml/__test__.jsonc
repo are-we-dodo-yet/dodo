@@ -2,7 +2,7 @@
   "tempDir": true,
   "steps": [
     {
-      // No deno.lock or package-lock.json — `deno install` should seed
+      // No deno.lock or package-lock.json — `dodo install` should seed
       // deno.lock from pnpm-lock.yaml instead.
       "args": "install",
       "output": "install.out"

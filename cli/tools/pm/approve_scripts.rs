@@ -193,7 +193,7 @@ fn find_script_candidates(
   deny_list: &[PackageReq],
 ) -> Result<Vec<ScriptCandidate>, AnyError> {
   let managed_resolver = npm_resolver.as_managed().with_context(|| {
-    "Lifecycle script approval requires an npm resolution. Run `deno install` first to create one."
+    "Lifecycle script approval requires an npm resolution. Run `dodo install` first to create one."
   })?;
   let snapshot = managed_resolver.resolution().snapshot();
   let mut candidates = Vec::new();

@@ -244,7 +244,7 @@ fn string_map_to_value(map: &IndexMap<String, String>) -> CstInputValue {
 
 // ===========================================================================
 // pnpm-workspace.yaml parsing (via the yaml_parser CST already used by
-// `deno fmt`, so no new YAML dependency is introduced).
+// `dodo fmt`, so no new YAML dependency is introduced).
 // ===========================================================================
 
 fn parse_pnpm_workspace(text: &str) -> Result<PnpmWorkspace, AnyError> {

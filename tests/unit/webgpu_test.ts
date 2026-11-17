@@ -551,7 +551,7 @@ function createWin32Window(): NativeWindow {
   const hwnd = user32.symbols.CreateWindowExW(
     0,
     wide("STATIC"),
-    wide("deno webgpu test"),
+    wide("dodo webgpu test"),
     WS_OVERLAPPEDWINDOW,
     0,
     0,

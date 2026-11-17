@@ -66,14 +66,16 @@ maintenance burden and enable developers to keep their runtimes lean.
 
 ---
 
-## Your first Deno program
+## Your first Dodo program
 
-Deno can be used for many different applications, but is most commonly used to
+Dodo can be used for many different applications, but is most commonly used to
 build web servers. Create a file called `server.ts` and include the following
 TypeScript code:
 
 ```ts
-Deno.serve((_req: Request) => {
+const Dodo = Deno;
+
+Dodo.serve((_req: Request) => {
   return new Response("Hello, world!");
 });
 ```
@@ -81,7 +83,7 @@ Deno.serve((_req: Request) => {
 Run your server with the following command:
 
 ```sh
-deno run --allow-net server.ts
+./target/debug/dodo run --allow-net server.ts
 ```
 
 This should start a local web server on

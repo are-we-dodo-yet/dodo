@@ -1,7 +1,7 @@
 // Regression test for https://github.com/denoland/deno/issues/31456
 // A wasm file included via `--include` has a host import
 // ("some_import"."dummy") that is provided explicitly at instantiation, not
-// through the module graph. `deno compile` must embed it as an asset rather
+// through the module graph. `dodo compile` must embed it as an asset rather
 // than treating it as a module graph root and failing to resolve that import.
 // See #27505.
 //

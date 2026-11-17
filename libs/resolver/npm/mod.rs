@@ -94,7 +94,7 @@ impl InNpmPackageChecker for DenoInNpmPackageChecker {
 }
 
 /// Whether `specifier` names one of the synthetic modules Deno uses for code
-/// that has no file on disk, such as `deno eval` (`$deno$eval.mts`) or piped
+/// that has no file on disk, such as `dodo eval` (`$deno$eval.mts`) or piped
 /// stdin (`$deno$stdin.mts`).
 ///
 /// These are resolved against the cwd so that imports and the closest
@@ -119,7 +119,7 @@ pub fn is_synthetic_module(specifier: &Url) -> bool {
 #[derive(Debug, Error, JsError)]
 #[class(generic)]
 #[error(
-  "Could not resolve \"{}\", but found it in a package.json. Deno expects the node_modules/ directory to be up to date. Did you forget to run `deno install`?",
+  "Could not resolve \"{}\", but found it in a package.json. Deno expects the node_modules/ directory to be up to date. Did you forget to run `dodo install`?",
   specifier
 )]
 pub struct NodeModulesOutOfDateError {
@@ -128,7 +128,7 @@ pub struct NodeModulesOutOfDateError {
 
 #[derive(Debug, Error, JsError)]
 #[class(generic)]
-#[error("Could not find '{}'. Deno expects the node_modules/ directory to be up to date. Did you forget to run `deno install`?", package_json_path.display())]
+#[error("Could not find '{}'. Deno expects the node_modules/ directory to be up to date. Did you forget to run `dodo install`?", package_json_path.display())]
 pub struct MissingPackageNodeModulesFolderError {
   pub package_json_path: PathBuf,
   // Don't bother displaying this error, so don't name it "source"

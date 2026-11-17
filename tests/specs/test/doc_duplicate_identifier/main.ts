@@ -1,4 +1,4 @@
-// `deno test --doc` tries to convert the example code snippets into pseudo
+// `dodo test --doc` tries to convert the example code snippets into pseudo
 // test files in a way that all the exported items are available without
 // explicit import statements. Therefore, in the test code, you don't have to
 // write like `import { add } from "./main.ts";`.

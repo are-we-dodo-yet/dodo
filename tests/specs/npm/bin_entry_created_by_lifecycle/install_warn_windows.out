@@ -14,5 +14,5 @@ Dependencies:
 │  Ignored build scripts for packages:
 │  npm:@denotest/bin-created-by-lifecycle@1.0.0
 │
-│  Run "deno approve-scripts" to run build scripts.
+│  Run "dodo approve-scripts" to run build scripts.
 ╰─

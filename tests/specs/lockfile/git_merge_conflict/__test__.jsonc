@@ -10,7 +10,7 @@
         "output": "[WILDCARD]"
       }, {
         // Read with a raw `cat` so the rewrite is attributable to `install`
-        // and not to `deno task` loading the lockfile itself.
+        // and not to `dodo task` loading the lockfile itself.
         "commandName": "cat",
         "args": "deno.lock",
         "output": "lock.out"
@@ -26,7 +26,7 @@
         "exitCode": 1
       }, {
         // The on-disk lockfile is left untouched, conflict markers and all.
-        // Read it with a raw `cat` (not `deno task`) so that reading does not
+        // Read it with a raw `cat` (not `dodo task`) so that reading does not
         // itself load and rewrite the lockfile.
         "commandName": "cat",
         "args": "deno.lock",

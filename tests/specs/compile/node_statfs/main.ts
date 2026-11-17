@@ -2,7 +2,7 @@ import fs from "node:fs";
 import assert from "node:assert/strict";
 
 // `import.meta.filename` points at the embedded module inside the
-// `deno compile` virtual file system. Calling node:fs.statfs on it used to
+// `dodo compile` virtual file system. Calling node:fs.statfs on it used to
 // fail because the implementation bypassed the FileSystem trait and called
 // libc / `GetDiskFreeSpaceW` directly on a path that does not exist on disk.
 const selfPath = import.meta.filename!;

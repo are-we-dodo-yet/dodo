@@ -1,5 +1,5 @@
 // Regression test for https://github.com/denoland/deno/issues/31597
-// `Deno.bundle()` is not (yet) wired up in the standalone (`deno compile`)
+// `Deno.bundle()` is not (yet) wired up in the standalone (`dodo compile`)
 // runtime. Make sure the failure surface is a clear user-facing message
 // rather than the historical "default BundleProvider does not do anything"
 // debug string.

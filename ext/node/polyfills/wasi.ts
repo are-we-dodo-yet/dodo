@@ -134,7 +134,7 @@ function validateString(
 type WasiOptions = any;
 
 // WASI preopens use direct host filesystem access in the native ops. They do
-// not read from the in-memory VFS that `deno compile` uses for embedded files.
+// not read from the in-memory VFS that `dodo compile` uses for embedded files.
 class WASI {
   #ctx;
   #version: string;

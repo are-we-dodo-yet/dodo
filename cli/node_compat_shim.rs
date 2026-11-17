@@ -7,7 +7,7 @@
 //! 1. Arg0 dispatch ([`maybe_rewrite_node_arg0`]): when the deno binary is
 //!    invoked through a file named `node` (a symlink/hardlink created below),
 //!    translate the Node.js CLI arguments to Deno arguments and run as if
-//!    `deno node ...` had been invoked.
+//!    `dodo node ...` had been invoked.
 //!
 //! 2. PATH injection ([`ensure_node_on_path`]): create a `node` executable
 //!    pointing back at the current deno binary in a cache directory and prepend
@@ -68,8 +68,8 @@ fn is_node_arg0(arg0: &OsString) -> bool {
     return false;
   };
   // Never misfire on the deno binary itself.
-  if file_name.eq_ignore_ascii_case("deno")
-    || file_name.eq_ignore_ascii_case("deno.exe")
+  if file_name.eq_ignore_ascii_case("dodo")
+    || file_name.eq_ignore_ascii_case("dodo.exe")
   {
     return false;
   }
@@ -130,10 +130,10 @@ pub fn maybe_rewrite_node_arg0(args: Vec<OsString>) -> Vec<OsString> {
   // Resolve the entrypoint for the run path the same way the standalone shim
   // does, sharing a single implementation. `current_exe` resolves to the real
   // deno binary (not the `node` symlink), so the resolution subprocess runs as
-  // plain `deno eval` without re-entering arg0 dispatch.
+  // plain `dodo eval` without re-entering arg0 dispatch.
   #[allow(clippy::disallowed_methods, reason = "resolving the node shim exe")]
   let current_exe =
-    std::env::current_exe().unwrap_or_else(|_| PathBuf::from("deno"));
+    std::env::current_exe().unwrap_or_else(|_| PathBuf::from("dodo"));
   node_shim::resolve_run_entrypoint(&current_exe, &mut deno_args);
 
   // `deno_args[0]` is the program-name slot ("node") that deno's flag parser
@@ -317,8 +317,8 @@ mod tests {
     assert!(is_node_arg0(&OsString::from("/usr/local/bin/node")));
     assert!(!is_node_arg0(&OsString::from("anode")));
     assert!(!is_node_arg0(&OsString::from("/path/to/mynode")));
-    assert!(!is_node_arg0(&OsString::from("deno")));
-    assert!(!is_node_arg0(&OsString::from("/usr/bin/deno")));
+    assert!(!is_node_arg0(&OsString::from("dodo")));
+    assert!(!is_node_arg0(&OsString::from("/usr/bin/dodo")));
   }
 
   #[test]
@@ -326,7 +326,7 @@ mod tests {
   fn detects_node_exe_arg0_on_windows() {
     assert!(is_node_arg0(&OsString::from("node.exe")));
     assert!(is_node_arg0(&OsString::from("NODE.EXE")));
-    assert!(!is_node_arg0(&OsString::from("deno.exe")));
+    assert!(!is_node_arg0(&OsString::from("dodo.exe")));
   }
 
   #[test]
@@ -366,7 +366,7 @@ mod tests {
 
     // Stand-in for the deno binary the shim points back at. Keep it in the same
     // directory tree as the shim so a Windows hardlink stays on one volume.
-    let fake_exe = base.join(if cfg!(windows) { "deno.exe" } else { "deno" });
+    let fake_exe = base.join(if cfg!(windows) { "dodo.exe" } else { "dodo" });
     std::fs::write(&fake_exe, b"binary").unwrap();
 
     let shim_dir = base.join(SHIM_DIR_NAME);

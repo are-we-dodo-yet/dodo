@@ -3,14 +3,14 @@
  * so reading the cwd keeps working.
  *
  * ```ts
- * #!/usr/bin/env -S deno run --allow-read --deny-env
+ * #!/usr/bin/env -S dodo run --allow-read --deny-env
  * Deno.cwd();
  * ```
  *
  * The same shebang denies env, so accessing the environment fails.
  *
  * ```ts
- * #!/usr/bin/env -S deno run --allow-read --deny-env
+ * #!/usr/bin/env -S dodo run --allow-read --deny-env
  * Deno.env.toObject();
  * ```
  * @module doc

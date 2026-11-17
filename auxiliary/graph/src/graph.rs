@@ -1043,7 +1043,7 @@ pub struct Import {
   /// If this is an import for only side effects (ex. `import './load.js';`)
   #[serde(skip_serializing)]
   pub is_side_effect: bool,
-  // Don't include attributes in `deno info --json` until someone has a need.
+  // Don't include attributes in `dodo info --json` until someone has a need.
   // Attribute error strings eventually will be included in a separate `Import::errors`, however.
   #[serde(skip_serializing)]
   pub attributes: ImportAttributes,

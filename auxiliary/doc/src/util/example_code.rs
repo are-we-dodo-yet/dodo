@@ -181,14 +181,14 @@ mod tests {
 
   #[test]
   fn preserves_shebang() {
-    let code = "#!/usr/bin/env -S deno run\nconsole.log(1);\n";
+    let code = "#!/usr/bin/env -S dodo run\nconsole.log(1);\n";
     assert_eq!(displayed(Some("ts"), code).unwrap(), code);
   }
 
   #[test]
   fn ignores_non_example_languages() {
     // Shell snippets routinely begin a line with `#`; leave them untouched.
-    let code = "# install\ndeno install\n";
+    let code = "# install\ndodo install\n";
     assert!(process_example_code(Some("sh"), code).is_none());
     assert!(process_example_code(Some("bash"), code).is_none());
     assert!(process_example_code(None, code).is_none());

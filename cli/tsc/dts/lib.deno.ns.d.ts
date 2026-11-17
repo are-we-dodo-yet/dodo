@@ -961,7 +961,7 @@ declare namespace Deno {
     repeats?: number;
   }
 
-  /** Register a test which will be run when `deno test` is used on the command
+  /** Register a test which will be run when `dodo test` is used on the command
    * line and the containing module looks like a test module.
    *
    * `fn` can be async if required.
@@ -1007,7 +1007,7 @@ declare namespace Deno {
    * @category Testing
    */
   export interface DenoTest {
-    /** Register a test which will be run when `deno test` is used on the command
+    /** Register a test which will be run when `dodo test` is used on the command
      * line and the containing module looks like a test module.
      *
      * `fn` can be async if required.
@@ -1044,7 +1044,7 @@ declare namespace Deno {
      */
     (t: TestDefinition): void;
 
-    /** Register a test which will be run when `deno test` is used on the command
+    /** Register a test which will be run when `dodo test` is used on the command
      * line and the containing module looks like a test module.
      *
      * `fn` can be async if required.
@@ -1067,7 +1067,7 @@ declare namespace Deno {
      */
     (name: string, fn: (t: TestContext) => void | Promise<void>): void;
 
-    /** Register a test which will be run when `deno test` is used on the command
+    /** Register a test which will be run when `dodo test` is used on the command
      * line and the containing module looks like a test module.
      *
      * `fn` can be async if required. Declared function must have a name.
@@ -1090,7 +1090,7 @@ declare namespace Deno {
      */
     (fn: (t: TestContext) => void | Promise<void>): void;
 
-    /** Register a test which will be run when `deno test` is used on the command
+    /** Register a test which will be run when `dodo test` is used on the command
      * line and the containing module looks like a test module.
      *
      * `fn` can be async if required.
@@ -1117,7 +1117,7 @@ declare namespace Deno {
       fn: (t: TestContext) => void | Promise<void>,
     ): void;
 
-    /** Register a test which will be run when `deno test` is used on the command
+    /** Register a test which will be run when `dodo test` is used on the command
      * line and the containing module looks like a test module.
      *
      * `fn` can be async if required.
@@ -1155,7 +1155,7 @@ declare namespace Deno {
       fn: (t: TestContext) => void | Promise<void>,
     ): void;
 
-    /** Register a test which will be run when `deno test` is used on the command
+    /** Register a test which will be run when `dodo test` is used on the command
      * line and the containing module looks like a test module.
      *
      * `fn` can be async if required. Declared function must have a name.
@@ -1535,12 +1535,12 @@ declare namespace Deno {
   }
 
   /**
-   * Register a benchmark test which will be run when `deno bench` is used on
+   * Register a benchmark test which will be run when `dodo bench` is used on
    * the command line and the containing module looks like a bench module.
    *
-   * A module "looks like a bench module" when `deno bench` selects it for
-   * execution. When you pass explicit file paths to `deno bench`, those files
-   * are always run. When you run `deno bench` without paths, it walks the
+   * A module "looks like a bench module" when `dodo bench` selects it for
+   * execution. When you pass explicit file paths to `dodo bench`, those files
+   * are always run. When you run `dodo bench` without paths, it walks the
    * directory looking for files whose name (ignoring the extension) ends with
    * `_bench` or `.bench`, or is exactly `bench`. Examples are `foo_bench.ts`,
    * `foo.bench.js`, or `bench.ts`. Supported extensions are the same as for
@@ -1582,7 +1582,7 @@ declare namespace Deno {
   export function bench(b: BenchDefinition): void;
 
   /**
-   * Register a benchmark test which will be run when `deno bench` is used on
+   * Register a benchmark test which will be run when `dodo bench` is used on
    * the command line and the containing module looks like a bench module.
    *
    * If the test function (`fn`) returns a promise or is async, the test runner
@@ -1610,7 +1610,7 @@ declare namespace Deno {
   ): void;
 
   /**
-   * Register a benchmark test which will be run when `deno bench` is used on
+   * Register a benchmark test which will be run when `dodo bench` is used on
    * the command line and the containing module looks like a bench module.
    *
    * If the test function (`fn`) returns a promise or is async, the test runner
@@ -1635,7 +1635,7 @@ declare namespace Deno {
   export function bench(fn: (b: BenchContext) => void | Promise<void>): void;
 
   /**
-   * Register a benchmark test which will be run when `deno bench` is used on
+   * Register a benchmark test which will be run when `dodo bench` is used on
    * the command line and the containing module looks like a bench module.
    *
    * If the test function (`fn`) returns a promise or is async, the test runner
@@ -1672,7 +1672,7 @@ declare namespace Deno {
   ): void;
 
   /**
-   * Register a benchmark test which will be run when `deno bench` is used on
+   * Register a benchmark test which will be run when `dodo bench` is used on
    * the command line and the containing module looks like a bench module.
    *
    * If the test function (`fn`) returns a promise or is async, the test runner
@@ -1706,7 +1706,7 @@ declare namespace Deno {
   ): void;
 
   /**
-   * Register a benchmark test which will be run when `deno bench` is used on
+   * Register a benchmark test which will be run when `dodo bench` is used on
    * the command line and the containing module looks like a bench module.
    *
    * If the test function (`fn`) returns a promise or is async, the test runner
@@ -1778,14 +1778,14 @@ declare namespace Deno {
    * `--env-file` flag when running a Deno program:
    *
    * ```sh
-   * deno run --env-file=.env --allow-env main.ts
+   * dodo run --env-file=.env --allow-env main.ts
    * ```
    *
    * If `--env-file` is specified without a value, it defaults to loading `.env`
    * from the current working directory:
    *
    * ```sh
-   * deno run --env-file --allow-env main.ts
+   * dodo run --env-file --allow-env main.ts
    * ```
    *
    * Learn more at [the Deno docs](https://docs.deno.com/runtime/reference/env_variables/).
@@ -5710,7 +5710,7 @@ declare namespace Deno {
     info: ServeHandlerInfo<Addr>,
   ) => Response | Promise<Response>;
 
-  /** Interface that module run with `deno serve` subcommand must conform to.
+  /** Interface that module run with `dodo serve` subcommand must conform to.
    *
    * To ensure your code is type-checked properly, make sure to add `satisfies Deno.ServeDefaultExport`
    * to the `export default { ... }` like so:

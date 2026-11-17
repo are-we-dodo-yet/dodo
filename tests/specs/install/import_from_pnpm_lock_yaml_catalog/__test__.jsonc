@@ -2,7 +2,7 @@
   "tempDir": true,
   "steps": [
     {
-      // No deno.lock or package-lock.json. `deno install` should seed
+      // No deno.lock or package-lock.json. `dodo install` should seed
       // deno.lock from pnpm-lock.yaml, resolving the `catalog:` specifier to
       // its real version requirement via the lockfile's `catalogs:` block.
       "args": "install",

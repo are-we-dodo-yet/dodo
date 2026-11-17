@@ -2,7 +2,7 @@
 //! Microbenchmark of the CLI flag-parsing entry point (`deno_cli_parser` plus
 //! the CLI-side bare-run fast path), built into the same binary (same profile /
 //! LTO) so the numbers are free of the runtime-startup and build confounders
-//! that a `deno run` wall-clock benchmark has.
+//! that a `dodo run` wall-clock benchmark has.
 
 use std::ffi::OsString;
 use std::hint::black_box;
@@ -17,9 +17,9 @@ fn osvec(args: &[&str]) -> Vec<OsString> {
 }
 
 fn benches(c: &mut Criterion) {
-  let bare = osvec(&["deno", "run", "script.ts"]);
+  let bare = osvec(&["dodo", "run", "script.ts"]);
   let with_flags = osvec(&[
-    "deno",
+    "dodo",
     "run",
     "-A",
     "--no-check",
@@ -28,7 +28,7 @@ fn benches(c: &mut Criterion) {
     "arg2",
   ]);
   let complex = osvec(&[
-    "deno",
+    "dodo",
     "run",
     "--allow-read=/a,/b",
     "--allow-net=example.com",

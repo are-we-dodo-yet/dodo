@@ -126,7 +126,7 @@ fn format_locked_files_message(
   if processes.is_empty() {
     message.push_str(
       "\n\nThis is usually an editor running the Deno language server holding \
-       the cache open. Close it (or any running `deno` process) and run `deno \
+       the cache open. Close it (or any running `deno` process) and run `dodo \
        clean` again.",
     );
   } else {
@@ -144,7 +144,7 @@ fn format_locked_files_message(
       message.push_str(&format!("\n  {} (PID {}){}", label, process.pid, hint));
     }
     message
-      .push_str("\n\nClose the process(es) above and run `deno clean` again.");
+      .push_str("\n\nClose the process(es) above and run `dodo clean` again.");
   }
 
   message
@@ -769,8 +769,8 @@ mod tests {
     let processes = vec![
       LockingProcess {
         pid: 1234,
-        name: "deno".to_string(),
-        exe: Some(PathBuf::from("C:/Program Files/deno/deno.exe")),
+        name: "dodo".to_string(),
+        exe: Some(PathBuf::from("C:/Program Files/deno/dodo.exe")),
         is_deno: true,
       },
       LockingProcess {
@@ -783,7 +783,7 @@ mod tests {
     let message = format_locked_files_message(&paths, &processes);
     assert!(message.starts_with("2 files could not be removed"));
     assert!(message.contains("Held open by:"));
-    assert!(message.contains("deno.exe (PID 1234)"));
+    assert!(message.contains("dodo.exe (PID 1234)"));
     assert!(message.contains("likely the language server"));
     assert!(message.contains("Some Editor (PID 5678)"));
     assert!(message.contains("Close the process(es) above"));

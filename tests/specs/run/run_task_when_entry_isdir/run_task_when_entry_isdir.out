@@ -1,2 +1,2 @@
-Task backend deno run -A ./backend/mod.ts
+Task backend dodo run -A ./backend/mod.ts
 Backend Task Running...

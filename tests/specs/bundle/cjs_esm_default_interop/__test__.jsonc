@@ -5,7 +5,7 @@
   // A dual CJS/ESM package whose ESM entry default-imports a CJS entry that
   // sets `module.exports.__esModule = true` (the shape tslib ships). The
   // bundle must use node-style CJS interop so the default import is the whole
-  // `module.exports`, matching how `deno run` executes the same files. This
+  // `module.exports`, matching how `dodo run` executes the same files. This
   // must hold regardless of `--platform` (#34837), since it reflects how the
   // source resolves its default import, not the runtime target.
   "tempDir": true,

@@ -1,6 +1,6 @@
 // Copyright 2018-2026 the Deno authors. MIT license.
 
-//! CDP multiplexer for `deno desktop --inspect`.
+//! CDP multiplexer for `dodo desktop --inspect`.
 //!
 //! Architecture:
 //!
@@ -1764,7 +1764,7 @@ mod tests {
         .as_str()
         .unwrap()
         .contains("js_app.html"),
-      "deno direct entry should launch js_app.html"
+      "dodo direct entry should launch js_app.html"
     );
     for page_entry in [&list[0], &list[2]] {
       assert!(

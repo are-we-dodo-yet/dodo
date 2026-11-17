@@ -2,6 +2,6 @@ Please specify a [SCRIPT_ARG] or a task name.
 
 Available tasks:
 - main
-    deno run main.ts
+    dodo run main.ts
 - main:foo
-    deno run main.ts
+    dodo run main.ts

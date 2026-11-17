@@ -237,7 +237,7 @@ pub async fn bundle_init(
   let module_load_preparer = factory.module_load_preparer().await?.clone();
   // Module loads (including remote imports) are checked against the caller's
   // permissions when invoked via `Deno.bundle()`, and against the CLI's own
-  // permissions when invoked via `deno bundle`.
+  // permissions when invoked via `dodo bundle`.
   let (permissions, is_runtime_api) = match caller_permissions {
     Some(permissions) => (permissions, true),
     None => (factory.root_permissions_container()?.clone(), false),
@@ -850,13 +850,13 @@ fn inline_declarations(
   }
 }
 
-/// Bundle a single entrypoint for `deno compile --bundle` and return the
+/// Bundle a single entrypoint for `dodo compile --bundle` and return the
 /// resulting JavaScript bytes in memory. The Deno-specific `createRequire`
 /// shim is applied to the output so CJS `require()` calls keep working in
 /// the compiled binary.
 ///
 /// `external` is the set of import patterns (typically npm package names) to
-/// leave unbundled. For `deno compile --bundle` this is populated with the
+/// leave unbundled. For `dodo compile --bundle` this is populated with the
 /// names of packages that ship native `.node` addons so their internal
 /// `require('./X.node')` calls keep their original `__dirname` context at
 /// runtime.
@@ -887,7 +887,7 @@ pub async fn bundle_for_compile(
   // Without this, module-graph creation skips deep CJS files inside
   // `node_modules` (jiti.cjs is the canonical case) and the parent
   // `.mjs` trips an esbuild parse error when its import target can't
-  // be loaded. This flips the same three resolver knobs `deno bundle`
+  // be loaded. This flips the same three resolver knobs `dodo bundle`
   // sets (`bundle_mode`, `node_code_translator_mode` = Disabled,
   // `allow_json_imports` = Always) without otherwise swapping the
   // subcommand, so the rest of compilation keeps Compile semantics.
@@ -1037,7 +1037,7 @@ async fn bundle_watch(
             watcher_communicator.watch_paths(current_roots.borrow().clone());
         }
 
-        // `deno bundle --watch` has no per-run exit code (and disables the
+        // `dodo bundle --watch` has no per-run exit code (and disables the
         // "finished" message above), so report 0 to the watcher.
         Ok(0)
       })
@@ -1285,7 +1285,7 @@ var __require = __deno_internal_createRequire(import.meta.url);
 // esbuild emits a node-mode interop call (`__toESM(require_x(), 1)`) only when
 // it can tell the importing module is *explicitly* ESM (a `.mjs`/`.mts` file or
 // a file under a `"type": "module"` package.json). It learns this while walking
-// package.json during its own resolve step. In `deno bundle` resolution and
+// package.json during its own resolve step. In `dodo bundle` resolution and
 // loading are handled by our plugin, and esbuild's plugin protocol has no way
 // to communicate a module's type, so esbuild falls back to browser-mode interop
 // which respects the `__esModule` marker and does not synthesize `.default`.
@@ -1484,7 +1484,7 @@ pub struct DenoPluginHandler {
   module_graph_container: Arc<MainModuleGraphContainer>,
   permissions: PermissionsContainer,
   /// Whether reads and writes must respect the calling program's permissions.
-  /// The directly invoked `deno bundle` command is a trusted CLI path.
+  /// The directly invoked `dodo bundle` command is a trusted CLI path.
   is_runtime_api: bool,
   module_loader: Arc<CliDenoResolverModuleLoader>,
   externals_matcher: Option<ExternalsMatcher>,
@@ -2129,7 +2129,7 @@ impl DenoPluginHandler {
 
   /// When bundling via `Deno.bundle()`, reading a module returns its
   /// (transpiled) source to the calling program, so it must be gated on the
-  /// caller's permissions. `deno bundle` reads its inputs unchecked like the
+  /// caller's permissions. `dodo bundle` reads its inputs unchecked like the
   /// other CLI subcommands, in which case this is a no-op.
   ///
   /// Graph preparation already performs the check before reading source. This

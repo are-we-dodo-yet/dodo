@@ -1,6 +1,6 @@
 # Deno Desktop — internals
 
-How `deno desktop` actually wires a native window to a Deno runtime. This skips
+How `dodo desktop` actually wires a native window to a Deno runtime. This skips
 the obvious (what a WebView is, what `Deno.serve` does) and documents the
 non-obvious mechanics: the load model, the ABI handshake, the two transports,
 and the lifecycle edges.
@@ -51,7 +51,7 @@ User code + assets are not files next to the dylib; they're a **section inside
 the dylib** named `d3n0l4nd`, read back with
 `libsui::find_section_in_current_image` (`find_section_in_dylib`,
 `lib.rs:1512`). `extract_standalone_with_finder` parses it into the standalone
-metadata + VFS, exactly like `deno compile`, but sourced from the loaded image
+metadata + VFS, exactly like `dodo compile`, but sourced from the loaded image
 rather than argv0.
 
 ## Boot ordering (and why it's strict)
@@ -143,7 +143,7 @@ change into `ChangeOutcome` (`hmr.rs:331`), which the desktop side maps to a
   ES-module change (imports / exported bindings / top-level `let` changed). The
   module graph can't be patched and a reload wouldn't help (the stale runtime
   keeps serving), so `restart_desktop_app()` calls `exit(75)` (`lib.rs:1537`).
-  The `deno desktop --hmr` supervisor owns the child, catches code 75, and
+  The `dodo desktop --hmr` supervisor owns the child, catches code 75, and
   relaunches — exiting via sentinel rather than re-exec keeps the process group,
   Ctrl-C handling, and temp-entrypoint cleanup with the supervisor
   (`HMR_RESTART_EXIT_CODE`, `lib.rs:1529`).

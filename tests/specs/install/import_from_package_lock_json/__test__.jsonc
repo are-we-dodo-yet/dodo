@@ -2,7 +2,7 @@
   "tempDir": true,
   "steps": [
     {
-      // No deno.lock exists, so `deno install` should seed one from
+      // No deno.lock exists, so `dodo install` should seed one from
       // package-lock.json.
       "args": "install",
       "output": "install.out"

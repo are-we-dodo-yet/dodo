@@ -1,6 +1,6 @@
 {
   // Regression test for https://github.com/denoland/deno/issues/26416 —
-  // `deno fmt --unstable-component` used to panic (or produce invalid
+  // `dodo fmt --unstable-component` used to panic (or produce invalid
   // Svelte) when a Svelte interpolation inside a class attribute contained
   // a switch statement. Verify the formatter runs without panicking and
   // produces stable, idempotent output.

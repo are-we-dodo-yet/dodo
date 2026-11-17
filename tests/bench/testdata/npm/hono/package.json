@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "test": "jest",
-    "test:deno": "deno test --allow-read deno_test",
+    "test:deno": "dodo test --allow-read deno_test",
     "test:bun": "bun wiptest --jsx-import-source ../src/middleware/jsx/jsx-dev-runtime bun_test/index.test.tsx",
     "test:all": "yarn test && yarn test:deno && yarn test:bun",
     "lint": "eslint --ext js,ts src .eslintrc.js",

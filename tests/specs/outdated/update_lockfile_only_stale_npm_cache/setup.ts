@@ -1,7 +1,7 @@
 // Simulate a stale npm registry metadata cache. The user installed
 // @denotest/has-patch-versions back when only 0.1.0 existed, so their cached
 // packument predates the newer in-range 0.1.1 (and the out-of-range 0.2.0) and
-// their lockfile is pinned at 0.1.0. `deno update --lockfile-only` must still
+// their lockfile is pinned at 0.1.0. `dodo update --lockfile-only` must still
 // pick up 0.1.1 by refetching metadata for the package. See denoland/deno#35348.
 
 // Drop 0.1.1 and 0.2.0 from the cached packument so the npm registry cache no

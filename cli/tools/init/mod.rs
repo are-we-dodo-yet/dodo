@@ -69,7 +69,7 @@ pub async fn init_project(
       "deno.json",
       &json!({
         "tasks": {
-          "dev": "deno run --watch main.ts"
+          "dev": "dodo run --watch main.ts"
         }
       }),
     )?;
@@ -151,7 +151,7 @@ Deno.test(async function serverFetchStatic() {
       "deno.json",
       &json!({
         "tasks": {
-          "dev": "deno serve --watch -R main.ts",
+          "dev": "dodo serve --watch -R main.ts",
         },
         "imports": {
           "@std/assert": "jsr:@std/assert@1",
@@ -195,7 +195,7 @@ Deno.test(function addTest() {
         "version": "0.1.0",
         "exports": "./mod.ts",
         "tasks": {
-          "dev": "deno test --watch"
+          "dev": "dodo test --watch"
         },
         "license": "MIT",
         "imports": {
@@ -254,7 +254,7 @@ Deno.test("returns json on /api", async () => {
       "deno.json",
       &json!({
         "tasks": {
-          "dev": "deno run --watch --allow-net main.ts"
+          "dev": "dodo run --watch --allow-net main.ts"
         },
         "imports": {
           "@std/assert": "jsr:@std/assert@1"
@@ -273,49 +273,49 @@ Deno.test("returns json on /api", async () => {
   }
   if init_flags.empty {
     info!("  {}", colors::gray("# Run the program"));
-    info!("  deno run main.ts");
+    info!("  dodo run main.ts");
     info!("");
     info!(
       "  {}",
       colors::gray("# Run the program and watch for file changes")
     );
-    info!("  deno task dev");
+    info!("  dodo task dev");
   } else if init_flags.serve {
     info!("  {}", colors::gray("# Run the server"));
-    info!("  deno serve -R main.ts");
+    info!("  dodo serve -R main.ts");
     info!("");
     info!(
       "  {}",
       colors::gray("# Run the server and watch for file changes")
     );
-    info!("  deno task dev");
+    info!("  dodo task dev");
     info!("");
     info!("  {}", colors::gray("# Run the tests"));
-    info!("  deno test -R");
+    info!("  dodo test -R");
   } else if init_flags.lib {
     info!("  {}", colors::gray("# Run the tests"));
-    info!("  deno test");
+    info!("  dodo test");
     info!("");
     info!(
       "  {}",
       colors::gray("# Run the tests and watch for file changes")
     );
-    info!("  deno task dev");
+    info!("  dodo task dev");
     info!("");
     info!("  {}", colors::gray("# Publish to JSR (dry run)"));
-    info!("  deno publish --dry-run");
+    info!("  dodo publish --dry-run");
   } else {
     info!("  {}", colors::gray("# Run the server"));
-    info!("  deno run --allow-net main.ts");
+    info!("  dodo run --allow-net main.ts");
     info!("");
     info!(
       "  {}",
       colors::gray("# Run the server and watch for file changes")
     );
-    info!("  deno task dev");
+    info!("  dodo task dev");
     info!("");
     info!("  {}", colors::gray("# Run the tests"));
-    info!("  deno test");
+    info!("  dodo test");
   }
   Ok(0)
 }
@@ -428,7 +428,7 @@ fn confirm_package_trust(
     log::info!(
       "{}",
       cformat!(
-        "You can initialize project manually by running <u>deno run {}</> and applying desired permissions.",
+        "You can initialize project manually by running <u>dodo run {}</> and applying desired permissions.",
         std::iter::once(script_name)
           .chain(args.iter().map(|a| a.as_ref()))
           .collect::<Vec<_>>()

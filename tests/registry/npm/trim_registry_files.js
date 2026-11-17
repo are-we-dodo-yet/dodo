@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run --allow-write=. --allow-read=.
+#!/usr/bin/env -S dodo run --allow-write=. --allow-read=.
 // Copyright 2018-2026 the Deno authors. MIT license.
 
 // Run this to trim the registry.json files

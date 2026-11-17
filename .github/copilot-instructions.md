@@ -61,7 +61,7 @@ to JavaScript — for instance filesystem operations and networking.
 cargo check
 
 # Build debug binary
-cargo build --bin deno
+cargo build --bin dodo
 
 # Build release version (slow, optimized)
 cargo build --release
@@ -92,7 +92,7 @@ The formatter (`tools/format.js`) runs `dprint` via `npm:dprint@0.47.2`. It
 formats TypeScript, JavaScript, JSON, Markdown, YAML, and Rust (via `rustfmt`).
 Configuration is in `.dprint.json`.
 
-The linter (`tools/lint.js`) runs `deno lint` for JS/TS and `cargo clippy` for
+The linter (`tools/lint.js`) runs `dodo lint` for JS/TS and `cargo clippy` for
 Rust.
 
 ## Testing
@@ -211,16 +211,16 @@ The validation script is at `tools/verify_pr_title.js`.
 
 ```bash
 # Verbose logging
-DENO_LOG=debug ./target/debug/deno run script.ts
+DENO_LOG=debug ./target/debug/dodo run script.ts
 
 # Module-specific logging
-DENO_LOG=deno_core=debug ./target/debug/deno run script.ts
+DENO_LOG=deno_core=debug ./target/debug/dodo run script.ts
 
 # Full backtrace on panic
-RUST_BACKTRACE=1 ./target/debug/deno run script.ts
+RUST_BACKTRACE=1 ./target/debug/dodo run script.ts
 
 # V8 inspector
-./target/debug/deno run --inspect-brk script.ts
+./target/debug/dodo run --inspect-brk script.ts
 ```
 
 In Rust code: `eprintln!("Debug: {:?}", var);` or `dbg!(var);`

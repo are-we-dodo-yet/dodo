@@ -12,7 +12,7 @@ use indexmap::IndexMap;
 ///
 /// Deno natively treats a `.wasm` import as an ES module whose exports are the
 /// Wasm instance's exports (see `render_js_wasm_module` in `deno_core`). esbuild
-/// has no such loader, so for `deno bundle` we generate equivalent JavaScript
+/// has no such loader, so for `dodo bundle` we generate equivalent JavaScript
 /// that:
 ///
 /// 1. imports the Wasm module's imports from their respective specifiers (these

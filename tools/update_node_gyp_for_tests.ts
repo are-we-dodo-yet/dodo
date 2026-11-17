@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run -ERNW --allow-sys
+#!/usr/bin/env -S dodo run -ERNW --allow-sys
 
 // Copyright 2018-2026 the Deno authors. MIT license.
 

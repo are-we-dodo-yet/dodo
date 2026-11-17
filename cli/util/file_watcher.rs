@@ -274,7 +274,7 @@ where
     WatcherRestartMode::Automatic,
     move |flags, communicator, changed_paths| {
       // Tools driven by `watch_func` have no meaningful per-run exit code, so
-      // report 0 to `watch_recv`. Only `deno run` / `deno serve` surface a
+      // report 0 to `watch_recv`. Only `dodo run` / `dodo serve` surface a
       // real exit code (e.g. one set via `Deno.exit()`).
       let operation_future = operation(flags, communicator, changed_paths)?;
       Ok(async move { operation_future.await.map(|()| 0) })

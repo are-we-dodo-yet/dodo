@@ -1,5 +1,5 @@
 export default {
   fetch() {
-    return new Response("deno serve with no args in fetch() works!");
+    return new Response("dodo serve with no args in fetch() works!");
   },
 };

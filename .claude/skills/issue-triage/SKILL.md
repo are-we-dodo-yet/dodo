@@ -33,7 +33,7 @@ go straight to Step 5.
 
 A valid bug report needs:
 
-- Deno version (`deno --version` output)
+- Deno version (`dodo --version` output)
 - Operating system
 - Reproduction steps or minimal reproduction code
 - Expected behavior vs actual behavior
@@ -55,10 +55,10 @@ to a local temp directory only if Docker is unavailable.
 
 ```sh
 # Run repro with latest canary
-docker run --rm -v "$REPRO_DIR":/repro -w /repro denoland/deno:canary deno run repro.ts
+docker run --rm -v "$REPRO_DIR":/repro -w /repro denoland/deno:canary dodo run repro.ts
 
 # Run repro with a specific version (e.g., 2.1.4)
-docker run --rm -v "$REPRO_DIR":/repro -w /repro denoland/deno:2.1.4 deno run repro.ts
+docker run --rm -v "$REPRO_DIR":/repro -w /repro denoland/deno:2.1.4 dodo run repro.ts
 ```
 
 Use `docker run --rm` so containers are cleaned up automatically. Mount the
@@ -68,7 +68,7 @@ repro files via `-v`.
 
 ```sh
 REPRO_DIR=$(mktemp -d)
-deno run "$REPRO_DIR/repro.ts"
+dodo run "$REPRO_DIR/repro.ts"
 ```
 
 ### Get Deno versions
@@ -140,16 +140,16 @@ label is sufficient. Do not over-label.
 | `lsp`                                                                                                                                  | Language server                  |
 | `runtime`                                                                                                                              | Runtime crate                    |
 | `permissions`                                                                                                                          | Permission system                |
-| `compile`                                                                                                                              | `deno compile`                   |
-| `testing`                                                                                                                              | `deno test` and coverage         |
-| `task runner`                                                                                                                          | `deno task`                      |
-| `install`                                                                                                                              | `deno install` / `deno add`      |
+| `compile`                                                                                                                              | `dodo compile`                   |
+| `testing`                                                                                                                              | `dodo test` and coverage         |
+| `task runner`                                                                                                                          | `dodo task`                      |
+| `install`                                                                                                                              | `dodo install` / `dodo add`      |
 | `tsc`                                                                                                                                  | TypeScript compiler              |
 | `types`                                                                                                                                | TypeScript type issues           |
 | `config`                                                                                                                               | `deno.json` configuration        |
 | `node resolution`                                                                                                                      | Node/npm module resolution       |
-| `publish`                                                                                                                              | `deno publish`                   |
-| `lint`                                                                                                                                 | `deno lint`                      |
+| `publish`                                                                                                                              | `dodo publish`                   |
+| `lint`                                                                                                                                 | `dodo lint`                      |
 | `wasm`                                                                                                                                 | WebAssembly                      |
 
 ### Priority labels (add only when clearly warranted)

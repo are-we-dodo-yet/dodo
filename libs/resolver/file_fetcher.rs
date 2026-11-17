@@ -539,7 +539,7 @@ impl<
     self.cache_info_enabled = true;
   }
 
-  /// Only use this for `deno info`.
+  /// Only use this for `dodo info`.
   fn get_local_path(&self, specifier: &Url) -> Option<PathBuf> {
     // TODO(@kitsonk) fix when deno_graph does not query cache for synthetic
     // modules

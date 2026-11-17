@@ -370,7 +370,7 @@ Deno.test(
         expectedType: "application/octet-stream",
       },
       {
-        content: new TextEncoder().encode("deno land"),
+        content: new TextEncoder().encode("dodo land"),
         type: "text/plain",
         name: "text",
         fileName: "deno.txt",
@@ -767,7 +767,7 @@ Deno.test(
 Deno.test(
   { permissions: { net: true } },
   async function fetchInitFormDataTextFileBody() {
-    const fileContent = "deno land";
+    const fileContent = "dodo land";
     const form = new FormData();
     form.append("field", "value");
     form.append(

@@ -1,8 +1,8 @@
-#!/usr/bin/env -S deno run --allow-read --allow-write --allow-env --allow-run
+#!/usr/bin/env -S dodo run --allow-read --allow-write --allow-env --allow-run
 // Copyright 2018-2026 the Deno authors. MIT license.
 // deno-lint-ignore-file no-console
 
-// Pre-downloads the pinned native TypeScript compiler that `deno check` uses,
+// Pre-downloads the pinned native TypeScript compiler that `dodo check` uses,
 // into a cache directory, so CI (and local test runs) don't re-download the
 // ~20MB compiler for every test's fresh `DENO_DIR`.
 //
@@ -13,13 +13,13 @@
 // `DENO_TSC_BIN` per-test (see `test_util::native_tsc_bin_path`), so this script
 // only needs to warm the cache - it does not export the path into the env.
 //
-//   deno run -A tools/download_tsc.ts [cache_deno_dir]
+//   dodo run -A tools/download_tsc.ts [cache_deno_dir]
 //
 // For local `cargo test` runs, running it once with the default cache directory
 // is enough; the harness finds the compiler under `target/.native_tsc/deno_dir`.
 // To point tests at a specific binary instead, export it explicitly:
 //
-//   export DENO_TSC_BIN=$(deno run -A tools/download_tsc.ts)
+//   export DENO_TSC_BIN=$(dodo run -A tools/download_tsc.ts)
 //
 // The `deno` binary to use is taken from the `DENO_BIN` env var, else the first
 // of `./target/release/deno` or `./target/debug/deno` that exists.
@@ -37,7 +37,7 @@ function resolveDenoBin(): string {
   const fromEnv = Deno.env.get("DENO_BIN");
   if (fromEnv) return Deno.realPathSync(fromEnv);
   for (const profile of ["release", "debug"]) {
-    const candidate = `./target/${profile}/deno${exe}`;
+    const candidate = `./target/${profile}/dodo${exe}`;
     try {
       return Deno.realPathSync(candidate);
     } catch {

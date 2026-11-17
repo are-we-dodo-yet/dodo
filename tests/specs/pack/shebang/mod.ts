@@ -1,2 +1,2 @@
-#!/usr/bin/env -S deno run -A
+#!/usr/bin/env -S dodo run -A
 console.log(Deno.cwd());

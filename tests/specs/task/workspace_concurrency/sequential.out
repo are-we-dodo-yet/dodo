@@ -1,7 +1,7 @@
 [UNORDERED_START]
-Task work (@app/a) deno run -A main.ts
-Task work (@app/b) deno run -A main.ts
-Task work (@app/c) deno run -A main.ts
+Task work (@app/a) dodo run -A main.ts
+Task work (@app/b) dodo run -A main.ts
+Task work (@app/c) dodo run -A main.ts
 a running
 a done
 b running

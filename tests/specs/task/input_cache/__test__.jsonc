@@ -36,19 +36,19 @@
       "steps": [
         {
           "args": "task build foo",
-          "output": "Task build deno run src/in.ts 'foo'\n1\n"
+          "output": "Task build dodo run src/in.ts 'foo'\n1\n"
         },
         {
           "args": "task build foo",
-          "output": "Task build deno run src/in.ts 'foo' (cached, inputs unchanged)\n"
+          "output": "Task build dodo run src/in.ts 'foo' (cached, inputs unchanged)\n"
         },
         {
           "args": "task build bar",
-          "output": "Task build deno run src/in.ts 'bar'\n1\n"
+          "output": "Task build dodo run src/in.ts 'bar'\n1\n"
         },
         {
           "args": "task build bar",
-          "output": "Task build deno run src/in.ts 'bar' (cached, inputs unchanged)\n"
+          "output": "Task build dodo run src/in.ts 'bar' (cached, inputs unchanged)\n"
         }
       ]
     },
@@ -59,17 +59,17 @@
         {
           "args": "task with_env",
           "envs": { "MY_VAR": "a" },
-          "output": "Task with_env deno run src/in.ts\n1\n"
+          "output": "Task with_env dodo run src/in.ts\n1\n"
         },
         {
           "args": "task with_env",
           "envs": { "MY_VAR": "a" },
-          "output": "Task with_env deno run src/in.ts (cached, inputs unchanged)\n"
+          "output": "Task with_env dodo run src/in.ts (cached, inputs unchanged)\n"
         },
         {
           "args": "task with_env",
           "envs": { "MY_VAR": "b" },
-          "output": "Task with_env deno run src/in.ts\n1\n"
+          "output": "Task with_env dodo run src/in.ts\n1\n"
         }
       ]
     },
@@ -84,13 +84,13 @@
         {
           "args": [
             "eval",
-            "Deno.writeTextFileSync('deno.json', JSON.stringify({tasks:{build:{command:'deno run -q src/in.ts',files:['src/**/*.ts']}}}))"
+            "Deno.writeTextFileSync('deno.json', JSON.stringify({tasks:{build:{command:'dodo run -q src/in.ts',files:['src/**/*.ts']}}}))"
           ],
           "output": ""
         },
         {
           "args": "task build",
-          "output": "Task build deno run -q src/in.ts\n1\n"
+          "output": "Task build dodo run -q src/in.ts\n1\n"
         }
       ]
     },
@@ -100,11 +100,11 @@
       "steps": [
         {
           "args": "task no_inputs",
-          "output": "Task no_inputs deno run src/in.ts\n1\n"
+          "output": "Task no_inputs dodo run src/in.ts\n1\n"
         },
         {
           "args": "task no_inputs",
-          "output": "Task no_inputs deno run src/in.ts\n1\n"
+          "output": "Task no_inputs dodo run src/in.ts\n1\n"
         }
       ]
     },
@@ -115,7 +115,7 @@
       "steps": [
         {
           "args": "task build_out",
-          "output": "Task build_out deno run -A src/gen.ts\ngenerated\n"
+          "output": "Task build_out dodo run -A src/gen.ts\ngenerated\n"
         },
         {
           "args": [
@@ -130,7 +130,7 @@
         },
         {
           "args": "task build_out",
-          "output": "Task build_out deno run -A src/gen.ts (cached, inputs unchanged)\n"
+          "output": "Task build_out dodo run -A src/gen.ts (cached, inputs unchanged)\n"
         },
         // The deleted output is back, restored from the cache.
         {
@@ -148,11 +148,11 @@
       "steps": [
         {
           "args": "task downstream",
-          "output": "Task dep deno run src/dep_in.ts\ndep\nTask downstream deno run src/down_in.ts\ndown\n"
+          "output": "Task dep dodo run src/dep_in.ts\ndep\nTask downstream dodo run src/down_in.ts\ndown\n"
         },
         {
           "args": "task downstream",
-          "output": "Task dep deno run src/dep_in.ts (cached, inputs unchanged)\nTask downstream deno run src/down_in.ts (cached, inputs unchanged)\n"
+          "output": "Task dep dodo run src/dep_in.ts (cached, inputs unchanged)\nTask downstream dodo run src/down_in.ts (cached, inputs unchanged)\n"
         },
         {
           "args": [
@@ -166,11 +166,11 @@
         // fingerprint is part of `downstream`'s cache key.
         {
           "args": "task downstream",
-          "output": "Task dep deno run src/dep_in.ts\ndep2\nTask downstream deno run src/down_in.ts\ndown\n"
+          "output": "Task dep dodo run src/dep_in.ts\ndep2\nTask downstream dodo run src/down_in.ts\ndown\n"
         },
         {
           "args": "task downstream",
-          "output": "Task dep deno run src/dep_in.ts (cached, inputs unchanged)\nTask downstream deno run src/down_in.ts (cached, inputs unchanged)\n"
+          "output": "Task dep dodo run src/dep_in.ts (cached, inputs unchanged)\nTask downstream dodo run src/down_in.ts (cached, inputs unchanged)\n"
         }
       ]
     }

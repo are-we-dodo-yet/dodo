@@ -25,7 +25,7 @@ pub async fn check(
     // watcher, so it runs once and never re-checks. Warn rather than appear to
     // watch. See https://github.com/denoland/deno/issues/36089.
     log::warn!(
-      "{} `deno check --watch` does not re-check on file changes yet; it runs once. See https://github.com/denoland/deno/issues/36089",
+      "{} `dodo check --watch` does not re-check on file changes yet; it runs once. See https://github.com/denoland/deno/issues/36089",
       colors::yellow("Warning")
     );
     let no_clear_screen = watch_flags.no_clear_screen;
@@ -46,8 +46,8 @@ pub async fn check(
 
 /// Type-check the project with the native TypeScript compiler.
 ///
-/// `deno check` generates a stock `tsconfig.json` and materializes the types of
-/// the project's dependencies (the same work `deno sync-types` performs), then
+/// `dodo check` generates a stock `tsconfig.json` and materializes the types of
+/// the project's dependencies (the same work `dodo sync-types` performs), then
 /// runs the pinned native `tsc` against it and remaps the compiler's
 /// diagnostics back onto the original module specifiers.
 async fn native_check(
@@ -77,7 +77,7 @@ async fn native_check(
   // Deno owns resolution: this drives deno's own graph diagnostics (missing
   // modules + hints) and the incremental type-check cache, so we can skip the
   // external compiler entirely when nothing it sees has changed.
-  // Resolve the requested roots the same way `deno check` always has:
+  // Resolve the requested roots the same way `dodo check` always has:
   // globs are expanded, workspace `exclude` is applied, and
   // `include_ignored_specified: false` means an explicitly-passed excluded file
   // is skipped rather than force-checked. An empty result is not an error - it
@@ -126,10 +126,10 @@ async fn native_check(
   // failures, and invalid specifiers. Missing-module errors are deliberately
   // *not* surfaced here (`will_type_check` defers them to tsc, which reports
   // them as TS2307), so a missing import is never double-reported. Note: the
-  // richer `deno add` hint Deno 2.x's forked tsc attached to import-level
+  // richer `dodo add` hint Deno 2.x's forked tsc attached to import-level
   // missing modules is not re-added on top of tsc's TS2307 yet; restoring it
   // additively is a follow-up. `allow_unknown_media_types: true` matches
-  // `deno check`, letting tsc handle unknown types instead of erroring.
+  // `dodo check`, letting tsc handle unknown types instead of erroring.
   factory.module_graph_builder().await?.graph_roots_valid(
     &graph,
     &roots,
@@ -233,7 +233,7 @@ async fn native_check(
     );
   let root_tsconfig = project_root.join("tsconfig.json");
   // Holds the root overlay temp file open until tsc has run (dropping deletes
-  // it), keeping `deno check` side-effect-free on the user's tree.
+  // it), keeping `dodo check` side-effect-free on the user's tree.
   let _root_tsconfig_guard;
   let base_tsconfig = if honor_user_tsconfig && root_tsconfig.exists() {
     let overlay = crate::tsc::tsconfig_gen::build_check_root_overlay(
@@ -255,7 +255,7 @@ async fn native_check(
     project_root.join(".deno").join("tsconfig.json")
   };
   // Pin tsc to exactly the roots deno resolved (glob-expanded and exclude-applied
-  // above), so `deno check *.ts` checks only the matched files - not the whole
+  // above), so `dodo check *.ts` checks only the matched files - not the whole
   // project - and an excluded file stays excluded. Local roots map to their
   // `file://` path; remote roots map to their `.deno/remote/` mirror (added just
   // below). Only an extensionless remote root - which stock tsc can't load - is
@@ -295,7 +295,7 @@ async fn native_check(
   let tsconfig_path = if files.is_empty() {
     base_tsconfig
   } else {
-    // `deno check <files>` checks only the named files (and their imports), not
+    // `dodo check <files>` checks only the named files (and their imports), not
     // the whole project. The generated `tsconfig.json` keeps an open `include`
     // (so bundlers can consume its resolver mappings), so write a per-file
     // config that extends it (by absolute path) and pins `files` - `files`/

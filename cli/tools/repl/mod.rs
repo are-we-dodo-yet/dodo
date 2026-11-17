@@ -171,9 +171,9 @@ pub async fn run(
     .create_custom_worker(
       WorkerExecutionMode::Repl,
       main_module.clone(),
-      // `deno repl` doesn't support preloading modules
+      // `dodo repl` doesn't support preloading modules
       vec![],
-      // `deno repl` doesn't support require modules
+      // `dodo repl` doesn't support require modules
       vec![],
       permissions.clone(),
       vec![crate::ops::testing::deno_test::init(test_event_sender)],
@@ -264,7 +264,7 @@ pub async fn run(
       )?;
       writeln!(
         handle,
-        "To specify permissions, run `deno repl` with allow flags."
+        "To specify permissions, run `dodo repl` with allow flags."
       )?;
     }
   }

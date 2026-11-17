@@ -44,7 +44,7 @@ fn napi_get_boolean(
 Update the generated symbol lists using the script:
 
 ```
-deno run --allow-write tools/napi/generate_symbols_lists.js
+dodo run --allow-write tools/napi/generate_symbols_lists.js
 ```
 
 Add a test in [`/tests/napi`](../../tests/napi/). You can also refer to Node.js

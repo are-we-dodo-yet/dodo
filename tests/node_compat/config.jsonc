@@ -63,7 +63,7 @@
     "es-module/test-esm-recursive-cjs-dependencies.mjs": {},
     "es-module/test-esm-repl-imports.js": {
       "ignore": true,
-      "reason": "requires `deno --interactive` flag (not yet implemented); previously passed only because the test runner did not await Node-style `done` callbacks, which masked the failing assertion"
+      "reason": "requires `dodo --interactive` flag (not yet implemented); previously passed only because the test runner did not await Node-style `done` callbacks, which masked the failing assertion"
     },
     "es-module/test-esm-require-cache.mjs": {},
     "es-module/test-esm-scope-node-modules.mjs": {},

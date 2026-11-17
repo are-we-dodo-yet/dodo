@@ -6,7 +6,7 @@
 // deno_core-related package directories (or root Cargo files). Used in CI
 // to decide whether to run deno_core tests.
 //
-// Usage: deno run --allow-run=git check_deno_core_changes.js <base_sha>
+// Usage: dodo run --allow-run=git check_deno_core_changes.js <base_sha>
 // Writes "skip_deno_core_test=true" or "skip_deno_core_test=false" to
 // $GITHUB_OUTPUT when running in GitHub Actions.
 

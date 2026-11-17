@@ -176,7 +176,7 @@ fn bump_version_preserves_deno_json_structure() {
   "version": "0.1.0",
   "exports": "./mod.ts",
   "tasks": {
-    "dev": "deno run --watch main.ts"
+    "dev": "dodo run --watch main.ts"
   }
 }"#,
   );
@@ -206,7 +206,7 @@ fn bump_version_works_with_package_json() {
   "name": "my-package",
   "version": "1.5.2",
   "scripts": {
-    "test": "deno test"
+    "test": "dodo test"
   }
 }"#,
   );

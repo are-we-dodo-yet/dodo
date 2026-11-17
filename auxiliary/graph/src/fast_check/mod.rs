@@ -153,7 +153,7 @@ pub enum FastCheckDiagnostic {
   /// fast check for the package or not.
   ///
   /// Note: This diagnostic will never (should never) be displayed to the user
-  /// because the fast check cache should not be used in deno lint or when
+  /// because the fast check cache should not be used in dodo lint or when
   /// publishing.
   #[error("diagnostic was cached")]
   Cached { specifier: ModuleSpecifier },

@@ -78,7 +78,7 @@ pub struct PackageJsonDepValueParseWithLocationError {
 /// name, but the member's version did not satisfy the requested constraint.
 /// Like pnpm, this is a hard error rather than silently linking the member or
 /// falling back to the registry. The message mirrors the equivalent
-/// `deno run` resolver error (`VersionNotSatisfied`).
+/// `dodo run` resolver error (`VersionNotSatisfied`).
 #[derive(Debug, Error, Clone)]
 #[error(
   "Failed to install '{alias}'{}: found package.json in workspace, but version '{version}' didn't satisfy constraint '{version_req}'\n    at {location}",

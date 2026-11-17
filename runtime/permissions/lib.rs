@@ -79,7 +79,7 @@ pub struct PermissionDeniedError {
 fn format_permission_error(name: &'static str) -> String {
   if is_standalone() {
     format!(
-      "specify the required permissions during compilation using `deno compile --allow-{name}`"
+      "specify the required permissions during compilation using `dodo compile --allow-{name}`"
     )
   } else {
     format!("run again with the --allow-{name} flag")
@@ -1826,7 +1826,7 @@ pub enum HostParseError {
 /// `--allow-net=unix:<path>` rules.
 ///
 /// A leading `/` is an absolute POSIX path on every host, including
-/// `deno compile --target=<unix>` from Windows (`Path::is_absolute()` on
+/// `dodo compile --target=<unix>` from Windows (`Path::is_absolute()` on
 /// Windows requires a drive letter, so `/var/run/docker.sock` would be
 /// rejected). Otherwise fall back to host semantics so Windows named pipes
 /// (`\\.\pipe\foo`) remain expressible as a scoped rule.
@@ -8504,7 +8504,7 @@ mod tests {
         )),
       ),
       // Unix socket rules are POSIX paths on every host (including Windows
-      // `deno compile --target=linux`). Lexically normalize `.`/`..` at parse
+      // `dodo compile --target=linux`). Lexically normalize `.`/`..` at parse
       // time so the rule matches the call-side path.
       (
         "unix:/var/run/docker.sock",
@@ -8585,21 +8585,21 @@ mod tests {
   fn test_denies_run_name() {
     let cases = [
       #[cfg(windows)]
-      ("deno", "C:\\deno.exe", true),
+      ("dodo", "C:\\dodo.exe", true),
       #[cfg(windows)]
-      ("deno", "C:\\sub\\deno.cmd", true),
+      ("dodo", "C:\\sub\\dodo.cmd", true),
       #[cfg(windows)]
-      ("deno", "C:\\sub\\DeNO.cmd", true),
+      ("dodo", "C:\\sub\\DoDO.cmd", true),
       #[cfg(windows)]
-      ("DEno", "C:\\sub\\deno.cmd", true),
+      ("DOdo", "C:\\sub\\dodo.cmd", true),
       #[cfg(windows)]
-      ("deno", "C:\\other\\sub\\deno.batch", true),
+      ("dodo", "C:\\other\\sub\\dodo.batch", true),
       #[cfg(windows)]
-      ("deno", "C:\\other\\sub\\deno", true),
+      ("dodo", "C:\\other\\sub\\dodo", true),
       #[cfg(windows)]
-      ("denort", "C:\\other\\sub\\deno.exe", false),
-      ("deno", "/home/test/deno", true),
-      ("deno", "/home/test/denot", false),
+      ("denort", "C:\\other\\sub\\dodo.exe", false),
+      ("dodo", "/home/test/dodo", true),
+      ("dodo", "/home/test/denot", false),
     ];
     for (name, cmd_path, denies) in cases {
       assert_eq!(

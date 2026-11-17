@@ -53,7 +53,7 @@ pub struct StandaloneData {
 }
 
 /// This function will try to run this binary as a standalone binary
-/// produced by `deno compile`. It determines if this is a standalone
+/// produced by `dodo compile`. It determines if this is a standalone
 /// binary by skipping over the trailer width at the end of the file,
 /// then checking for the magic trailer string `d3n0l4nd`. If found,
 /// the bundle is executed. If not, this function exits with `Ok(None)`.
@@ -660,7 +660,7 @@ impl StandaloneModules {
           };
           // A file read from disk at runtime (e.g. a plugin discovered by a
           // compiled program) hasn't been transpiled at compile time, so
-          // transpile TypeScript/JSX here, mirroring `deno run`.
+          // transpile TypeScript/JSX here, mirroring `dodo run`.
           let media_type = MediaType::from_specifier(specifier);
           if matches!(
             media_type,
@@ -697,7 +697,7 @@ impl StandaloneModules {
 /// Transpile TypeScript/JSX source to JavaScript for modules that are not
 /// embedded in the binary, namely `data:`/`blob:` URLs and local files read
 /// from disk at runtime. Embedded modules are already transpiled at
-/// `deno compile` time, but a compiled program can still dynamically `import()`
+/// `dodo compile` time, but a compiled program can still dynamically `import()`
 /// TypeScript that it builds or discovers while running. `deno_ast` is already
 /// linked into the binary via `ext/node`, so transpiling here adds no extra
 /// binary size.

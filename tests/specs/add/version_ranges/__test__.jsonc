@@ -1,7 +1,7 @@
 {
   "tempDir": true,
   "tests": {
-    // `deno add` accepts the full npm range grammar on the command line and
+    // `dodo add` accepts the full npm range grammar on the command line and
     // resolves it to a concrete version before writing it (issue #26587).
     // Ranges containing spaces are passed as a single argument here, the same
     // way they would need to be quoted in a shell.

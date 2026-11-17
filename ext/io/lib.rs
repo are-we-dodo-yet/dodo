@@ -416,7 +416,7 @@ pub struct Stdio {
 
 /// Holds the effective stdout/stderr handles for child process inheritance.
 ///
-/// When the runtime redirects stdout/stderr (e.g. during `deno test` for
+/// When the runtime redirects stdout/stderr (e.g. during `dodo test` for
 /// output capture), child processes spawned with `stdio: "inherit"` need
 /// to inherit the redirected handles, not the original OS stdout/stderr.
 /// This struct is stored in `OpState` during IO extension init and read

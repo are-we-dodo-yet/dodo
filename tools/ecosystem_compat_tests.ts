@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run --allow-all --config=tests/config/deno.json
+#!/usr/bin/env -S dodo run --allow-all --config=tests/config/deno.json
 // Copyright 2018-2026 the Deno authors. MIT license.
 import $ from "jsr:@david/dax@^0.42.0";
 import { join } from "./util.js";

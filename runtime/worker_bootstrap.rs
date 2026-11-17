@@ -18,26 +18,26 @@ pub enum WorkerExecutionMode {
 
   /// Running in a worker.
   Worker,
-  /// `deno run`
+  /// `dodo run`
   Run,
-  /// `deno repl`
+  /// `dodo repl`
   Repl,
-  /// `deno eval`
+  /// `dodo eval`
   Eval,
-  /// `deno test`
+  /// `dodo test`
   Test,
-  /// `deno bench`
+  /// `dodo bench`
   Bench,
-  /// `deno serve`
+  /// `dodo serve`
   ServeMain {
     worker_count: usize,
   },
   ServeWorker {
     worker_index: usize,
   },
-  /// `deno jupyter`
+  /// `dodo jupyter`
   Jupyter,
-  /// `deno deploy`
+  /// `dodo deploy`
   Deploy,
 }
 
@@ -104,7 +104,7 @@ pub struct BootstrapOptions {
   pub unstable_features: Vec<i32>,
   pub user_agent: String,
   pub inspect: bool,
-  /// If this is a `deno compile`-ed executable.
+  /// If this is a `dodo compile`-ed executable.
   pub is_standalone: bool,
   pub has_node_modules_dir: bool,
   pub argv0: Option<String>,
@@ -114,7 +114,7 @@ pub struct BootstrapOptions {
   pub node_ipc_init: Option<(i64, ChildIpcSerialization)>,
   pub mode: WorkerExecutionMode,
   pub no_legacy_abort: bool,
-  // Used by `deno serve`
+  // Used by `dodo serve`
   pub serve_port: Option<u16>,
   pub serve_host: Option<String>,
   pub auto_serve: bool,

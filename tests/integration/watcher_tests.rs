@@ -920,7 +920,7 @@ async fn serve_watch_all() {
 }
 
 // Regression test for https://github.com/denoland/deno/issues/30382.
-// Ensures that `deno serve --watch` applies the import map from deno.json when
+// Ensures that `dodo serve --watch` applies the import map from deno.json when
 // resolving the main module, so a bare specifier entrypoint resolves the same
 // way it does without `--watch`.
 #[test(flaky)]
@@ -965,7 +965,7 @@ async fn serve_watch_with_import_map() {
 }
 
 // Regression test for https://github.com/denoland/deno/issues/26052
-// On a watcher restart, `deno serve --parallel` used to leave the previous
+// On a watcher restart, `dodo serve --parallel` used to leave the previous
 // generation of workers running (the worker threads were never signalled and
 // the main worker task was detached), so requests kept being served by the old
 // code and the process would eventually panic with an isolate mismatch.
@@ -998,7 +998,7 @@ async fn serve_watch_parallel_stops_old_workers() {
     .unwrap();
 
   // If anything in the test body panics (a timeout, a failed assertion), the
-  // child must still be killed before unwinding: a leaked `deno serve --watch`
+  // child must still be killed before unwinding: a leaked `dodo serve --watch`
   // child never exits on its own, and on Windows tokio reads child pipes with
   // blocking threads, so dropping the test runtime during the unwind waits
   // forever on a stderr read that never completes. This wedged CI for the
@@ -1161,7 +1161,7 @@ async fn serve_watch_parallel_stops_old_workers_inner(
 }
 
 // Regression test for https://github.com/denoland/deno/issues/30046
-// `deno serve` used to ignore `--watch-exclude` entirely, so writing to an
+// `dodo serve` used to ignore `--watch-exclude` entirely, so writing to an
 // excluded file that's part of the module graph would trigger a restart.
 #[test(flaky)]
 async fn serve_watch_with_excluded_paths() {
@@ -1836,7 +1836,7 @@ async fn test_watch_doc() {
 }
 
 // Regression test for https://github.com/denoland/deno/issues/24558:
-// `deno test --doc --watch` panicked with a parse error on Markdown files
+// `dodo test --doc --watch` panicked with a parse error on Markdown files
 // because the watcher passed them to the module graph builder as roots.
 #[test(flaky)]
 async fn test_watch_doc_markdown() {
@@ -2315,10 +2315,10 @@ async fn run_watch_hmr_deno_exit() {
   run_watch_exit_keeps_watcher_alive("--watch-hmr", "Deno.exit(42)").await;
 }
 
-/// Test that a served module calling `Deno.exit()` under `deno serve --watch`
+/// Test that a served module calling `Deno.exit()` under `dodo serve --watch`
 /// ends the current run without killing the watcher, which keeps watching and
-/// restarts on the next file change. `deno serve --watch` shares the same exit
-/// handling as `deno run --watch`. See https://github.com/denoland/deno/issues/7590.
+/// restarts on the next file change. `dodo serve --watch` shares the same exit
+/// handling as `dodo run --watch`. See https://github.com/denoland/deno/issues/7590.
 #[test(flaky)]
 async fn serve_watch_deno_exit() {
   let t = TempDir::new();
@@ -3125,7 +3125,7 @@ console.log("Listening...")
   // right after the module is replaced where the listener has been closed and
   // not yet rebound and a connection is refused. Retry until it is accepting.
   //
-  // This used to spawn a fire-and-forget `deno eval` child that fetched once
+  // This used to spawn a fire-and-forget `dodo eval` child that fetched once
   // and was never awaited: a refused connection there silently dropped the
   // request (leaving this test to hang until `wait_contains` timed out) and
   // printed `error sending request for url (http://localhost:11111/)` onto the

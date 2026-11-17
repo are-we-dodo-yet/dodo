@@ -164,7 +164,7 @@ declare interface Notification extends EventTarget {
 /** Web Notifications API.
  *
  * Construct a notification to display it. Only available in apps
- * compiled with `deno desktop`.
+ * compiled with `dodo desktop`.
  *
  * Notification permission is checked against the OS (e.g. macOS User
  * Notifications). {@linkcode Notification.permission} reports the
@@ -242,7 +242,7 @@ declare interface Permissions {
 
 /** Read from and write plain text to the system clipboard. A subset of the
  * web [Clipboard API](https://developer.mozilla.org/en-US/docs/Web/API/Clipboard);
- * only the text methods are backed by `deno desktop`. */
+ * only the text methods are backed by `dodo desktop`. */
 declare interface Clipboard extends EventTarget {
   /** Resolve with the clipboard's text content, or an empty string when the
    * clipboard is empty or holds no text.
@@ -267,7 +267,7 @@ declare var Clipboard: {
 };
 
 /** Extends the {@linkcode Navigator} provided by `deno.window` with the
- * Permissions and Clipboard API surface available to `deno desktop` apps. */
+ * Permissions and Clipboard API surface available to `dodo desktop` apps. */
 declare interface Navigator {
   readonly permissions: Permissions;
   readonly clipboard: Clipboard;
@@ -278,7 +278,7 @@ declare namespace Deno {
 
   /** The application version read from `deno.json` at compile time, or
    * `null` if no version was configured. Only available in apps compiled
-   * with `deno desktop`. */
+   * with `dodo desktop`. */
   export const desktopVersion: string | null;
 
   export interface AutoUpdateOptions {
@@ -351,7 +351,7 @@ declare namespace Deno {
    * the failure is logged, and the update is skipped; distribute updates
    * through the system package manager instead.
    *
-   * Only available in apps compiled with `deno desktop`.
+   * Only available in apps compiled with `dodo desktop`.
    *
    * ```ts
    * Deno.autoUpdate({

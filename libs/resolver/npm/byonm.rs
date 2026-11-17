@@ -35,13 +35,13 @@ use crate::npm::version_req_matches_including_pre;
 #[derive(Debug, Error, deno_error::JsError)]
 pub enum ByonmResolvePkgFolderFromDenoReqError {
   #[class(generic)]
-  #[error("Could not find \"{}\" in a node_modules folder. Deno expects the node_modules/ directory to be up to date. Did you forget to run `deno install`?", .0)]
+  #[error("Could not find \"{}\" in a node_modules folder. Deno expects the node_modules/ directory to be up to date. Did you forget to run `dodo install`?", .0)]
   MissingAlias(StackString),
   #[class(inherit)]
   #[error(transparent)]
   PackageJson(#[from] PackageJsonLoadError),
   #[class(generic)]
-  #[error("Could not find a matching package for 'npm:{}' in the node_modules directory. Ensure you have all your JSR and npm dependencies listed in your deno.json or package.json, then run `deno install`. Alternatively, turn on auto-install by specifying `\"nodeModulesDir\": \"auto\"` in your deno.json file.", .0)]
+  #[error("Could not find a matching package for 'npm:{}' in the node_modules directory. Ensure you have all your JSR and npm dependencies listed in your deno.json or package.json, then run `dodo install`. Alternatively, turn on auto-install by specifying `\"nodeModulesDir\": \"auto\"` in your deno.json file.", .0)]
   UnmatchedReq(PackageReq),
   #[class(inherit)]
   #[error(transparent)]

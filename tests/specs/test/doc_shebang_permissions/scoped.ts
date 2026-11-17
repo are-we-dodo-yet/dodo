@@ -4,7 +4,7 @@
  * than the shebang declares.
  *
  * ```ts
- * #!/usr/bin/env -S deno run --allow-read --deny-read=/etc
+ * #!/usr/bin/env -S dodo run --allow-read --deny-read=/etc
  * Deno.cwd();
  * ```
  * @module doc

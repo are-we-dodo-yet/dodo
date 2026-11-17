@@ -4,6 +4,6 @@
     "./bar"
   ],
   "tasks": {
-    "dev": "deno task --members dev"
+    "dev": "dodo task --members dev"
   }
 }

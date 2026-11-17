@@ -1721,7 +1721,7 @@ function registerDeclarativeServer(exports) {
       },
     });
 
-    // Wire SIGTERM/SIGINT to a graceful server shutdown so that `deno serve`
+    // Wire SIGTERM/SIGINT to a graceful server shutdown so that `dodo serve`
     // drains in-flight requests and exits cleanly (exit code 0) instead of
     // being terminated by the OS default signal handler (exit code 143/130),
     // e.g. when a container is redeployed.

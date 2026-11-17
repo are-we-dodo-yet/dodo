@@ -20,7 +20,7 @@ const NATIVE_ADDON_CACHE_DIR_NAME: &str = "deno-native-addons";
 #[derive(Debug, thiserror::Error, deno_error::JsError)]
 pub enum LoadError {
   #[class(generic)]
-  #[error("Failed to write native addon (Deno FFI/Node API) '{0}' to '{1}' because the file system was readonly. This is a limitation of native addons with deno compile.", executable_path.display(), real_path.display())]
+  #[error("Failed to write native addon (Deno FFI/Node API) '{0}' to '{1}' because the file system was readonly. This is a limitation of native addons with dodo compile.", executable_path.display(), real_path.display())]
   ReadOnlyFilesystem {
     real_path: PathBuf,
     executable_path: PathBuf,
@@ -40,7 +40,7 @@ pub enum LoadError {
 
 pub type DenoRtNativeAddonLoaderRc = Arc<dyn DenoRtNativeAddonLoader>;
 
-/// Loads native addons in `deno compile`.
+/// Loads native addons in `dodo compile`.
 ///
 /// The implementation should provide the bytes from the binary
 /// of the native file.

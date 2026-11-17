@@ -44,7 +44,7 @@ example looks like:
 }
 ```
 
-This will run `deno run main.js` then assert that the output matches the text in
+This will run `dodo run main.js` then assert that the output matches the text in
 `main.out`.
 
 Or another example that runs multiple steps:

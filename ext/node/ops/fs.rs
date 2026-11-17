@@ -31,7 +31,7 @@ use tokio::task::JoinError;
 use crate::ops::constant::UV_FS_COPYFILE_EXCL;
 
 /// Virtual file descriptors for files without a real OS fd (e.g. VFS files
-/// in `deno compile` binaries). These start at a high value to avoid
+/// in `dodo compile` binaries). These start at a high value to avoid
 /// collisions with real OS fds.
 const VIRTUAL_FD_START: i32 = 1_000_000_000;
 static NEXT_VIRTUAL_FD: AtomicI32 = AtomicI32::new(VIRTUAL_FD_START);
@@ -390,7 +390,7 @@ pub fn op_node_open_sync(
   let open_options = options;
 
   let file = fs.open_sync(&path, open_options)?;
-  // For VFS files (e.g. in deno compile), backing_fd() returns None.
+  // For VFS files (e.g. in dodo compile), backing_fd() returns None.
   // Assign a virtual fd so the file can still be used through FdTable.
   let fd = match file.clone().backing_fd() {
     Some(backing_fd) => raw_fd_from_backing_fd(backing_fd)?,
@@ -451,7 +451,7 @@ pub async fn op_node_open(
   let open_options = options;
 
   let file = fs.open_async(path.as_owned(), open_options).await?;
-  // For VFS files (e.g. in deno compile), backing_fd() returns None.
+  // For VFS files (e.g. in dodo compile), backing_fd() returns None.
   // Assign a virtual fd so the file can still be used through FdTable.
   let fd = match file.clone().backing_fd() {
     Some(backing_fd) => raw_fd_from_backing_fd(backing_fd)?,

@@ -603,7 +603,7 @@ pub static LOCK_ARGS: &[ArgDef] = &[
 // ============================================================
 
 // Shared between `run` and its alias-like `watch` subcommand
-// (`deno watch` == `deno run --watch-hmr`).
+// (`dodo watch` == `dodo run --watch-hmr`).
 static RUN_ARGS: &[ArgDef] = &[
   ArgDef::new("script_arg")
     .positional()
@@ -1150,7 +1150,7 @@ pub static TEST_SUBCOMMAND: CommandDef = CommandDef {
       .conflicts_with(&["inspect", "inspect-brk", "inspect-wait"])
 .help("Collect coverage profile data into DIR. If DIR is not specified, it uses 'coverage/'.\n  This option can also be set via the DENO_COVERAGE_DIR environment variable."),
     ArgDef::new("clean").long("clean").set_true()
-.help("Empty the temporary coverage profile data directory before running tests.\n  Note: running multiple `deno test --clean` calls in series or parallel for the same coverage directory may cause race conditions."),
+.help("Empty the temporary coverage profile data directory before running tests.\n  Note: running multiple `dodo test --clean` calls in series or parallel for the same coverage directory may cause race conditions."),
     ArgDef::new("fail-fast")
       .long("fail-fast")
       .action(ArgAction::Set)
@@ -1455,7 +1455,7 @@ pub static CHECK_SUBCOMMAND: CommandDef = CommandDef {
     ArgDef::new("check-js").long("check-js").set_true().hidden()
 .help("Enable type-checking of JavaScript files (equivalent to `compilerOptions.checkJs: true`)"),
     ArgDef::new("desktop").long("desktop").set_true()
-.help("Type-check using the type definitions for `deno desktop`"),
+.help("Type-check using the type definitions for `dodo desktop`"),
     ArgDef::new("no-code-cache")
       .long("no-code-cache")
       .set_true()
@@ -2193,7 +2193,7 @@ pub static COMPLETIONS_SUBCOMMAND: CommandDef = CommandDef {
         "fig",
       ])),
     ArgDef::new("dynamic").long("dynamic").set_true()
-.help("Generate dynamic completions for the given shell (unstable), currently this only provides available tasks for `deno task`."),
+.help("Generate dynamic completions for the given shell (unstable), currently this only provides available tasks for `dodo task`."),
   ],
   arg_groups: &[UNSTABLE_DEPRECATED_ARG, UNSTABLE_FEATURE_ARGS],
   subcommands: &[],
@@ -2221,7 +2221,7 @@ pub static INIT_SUBCOMMAND: CommandDef = CommandDef {
       .long("serve")
       .set_true()
       .conflicts_with(&["lib"])
-      .help("Generate an example project for `deno serve`"),
+      .help("Generate an example project for `dodo serve`"),
     ArgDef::new("npm")
       .long("npm")
       .set_true()
@@ -2738,7 +2738,7 @@ pub static LSP_SUBCOMMAND: CommandDef = CommandDef {
 
 pub static VENDOR_SUBCOMMAND: CommandDef = CommandDef {
   name: "vendor",
-  about: "`deno vendor` was removed in Deno 2.\n\nSee the Deno 1.x to 2.x Migration Guide for migration instructions: https://docs.deno.com/runtime/manual/advanced/migrate_deprecations",
+  about: "`dodo vendor` was removed in Deno 2.\n\nSee the Deno 1.x to 2.x Migration Guide for migration instructions: https://docs.deno.com/runtime/manual/advanced/migrate_deprecations",
   aliases: &[],
   args: &[
     ArgDef::new("help")

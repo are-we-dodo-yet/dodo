@@ -13,7 +13,7 @@
     },
     "file_not_exists": {
       // No local cli.ts file: the entry is treated as an npm package
-      // (defaulting to the npm registry, like `deno add`). The mock npm
+      // (defaulting to the npm registry, like `dodo add`). The mock npm
       // registry doesn't have this name, so install fails with a clear
       // "package does not exist" error rather than the legacy
       // "missing a prefix" hint.

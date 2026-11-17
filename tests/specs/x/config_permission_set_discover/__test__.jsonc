@@ -8,9 +8,9 @@
   // explicit `--config`. The re-run subprocess runs the installed bin FILE
   // (under `deno_x_cache`), so its config auto-discovery anchors on the install
   // dir, NOT the user's cwd — it would find the internal temp `deno.json` (which
-  // has no permission set) and fail. `deno x` must therefore resolve the user's
+  // has no permission set) and fail. `dodo x` must therefore resolve the user's
   // auto-discovered cwd `deno.json` and forward it explicitly (alongside
-  // `-P=write`) so the child resolves the set — matching `deno run -P=write
+  // `-P=write`) so the child resolves the set — matching `dodo run -P=write
   // npm:@denotest/try-write`. Previously the npm auto-install path forwarded the
   // internal temp `deno.json`, so the set could not be found.
   "tests": {

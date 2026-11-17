@@ -520,7 +520,7 @@ fn compute_document_lint_diagnostics(
   }
 }
 
-/// Computes an LSP range to highlight for a `deno doc --lint` diagnostic.
+/// Computes an LSP range to highlight for a `dodo doc --lint` diagnostic.
 ///
 /// `deno_doc` only reports the byte offset of the start of the offending
 /// symbol, so highlight the identifier-like token that begins there (falling
@@ -556,7 +556,7 @@ fn doc_diagnostic_range(
   }
 }
 
-/// Generates `deno doc --lint` diagnostics for a module that is a published
+/// Generates `dodo doc --lint` diagnostics for a module that is a published
 /// package's export entrypoint, caching them on the module instance. Like lint
 /// diagnostics, these are derived solely from the module's own contents, so a
 /// given module instance always produces the same result.
@@ -1322,7 +1322,7 @@ fn diagnose_resolution(
 /// Surface an unresolved import of a `.d.ts` entrypoint as a resolution error.
 ///
 /// A `.d.ts` document is itself an entrypoint in the editor, so its own
-/// unresolved imports should be reported (e.g. `TS2307` from `deno check`).
+/// unresolved imports should be reported (e.g. `TS2307` from `dodo check`).
 /// However deno_graph records a bare specifier in a `.d.ts` as
 /// `Resolution::None` (a `.ts` file records `Resolution::Err`), which
 /// `diagnose_resolution()` ignores, and tsc skips them under `skipLibCheck`. So
@@ -1413,7 +1413,7 @@ fn diagnose_dependency(
 
   if referrer_module.media_type.is_declaration() {
     // A `.d.ts` document opened in the editor is itself an entrypoint, so its
-    // own unresolved imports should be surfaced (matching `deno check`, which
+    // own unresolved imports should be surfaced (matching `dodo check`, which
     // reports `TS2307` for them). This must happen regardless of `skipLibCheck`
     // and before the early return below, mirroring `cli/type_checker.rs`.
     diagnose_dts_entrypoint_unresolved_import(
@@ -1942,7 +1942,7 @@ pub async fn generate_module_diagnostics(
 
 /// Returns the `no-slow-types` (fast check) diagnostics that land on `module`.
 ///
-/// These diagnostics are reported by `deno publish` / `deno lint` for
+/// These diagnostics are reported by `dodo publish` / `dodo lint` for
 /// publishable JSR packages and require a fully built fast check module graph
 /// of the whole package. Because a single slow type can produce diagnostics on
 /// any module reachable from a package's exports, the graph is built once per
@@ -1976,7 +1976,7 @@ async fn generate_no_slow_types_diagnostics(
   }
   // Respect the lint configuration: if `no-slow-types` is excluded (or not
   // otherwise enabled) for this document, don't report its diagnostics. This
-  // keeps the LSP in sync with `deno lint`, which filters the rule out.
+  // keeps the LSP in sync with `dodo lint`, which filters the rule out.
   let linter = snapshot.linter_resolver.for_module(module);
   if !linter.inner.has_package_rule("no-slow-types") {
     return Vec::new();
@@ -2115,8 +2115,8 @@ fn no_slow_types_diagnostic_to_lsp(
 }
 
 /// Returns whether the module is an export entrypoint of a publishable
-/// (JSR) package in the workspace, i.e. a file that `deno doc --lint` and
-/// `deno publish` would check for documentation issues.
+/// (JSR) package in the workspace, i.e. a file that `dodo doc --lint` and
+/// `dodo publish` would check for documentation issues.
 fn module_is_package_export(
   snapshot: &StateSnapshot,
   module: &DocumentModule,

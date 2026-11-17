@@ -4,7 +4,7 @@
     // A user-supplied `compilerOptions.lib` leaves deno's own bundled
     // `asset:///` declarations with unresolved references (e.g.
     // `lib.deno.ns.d.ts` referencing `node:net` and `NodeJS.Timeout`).
-    // Those aren't user-editable and `deno check` doesn't report them, so
+    // Those aren't user-editable and `dodo check` doesn't report them, so
     // declaration emit must not fail on them either.
     "declaration_with_custom_lib": {
       "args": "transpile main.ts -o out.js --declaration",

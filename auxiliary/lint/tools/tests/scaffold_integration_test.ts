@@ -13,7 +13,7 @@ Deno.test(
 
     try {
       console.log(`Run the scaffold script to create ${name} rule`);
-      const p1 = new Deno.Command("deno", {
+      const p1 = new Deno.Command("dodo", {
         args: [
           "run",
           "--allow-write=.",

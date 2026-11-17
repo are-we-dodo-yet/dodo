@@ -1,4 +1,4 @@
-#!/usr/bin/env -S deno run --allow-read --allow-write --allow-env --allow-run
+#!/usr/bin/env -S dodo run --allow-read --allow-write --allow-env --allow-run
 // deno-lint-ignore-file
 // Copyright 2018-2026 the Deno authors. MIT license.
 

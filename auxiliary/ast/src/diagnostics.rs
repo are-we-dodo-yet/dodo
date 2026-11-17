@@ -216,7 +216,7 @@ impl fmt::Display for RepeatingCharFmt {
 }
 
 /// How many spaces a tab should be displayed as. 2 is the default used for
-/// `deno fmt`, so we'll use that here.
+/// `dodo fmt`, so we'll use that here.
 const TAB_WIDTH: usize = 2;
 
 struct ReplaceTab<'a>(&'a str);

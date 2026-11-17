@@ -1,9 +1,9 @@
 {
   "tasks": {
-    "build1": "deno run ../build1.js",
-    "build2": "deno run ../build2.js",
+    "build1": "dodo run ../build1.js",
+    "build2": "dodo run ../build2.js",
     "run": {
-      "command": "deno run ../run.js",
+      "command": "dodo run ../run.js",
       "dependencies": ["build1", "build2"]
     }
   }

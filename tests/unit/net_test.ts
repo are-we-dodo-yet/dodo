@@ -1717,7 +1717,7 @@ Deno.test(
 // `DatagramConn.send()` checks the destination path independently of the
 // listen path. Here the socket is listened with `--allow-net` scoped to its
 // own path, but sending to a different (ungranted) path is denied. Run in a
-// subprocess (`deno run`, not `deno eval` which has implicit full permissions)
+// subprocess (`dodo run`, not `dodo eval` which has implicit full permissions)
 // so the dynamic socket paths can be passed in the allow-net rule.
 Deno.test(
   {

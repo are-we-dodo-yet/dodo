@@ -106,7 +106,7 @@ pub fn status(maybe_name: Option<&str>) -> Result<(), AnyError> {
     );
     Ok(())
   } else {
-    let mut install_cmd = "deno jupyter --install".to_string();
+    let mut install_cmd = "dodo jupyter --install".to_string();
     if let Some(name) = maybe_name {
       install_cmd.push_str(" --name ");
       install_cmd.push_str(name);

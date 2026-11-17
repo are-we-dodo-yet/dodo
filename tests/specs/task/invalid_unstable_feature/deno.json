@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "start": "deno run index.js"
+    "start": "dodo run index.js"
   },
   "unstable": [
     "abc",

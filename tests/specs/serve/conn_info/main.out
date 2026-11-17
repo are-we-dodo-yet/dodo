@@ -1,3 +1,3 @@
 Check [WILDCARD]main.ts
-deno serve: Listening on http://[WILDCARD]
+dodo serve: Listening on http://[WILDCARD]
 ServeHandlerInfo {}

@@ -26,7 +26,7 @@ use super::get_types_declaration_file_text;
 /// Mirrors Deno's own config resolution (see #29925): a `tsconfig.json` is only
 /// picked up when there's a sibling `deno.json`/`deno.jsonc`/`package.json` and
 /// config discovery isn't disabled (`--no-config`). Otherwise the file is
-/// ignored - `deno check` type-checks with Deno's own defaults and must not read
+/// ignored - `dodo check` type-checks with Deno's own defaults and must not read
 /// (or rewrite) the stray tsconfig.
 pub fn should_honor_user_tsconfig(
   project_root: &Path,
@@ -40,7 +40,7 @@ pub fn should_honor_user_tsconfig(
     .any(|f| project_root.join(f).exists())
 }
 
-/// Build a throwaway "root" tsconfig for `deno check` that mirrors the user's
+/// Build a throwaway "root" tsconfig for `dodo check` that mirrors the user's
 /// committed `tsconfig.json` but prepends our generated `.deno/tsconfig.json` to
 /// `extends` and carries the npm project `references` - WITHOUT mutating the
 /// user's file. `native_check` writes the returned value to a temp config in the
@@ -159,7 +159,7 @@ pub fn ensure_deno_dir(project_root: &Path) -> std::io::Result<PathBuf> {
   let deno_dir = project_root.join(".deno");
   std::fs::create_dir_all(&deno_dir)?;
   // `.deno/` is a generated cache (materialized types, per-package projects).
-  // Mark it ignored so gitignore-respecting tooling - `deno publish`, git,
+  // Mark it ignored so gitignore-respecting tooling - `dodo publish`, git,
   // formatters - skips it rather than treating it as project source.
   std::fs::write(deno_dir.join(".gitignore"), "*\n")?;
   Ok(deno_dir)
@@ -298,7 +298,7 @@ fn ensure_root_tsconfig(
   // A `_deno_generated: true` sentinel marks a root tsconfig that WE created (as
   // opposed to a user-authored one). Ours is safe to regenerate wholesale; a
   // user's is only ever augmented (see the byte-splice below) so we never lose
-  // their compiler options or comments. This also makes `deno check` idempotent:
+  // their compiler options or comments. This also makes `dodo check` idempotent:
   // on the second run the root tsconfig is always the one we wrote, and without
   // the sentinel we'd have no way to tell it apart from a committed config.
   if is_deno_generated_tsconfig(&content) {
@@ -328,7 +328,7 @@ fn ensure_root_tsconfig(
       std::io::ErrorKind::InvalidData,
       format!(
         "existing {} is not valid JSON/JSONC: {e}. Fix or remove it and re-run \
-         `deno sync-types`.",
+         `dodo sync-types`.",
         root_tsconfig_path.display()
       ),
     )
@@ -524,7 +524,7 @@ fn ensure_root_npm_references(
 /// `@types/node`. It assumes the `@types/node` we always install provides these
 /// globals; a project pinning an `@types/node` that doesn't is on its own. The
 /// proper fix is dual-globals reconciliation in Deno's core libs (which also
-/// fixes `deno check`, broken on this today), not this generator.
+/// fixes `dodo check`, broken on this today), not this generator.
 const NODE_OWNED_GLOBAL_TYPES: &[&str] = &[
   "URLPattern",
   "URLPatternInit",
@@ -1202,7 +1202,7 @@ fn generate_npm_paths(
         .unwrap_or_else(|| local_pkg_dir.clone());
       let is_global_cache = pkg_dir != local_pkg_dir;
       // Only map a package that is actually materialized under `node_modules`.
-      // With Deno's default global-cache mode, `deno install` may resolve npm
+      // With Deno's default global-cache mode, `dodo install` may resolve npm
       // deps without a local `node_modules/<pkg>`; emitting a path to a
       // nonexistent directory just makes stock tsc fail. The caller warns when
       // this happens so the user knows to enable a node_modules directory.

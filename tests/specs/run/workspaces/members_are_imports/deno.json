@@ -4,6 +4,6 @@
     "bar"
   ],
   "tasks": {
-    "dev": "deno run --watch main.ts"
+    "dev": "dodo run --watch main.ts"
   }
 }

@@ -1494,7 +1494,7 @@ import value2 = require("./b.js");
   #[tokio::test]
   async fn test_analyze_ts_references_and_jsx_import_source_with_shebang() {
     let specifier = ModuleSpecifier::parse("file:///a/test.tsx").unwrap();
-    let source = r#"#!/usr/bin/env -S deno run
+    let source = r#"#!/usr/bin/env -S dodo run
 /// <reference path="./ref.d.ts" />
 /* @jsxImportSource preact */
 export {};

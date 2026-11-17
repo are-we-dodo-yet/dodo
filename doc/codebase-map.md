@@ -81,7 +81,7 @@ See [`testing.md`](./testing.md) for the command that runs each suite.
 
 Developer and CI scripts, all run with Deno:
 
-- `tools/format.js` — format the whole tree (`deno fmt` plus extras).
+- `tools/format.js` — format the whole tree (`dodo fmt` plus extras).
 - `tools/lint.js` — lint Rust and JS/TS; pass `--js` for JS/TS only.
 - `tools/check_deno_core_changes.js`, `tools/check_docs_only_changes.js` — CI
   helpers that decide which jobs to run based on the changed files.

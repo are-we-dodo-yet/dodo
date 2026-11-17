@@ -7,9 +7,9 @@ Task build (@app/shared) echo 'shared build'
 [@app/shared#build] shared build
 [UNORDERED_END]
 [UNORDERED_START]
-Task dev (@app/server) deno run -A main.ts
-Task dev (@app/web) deno run -A main.ts
-Task dev (@app/shared) deno run -A main.ts
+Task dev (@app/server) dodo run -A main.ts
+Task dev (@app/web) dodo run -A main.ts
+Task dev (@app/shared) dodo run -A main.ts
   [@app/server#dev] server ready
      [@app/web#dev] web ready
   [@app/shared#dev] shared ready

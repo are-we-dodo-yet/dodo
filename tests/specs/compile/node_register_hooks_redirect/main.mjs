@@ -23,7 +23,7 @@ const hook = registerHooks({
   },
 });
 
-// Computed specifier so `deno compile` cannot statically embed original.mjs;
+// Computed specifier so `dodo compile` cannot statically embed original.mjs;
 // its load is serviced entirely through the hook chain at runtime.
 const spec = "./ori" + "ginal.mjs";
 const mod = await import(spec);

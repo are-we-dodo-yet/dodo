@@ -3,7 +3,7 @@
 // 2. Tag "v1.0.0" on that commit
 // 3. A manual version change (a/deno.json bumped to 1.2.0)
 // 4. A conventional commit "fix(b): patch fix"
-// This lets us test that `deno bump-version` detects the manual change for @x/a
+// This lets us test that `dodo bump-version` detects the manual change for @x/a
 // and derives a commit-based bump for @x/b.
 
 const run = async (cmd: string[]) => {

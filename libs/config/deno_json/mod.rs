@@ -425,7 +425,7 @@ pub struct FmtOptionsConfig {
   pub angular_next_control_flow_same_line: Option<bool>,
   pub sort_named_imports: Option<SortOrder>,
   pub sort_named_exports: Option<SortOrder>,
-  /// Whether `deno fmt` should read `.editorconfig` files to fill in
+  /// Whether `dodo fmt` should read `.editorconfig` files to fill in
   /// options that are not otherwise set. Defaults to `true` when unset.
   pub use_editor_config: Option<bool>,
 }
@@ -801,8 +801,8 @@ impl BenchConfig {
   }
 }
 
-/// Minimum coverage percentages required for `deno coverage` and
-/// `deno test --coverage` to succeed. Modelled on Vitest's
+/// Minimum coverage percentages required for `dodo coverage` and
+/// `dodo test --coverage` to succeed. Modelled on Vitest's
 /// `coverage.thresholds`. A `None` value means the metric is not checked.
 #[derive(Clone, Copy, Debug, Default, PartialEq)]
 pub struct CoverageThresholds {
@@ -2932,11 +2932,11 @@ mod tests {
         "useEditorConfig": false
       },
       "tasks": {
-        "build": "deno run --allow-read --allow-write build.ts",
-        "server": "deno run --allow-net --allow-read server.ts",
+        "build": "dodo run --allow-read --allow-write build.ts",
+        "server": "dodo run --allow-net --allow-read server.ts",
         "client": {
           "description": "Build client project",
-          "command": "deno run -A client.js",
+          "command": "dodo run -A client.js",
           "dependencies": ["build"]
         }
       },
@@ -3016,17 +3016,17 @@ mod tests {
     let tasks_config = config_file.to_tasks_config().unwrap().unwrap();
     assert_eq!(
       tasks_config["build"],
-      "deno run --allow-read --allow-write build.ts".into(),
+      "dodo run --allow-read --allow-write build.ts".into(),
     );
     assert_eq!(
       tasks_config["server"],
-      "deno run --allow-net --allow-read server.ts".into(),
+      "dodo run --allow-net --allow-read server.ts".into(),
     );
     assert_eq!(
       tasks_config["client"],
       TaskDefinition {
         description: Some("Build client project".to_string()),
-        command: Some("deno run -A client.js".to_string()),
+        command: Some("dodo run -A client.js".to_string()),
         dependencies: vec!["build".to_string()],
         files: Vec::new(),
         output: Vec::new(),
@@ -3329,8 +3329,8 @@ mod tests {
     run_task_error_test(
       r#"{
         "tasks": {
-          "build": "deno test",
-          "some%test": "deno bundle mod.ts"
+          "build": "dodo test",
+          "some%test": "dodo bundle mod.ts"
         }
       }"#,
       concat!(
@@ -3345,8 +3345,8 @@ mod tests {
     run_task_error_test(
       r#"{
         "tasks": {
-          "build": "deno test",
-          "1test": "deno bundle mod.ts"
+          "build": "dodo test",
+          "1test": "dodo bundle mod.ts"
         }
       }"#,
       concat!(
@@ -3361,8 +3361,8 @@ mod tests {
     run_task_error_test(
       r#"{
         "tasks": {
-          "build": "deno test",
-          "": "deno bundle mod.ts"
+          "build": "dodo test",
+          "": "dodo bundle mod.ts"
         }
       }"#,
       "Configuration file task names cannot be empty",
@@ -3764,18 +3764,18 @@ mod tests {
     let config_text = r#"{
       "tasks": {
         // dev task
-        "dev": "deno run -A --watch mod.ts",
+        "dev": "dodo run -A --watch mod.ts",
         // run task
         // with multiple line comments
-        "run": "deno run -A mod.ts", // comments not supported here
+        "run": "dodo run -A mod.ts", // comments not supported here
         /*
          * test task
          *
          * with multi-line comments
          */
-        "test": "deno test",
-        /* we should */ /* ignore these */ "fmt": "deno fmt",
-        "lint": "deno lint"
+        "test": "dodo test",
+        /* we should */ /* ignore these */ "fmt": "dodo fmt",
+        "lint": "dodo lint"
         // trailing comments
       },
     }"#;
@@ -3786,11 +3786,11 @@ mod tests {
     assert_eq!(
       config.resolve_tasks_config().unwrap(),
       IndexMap::from([
-        ("dev".into(), "deno run -A --watch mod.ts".into(),),
-        ("run".into(), "deno run -A mod.ts".into(),),
-        ("test".into(), "deno test".into(),),
-        ("fmt".into(), "deno fmt".into(),),
-        ("lint".into(), "deno lint".into(),)
+        ("dev".into(), "dodo run -A --watch mod.ts".into(),),
+        ("run".into(), "dodo run -A mod.ts".into(),),
+        ("test".into(), "dodo test".into(),),
+        ("fmt".into(), "dodo fmt".into(),),
+        ("lint".into(), "dodo lint".into(),)
       ])
     );
   }

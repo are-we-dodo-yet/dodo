@@ -2,7 +2,7 @@
   "tempDir": true,
   "tests": {
     // Bare scoped package name (no `npm:` prefix) — should resolve to the
-    // npm registry, matching the behavior of `deno add` / local `deno install`.
+    // npm registry, matching the behavior of `dodo add` / local `dodo install`.
     "scoped": {
       "steps": [{
         "if": "unix",

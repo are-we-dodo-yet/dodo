@@ -89,7 +89,7 @@ struct TestConfig {
   /// override (e.g. `node_shared_openssl=1`) which would regress other tests
   /// if applied globally.
   env: Option<HashMap<String, String>>,
-  /// Extra `deno run`/`deno test` CLI flags to append for this test only,
+  /// Extra `dodo run`/`dodo test` CLI flags to append for this test only,
   /// appearing after the standard `RUN_ARGS`/`TEST_ARGS` and after any
   /// flags derived from the test source's `// Flags:` directive. Use
   /// sparingly - typically for security knobs like

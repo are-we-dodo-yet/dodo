@@ -7,7 +7,7 @@
 // runs the `lint` job alone (markdown formatting + lint), since there is no
 // code to compile or test.
 //
-// Usage: deno run --allow-run=git check_docs_only_changes.js <base_sha>
+// Usage: dodo run --allow-run=git check_docs_only_changes.js <base_sha>
 // Writes "docs_only=true" or "docs_only=false" to $GITHUB_OUTPUT when running
 // in GitHub Actions.
 

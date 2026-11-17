@@ -720,7 +720,7 @@ pub(crate) fn upgrade_snapshotted_ops_with_fast_calls<'s, 'i>(
 /// residual ext-module loaders (`op_lazy_load_esm` / `op_load_ext_script`)
 /// before the loaded module's body captures its op references, so runtime
 /// modules see the fast-call overloads. Programs that never load a residual
-/// module (e.g. `deno run empty.js`) never trigger it, saving the ~0.9ms pass.
+/// module (e.g. `dodo run empty.js`) never trigger it, saving the ~0.9ms pass.
 /// No-op during snapshot build / fresh-bind (flag pre-set in `new_inner`).
 /// Read `Deno.core.ops` + `Deno.core.setUpAsyncStub` from the global. Valid
 /// only while `Deno.core` is still present (during `new_inner`, before the

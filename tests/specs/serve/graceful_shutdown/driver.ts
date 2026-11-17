@@ -1,4 +1,4 @@
-// Spawns `deno serve` and verifies that it shuts down cleanly (exit code 0)
+// Spawns `dodo serve` and verifies that it shuts down cleanly (exit code 0)
 // when it receives SIGTERM/SIGINT, instead of being terminated by the OS
 // default signal handler (which would report the killing signal).
 

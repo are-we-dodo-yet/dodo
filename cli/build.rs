@@ -521,15 +521,15 @@ fn emit_startup_order_link_args(out_dir: &Path) {
   let order_file = order_file.canonicalize().unwrap();
   match target.as_str() {
     "aarch64-apple-darwin" => println!(
-      "cargo:rustc-link-arg-bin=deno=-Wl,-order_file,{}",
+      "cargo:rustc-link-arg-bin=dodo=-Wl,-order_file,{}",
       order_file.display()
     ),
     "aarch64-unknown-linux-gnu" | "x86_64-unknown-linux-gnu" => {
       println!(
-        "cargo:rustc-link-arg-bin=deno=-Wl,--symbol-ordering-file={}",
+        "cargo:rustc-link-arg-bin=dodo=-Wl,--symbol-ordering-file={}",
         order_file.display()
       );
-      println!("cargo:rustc-link-arg-bin=deno=-Wl,--no-warn-symbol-ordering");
+      println!("cargo:rustc-link-arg-bin=dodo=-Wl,--no-warn-symbol-ordering");
     }
     _ => unreachable!(),
   }
@@ -546,8 +546,8 @@ fn main() {
     return;
   }
 
-  deno_napi::print_linker_flags("deno");
-  deno_webgpu::print_linker_flags("deno");
+  deno_napi::print_linker_flags("dodo");
+  deno_webgpu::print_linker_flags("dodo");
 
   // Host snapshots won't work when cross compiling.
   let target = env::var("TARGET").unwrap();

@@ -440,7 +440,7 @@ const hostImpl = {
         impliedNodeFormat: isCjs
           ? ts.ModuleKind.CommonJS
           : ts.ModuleKind.ESNext,
-        // no need to parse docs for `deno check`
+        // no need to parse docs for `dodo check`
         jsDocParsingMode: ts.JSDocParsingMode.ParseForTypeErrors,
       },
       false,

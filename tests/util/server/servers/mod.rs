@@ -1172,7 +1172,7 @@ console.log("imported", import.meta.url);
           .compression_method(zip::CompressionMethod::Stored);
 
         let exe_name = if path.contains("windows") {
-          "deno.exe"
+          "dodo.exe"
         } else {
           "deno"
         };

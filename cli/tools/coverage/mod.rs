@@ -1006,7 +1006,7 @@ fn check_coverage_thresholds(
 }
 
 /// Returned when a configured coverage threshold is not met. A distinct type so
-/// `deno test --coverage` can treat it as fatal while still tolerating benign
+/// `dodo test --coverage` can treat it as fatal while still tolerating benign
 /// report-generation errors.
 #[derive(Debug)]
 pub struct CoverageThresholdError(pub String);

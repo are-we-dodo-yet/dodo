@@ -127,7 +127,7 @@ Release checklist: <LINK TO THIS FORKED GIST GOES HERE>
       changes in this release. If in doubt message @bartlomieju and skip this
       step.
 
-## Add `deno upgrade` banner
+## Add `dodo upgrade` banner
 
 - [ ] You can optionally add a banner that will be printed when users run
       `deno

@@ -135,7 +135,7 @@ impl CliMainWorker {
     // WARNING: Remember to update cli/lib/worker.rs to align with
     // changes made here so that they affect deno_compile as well.
 
-    // Under `deno run --watch-hmr` / `deno serve --watch`, install the isolate
+    // Under `dodo run --watch-hmr` / `dodo serve --watch`, install the isolate
     // handle so a script calling `Deno.exit()` terminates this isolate instead
     // of the whole process, allowing the file watcher to survive and restart on
     // the next change. The regular `--watch` path uses `run_for_watcher`, which
@@ -410,7 +410,7 @@ impl CliMainWorker {
 
   /// Install the isolate handle so that a script calling `Deno.exit()`
   /// terminates this isolate instead of the whole process. Used by the file
-  /// watcher paths (`deno run --watch[-hmr]`, `deno serve --watch`) so a script
+  /// watcher paths (`dodo run --watch[-hmr]`, `dodo serve --watch`) so a script
   /// calling `Deno.exit()` ends the current run without killing the watcher.
   /// See issue #7590.
   fn install_watcher_exit_handle(&mut self) {

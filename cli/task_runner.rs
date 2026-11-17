@@ -183,10 +183,10 @@ pub async fn run_task(
     .with_context(|| format!("Error parsing script '{}'.", opts.task_name))?;
   let env_vars =
     prepare_env_vars(opts.env_vars, opts.init_cwd, opts.node_modules_bin_dirs);
-  if !opts.custom_commands.contains_key("deno") {
+  if !opts.custom_commands.contains_key("dodo") {
     opts
       .custom_commands
-      .insert("deno".to_string(), Rc::new(DenoCommand::default()));
+      .insert("dodo".to_string(), Rc::new(DenoCommand::default()));
   }
   let state = deno_task_shell::ShellState::new(
     env_vars,
@@ -327,7 +327,7 @@ impl ShellCommand for NpmCommand {
         OsStr::new("1"),
       );
       return ExecutableCommand::new(
-        "deno".to_string(),
+        "dodo".to_string(),
         std::env::current_exe()
           .and_then(|p| canonicalize_path(&p))
           .unwrap(),
@@ -358,7 +358,7 @@ pub struct DenoCommand(ExecutableCommand);
 impl Default for DenoCommand {
   fn default() -> Self {
     Self(ExecutableCommand::new(
-      "deno".to_string(),
+      "dodo".to_string(),
       std::env::current_exe()
         .and_then(|p| canonicalize_path(&p))
         .unwrap(),
@@ -411,7 +411,7 @@ impl ShellCommand for NodeCommand {
       OsStr::new("1"),
     );
     ExecutableCommand::new(
-      "deno".to_string(),
+      "dodo".to_string(),
       std::env::current_exe()
         .and_then(|p| canonicalize_path(&p))
         .unwrap(),
@@ -511,7 +511,7 @@ impl ShellCommand for NodeModulesFileRunCommand {
     ];
     args.extend(context.args);
     let executable_command = deno_task_shell::ExecutableCommand::new(
-      "deno".to_string(),
+      "dodo".to_string(),
       std::env::current_exe()
         .and_then(|p| canonicalize_path(&p))
         .unwrap(),

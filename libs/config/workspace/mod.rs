@@ -2817,7 +2817,7 @@ impl WorkspaceDirectory {
     // `deploy.include` that points at a workspace member (e.g.
     // `./packages/backend/**`) is an explicit instruction to ship those files,
     // not a member contributing its own files. Stripping those includes left
-    // `deno deploy` from a workspace root with an empty file set.
+    // `dodo deploy` from a workspace root with an empty file set.
     combine_files_config_with_cli_args(&mut config.files, cli_args);
     Ok(Some(config))
   }
@@ -6761,7 +6761,7 @@ pub mod test {
   }
 
   // Regression test for https://github.com/denoland/deno/issues/30915 — running
-  // `deno fmt .` (or `deno lint .`) from the workspace root must not cause each
+  // `dodo fmt .` (or `dodo lint .`) from the workspace root must not cause each
   // member to walk the whole workspace.
   #[test]
   fn test_resolve_config_for_members_cli_include_workspace_root() {
@@ -6775,7 +6775,7 @@ pub mod test {
     sys.fs_insert_json(root_dir().join("member-a/deno.json"), json!({}));
     sys.fs_insert_json(root_dir().join("member-b/deno.json"), json!({}));
     let workspace_dir = workspace_at_start_dir(&sys, &root_dir());
-    // Simulate CLI args from `deno fmt .` — base + include both pointing at the
+    // Simulate CLI args from `dodo fmt .` — base + include both pointing at the
     // workspace root.
     let cli_args = FilePatterns {
       base: root_dir(),
@@ -7489,7 +7489,7 @@ pub mod test {
   #[test]
   fn test_deploy_config_in_root_does_not_exclude_members() {
     // Regression test: when deploy config is in the workspace root and the
-    // user runs `deno deploy` from the root, workspace member directories
+    // user runs `dodo deploy` from the root, workspace member directories
     // should NOT be excluded from the file patterns.
     let sys = InMemorySys::default();
     let root_config = root_dir().join("deno.json");
@@ -7566,7 +7566,7 @@ pub mod test {
     // Regression test: a workspace-root `deploy.include` glob that points at a
     // workspace member must keep the matching member files. Previously the
     // member-include strip dropped these explicit includes, leaving
-    // `deno deploy` from the root with no files to upload.
+    // `dodo deploy` from the root with no files to upload.
     let sys = InMemorySys::default();
     sys.fs_insert_json(
       root_dir().join("deno.json"),

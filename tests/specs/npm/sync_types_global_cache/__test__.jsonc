@@ -1,5 +1,5 @@
 {
-  // `deno sync-types` in global-cache mode (nodeModulesDir: "none") should
+  // `dodo sync-types` in global-cache mode (nodeModulesDir: "none") should
   // generate per-package referenced tsconfig projects under `.deno/npm/`
   // without materializing a `node_modules` tree.
   "tempDir": true,

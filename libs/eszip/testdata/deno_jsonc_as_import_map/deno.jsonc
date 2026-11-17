@@ -1,6 +1,6 @@
 {
   "tasks": {
-    "run": "deno run main.ts"
+    "run": "dodo run main.ts"
   },
   // comment
   "imports": {
