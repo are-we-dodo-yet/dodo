@@ -4435,7 +4435,7 @@ dependencies = [
 [[package]]
 name = "dprint-plugin-json"
 version = "0.25.2"
-source = "git+https://github.com/are-we-dodo-yet/dprint-plugin-json?branch=push-yszvxtllzwlu#68efb846b4951e47aa8ba3324a260cffaa830313"
+source = "git+https://github.com/are-we-dodo-yet/dprint-plugin-json?rev=68efb846b4951e47aa8ba3324a260cffaa830313#68efb846b4951e47aa8ba3324a260cffaa830313"
 dependencies = [
  "dprint-core",
  "dprint-core-macros",
@@ -4448,7 +4448,7 @@ dependencies = [
 [[package]]
 name = "dprint-plugin-jupyter"
 version = "0.5.0"
-source = "git+https://github.com/are-we-dodo-yet/dprint-plugin-jupyter?branch=push-zyzsssukmskk#0125264c5776bf703395d9eda56a28d43f8aed1e"
+source = "git+https://github.com/are-we-dodo-yet/dprint-plugin-jupyter?rev=0125264c5776bf703395d9eda56a28d43f8aed1e#0125264c5776bf703395d9eda56a28d43f8aed1e"
 dependencies = [
  "dprint-core",
  "jsonc-parser",
@@ -4460,7 +4460,7 @@ dependencies = [
 [[package]]
 name = "dprint-plugin-markdown"
 version = "0.26.0"
-source = "git+https://github.com/are-we-dodo-yet/dprint-plugin-markdown?branch=push-lpqpkxwxlllp#b342a36cfd61dda148032e2330fea0c725ae1c84"
+source = "git+https://github.com/are-we-dodo-yet/dprint-plugin-markdown?rev=b342a36cfd61dda148032e2330fea0c725ae1c84#b342a36cfd61dda148032e2330fea0c725ae1c84"
 dependencies = [
  "dprint-core",
  "dprint-core-macros",
@@ -4472,7 +4472,7 @@ dependencies = [
 [[package]]
 name = "dprint-plugin-typescript"
 version = "0.96.1"
-source = "git+https://github.com/are-we-dodo-yet/dprint-plugin-typescript?branch=push-lmrnoqpvpyvm#040482df74e4d5a3494c6bcd31a460b10b220ab0"
+source = "git+https://github.com/are-we-dodo-yet/dprint-plugin-typescript?rev=040482df74e4d5a3494c6bcd31a460b10b220ab0#040482df74e4d5a3494c6bcd31a460b10b220ab0"
 dependencies = [
  "capacity_builder",
  "dprint-core",

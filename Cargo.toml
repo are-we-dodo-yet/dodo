@@ -366,10 +366,10 @@ console_static_text = "0.9.0"
 crossterm = "0.29.0"
 dhat = "0.3.3"
 dprint-core = "=0.71.1"
-dprint-plugin-json = { git = "https://github.com/are-we-dodo-yet/dprint-plugin-json", branch = "push-yszvxtllzwlu", version = "=0.25.2" }
-dprint-plugin-jupyter = { git = "https://github.com/are-we-dodo-yet/dprint-plugin-jupyter", branch = "push-zyzsssukmskk", version = "=0.5.0" }
-dprint-plugin-markdown = { git = "https://github.com/are-we-dodo-yet/dprint-plugin-markdown", branch = "push-lpqpkxwxlllp", version = "=0.26.0" }
-dprint-plugin-typescript = { git = "https://github.com/are-we-dodo-yet/dprint-plugin-typescript", branch = "push-lmrnoqpvpyvm", version = "=0.96.1" }
+dprint-plugin-json = { git = "https://github.com/are-we-dodo-yet/dprint-plugin-json", rev = "68efb846b4951e47aa8ba3324a260cffaa830313", version = "=0.25.2" }
+dprint-plugin-jupyter = { git = "https://github.com/are-we-dodo-yet/dprint-plugin-jupyter", rev = "0125264c5776bf703395d9eda56a28d43f8aed1e", version = "=0.5.0" }
+dprint-plugin-markdown = { git = "https://github.com/are-we-dodo-yet/dprint-plugin-markdown", rev = "b342a36cfd61dda148032e2330fea0c725ae1c84", version = "=0.26.0" }
+dprint-plugin-typescript = { git = "https://github.com/are-we-dodo-yet/dprint-plugin-typescript", rev = "040482df74e4d5a3494c6bcd31a460b10b220ab0", version = "=0.96.1" }
 dunce = "1.0.5"
 env_logger = { version = "0.11.6", default-features = false, features = ["regex"] }
 imara-diff = "0.2.0"
