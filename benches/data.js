@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794959727034,
+  "lastUpdate": 1794959729047,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo",
   "entries": {
     "Execution Time": [
@@ -3580,6 +3580,35 @@ window.BENCHMARK_DATA = {
           {
             "name": "CLI_SNAPSHOT.bin",
             "value": 1.692,
+            "unit": "MiB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e54e8dd95a7fbb18d509d024db8470d0efcb49ae",
+          "message": "fix: handle timer tracking in core (#23)\n\nSigned-off-by: Yaroslav Bolyukin <iam@lach.pw>",
+          "timestamp": "2026-11-17T23:45:36+01:00",
+          "tree_id": "50016e41583b1f348243a18a877ede34641bf75e",
+          "url": "https://github.com/are-we-dodo-yet/dodo/commit/e54e8dd95a7fbb18d509d024db8470d0efcb49ae"
+        },
+        "date": 1794959728272,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "CLI_SNAPSHOT.bin",
+            "value": 1.693,
             "unit": "MiB"
           }
         ]
