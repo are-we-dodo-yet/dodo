@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794959723127,
+  "lastUpdate": 1794959725097,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo",
   "entries": {
     "Execution Time": [
@@ -2972,6 +2972,95 @@ window.BENCHMARK_DATA = {
           {
             "name": "workers_startup",
             "value": 418.492,
+            "unit": "MiB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e54e8dd95a7fbb18d509d024db8470d0efcb49ae",
+          "message": "fix: handle timer tracking in core (#23)\n\nSigned-off-by: Yaroslav Bolyukin <iam@lach.pw>",
+          "timestamp": "2026-11-17T23:45:36+01:00",
+          "tree_id": "50016e41583b1f348243a18a877ede34641bf75e",
+          "url": "https://github.com/are-we-dodo-yet/dodo/commit/e54e8dd95a7fbb18d509d024db8470d0efcb49ae"
+        },
+        "date": 1794959724274,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "cold_hello",
+            "value": 47.512,
+            "unit": "MiB"
+          },
+          {
+            "name": "cold_relative_import",
+            "value": 48.148,
+            "unit": "MiB"
+          },
+          {
+            "name": "error_001",
+            "value": 44.383,
+            "unit": "MiB"
+          },
+          {
+            "name": "hello",
+            "value": 47.629,
+            "unit": "MiB"
+          },
+          {
+            "name": "no_check_hello",
+            "value": 47.793,
+            "unit": "MiB"
+          },
+          {
+            "name": "relative_import",
+            "value": 48.098,
+            "unit": "MiB"
+          },
+          {
+            "name": "response_string",
+            "value": 55.723,
+            "unit": "MiB"
+          },
+          {
+            "name": "text_decoder",
+            "value": 56.824,
+            "unit": "MiB"
+          },
+          {
+            "name": "text_encoder",
+            "value": 66.551,
+            "unit": "MiB"
+          },
+          {
+            "name": "text_encoder_into",
+            "value": 55.547,
+            "unit": "MiB"
+          },
+          {
+            "name": "workers_large_message",
+            "value": 434.094,
+            "unit": "MiB"
+          },
+          {
+            "name": "workers_round_robin",
+            "value": 93.539,
+            "unit": "MiB"
+          },
+          {
+            "name": "workers_startup",
+            "value": 414.238,
             "unit": "MiB"
           }
         ]
