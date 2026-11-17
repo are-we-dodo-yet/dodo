@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794959725097,
+  "lastUpdate": 1794959727034,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo",
   "entries": {
     "Execution Time": [
@@ -3336,6 +3336,45 @@ window.BENCHMARK_DATA = {
           {
             "name": "swc_rlib",
             "value": 90.804,
+            "unit": "MiB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "e54e8dd95a7fbb18d509d024db8470d0efcb49ae",
+          "message": "fix: handle timer tracking in core (#23)\n\nSigned-off-by: Yaroslav Bolyukin <iam@lach.pw>",
+          "timestamp": "2026-11-17T23:45:36+01:00",
+          "tree_id": "50016e41583b1f348243a18a877ede34641bf75e",
+          "url": "https://github.com/are-we-dodo-yet/dodo/commit/e54e8dd95a7fbb18d509d024db8470d0efcb49ae"
+        },
+        "date": 1794959726257,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "deno",
+            "value": 343.56,
+            "unit": "MiB"
+          },
+          {
+            "name": "rusty_v8_rlib",
+            "value": 1.354,
+            "unit": "MiB"
+          },
+          {
+            "name": "swc_rlib",
+            "value": 90.739,
             "unit": "MiB"
           }
         ]
