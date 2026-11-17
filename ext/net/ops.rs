@@ -1114,6 +1114,8 @@ pub struct ResolveAddrArgs {
   #[from_v8(serde)]
   record_type: RecordType,
   options: Option<ResolveDnsOption>,
+  #[from_v8(default)]
+  no_retry: bool,
 }
 
 #[derive(FromV8)]
@@ -1139,6 +1141,7 @@ pub async fn op_dns_resolve(
     record_type,
     options,
     cancel_rid,
+    no_retry,
   } = args;
 
   // Parse the query name up front. `Resolver::lookup` performs the same
@@ -1172,6 +1175,10 @@ pub async fn op_dns_resolve(
   if cancel_rid.is_some() {
     opts.timeout = std::time::Duration::from_secs(1);
     opts.attempts = 1;
+  }
+
+  if no_retry {
+    opts.attempts = 0;
   }
 
   {
