@@ -23,6 +23,7 @@ use deno_core::ResourceId;
 use deno_core::ToV8;
 use deno_core::op2;
 use deno_permissions::PermissionsContainer;
+use hickory_proto::ProtoError;
 use hickory_proto::op::ResponseCode;
 use hickory_proto::rr::Name;
 use hickory_proto::rr::RData;
@@ -241,6 +242,11 @@ impl NetError {
           "ENODATA"
         }
       }
+      ResolveError::Proto(
+        ProtoError::Decode(_)
+        | ProtoError::FormError { .. }
+        | ProtoError::NotAResponse,
+      ) => "EBADRESP",
       _ => "",
     }
   }
