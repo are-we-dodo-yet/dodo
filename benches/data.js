@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794964499562,
+  "lastUpdate": 1794964502759,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo",
   "entries": {
     "Execution Time": [
@@ -2551,6 +2551,95 @@ window.BENCHMARK_DATA = {
           {
             "name": "workers_startup",
             "value": 40885,
+            "unit": "syscalls"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b00f96f63ed0959c0d3b38d14f668febd59ea410",
+          "message": "fix: handle symlinks in node_modules in deno compile (#19)\n\nSigned-off-by: Yaroslav Bolyukin <iam@lach.pw>",
+          "timestamp": "2026-11-18T01:03:57+01:00",
+          "tree_id": "71b3de1966d34aed3971aad90f3c8bc5a77be6b1",
+          "url": "https://github.com/are-we-dodo-yet/dodo/commit/b00f96f63ed0959c0d3b38d14f668febd59ea410"
+        },
+        "date": 1794964501098,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "cold_hello",
+            "value": 1848,
+            "unit": "syscalls"
+          },
+          {
+            "name": "cold_relative_import",
+            "value": 1851,
+            "unit": "syscalls"
+          },
+          {
+            "name": "error_001",
+            "value": 1945,
+            "unit": "syscalls"
+          },
+          {
+            "name": "hello",
+            "value": 1847,
+            "unit": "syscalls"
+          },
+          {
+            "name": "no_check_hello",
+            "value": 1853,
+            "unit": "syscalls"
+          },
+          {
+            "name": "relative_import",
+            "value": 1874,
+            "unit": "syscalls"
+          },
+          {
+            "name": "response_string",
+            "value": 2084,
+            "unit": "syscalls"
+          },
+          {
+            "name": "text_decoder",
+            "value": 2006,
+            "unit": "syscalls"
+          },
+          {
+            "name": "text_encoder",
+            "value": 2688,
+            "unit": "syscalls"
+          },
+          {
+            "name": "text_encoder_into",
+            "value": 1948,
+            "unit": "syscalls"
+          },
+          {
+            "name": "workers_large_message",
+            "value": 76374,
+            "unit": "syscalls"
+          },
+          {
+            "name": "workers_round_robin",
+            "value": 8083,
+            "unit": "syscalls"
+          },
+          {
+            "name": "workers_startup",
+            "value": 38061,
             "unit": "syscalls"
           }
         ]
