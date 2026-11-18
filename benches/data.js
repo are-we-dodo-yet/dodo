@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794959733037,
+  "lastUpdate": 1794964496475,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo",
   "entries": {
     "Execution Time": [
@@ -920,6 +920,121 @@ window.BENCHMARK_DATA = {
             "range": "± 6.483",
             "unit": "ms",
             "extra": "min 530.355 ms, max 554.031 ms, user 426.204 ms, system 277.79 ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b00f96f63ed0959c0d3b38d14f668febd59ea410",
+          "message": "fix: handle symlinks in node_modules in deno compile (#19)\n\nSigned-off-by: Yaroslav Bolyukin <iam@lach.pw>",
+          "timestamp": "2026-11-18T01:03:57+01:00",
+          "tree_id": "71b3de1966d34aed3971aad90f3c8bc5a77be6b1",
+          "url": "https://github.com/are-we-dodo-yet/dodo/commit/b00f96f63ed0959c0d3b38d14f668febd59ea410"
+        },
+        "date": 1794964495001,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "cold_hello",
+            "value": 20.495,
+            "range": "± 1.906",
+            "unit": "ms",
+            "extra": "min 16.525 ms, max 25.392 ms, user 9.814 ms, system 13.732 ms"
+          },
+          {
+            "name": "cold_relative_import",
+            "value": 21.022,
+            "range": "± 1.908",
+            "unit": "ms",
+            "extra": "min 16.889 ms, max 25.758 ms, user 10.207 ms, system 13.819 ms"
+          },
+          {
+            "name": "error_001",
+            "value": 21.771,
+            "range": "± 2.305",
+            "unit": "ms",
+            "extra": "min 17.155 ms, max 29.055 ms, user 10.83 ms, system 14.49 ms"
+          },
+          {
+            "name": "hello",
+            "value": 20.997,
+            "range": "± 1.939",
+            "unit": "ms",
+            "extra": "min 16.941 ms, max 26.839 ms, user 9.924 ms, system 13.904 ms"
+          },
+          {
+            "name": "no_check_hello",
+            "value": 21.021,
+            "range": "± 2.274",
+            "unit": "ms",
+            "extra": "min 16.894 ms, max 28.624 ms, user 9.983 ms, system 14.162 ms"
+          },
+          {
+            "name": "relative_import",
+            "value": 21.289,
+            "range": "± 2.01",
+            "unit": "ms",
+            "extra": "min 17.588 ms, max 28.502 ms, user 9.627 ms, system 14.405 ms"
+          },
+          {
+            "name": "response_string",
+            "value": 31.371,
+            "range": "± 2.873",
+            "unit": "ms",
+            "extra": "min 26.091 ms, max 40.078 ms, user 20.298 ms, system 18.866 ms"
+          },
+          {
+            "name": "text_decoder",
+            "value": 38.485,
+            "range": "± 4.764",
+            "unit": "ms",
+            "extra": "min 30.446 ms, max 49.859 ms, user 27.244 ms, system 16.317 ms"
+          },
+          {
+            "name": "text_encoder",
+            "value": 93.769,
+            "range": "± 5.108",
+            "unit": "ms",
+            "extra": "min 87.509 ms, max 107.709 ms, user 77.962 ms, system 25.707 ms"
+          },
+          {
+            "name": "text_encoder_into",
+            "value": 57.11,
+            "range": "± 5.67",
+            "unit": "ms",
+            "extra": "min 50.401 ms, max 73.297 ms, user 49.886 ms, system 15.553 ms"
+          },
+          {
+            "name": "workers_large_message",
+            "value": 692.286,
+            "range": "± 23.647",
+            "unit": "ms",
+            "extra": "min 644.516 ms, max 716.193 ms, user 573.693 ms, system 431.69 ms"
+          },
+          {
+            "name": "workers_round_robin",
+            "value": 163.669,
+            "range": "± 4.33",
+            "unit": "ms",
+            "extra": "min 156.905 ms, max 174.584 ms, user 201.807 ms, system 80.046 ms"
+          },
+          {
+            "name": "workers_startup",
+            "value": 759.202,
+            "range": "± 14.588",
+            "unit": "ms",
+            "extra": "min 739.527 ms, max 782.142 ms, user 554.912 ms, system 418.085 ms"
           }
         ]
       }
