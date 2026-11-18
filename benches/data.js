@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794964502759,
+  "lastUpdate": 1794964505222,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo",
   "entries": {
     "Execution Time": [
@@ -3354,6 +3354,95 @@ window.BENCHMARK_DATA = {
           {
             "name": "workers_startup",
             "value": 414.238,
+            "unit": "MiB"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b00f96f63ed0959c0d3b38d14f668febd59ea410",
+          "message": "fix: handle symlinks in node_modules in deno compile (#19)\n\nSigned-off-by: Yaroslav Bolyukin <iam@lach.pw>",
+          "timestamp": "2026-11-18T01:03:57+01:00",
+          "tree_id": "71b3de1966d34aed3971aad90f3c8bc5a77be6b1",
+          "url": "https://github.com/are-we-dodo-yet/dodo/commit/b00f96f63ed0959c0d3b38d14f668febd59ea410"
+        },
+        "date": 1794964504294,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "cold_hello",
+            "value": 47.758,
+            "unit": "MiB"
+          },
+          {
+            "name": "cold_relative_import",
+            "value": 48.078,
+            "unit": "MiB"
+          },
+          {
+            "name": "error_001",
+            "value": 45.895,
+            "unit": "MiB"
+          },
+          {
+            "name": "hello",
+            "value": 48.426,
+            "unit": "MiB"
+          },
+          {
+            "name": "no_check_hello",
+            "value": 46.918,
+            "unit": "MiB"
+          },
+          {
+            "name": "relative_import",
+            "value": 46.484,
+            "unit": "MiB"
+          },
+          {
+            "name": "response_string",
+            "value": 56.207,
+            "unit": "MiB"
+          },
+          {
+            "name": "text_decoder",
+            "value": 55.898,
+            "unit": "MiB"
+          },
+          {
+            "name": "text_encoder",
+            "value": 68.258,
+            "unit": "MiB"
+          },
+          {
+            "name": "text_encoder_into",
+            "value": 55.055,
+            "unit": "MiB"
+          },
+          {
+            "name": "workers_large_message",
+            "value": 432.867,
+            "unit": "MiB"
+          },
+          {
+            "name": "workers_round_robin",
+            "value": 94.277,
+            "unit": "MiB"
+          },
+          {
+            "name": "workers_startup",
+            "value": 417.066,
             "unit": "MiB"
           }
         ]
