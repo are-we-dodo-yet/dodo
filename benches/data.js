@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794964513939,
+  "lastUpdate": 1794964516492,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo",
   "entries": {
     "Execution Time": [
@@ -4716,6 +4716,55 @@ window.BENCHMARK_DATA = {
           {
             "name": "startup_shutdown",
             "value": 6,
+            "unit": "ms"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b00f96f63ed0959c0d3b38d14f668febd59ea410",
+          "message": "fix: handle symlinks in node_modules in deno compile (#19)\n\nSigned-off-by: Yaroslav Bolyukin <iam@lach.pw>",
+          "timestamp": "2026-11-18T01:03:57+01:00",
+          "tree_id": "71b3de1966d34aed3971aad90f3c8bc5a77be6b1",
+          "url": "https://github.com/are-we-dodo-yet/dodo/commit/b00f96f63ed0959c0d3b38d14f668febd59ea410"
+        },
+        "date": 1794964515481,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "big_file_edits",
+            "value": 3426,
+            "unit": "ms"
+          },
+          {
+            "name": "code_lens",
+            "value": 1368,
+            "unit": "ms"
+          },
+          {
+            "name": "deco_apps_edits_nav",
+            "value": 20008,
+            "unit": "ms"
+          },
+          {
+            "name": "find_replace",
+            "value": 16,
+            "unit": "ms"
+          },
+          {
+            "name": "startup_shutdown",
+            "value": 10,
             "unit": "ms"
           }
         ]
