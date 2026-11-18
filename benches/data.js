@@ -1,5 +1,5 @@
 window.BENCHMARK_DATA = {
-  "lastUpdate": 1794964496475,
+  "lastUpdate": 1794964499562,
   "repoUrl": "https://github.com/are-we-dodo-yet/dodo",
   "entries": {
     "Execution Time": [
@@ -1683,6 +1683,95 @@ window.BENCHMARK_DATA = {
           "url": "https://github.com/are-we-dodo-yet/dodo/commit/e54e8dd95a7fbb18d509d024db8470d0efcb49ae"
         },
         "date": 1794959719885,
+        "tool": "customSmallerIsBetter",
+        "benches": [
+          {
+            "name": "cold_hello",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "cold_relative_import",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "error_001",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "hello",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "no_check_hello",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "relative_import",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "response_string",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "text_decoder",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "text_encoder",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "text_encoder_into",
+            "value": 8,
+            "unit": "threads"
+          },
+          {
+            "name": "workers_large_message",
+            "value": 58,
+            "unit": "threads"
+          },
+          {
+            "name": "workers_round_robin",
+            "value": 12,
+            "unit": "threads"
+          },
+          {
+            "name": "workers_startup",
+            "value": 59,
+            "unit": "threads"
+          }
+        ]
+      },
+      {
+        "commit": {
+          "author": {
+            "email": "iam@lach.pw",
+            "name": "Lach",
+            "username": "CertainLach"
+          },
+          "committer": {
+            "email": "noreply@github.com",
+            "name": "GitHub",
+            "username": "web-flow"
+          },
+          "distinct": true,
+          "id": "b00f96f63ed0959c0d3b38d14f668febd59ea410",
+          "message": "fix: handle symlinks in node_modules in deno compile (#19)\n\nSigned-off-by: Yaroslav Bolyukin <iam@lach.pw>",
+          "timestamp": "2026-11-18T01:03:57+01:00",
+          "tree_id": "71b3de1966d34aed3971aad90f3c8bc5a77be6b1",
+          "url": "https://github.com/are-we-dodo-yet/dodo/commit/b00f96f63ed0959c0d3b38d14f668febd59ea410"
+        },
+        "date": 1794964497975,
         "tool": "customSmallerIsBetter",
         "benches": [
           {
