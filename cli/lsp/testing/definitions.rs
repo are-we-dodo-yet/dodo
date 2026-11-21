@@ -6,7 +6,7 @@ use deno_lib::util::checksum;
 use indexmap::IndexMap;
 use indexmap::IndexSet;
 use lsp::Range;
-use tower_lsp::lsp_types as lsp;
+use tower_lsp_server::ls_types as lsp;
 
 use super::lsp_custom;
 use super::lsp_custom::TestData;

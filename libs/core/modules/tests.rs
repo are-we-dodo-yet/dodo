@@ -2469,6 +2469,49 @@ fn lazy_loaded_internal_module_ignores_loader_remapping() {
 }
 
 #[test]
+fn repro_reimport_instantiated_internal_module_from_user_graph() {
+  let main = ModuleSpecifier::parse("file:///main.js").unwrap();
+  let loader = StaticModuleLoader::new([(
+    main.clone(),
+    r#"
+      import { dep } from "node:lazy_pub";
+      if (dep !== "object") throw new Error("bad dep: " + dep);
+    "#,
+  )]);
+  let mut runtime = JsRuntime::new(RuntimeOptions {
+    module_loader: Some(Rc::new(loader)),
+    ..Default::default()
+  });
+
+  runtime
+    .lazy_load_es_module_with_code(
+      "ext:test/dep.js",
+      r#"
+      import { core } from "ext:core/mod.js";
+      export const dep = typeof core;
+    "#,
+    )
+    .unwrap();
+
+  runtime.module_map().add_lazy_loaded_esm_source(
+    crate::ascii_str!("node:lazy_pub").into(),
+    crate::ascii_str!(
+      r#"
+      export { dep } from "ext:test/dep.js";
+    "#
+    )
+    .into(),
+  );
+
+  let main_id =
+    futures::executor::block_on(runtime.load_main_es_module(&main)).unwrap();
+  #[allow(clippy::let_underscore_future, reason = "test code")]
+  let _ = runtime.mod_evaluate(main_id);
+  futures::executor::block_on(runtime.run_event_loop(Default::default()))
+    .unwrap();
+}
+
+#[test]
 fn import_meta_filename_dirname() {
   #[cfg(not(target_os = "windows"))]
   let main_specifier = resolve_url("file:///main_module.js").unwrap();

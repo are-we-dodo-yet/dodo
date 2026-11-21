@@ -20,7 +20,7 @@ use deno_core::OpState;
 use deno_core::op2;
 use deno_permissions::OpenAccessKind;
 use deno_permissions::PermissionsContainer;
-use rand::RngCore;
+use rand::Rng;
 
 const ERRNO_SUCCESS: i32 = 0;
 const ERRNO_ACCES: i32 = 2;
@@ -743,7 +743,7 @@ impl WasiContext {
     let Some(dest) = get_memory_slice_mut(memory, buf_ptr, buf_len) else {
       return ERRNO_FAULT;
     };
-    rand::thread_rng().fill_bytes(dest);
+    rand::rng().fill_bytes(dest);
     ERRNO_SUCCESS
   }
 
@@ -1256,7 +1256,7 @@ impl WasiContext {
       Ok(m) => m,
       Err(e) => return io_err_to_errno(&e),
     };
-    let (atime, mtime) = match resolve_filestat_times_from_meta(
+    let times = match resolve_filestat_times_from_meta(
       &meta,
       atim as u64,
       mtim as u64,
@@ -1265,7 +1265,7 @@ impl WasiContext {
       Ok(v) => v,
       Err(e) => return e,
     };
-    match filetime::set_file_handle_times(file_ref, Some(atime), Some(mtime)) {
+    match file_ref.set_times(times) {
       Ok(()) => ERRNO_SUCCESS,
       Err(e) => io_err_to_errno(&e),
     }
@@ -1832,7 +1832,7 @@ impl WasiContext {
       Ok(m) => m,
       Err(e) => return io_err_to_errno(&e),
     };
-    let (atime, mtime) = match resolve_filestat_times_from_meta(
+    let times = match resolve_filestat_times_from_meta(
       &meta,
       atim as u64,
       mtim as u64,
@@ -1842,9 +1842,9 @@ impl WasiContext {
       Err(e) => return e,
     };
     let result = if follow_symlinks {
-      filetime::set_file_times(&resolved, atime, mtime)
+      std::fs::set_times(&resolved, times)
     } else {
-      filetime::set_symlink_file_times(&resolved, atime, mtime)
+      std::fs::set_times_nofollow(&resolved, times)
     };
     match result {
       Ok(()) => ERRNO_SUCCESS,
@@ -2270,7 +2270,7 @@ fn resolve_filestat_times_from_meta(
   atim_ns: u64,
   mtim_ns: u64,
   fst_flags: u16,
-) -> Result<(filetime::FileTime, filetime::FileTime), i32> {
+) -> Result<std::fs::FileTimes, i32> {
   // Both *_NOW and the explicit bit set is invalid in WASI.
   if (fst_flags & FSTFLAGS_ATIM != 0 && fst_flags & FSTFLAGS_ATIM_NOW != 0)
     || (fst_flags & FSTFLAGS_MTIM != 0 && fst_flags & FSTFLAGS_MTIM_NOW != 0)
@@ -2281,28 +2281,26 @@ fn resolve_filestat_times_from_meta(
   let now = std::time::SystemTime::now();
 
   let atime = if fst_flags & FSTFLAGS_ATIM_NOW != 0 {
-    filetime::FileTime::from_system_time(now)
+    now
   } else if fst_flags & FSTFLAGS_ATIM != 0 {
-    filetime::FileTime::from_unix_time(
-      (atim_ns / 1_000_000_000) as i64,
-      (atim_ns % 1_000_000_000) as u32,
-    )
+    std::time::UNIX_EPOCH + std::time::Duration::from_nanos(atim_ns)
   } else {
-    filetime::FileTime::from_last_access_time(meta)
+    meta.accessed().map_err(|e| io_err_to_errno(&e))?
   };
 
   let mtime = if fst_flags & FSTFLAGS_MTIM_NOW != 0 {
-    filetime::FileTime::from_system_time(now)
+    now
   } else if fst_flags & FSTFLAGS_MTIM != 0 {
-    filetime::FileTime::from_unix_time(
-      (mtim_ns / 1_000_000_000) as i64,
-      (mtim_ns % 1_000_000_000) as u32,
-    )
+    std::time::UNIX_EPOCH + std::time::Duration::from_nanos(mtim_ns)
   } else {
-    filetime::FileTime::from_last_modification_time(meta)
+    meta.modified().map_err(|e| io_err_to_errno(&e))?
   };
 
-  Ok((atime, mtime))
+  Ok(
+    std::fs::FileTimes::new()
+      .set_accessed(atime)
+      .set_modified(mtime),
+  )
 }
 
 /// Build an FdEntry for one of the WASI stdio slots from a user-supplied

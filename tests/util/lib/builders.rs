@@ -397,7 +397,7 @@ impl TestContext {
     let bytes = curl_fetch(url.as_str());
     let mut hasher = sha2::Sha256::new();
     hasher.update(&bytes);
-    format!("{:x}", hasher.finalize())
+    faster_hex::hex_string(&hasher.finalize())
   }
 }
 

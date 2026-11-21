@@ -92,14 +92,14 @@ fn rewrite_import_section(
   unfurl: &mut dyn FnMut(&str) -> Option<String>,
 ) -> Result<Option<Vec<u8>>, AnyError> {
   let reader = wasmparser::ImportSectionReader::new(
-    wasmparser::BinaryReader::new(body, body_offset),
+    wasmparser::BinaryReader::new(body, body_offset as u64),
   )
   .context("Failed to parse Wasm import section")?;
 
   let mut groups = Vec::new();
   for group in reader.into_iter_with_offsets() {
     let (offset, group) = group.context("Failed to parse Wasm import")?;
-    groups.push((offset - body_offset, group));
+    groups.push((offset as usize - body_offset, group));
   }
 
   let mut records = Vec::new();
@@ -184,11 +184,11 @@ fn collect_import_records<'a>(
       while let Some(item) = items.next() {
         let (item_offset, _) =
           item.context("Failed to parse compact Wasm import item")?;
-        let item_offset = item_offset - body_offset;
+        let item_offset = item_offset as usize - body_offset;
         let item_end = items
           .peek()
           .map(|item| match item {
-            Ok((offset, _)) => *offset - body_offset,
+            Ok((offset, _)) => *offset as usize - body_offset,
             Err(_) => group_end,
           })
           .unwrap_or(group_end);
@@ -221,7 +221,7 @@ fn collect_import_records<'a>(
         bail!("Unexpected compact Wasm import discriminator");
       }
       let type_start = discriminator + 1;
-      let type_end = names.range().start - body_offset;
+      let type_end = names.range().start as usize - body_offset;
       if type_end < type_start || type_end > body.len() {
         bail!("Compact Wasm import type range out of bounds");
       }
@@ -230,11 +230,11 @@ fn collect_import_records<'a>(
       while let Some(name) = names.next() {
         let (name_offset, _) =
           name.context("Failed to parse compact Wasm import name")?;
-        let name_offset = name_offset - body_offset;
+        let name_offset = name_offset as usize - body_offset;
         let name_end = names
           .peek()
           .map(|name| match name {
-            Ok((offset, _)) => *offset - body_offset,
+            Ok((offset, _)) => *offset as usize - body_offset,
             Err(_) => group_end,
           })
           .unwrap_or(group_end);

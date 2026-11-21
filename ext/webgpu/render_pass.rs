@@ -380,7 +380,7 @@ impl GPURenderPassEncoder {
       .render_pass_set_vertex_buffer(
         &mut self.render_pass.borrow_mut(),
         slot,
-        buffer.id,
+        Some(buffer.id),
         offset,
         size.and_then(NonZeroU64::new),
       )

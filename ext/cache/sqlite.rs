@@ -278,7 +278,7 @@ impl SqliteBackedCache {
     if let Some(resource) = resource {
       let body_key = hash(&format!(
         "{}_{}",
-        &request_response.request_url,
+        request_response.request_url,
         now.as_nanos()
       ));
       let responses_dir =
@@ -568,7 +568,7 @@ impl deno_core::Resource for SqliteBackedCache {
 
 pub fn hash(token: &str) -> String {
   use sha2::Digest;
-  format!("{:x}", sha2::Sha256::digest(token.as_bytes()))
+  faster_hex::hex_string(&sha2::Sha256::digest(token.as_bytes()))
 }
 
 #[cfg(all(test, unix))]
