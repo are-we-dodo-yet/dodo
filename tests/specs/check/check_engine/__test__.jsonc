@@ -1,0 +1,42 @@
+{
+  "tempDir": true,
+  "tests": {
+    // the native TypeScript 7 compiler by default ...
+    "native": {
+      "args": "check bad.ts",
+      "output": "bad.out",
+      "exitCode": 1
+    },
+    // ... or the in-process TypeScript 6 compiler with DENO_CHECK_ENGINE=tsc
+    "env_tsc": {
+      "args": "check bad.ts",
+      "envs": { "DENO_CHECK_ENGINE": "tsc" },
+      "output": "bad.out",
+      "exitCode": 1
+    },
+    "env_native": {
+      "args": "check ok.ts",
+      "envs": { "DENO_CHECK_ENGINE": "native" },
+      "output": "Check ok.ts\n",
+      "exitCode": 0
+    },
+    "env_unknown_value_warns": {
+      "args": "check ok.ts",
+      "envs": { "DENO_CHECK_ENGINE": "tsgo" },
+      "output": "env_unknown.out",
+      "exitCode": 0
+    },
+    // code blocks are checked by the in-process compiler only
+    "doc_only_tsc": {
+      "args": "check --doc-only doc.ts",
+      "envs": { "DENO_CHECK_ENGINE": "tsc" },
+      "output": "doc_only.out",
+      "exitCode": 1
+    },
+    "doc_only_native_warns": {
+      "args": "check --doc-only doc.ts",
+      "output": "doc_only_native.out",
+      "exitCode": 0
+    }
+  }
+}

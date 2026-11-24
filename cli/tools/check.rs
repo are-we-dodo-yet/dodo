@@ -12,14 +12,54 @@ use crate::args::Flags;
 use crate::args::SyncTypesFlags;
 use crate::args::graph_kind;
 use crate::factory::CliFactory;
+use crate::graph_container::CheckSpecifiersOptions;
+use crate::graph_container::CollectSpecifiersOptions;
 use crate::graph_util::GraphRootsValidOptions;
 use crate::tsc::Diagnostics;
+use crate::util::extract;
 use crate::util::file_watcher;
+
+/// Selects the type checker `deno check` uses (`native` or `tsc`).
+pub const DENO_CHECK_ENGINE_ENV: &str = "DENO_CHECK_ENGINE";
+
+/// The type checker `deno check` runs.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq)]
+pub enum CheckEngine {
+  /// The pinned native TypeScript 7 compiler (`tsgo`).
+  #[default]
+  Native,
+  /// The in-process TypeScript 6 compiler, as before the native checker.
+  Tsc,
+}
+
+/// The engine `DENO_CHECK_ENGINE` selects: native when it is unset or empty;
+/// an unknown value warns and checks natively.
+fn check_engine_from_env(value: Option<&str>) -> CheckEngine {
+  match value.map(str::trim) {
+    None | Some("") | Some("native") => CheckEngine::Native,
+    Some("tsc") => CheckEngine::Tsc,
+    Some(value) => {
+      log::warn!(
+        "{} {}={}: unsupported type-check engine: {} (expected \"native\" or \"tsc\"); type-checking natively",
+        colors::yellow("Warning"),
+        DENO_CHECK_ENGINE_ENV,
+        value,
+        value
+      );
+      CheckEngine::Native
+    }
+  }
+}
 
 pub async fn check(
   flags: Arc<Flags>,
   check_flags: CheckFlags,
 ) -> Result<(), AnyError> {
+  let engine =
+    check_engine_from_env(std::env::var(DENO_CHECK_ENGINE_ENV).ok().as_deref());
+  if engine == CheckEngine::Tsc {
+    return tsc_check(flags, check_flags).await;
+  }
   if let Some(watch_flags) = &flags.watch {
     // The native check path doesn't yet wire the resolved graph into the file
     // watcher, so it runs once and never re-checks. Warn rather than appear to
@@ -44,6 +84,87 @@ pub async fn check(
   }
 }
 
+/// Type-check with the in-process TypeScript 6 compiler
+/// (`DENO_CHECK_ENGINE=tsc`), as `deno check` did before the native checker.
+async fn tsc_check(
+  flags: Arc<Flags>,
+  check_flags: CheckFlags,
+) -> Result<(), AnyError> {
+  if let Some(watch_flags) = &flags.watch {
+    let no_clear_screen = watch_flags.no_clear_screen;
+    file_watcher::watch_func(
+      flags,
+      file_watcher::PrintConfig::new("Check", !no_clear_screen),
+      move |flags, watcher_communicator, changed_paths| {
+        let check_flags = check_flags.clone();
+        watcher_communicator.show_path_changed(changed_paths);
+        Ok(async move {
+          let factory = CliFactory::from_flags_for_watcher(
+            flags,
+            watcher_communicator.clone(),
+          );
+          tsc_check_with_factory(&factory, check_flags).await
+        })
+      },
+    )
+    .await
+  } else {
+    let factory = CliFactory::from_flags(flags);
+    tsc_check_with_factory(&factory, check_flags).await
+  }
+}
+
+async fn tsc_check_with_factory(
+  factory: &CliFactory,
+  check_flags: CheckFlags,
+) -> Result<(), AnyError> {
+  let main_graph_container = factory.main_module_graph_container().await?;
+
+  let specifiers = main_graph_container.collect_specifiers(
+    &check_flags.files,
+    CollectSpecifiersOptions {
+      include_ignored_specified: false,
+    },
+  )?;
+  if specifiers.is_empty() {
+    log::warn!("{} No matching files found.", colors::yellow("Warning"));
+  }
+
+  let specifiers_for_typecheck = if check_flags.doc || check_flags.doc_only {
+    let file_fetcher = factory.file_fetcher()?;
+    let root_permissions = factory.root_permissions_container()?;
+
+    let mut specifiers_for_typecheck = if check_flags.doc {
+      specifiers.clone()
+    } else {
+      vec![]
+    };
+
+    for s in specifiers {
+      let file = file_fetcher.fetch(&s, root_permissions).await?;
+      let snippet_files = extract::extract_snippet_files(file)?;
+      for snippet_file in snippet_files {
+        specifiers_for_typecheck.push(snippet_file.url.clone());
+        file_fetcher.insert_memory_files(snippet_file);
+      }
+    }
+
+    specifiers_for_typecheck
+  } else {
+    specifiers
+  };
+
+  main_graph_container
+    .check_specifiers(
+      &specifiers_for_typecheck,
+      CheckSpecifiersOptions {
+        allow_unknown_media_types: true,
+        ..Default::default()
+      },
+    )
+    .await
+}
+
 /// Type-check the project with the native TypeScript compiler.
 ///
 /// `deno check` generates a stock `tsconfig.json` and materializes the types of
@@ -58,7 +179,7 @@ async fn native_check(
     // Doc snippet extraction was handled by Deno 2.x's forked tsc; the native
     // compiler does not type-check markdown/JSDoc snippets yet.
     log::warn!(
-      "{} --doc/--doc-only is not yet supported by the native type checker and will be ignored",
+      "{} --doc/--doc-only is not yet supported by the native type checker and will be ignored; set DENO_CHECK_ENGINE=tsc to check code blocks with the in-process TypeScript",
       colors::yellow("Warning")
     );
   }
@@ -509,4 +630,19 @@ fn remote_root_mirror_files(
     }
   }
   files
+}
+
+#[cfg(test)]
+mod check_engine_tests {
+  use super::*;
+
+  #[test]
+  fn check_engine_resolution() {
+    assert_eq!(check_engine_from_env(None), CheckEngine::Native);
+    assert_eq!(check_engine_from_env(Some("")), CheckEngine::Native);
+    assert_eq!(check_engine_from_env(Some(" native ")), CheckEngine::Native);
+    assert_eq!(check_engine_from_env(Some("tsc")), CheckEngine::Tsc);
+    // an unknown value warns and checks natively
+    assert_eq!(check_engine_from_env(Some("tsgo")), CheckEngine::Native);
+  }
 }

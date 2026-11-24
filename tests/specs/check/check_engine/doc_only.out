@@ -1,0 +1,7 @@
+Check doc.ts#2-5.ts
+TS2322 [ERROR]: Type 'string' is not assignable to type 'number'.
+const n: number = "not a number";
+      ^
+    at file:///[WILDCARD]/doc.ts#2-5.ts:2:7
+
+error: Type checking failed.

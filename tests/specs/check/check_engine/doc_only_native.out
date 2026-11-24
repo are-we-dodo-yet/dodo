@@ -1,0 +1,2 @@
+Warning --doc/--doc-only is not yet supported by the native type checker and will be ignored; set DENO_CHECK_ENGINE=tsc to check code blocks with the in-process TypeScript
+[WILDCARD]

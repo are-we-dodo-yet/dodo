@@ -1,0 +1,2 @@
+Warning DENO_CHECK_ENGINE=tsgo: unsupported type-check engine: tsgo (expected "native" or "tsc"); type-checking natively
+[WILDCARD]
