@@ -2058,7 +2058,24 @@ impl<T> MapErrContext for Result<T, FsError> {
   }
 }
 
-fn path_into_string(s: std::ffi::OsString) -> Result<String, FsOpsError> {
+/// `err` as an operation's error naming its path, as the
+/// path-based ops report it (`Deno.Root`'s operations, `crate::root`).
+pub(crate) fn operation_error_with_path(
+  err: FsError,
+  operation: &'static str,
+  path: &str,
+) -> FsOpsError {
+  FsOpsErrorKind::OperationError(OperationError {
+    operation,
+    kind: OperationErrorKind::WithPath(path.to_string()),
+    err,
+  })
+  .into_box()
+}
+
+pub(crate) fn path_into_string(
+  s: std::ffi::OsString,
+) -> Result<String, FsOpsError> {
   s.into_string()
     .map_err(|e| FsOpsErrorKind::InvalidUtf8(e).into_box())
 }

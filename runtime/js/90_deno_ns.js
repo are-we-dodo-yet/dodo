@@ -219,6 +219,10 @@ const denoNs = {
   FsFile: fs.FsFile,
   open: fs.open,
   openSync: fs.openSync,
+  // Deno.openRoot()
+  openRoot: fs.openRoot,
+  openRootSync: fs.openRootSync,
+  Root: fs.Root,
   create: fs.create,
   createSync: fs.createSync,
   stdin: io.stdin,
