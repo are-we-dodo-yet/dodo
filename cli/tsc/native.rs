@@ -32,11 +32,71 @@ use crate::tsc::DiagnosticCategory;
 use crate::tsc::Position;
 
 /// Pinned version of the native TypeScript compiler (`typescript@N`, the
-/// Go/`tsgo` line) that `deno check` runs. Bumping this constant is the only
-/// supported way to change the compiler; `deno check` never floats to the
+/// Go/`tsgo` line) that `deno check` runs. Bumping this constant (with
+/// [`TYPESCRIPT_INTEGRITY`]) is the only supported way to change the
+/// compiler; `deno check` never floats to the
 /// latest published version so that a given Deno release always type-checks
 /// with a known compiler.
 pub const TYPESCRIPT_VERSION: &str = "7.0.2";
+
+/// The npm `dist.integrity` (sha512) of each
+/// `@typescript/typescript-<platform>@TYPESCRIPT_VERSION` package. The download
+/// is refused unless the registry reports exactly this integrity, so the
+/// compiler `deno check` runs is the one pinned here even when the package
+/// comes from a mirror or a registry configured in `.npmrc`. Update these
+/// together with [`TYPESCRIPT_VERSION`].
+const TYPESCRIPT_INTEGRITY: &[(&str, &str)] = &[
+  (
+    "darwin-arm64",
+    "sha512-gowzar9MwS/aRWp6f3a4KUqzRjAZjOsmGNCM6LcTgXum+dBfgsBVMN+AgvOCCbguXyick6LJhpBszxMebJ8syA==",
+  ),
+  (
+    "darwin-x64",
+    "sha512-SZ9xZInqApNlNGc9s0W1VSsktYSOe9cFqNOIqmN1Gs8SmkjKZYFt017G4VwPxASInODuAdbTW7sXiFUf893RgA==",
+  ),
+  (
+    "linux-arm64",
+    "sha512-Qh4eU4/y3yDjnfjjyPYihMj5/ODIlmt+Bzu17OI+fiSRDW57QmU5SiN63exPRNJPKUzcc1INa1NXdrJ+MqHjUQ==",
+  ),
+  (
+    "linux-x64",
+    "sha512-EYdf2cNg7rgCWJnxCdJ+F3V39O8ihb37eHAu1LK8oAFizgTQbPOK7zHHXbPt8rX24COqODXeI3sIf0fCXG7H/A==",
+  ),
+  (
+    "win32-arm64",
+    "sha512-Gyl1Vy6OsWesLzmq+EP0Fb7b4Nid5232AvcA2SFcdYreldpNtYFFofPjnt62y9hQy7VTaZp65ICJjuAQRaVcIQ==",
+  ),
+  (
+    "win32-x64",
+    "sha512-0BQ3HkAHHlKLSp1qRvf3SUhGpGsDuhB/jgFw75guyqbxJqEaS0Cw/VFO8i2nHglJUzQCRtMMR/IBAKE3ETMC4g==",
+  ),
+];
+
+/// Refuse a registry `dist.integrity` other than the one pinned for `target`.
+fn verify_pinned_integrity(
+  target: &str,
+  registry_integrity: Option<&str>,
+) -> Result<(), AnyError> {
+  let pinned = TYPESCRIPT_INTEGRITY
+    .iter()
+    .find(|(platform, _)| *platform == target)
+    .map(|(_, integrity)| *integrity)
+    .with_context(|| {
+      format!(
+        "no pinned integrity for @typescript/typescript-{target}@{TYPESCRIPT_VERSION}"
+      )
+    })?;
+  if registry_integrity != Some(pinned) {
+    anyhow::bail!(
+      "the registry's @typescript/typescript-{}@{} does not match the pinned integrity (expected {}, got {}); refusing to run it",
+      target,
+      TYPESCRIPT_VERSION,
+      pinned,
+      registry_integrity.unwrap_or("none")
+    );
+  }
+  Ok(())
+}
 
 /// npm platform-package suffix for the current host, matching the
 /// `@typescript/typescript-<suffix>` optional dependencies shipped by
@@ -132,6 +192,8 @@ pub async fn ensure_native_tsc(
       tsc_path.display()
     );
   };
+
+  verify_pinned_integrity(target, dist.integrity().for_lockfile().as_deref())?;
 
   let registry_url = npmrc.get_registry_url(&nv.name);
   let package_folder =
@@ -594,6 +656,36 @@ mod tests {
       typescript_platform_for("aarch64", "windows").unwrap(),
       "win32-arm64"
     );
+  }
+
+  #[test]
+  fn typescript_integrity_pinned_for_every_platform() {
+    for (arch, os) in [
+      ("x86_64", "linux"),
+      ("aarch64", "linux"),
+      ("x86_64", "macos"),
+      ("aarch64", "macos"),
+      ("x86_64", "windows"),
+      ("aarch64", "windows"),
+    ] {
+      let target = typescript_platform_for(arch, os).unwrap();
+      let (_, pinned) = TYPESCRIPT_INTEGRITY
+        .iter()
+        .find(|(platform, _)| *platform == target)
+        .unwrap();
+      assert!(pinned.starts_with("sha512-"), "{target}");
+      verify_pinned_integrity(target, Some(pinned)).unwrap();
+    }
+  }
+
+  #[test]
+  fn typescript_integrity_mismatch_is_refused() {
+    let err = verify_pinned_integrity("linux-x64", Some("sha512-AAAA"))
+      .unwrap_err()
+      .to_string();
+    assert!(err.contains("does not match the pinned integrity"), "{err}");
+    assert!(verify_pinned_integrity("linux-x64", None).is_err());
+    assert!(verify_pinned_integrity("plan9-x64", Some("sha512-AAAA")).is_err());
   }
 
   #[test]
