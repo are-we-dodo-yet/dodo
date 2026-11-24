@@ -2023,6 +2023,175 @@ declare namespace Deno {
    */
   export function openSync(path: string | URL, options?: OpenOptions): FsFile;
 
+  /**
+   * Opens a directory as a {@linkcode Deno.Root}, a handle whose file system
+   * operations can never reach outside it (like Go's `os.OpenRoot`).
+   *
+   * ```ts
+   * using root = await Deno.openRoot("./uploads");
+   * // `name` comes from a request: it can't name anything outside ./uploads
+   * await root.writeFile(name, data);
+   * const text = await root.readTextFile("notes/today.txt");
+   * await root.readTextFile("../secret.txt"); // throws Deno.errors.NotCapable
+   * ```
+   *
+   * Every path given to the root is relative to it and resolved beneath it:
+   * - an absolute path (on Windows also `C:x`, `\x` or a UNC path) is
+   *   refused;
+   * - `..` is resolved lexically, before anything is opened, and refused
+   *   where it would climb above the root (`a/../b` is `b`; `a/../../b` is
+   *   refused);
+   * - the directory is held open: moving it, or replacing its path with a
+   *   symlink, after the root was opened changes nothing; operations go on in
+   *   the directory that was opened;
+   * - a symlink inside the root is followed only when its target stays
+   *   beneath the root (on Unix; see below), so a link swapped in between
+   *   two operations, or by another process, can't lead out of it.
+   *
+   * A path that would leave the root throws `Deno.errors.NotCapable`.
+   *
+   * How each OS holds it:
+   * - **Linux**: every open is `openat2()` from the root's descriptor with
+   *   `RESOLVE_BENEATH | RESOLVE_NO_MAGICLINKS` (Linux 5.6+), which the
+   *   kernel refuses atomically when a `..` or a symlink leads out; on older
+   *   kernels, and when a link must be re-checked, each component is opened
+   *   from the previous one's descriptor with `O_NOFOLLOW`, and a link's
+   *   target is checked as a new path before it is followed.
+   * - **macOS** and the BSDs: the component walk, with `openat()` and
+   *   `O_NOFOLLOW`, as above.
+   * - **Windows**: each component is opened with `NtCreateFile` relative to
+   *   the previous component's handle, never following a reparse point: a
+   *   path through a symlink or junction inside the root is refused (not
+   *   followed), and {@linkcode Deno.Root.symlink} and
+   *   {@linkcode Deno.Root.readLink} throw `Deno.errors.NotSupported`.
+   *
+   * Permissions: opening the root requires read access to `path`. Inside
+   * the root no further allow is needed, but a write (`writeFile`, an open
+   * for writing, `mkdir`, `remove`, `rename`, `symlink`) requires write
+   * access to the root's directory where it is when the operation runs,
+   * and every `--deny-read` / `--deny-write` rule still holds inside the
+   * root (on Unix for the object an open reaches, links followed; on
+   * Windows for the path, since no link is followed there).
+   *
+   * Files embedded in a `deno compile` program are not reachable through a
+   * root: it opens the real file system.
+   *
+   * @tags allow-read
+   * @category File System
+   */
+  export function openRoot(path: string | URL): Promise<Root>;
+
+  /**
+   * The synchronous {@linkcode Deno.openRoot}.
+   *
+   * ```ts
+   * using root = Deno.openRootSync("./uploads");
+   * root.writeTextFileSync("hello.txt", "hi");
+   * ```
+   *
+   * @tags allow-read
+   * @category File System
+   */
+  export function openRootSync(path: string | URL): Root;
+
+  /**
+   * A directory opened with {@linkcode Deno.openRoot}. Its methods take the arguments of
+   * the `Deno` function of the same name, but every path is a string
+   * relative to the root and is resolved beneath it (see
+   * {@linkcode Deno.openRoot} for the rules and how each OS holds them).
+   * Closing the root (or leaving its `using` block) doesn't close the files
+   * it opened.
+   *
+   * @category File System
+   */
+  export class Root implements Disposable {
+    /** The path the root was opened with, as given. */
+    readonly path: string;
+    /** As {@linkcode Deno.open}, relative to the root. */
+    open(path: string, options?: OpenOptions): Promise<FsFile>;
+    /** As {@linkcode Deno.openSync}, relative to the root. */
+    openSync(path: string, options?: OpenOptions): FsFile;
+    /** As {@linkcode Deno.create}, relative to the root. */
+    create(path: string): Promise<FsFile>;
+    /** As {@linkcode Deno.createSync}, relative to the root. */
+    createSync(path: string): FsFile;
+    /** As {@linkcode Deno.readFile}, relative to the root. */
+    readFile(path: string): Promise<Uint8Array<ArrayBuffer>>;
+    /** As {@linkcode Deno.readFileSync}, relative to the root. */
+    readFileSync(path: string): Uint8Array<ArrayBuffer>;
+    /** As {@linkcode Deno.readTextFile}, relative to the root. */
+    readTextFile(path: string): Promise<string>;
+    /** As {@linkcode Deno.readTextFileSync}, relative to the root. */
+    readTextFileSync(path: string): string;
+    /** As {@linkcode Deno.writeFile}, relative to the root. */
+    writeFile(
+      path: string,
+      data: Uint8Array,
+      options?: Omit<WriteFileOptions, "signal">,
+    ): Promise<void>;
+    /** As {@linkcode Deno.writeFileSync}, relative to the root. */
+    writeFileSync(
+      path: string,
+      data: Uint8Array,
+      options?: Omit<WriteFileOptions, "signal">,
+    ): void;
+    /** As {@linkcode Deno.writeTextFile}, relative to the root. */
+    writeTextFile(
+      path: string,
+      data: string,
+      options?: Omit<WriteFileOptions, "signal">,
+    ): Promise<void>;
+    /** As {@linkcode Deno.writeTextFileSync}, relative to the root. */
+    writeTextFileSync(
+      path: string,
+      data: string,
+      options?: Omit<WriteFileOptions, "signal">,
+    ): void;
+    /** As {@linkcode Deno.stat}, relative to the root (links followed while
+     * they stay inside it). */
+    stat(path: string): Promise<FileInfo>;
+    /** As {@linkcode Deno.statSync}, relative to the root. */
+    statSync(path: string): FileInfo;
+    /** As {@linkcode Deno.lstat}, relative to the root. */
+    lstat(path: string): Promise<FileInfo>;
+    /** As {@linkcode Deno.lstatSync}, relative to the root. */
+    lstatSync(path: string): FileInfo;
+    /** As {@linkcode Deno.mkdir}, relative to the root. */
+    mkdir(path: string, options?: MkdirOptions): Promise<void>;
+    /** As {@linkcode Deno.mkdirSync}, relative to the root. */
+    mkdirSync(path: string, options?: MkdirOptions): void;
+    /** As {@linkcode Deno.remove}, relative to the root; a recursive remove
+     * never enters a symlink (it removes the link). The root itself can't be
+     * removed through it. */
+    remove(path: string, options?: RemoveOptions): Promise<void>;
+    /** As {@linkcode Deno.removeSync}, relative to the root. */
+    removeSync(path: string, options?: RemoveOptions): void;
+    /** As {@linkcode Deno.rename}; both paths are relative to the root and
+     * stay inside it. */
+    rename(oldpath: string, newpath: string): Promise<void>;
+    /** As {@linkcode Deno.renameSync}, both paths relative to the root. */
+    renameSync(oldpath: string, newpath: string): void;
+    /** As {@linkcode Deno.readDir}, relative to the root. */
+    readDir(path: string): AsyncIterable<DirEntry>;
+    /** As {@linkcode Deno.readDirSync}, relative to the root. */
+    readDirSync(path: string): IteratorObject<DirEntry>;
+    /** Creates `path` (relative to the root) as a symlink to `target`.
+     * `target` is stored as given; following the link from the root later
+     * is held to the root like any other path. Unix only: throws
+     * `Deno.errors.NotSupported` on Windows. */
+    symlink(target: string | URL, path: string): Promise<void>;
+    /** The synchronous {@linkcode Deno.Root.symlink}. */
+    symlinkSync(target: string | URL, path: string): void;
+    /** As {@linkcode Deno.readLink}, relative to the root. Unix only: throws
+     * `Deno.errors.NotSupported` on Windows. */
+    readLink(path: string): Promise<string>;
+    /** As {@linkcode Deno.readLinkSync}, relative to the root. */
+    readLinkSync(path: string): string;
+    /** Closes the root. */
+    close(): void;
+    [Symbol.dispose](): void;
+  }
+
   /** Creates a file if none exists or truncates an existing file and resolves to
    *  an instance of {@linkcode Deno.FsFile}.
    *

@@ -34,6 +34,8 @@ use serde::de;
 use url::Url;
 
 pub mod broker;
+#[cfg(unix)]
+pub mod checked_open;
 mod ipc_pipe;
 pub mod prompter;
 mod runtime_descriptor_parser;
@@ -4312,6 +4314,36 @@ impl PermissionsContainer {
         self.check_import_resolved_host(specifier)
       }
     }
+  }
+
+  /// The paths an access of `access_kind` is denied (`--deny-read`,
+  /// `--deny-write` and ignored paths), as written: those of the read
+  /// permission, the write permission or both, as they are now. For an
+  /// operation held to a directory it opened itself (`Deno.openRoot`), whose
+  /// only allow is that directory.
+  #[cfg(unix)]
+  pub fn open_denies(&self, access_kind: OpenAccessKind) -> Vec<PathBuf> {
+    let inner = self.inner.lock();
+    let mut denies = Vec::new();
+    if access_kind.is_read() {
+      for desc in inner.read.descriptors.iter() {
+        if let UnaryPermissionDesc::FlagDenied(d)
+        | UnaryPermissionDesc::FlagIgnored(d) = desc
+        {
+          denies.push(d.0.path.clone());
+        }
+      }
+    }
+    if access_kind.is_write() {
+      for desc in inner.write.descriptors.iter() {
+        if let UnaryPermissionDesc::FlagDenied(d)
+        | UnaryPermissionDesc::FlagIgnored(d) = desc
+        {
+          denies.push(d.0.path.clone());
+        }
+      }
+    }
+    denies
   }
 
   #[must_use = "the resolved return value to mitigate time-of-check to time-of-use issues"]

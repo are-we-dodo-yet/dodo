@@ -59,6 +59,28 @@ const {
   op_fs_remove_sync,
   op_fs_rename_async,
   op_fs_rename_sync,
+  op_fs_root_file_open_async,
+  op_fs_root_file_open_sync,
+  op_fs_root_mkdir_async,
+  op_fs_root_mkdir_sync,
+  op_fs_root_open_async,
+  op_fs_root_open_sync,
+  op_fs_root_read_dir_async,
+  op_fs_root_read_dir_sync,
+  op_fs_root_read_file_async,
+  op_fs_root_read_file_sync,
+  op_fs_root_read_link_async,
+  op_fs_root_read_link_sync,
+  op_fs_root_remove_async,
+  op_fs_root_remove_sync,
+  op_fs_root_rename_async,
+  op_fs_root_rename_sync,
+  op_fs_root_stat_async,
+  op_fs_root_stat_sync,
+  op_fs_root_symlink_async,
+  op_fs_root_symlink_sync,
+  op_fs_root_write_file_async,
+  op_fs_root_write_file_sync,
   op_fs_seek_async,
   op_fs_seek_sync,
   op_fs_stat_async,
@@ -89,6 +111,7 @@ const {
   ObjectPrototypeIsPrototypeOf,
   ObjectSetPrototypeOf,
   ObjectValues,
+  SafeArrayIterator,
   StringPrototypeSlice,
   StringPrototypeStartsWith,
   Symbol,
@@ -989,6 +1012,268 @@ function writeTextFile(
   }
 }
 
+// `Deno.openRoot()`, a directory handle whose operations stay
+// beneath it (see ext/fs/root.rs).
+const rootConstructorKey = Symbol("Deno.internal.Root");
+
+function rootPath(path) {
+  if (typeof path !== "string") {
+    throw new TypeError(
+      "A path in a 'Deno.Root' must be a string relative to the root",
+    );
+  }
+  return path;
+}
+
+function rootWriteOptions(options) {
+  return [
+    options?.mode,
+    options?.append ?? false,
+    options?.create ?? true,
+    options?.createNew ?? false,
+  ];
+}
+
+class Root {
+  #rid = 0;
+  #path;
+
+  constructor(rid, path, symbol) {
+    if (symbol !== rootConstructorKey) {
+      throw new TypeError(
+        "'Deno.Root' cannot be constructed, use 'Deno.openRoot()' or 'Deno.openRootSync()' instead",
+      );
+    }
+    ObjectDefineProperty(this, internalRidSymbol, {
+      __proto__: null,
+      enumerable: false,
+      value: rid,
+    });
+    this.#rid = rid;
+    this.#path = path;
+  }
+
+  /** The path the root was opened with. */
+  get path() {
+    return this.#path;
+  }
+
+  async open(path, options) {
+    if (options) checkOpenOptions(options);
+    const rid = await op_fs_root_file_open_async(
+      this.#rid,
+      rootPath(path),
+      options,
+    );
+    return new FsFile(rid, fsFileConstructorKey);
+  }
+
+  openSync(path, options) {
+    if (options) checkOpenOptions(options);
+    const rid = op_fs_root_file_open_sync(this.#rid, rootPath(path), options);
+    return new FsFile(rid, fsFileConstructorKey);
+  }
+
+  create(path) {
+    return this.open(path, {
+      read: true,
+      write: true,
+      truncate: true,
+      create: true,
+    });
+  }
+
+  createSync(path) {
+    return this.openSync(path, {
+      read: true,
+      write: true,
+      truncate: true,
+      create: true,
+    });
+  }
+
+  readFile(path) {
+    return op_fs_root_read_file_async(this.#rid, rootPath(path));
+  }
+
+  readFileSync(path) {
+    return op_fs_root_read_file_sync(this.#rid, rootPath(path));
+  }
+
+  async readTextFile(path) {
+    return new TextDecoder().decode(await this.readFile(path));
+  }
+
+  readTextFileSync(path) {
+    return new TextDecoder().decode(this.readFileSync(path));
+  }
+
+  async writeFile(path, data, options) {
+    const { 0: mode, 1: append, 2: create, 3: createNew } = rootWriteOptions(
+      options,
+    );
+    await op_fs_root_write_file_async(
+      this.#rid,
+      rootPath(path),
+      mode,
+      append,
+      create,
+      createNew,
+      data,
+    );
+  }
+
+  writeFileSync(path, data, options) {
+    const { 0: mode, 1: append, 2: create, 3: createNew } = rootWriteOptions(
+      options,
+    );
+    op_fs_root_write_file_sync(
+      this.#rid,
+      rootPath(path),
+      mode,
+      append,
+      create,
+      createNew,
+      data,
+    );
+  }
+
+  writeTextFile(path, data, options) {
+    return this.writeFile(path, new TextEncoder().encode(data), options);
+  }
+
+  writeTextFileSync(path, data, options) {
+    return this.writeFileSync(
+      path,
+      new TextEncoder().encode(data),
+      options,
+    );
+  }
+
+  async stat(path) {
+    return parseFileInfo(
+      await op_fs_root_stat_async(this.#rid, rootPath(path), true),
+    );
+  }
+
+  statSync(path) {
+    return parseFileInfo(
+      op_fs_root_stat_sync(this.#rid, rootPath(path), true),
+    );
+  }
+
+  async lstat(path) {
+    return parseFileInfo(
+      await op_fs_root_stat_async(this.#rid, rootPath(path), false),
+    );
+  }
+
+  lstatSync(path) {
+    return parseFileInfo(
+      op_fs_root_stat_sync(this.#rid, rootPath(path), false),
+    );
+  }
+
+  async mkdir(path, options) {
+    await op_fs_root_mkdir_async(
+      this.#rid,
+      rootPath(path),
+      options?.recursive ?? false,
+      options?.mode,
+    );
+  }
+
+  mkdirSync(path, options) {
+    op_fs_root_mkdir_sync(
+      this.#rid,
+      rootPath(path),
+      options?.recursive ?? false,
+      options?.mode,
+    );
+  }
+
+  async remove(path, options) {
+    await op_fs_root_remove_async(
+      this.#rid,
+      rootPath(path),
+      !!options?.recursive,
+    );
+  }
+
+  removeSync(path, options) {
+    op_fs_root_remove_sync(this.#rid, rootPath(path), !!options?.recursive);
+  }
+
+  async rename(oldpath, newpath) {
+    await op_fs_root_rename_async(
+      this.#rid,
+      rootPath(oldpath),
+      rootPath(newpath),
+    );
+  }
+
+  renameSync(oldpath, newpath) {
+    op_fs_root_rename_sync(this.#rid, rootPath(oldpath), rootPath(newpath));
+  }
+
+  readDir(path) {
+    const rid = this.#rid;
+    path = rootPath(path);
+    return {
+      async *[SymbolAsyncIterator]() {
+        const entries = await op_fs_root_read_dir_async(rid, path);
+        yield* new SafeArrayIterator(entries);
+      },
+    };
+  }
+
+  readDirSync(path) {
+    return op_fs_root_read_dir_sync(this.#rid, rootPath(path))[
+      SymbolIterator
+    ]();
+  }
+
+  async symlink(target, path) {
+    await op_fs_root_symlink_async(
+      this.#rid,
+      pathFromURL(target),
+      rootPath(path),
+    );
+  }
+
+  symlinkSync(target, path) {
+    op_fs_root_symlink_sync(this.#rid, pathFromURL(target), rootPath(path));
+  }
+
+  readLink(path) {
+    return op_fs_root_read_link_async(this.#rid, rootPath(path));
+  }
+
+  readLinkSync(path) {
+    return op_fs_root_read_link_sync(this.#rid, rootPath(path));
+  }
+
+  close() {
+    core.close(this.#rid);
+  }
+
+  [SymbolDispose]() {
+    core.tryClose(this.#rid);
+  }
+}
+
+async function openRoot(path) {
+  const pathString = pathFromURL(path);
+  const rid = await op_fs_root_open_async(pathString);
+  return new Root(rid, pathString, rootConstructorKey);
+}
+
+function openRootSync(path) {
+  const pathString = pathFromURL(path);
+  const rid = op_fs_root_open_sync(pathString);
+  return new Root(rid, pathString, rootConstructorKey);
+}
+
 return {
   chdir,
   chmod,
@@ -1013,6 +1298,8 @@ return {
   mkdir,
   mkdirSync,
   open,
+  openRoot,
+  openRootSync,
   openSync,
   readDir,
   readDirSync,
@@ -1028,6 +1315,7 @@ return {
   removeSync,
   rename,
   renameSync,
+  Root,
   stat,
   statSync,
   symlink,
