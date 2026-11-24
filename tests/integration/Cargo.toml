@@ -59,4 +59,4 @@ uuid = { workspace = true, features = ["serde"] }
 zeromq.workspace = true
 
 [target.'cfg(unix)'.dev-dependencies]
-nix.workspace = true
+nix = { workspace = true, features = ["fs", "socket", "uio"] }

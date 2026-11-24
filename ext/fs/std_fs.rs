@@ -1320,6 +1320,30 @@ pub fn open_with_checked_path(
   opts: OpenOptions,
   path: &CheckedPath,
 ) -> FsResult<std::fs::File> {
+  // A v2 permission broker opens the file itself and hands the descriptor
+  // back, so the file used is the one it decided on, not whatever the path
+  // names by the time this process would open it (a symlink swapped in after
+  // the check). A v1 broker, or none, leaves the open to the code below.
+  if let Some(outcome) = deno_permissions::broker::maybe_open_with_broker(
+    path,
+    &deno_permissions::broker::BrokerOpenOptions {
+      read: opts.read,
+      write: opts.write,
+      create: opts.create,
+      create_new: opts.create_new,
+      truncate: opts.truncate,
+      append: opts.append,
+      mode: opts.mode,
+      custom_flags: opts.custom_flags,
+    },
+  ) {
+    match outcome? {
+      deno_permissions::broker::BrokerOpenOutcome::File(file) => {
+        return Ok(file);
+      }
+      deno_permissions::broker::BrokerOpenOutcome::OpenItself => {}
+    }
+  }
   // Rust's std::fs::OpenOptions requires write or append when create is set.
   // However, POSIX allows O_RDONLY | O_CREAT (create the file if it doesn't
   // exist, then open for reading). Handle this by creating the file first

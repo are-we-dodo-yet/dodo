@@ -3656,6 +3656,163 @@ fn test_permission_broker() {
   );
 }
 
+/// A v2 permission broker (`"v":2` in its first answer) opens the files
+/// itself and hands the descriptors back over the socket (`SCM_RIGHTS`); the
+/// fs ops use them. A refused open, a descriptor for another file and one
+/// whose file left the path after the broker opened it all fail the open.
+#[cfg(unix)]
+#[test]
+fn test_permission_broker_v2() {
+  use std::io::BufRead;
+  use std::io::IoSlice;
+  use std::os::fd::AsRawFd;
+  use std::os::unix::fs::OpenOptionsExt;
+  use std::os::unix::net::UnixListener;
+
+  use nix::sys::socket::ControlMessage;
+  use nix::sys::socket::MsgFlags;
+  use nix::sys::socket::sendmsg;
+
+  let context = TestContext::default();
+  let dir = context.temp_dir().path().canonicalize();
+  // Not canonicalized: macOS's /private prefix can push a socket path past
+  // its length limit.
+  let socket_path = context.temp_dir().path().join("broker.sock");
+  dir.join("data.txt").write("public");
+  dir.join("denied.txt").write("denied");
+  dir.join("mismatch.txt").write("mismatch");
+  dir.join("swapped.txt").write("swapped");
+  dir.join("secret.txt").write("secret");
+
+  let listener = UnixListener::bind(socket_path.as_path()).unwrap();
+  let broker_dir = dir.to_path_buf();
+  let broker = std::thread::spawn(move || {
+    let (stream, _) = listener.accept().unwrap();
+    let mut reader = std::io::BufReader::new(stream.try_clone().unwrap());
+    let mut requests = Vec::new();
+    loop {
+      let mut line = String::new();
+      if reader.read_line(&mut line).unwrap_or(0) == 0 {
+        return requests;
+      }
+      let req: serde_json::Value = serde_json::from_str(&line).unwrap();
+      requests.push(req.clone());
+      let id = req["id"].as_u64().unwrap();
+      let mut fd_file = None;
+      let response = if req["permission"] != "open" {
+        json!({ "id": id, "result": "allow", "v": 2 })
+      } else {
+        let path = std::path::PathBuf::from(req["value"].as_str().unwrap());
+        let name = path.file_name().unwrap().to_str().unwrap().to_string();
+        let open = &req["open"];
+        let mut options = std::fs::OpenOptions::new();
+        options
+          .read(open["read"] == true)
+          .write(open["write"] == true)
+          .create(open["create"] == true)
+          .custom_flags(libc_o_nofollow());
+        match name.as_str() {
+          // Anything outside the test's directory: a broker that opens
+          // whatever it allows, following links (so a name that means
+          // "the opener's own" would be its own), else open it yourself.
+          _ if !path.starts_with(&broker_dir) => {
+            match std::fs::OpenOptions::new()
+              .read(open["read"] == true)
+              .write(open["write"] == true)
+              .open(&path)
+            {
+              Ok(file) => {
+                fd_file = Some(file);
+                json!({ "id": id, "result": "allow", "fd": true })
+              }
+              Err(_) => json!({ "id": id, "result": "allow" }),
+            }
+          }
+          "denied.txt" => {
+            json!({ "id": id, "result": "deny", "reason": "not this one" })
+          }
+          // Hands back another file's descriptor.
+          "mismatch.txt" => {
+            fd_file = Some(options.open(broker_dir.join("data.txt")).unwrap());
+            json!({ "id": id, "result": "allow", "fd": true })
+          }
+          // Opens the file, then the path is swapped for a link to a
+          // forbidden file before the answer arrives.
+          "swapped.txt" => {
+            fd_file = Some(options.open(&path).unwrap());
+            std::fs::rename(&path, path.with_extension("old")).unwrap();
+            std::os::unix::fs::symlink(broker_dir.join("secret.txt"), &path)
+              .unwrap();
+            json!({ "id": id, "result": "allow", "fd": true })
+          }
+          _ => {
+            fd_file = Some(options.open(&path).unwrap());
+            json!({ "id": id, "result": "allow", "fd": true })
+          }
+        }
+      };
+      let line = format!("{response}\n");
+      let iov = [IoSlice::new(line.as_bytes())];
+      let fds: Vec<i32> = fd_file.iter().map(|f| f.as_raw_fd()).collect();
+      let cmsg = [ControlMessage::ScmRights(&fds)];
+      let cmsgs: &[ControlMessage] = if fds.is_empty() { &[] } else { &cmsg };
+      sendmsg::<()>(stream.as_raw_fd(), &iov, cmsgs, MsgFlags::empty(), None)
+        .unwrap();
+    }
+  });
+
+  let output = context
+    .new_command()
+    .env("DENO_PERMISSION_BROKER_PATH", &socket_path)
+    .args_vec([
+      "run".to_string(),
+      "--quiet".to_string(),
+      "run/permission_broker/v2.ts".to_string(),
+      dir.to_string(),
+    ])
+    .run();
+  output.assert_exit_code(0);
+  output.assert_matches_text(
+    "[WILDCARD]data.txt: public
+denied.txt: PermissionDenied
+mismatch.txt: PermissionDenied
+swapped.txt: PermissionDenied
+out.txt: written
+async data.txt: public
+",
+  );
+  let requests = broker.join().unwrap();
+  // Names of the opener's own objects are opened by Deno after the check,
+  // never by the broker.
+  assert!(
+    !requests.iter().any(|r| r["permission"] == "open"
+      && r["value"]
+        .as_str()
+        .is_some_and(|v| v.starts_with("/dev/") || v.starts_with("/proc/"))),
+    "{requests:#?}"
+  );
+  let opens: Vec<&serde_json::Value> = requests
+    .iter()
+    .filter(|r| {
+      r["permission"] == "open"
+        && r["value"]
+          .as_str()
+          .is_some_and(|v| v.starts_with(&dir.to_string()))
+    })
+    .collect();
+  // data, denied, mismatch, swapped, out (write), out (read), async data.
+  assert_eq!(opens.len(), 7, "{requests:#?}");
+  assert!(opens.iter().all(|r| r["v"] == 2), "{opens:#?}");
+  assert_eq!(opens[4]["open"]["write"], true);
+  assert_eq!(opens[4]["open"]["create"], true);
+  assert_eq!(opens[0]["value"], dir.join("data.txt").to_string().as_str());
+}
+
+#[cfg(unix)]
+fn libc_o_nofollow() -> i32 {
+  nix::fcntl::OFlag::O_NOFOLLOW.bits()
+}
+
 // Regression test for https://github.com/denoland/deno/issues/32473
 // Verifies that process.stdout.write() and console.log() produce output
 // in the correct order when stdout is a TTY (uses PTY).
