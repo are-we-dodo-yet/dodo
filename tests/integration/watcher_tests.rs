@@ -3554,6 +3554,35 @@ async fn run_hmr_added_import_and_quick_saves() {
   check_alive_then_kill(child);
 }
 
+// https://github.com/denoland/deno/issues/31053
+#[test(flaky)]
+async fn run_hmr_atomic_save() {
+  let t = TempDir::new();
+  t.path()
+    .join("main.js")
+    .write("import './mod.js';\nsetInterval(() => {}, 1000);\n");
+  let module = t.path().join("mod.js");
+  module.write("console.log('mod v1');\nimport.meta.hot.accept();\n");
+
+  let mut child = spawn_run_hmr(&t, "main.js");
+  let (mut stdout_lines, mut stderr_lines) = child_lines(&mut child);
+  wait_for_watcher("mod.js", &mut stderr_lines).await;
+  wait_contains("mod v1", &mut stdout_lines).await;
+
+  for version in 2..5 {
+    let temp = t.path().join(format!("mod.js.{version}.tmp"));
+    temp.write(format!(
+      "console.log('mod v{version}');\nimport.meta.hot.accept();\n"
+    ));
+    std::fs::rename(temp.as_path(), module.as_path()).unwrap();
+    wait_contains_without("Updated file", "Restarting", &mut stderr_lines)
+      .await;
+    wait_contains(&format!("mod v{version}"), &mut stdout_lines).await;
+  }
+
+  check_alive_then_kill(child);
+}
+
 #[test(flaky)]
 async fn serve_hmr_parallel() {
   let t = TempDir::new();

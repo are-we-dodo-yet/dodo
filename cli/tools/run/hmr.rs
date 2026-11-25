@@ -84,6 +84,10 @@ impl CliHmrHost {
         }
       }
       let paths = self.pending.clone().unwrap();
+      if paths.is_empty() {
+        self.pending = None;
+        return HmrChange::FullReload("a watched file was removed".to_string());
+      }
       let result = self.graph_container.hmr_reload_paths(&paths).await;
       self.pending = None;
       match result {
