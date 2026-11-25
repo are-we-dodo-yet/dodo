@@ -10,7 +10,6 @@ use deno_core::Extension;
 use deno_core::OpState;
 use deno_core::error::CoreError;
 use deno_core::error::JsError;
-use deno_core::futures::FutureExt;
 use deno_core::v8;
 use deno_error::JsErrorBox;
 use deno_lib::worker::LibMainWorker;
@@ -29,19 +28,17 @@ use deno_runtime::deno_os::WatcherExited;
 use deno_runtime::deno_permissions::PermissionsContainer;
 use deno_runtime::worker::MainWorker;
 use deno_semver::npm::NpmPackageReqReference;
-use tokio::select;
 
 use crate::args::CliLockfile;
 use crate::npm::CliNpmInstaller;
 use crate::npm::CliNpmResolver;
 use crate::sys::CliSys;
-use crate::tools::run::hmr::HmrRunner;
-use crate::tools::run::hmr::HmrRunnerState;
+use crate::tools::run::hmr::CliHmrHost;
 use crate::util::file_watcher::WatcherCommunicator;
 use crate::util::file_watcher::WatcherRestartMode;
 use crate::util::progress_bar::ProgressBar;
 
-pub type CreateHmrRunnerCb = Box<dyn Fn() -> HmrRunnerState + Send + Sync>;
+pub type CreateHmrRunnerCb = Box<dyn Fn() -> CliHmrHost + Send + Sync>;
 
 pub struct CliMainWorkerOptions {
   pub create_hmr_runner: Option<CreateHmrRunnerCb>,
@@ -80,7 +77,7 @@ impl CliMainWorker {
   pub async fn run(&mut self) -> Result<i32, CoreError> {
     let maybe_coverage_collector = self.maybe_setup_coverage_collector();
     let maybe_cpu_profiler = self.maybe_setup_cpu_profiler();
-    let mut maybe_hmr_runner = self.maybe_setup_hmr_runner();
+    let mut maybe_hmr_host = self.maybe_setup_hmr_host();
 
     // Wrap profiler and coverage in Rc<RefCell<Option<...>>> so that
     // both the normal cleanup path and the Deno.exit() op_exit path
@@ -151,7 +148,7 @@ impl CliMainWorker {
     self.spawn_sigusr1_inspector_listener();
 
     let mut result = self
-      .run_to_completion(&mut maybe_hmr_runner, has_coverage)
+      .run_to_completion(&mut maybe_hmr_host, has_coverage)
       .await;
 
     // If the script called `Deno.exit()` under a watcher, `op_exit` terminated
@@ -169,8 +166,8 @@ impl CliMainWorker {
     if let Some(mut cpu_profiler) = profiler_cell.borrow_mut().take() {
       cpu_profiler.stop_profiling()?;
     }
-    if let Some(hmr_runner) = maybe_hmr_runner.as_mut() {
-      hmr_runner.stop();
+    if let Some(hmr_host) = &maybe_hmr_host {
+      hmr_host.stop();
     }
 
     result?;
@@ -223,7 +220,7 @@ impl CliMainWorker {
   /// is set).
   async fn run_to_completion(
     &mut self,
-    maybe_hmr_runner: &mut Option<HmrRunner>,
+    maybe_hmr_host: &mut Option<CliHmrHost>,
     has_coverage: bool,
   ) -> Result<(), CoreError> {
     log::debug!("main_module {}", self.worker.main_module());
@@ -234,20 +231,9 @@ impl CliMainWorker {
     self.worker.dispatch_load_event()?;
 
     loop {
-      if let Some(hmr_runner) = maybe_hmr_runner.as_mut() {
-        let hmr_future = hmr_runner.run().boxed_local();
-        let event_loop_future = self.worker.run_event_loop(false).boxed_local();
-
-        let result;
-        select! {
-          hmr_result = hmr_future => {
-            result = hmr_result;
-          },
-          event_loop_result = event_loop_future => {
-            result = event_loop_result;
-          }
-        }
-        if let Err(e) = result {
+      if let Some(hmr_host) = maybe_hmr_host.as_mut() {
+        hmr_host.start();
+        if let Err(e) = self.worker.run_event_loop_with_hmr(hmr_host).await {
           self
             .shared
             .maybe_file_watcher_communicator
@@ -428,18 +414,11 @@ impl CliMainWorker {
     self.op_state().borrow().has::<WatcherExited>()
   }
 
-  pub fn maybe_setup_hmr_runner(&mut self) -> Option<HmrRunner> {
-    let setup_hmr_runner = self.shared.create_hmr_runner.as_ref()?;
-
-    let hmr_runner_state = setup_hmr_runner();
-    let state = hmr_runner_state.clone();
-
-    let callback = Box::new(move |message| hmr_runner_state.callback(message));
-    let session = self.worker.create_inspector_session(callback);
-    let mut hmr_runner = HmrRunner::new(state, session);
-    hmr_runner.start();
-
-    Some(hmr_runner)
+  pub fn maybe_setup_hmr_host(&mut self) -> Option<CliHmrHost> {
+    let create_hmr_host = self.shared.create_hmr_runner.as_ref()?;
+    let hmr_host = create_hmr_host();
+    self.worker.enable_hmr();
+    Some(hmr_host)
   }
 
   pub fn maybe_setup_coverage_collector(

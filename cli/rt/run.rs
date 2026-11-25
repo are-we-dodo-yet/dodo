@@ -636,7 +636,9 @@ impl EmbeddedModuleLoader {
           // bump the `FirstRun` strategy's pending counter via `get_sync`
           // without a matching `set_sync`, preventing the cache from ever
           // being serialized. See https://github.com/denoland/deno/issues/31766
-          let code_cache_entry = if module_type == ModuleType::JavaScript {
+          let code_cache_entry = if module_type == ModuleType::JavaScript
+            && !crate::binary::hmr_sources_enabled()
+          {
             self
               .shared
               .get_code_cache(module_specifier, module_source.as_bytes())
@@ -1418,11 +1420,24 @@ pub async fn run_with_options(
   // use a dummy npm registry url
   let npm_registry_url = Url::parse("https://localhost/").unwrap();
   let root_dir_url = Arc::new(Url::from_directory_path(&root_path).unwrap());
+  if let Some(watch_dir) = &hmr_watch_dir {
+    crate::binary::enable_hmr_sources(root_path.clone(), watch_dir.clone());
+  }
   let workspace_root_path =
     hmr_watch_dir.clone().unwrap_or_else(|| root_path.clone());
   let workspace_root_dir_url =
     Arc::new(Url::from_directory_path(&workspace_root_path).unwrap());
   let entrypoint = root_dir_url.join(&metadata.entrypoint_key).unwrap();
+  if hmr_watch_dir.is_some()
+    && let Ok(entrypoint_path) = entrypoint.to_file_path()
+    && !crate::binary::hmr_source_path(&entrypoint_path)
+      .is_some_and(|path| path.exists())
+  {
+    log::warn!(
+      "HMR: the entrypoint {} was not found in the watched directory; hot updates are disabled",
+      entrypoint
+    );
+  }
   // When this process was spawned by node:child_process.fork() from a compiled
   // binary, the parent asks us to run a specific embedded module instead of the
   // baked-in entrypoint (see ext/node/polyfills/child_process.ts). Otherwise a
@@ -1936,39 +1951,22 @@ pub async fn run_with_options(
   }
 
   if let Some(watch_dir) = hmr_watch_dir {
-    let mut hmr_runner =
-      crate::hmr::setup_desktop_hmr(&mut worker, watch_dir, root_path.clone())?;
-    if let Some(cb) = hmr_on_reload {
-      hmr_runner.set_on_reload(cb);
-    }
-
-    // Run one event loop tick so the inspector processes the
-    // Debugger.enable / Runtime.enable messages before we load modules.
-    // This ensures scriptParsed notifications are emitted during module load.
-    worker.run_event_loop(false).await?;
+    let mut hmr_host = crate::hmr::DesktopHmrHost::new(
+      watch_dir,
+      root_path.clone(),
+      hmr_on_reload,
+    )?;
+    worker.enable_hmr();
 
     worker.execute_load_phase().await?;
 
     loop {
-      let hmr_fut = hmr_runner.run();
-      let event_loop_fut = worker.run_event_loop(false);
-
-      tokio::select! {
-        hmr_result = hmr_fut => {
-          if let Err(e) = hmr_result {
-            log::error!("HMR error: {:?}", e);
-          }
-        }
-        event_loop_result = event_loop_fut => {
-          event_loop_result?;
-          let web_continue = worker.dispatch_beforeunload_event()?;
-          if !web_continue {
-            let node_continue =
-              worker.dispatch_process_beforeexit_event()?;
-            if !node_continue {
-              break;
-            }
-          }
+      worker.run_event_loop_with_hmr(&mut hmr_host).await?;
+      let web_continue = worker.dispatch_beforeunload_event()?;
+      if !web_continue {
+        let node_continue = worker.dispatch_process_beforeexit_event()?;
+        if !node_continue {
+          break;
         }
       }
     }

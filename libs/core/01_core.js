@@ -3,12 +3,16 @@
 
 ((window) => {
   const {
+    ArrayPrototypeIncludes,
+    ArrayPrototypeIndexOf,
     ArrayPrototypeMap,
     ArrayPrototypePush,
+    ArrayPrototypeSplice,
     Error,
     ErrorCaptureStackTrace,
     FunctionPrototypeBind,
     ObjectAssign,
+    ObjectCreate,
     ObjectDefineProperties,
     ObjectDefineProperty,
     ObjectFreeze,
@@ -18,6 +22,7 @@
     ReflectOwnKeys,
     setQueueMicrotask,
     setSharedArrayBuffer,
+    SafeArrayIterator,
     SafeMap,
     SafeWeakMap,
     StringPrototypeSlice,
@@ -74,6 +79,10 @@
     op_run_microtasks,
     op_serialize,
     op_add_main_module_handler,
+    op_hmr_deps,
+    op_hmr_evict,
+    op_hmr_importers,
+    op_hmr_resolve,
     op_set_handled_promise_rejection_handler,
     op_set_promise_hooks,
     op_set_wasm_streaming_callback,
@@ -1054,12 +1063,425 @@
     }
   }
 
+  const hmrRecords = new SafeMap();
+  const hmrStatusHandlers = [];
+  let hmrStatus = "idle";
+  let hmrApplying = false;
+  let hmrSelfInvalidated = [];
+  let hmrBubbling = [];
+
+  function hmrGetRecord(specifier) {
+    let record = hmrRecords.get(specifier);
+    if (record === undefined) {
+      record = {
+        generation: 0,
+        data: {},
+        selfAccepted: false,
+        selfCallback: null,
+        selfErrorHandler: null,
+        acceptedDeps: new SafeMap(),
+        declined: false,
+        disposers: [],
+        pruners: [],
+      };
+      hmrRecords.set(specifier, record);
+    }
+    return record;
+  }
+
+  async function hmrSetStatus(status) {
+    hmrStatus = status;
+    for (let i = 0; i < hmrStatusHandlers.length; i++) {
+      await hmrStatusHandlers[i](status);
+    }
+  }
+
+  function hmrRemove(array, item) {
+    const index = ArrayPrototypeIndexOf(array, item);
+    if (index !== -1) {
+      ArrayPrototypeSplice(array, index, 1);
+    }
+  }
+
+  function hmrCreateHotContext(specifier, isCurrent) {
+    const record = hmrGetRecord(specifier);
+    const generation = isCurrent ? record.generation : -1;
+    const data = record.data;
+    const isActive = () => record.generation === generation;
+    return ObjectFreeze({
+      data,
+      accept(deps, callback, errorHandler) {
+        if (!isActive()) {
+          return;
+        }
+        if (deps === undefined || typeof deps === "function") {
+          record.selfAccepted = true;
+          record.selfCallback = deps ?? null;
+          record.selfErrorHandler = callback ?? null;
+          return;
+        }
+        const single = typeof deps === "string";
+        const depList = single ? [deps] : deps;
+        const resolved = [];
+        for (let i = 0; i < depList.length; i++) {
+          ArrayPrototypePush(resolved, op_hmr_resolve(depList[i], specifier));
+        }
+        const entry = {
+          deps: resolved,
+          single,
+          callback: callback ?? null,
+          errorHandler: errorHandler ?? null,
+        };
+        for (let i = 0; i < resolved.length; i++) {
+          record.acceptedDeps.set(resolved[i], entry);
+        }
+      },
+      decline() {
+        if (isActive()) {
+          record.declined = true;
+        }
+      },
+      dispose(callback) {
+        if (isActive()) {
+          ArrayPrototypePush(record.disposers, callback);
+        }
+      },
+      addDisposeHandler(callback) {
+        if (isActive()) {
+          ArrayPrototypePush(record.disposers, callback);
+        }
+      },
+      removeDisposeHandler(callback) {
+        if (isActive()) {
+          hmrRemove(record.disposers, callback);
+        }
+      },
+      prune(callback) {
+        if (isActive()) {
+          ArrayPrototypePush(record.pruners, callback);
+        }
+      },
+      invalidate() {
+        if (!hmrApplying) {
+          throw new TypeError(
+            "import.meta.hot.invalidate() can only be called while an update is being applied",
+          );
+        }
+        if (isActive() && !ArrayPrototypeIncludes(hmrBubbling, specifier)) {
+          ArrayPrototypePush(hmrSelfInvalidated, specifier);
+        }
+      },
+      status(handler) {
+        if (handler === undefined) {
+          return hmrStatus;
+        }
+        ArrayPrototypePush(hmrStatusHandlers, handler);
+      },
+      addStatusHandler(handler) {
+        ArrayPrototypePush(hmrStatusHandlers, handler);
+      },
+      removeStatusHandler(handler) {
+        hmrRemove(hmrStatusHandlers, handler);
+      },
+    });
+  }
+
+  function hmrPlan(changed, forceBubble) {
+    const invalidated = [];
+    const boundaries = [];
+    const walk = (node, chain) => {
+      const importers = op_hmr_importers(node);
+      if (importers === null) {
+        return `${node} is not a loaded module`;
+      }
+      const record = hmrRecords.get(node);
+      if (record !== undefined && record.declined) {
+        return `${node} declined hot updates`;
+      }
+      if (!ArrayPrototypeIncludes(invalidated, node)) {
+        ArrayPrototypePush(invalidated, node);
+      }
+      if (
+        record !== undefined && record.selfAccepted &&
+        !ArrayPrototypeIncludes(forceBubble, node)
+      ) {
+        ArrayPrototypePush(boundaries, { boundary: node, via: null });
+        return null;
+      }
+      let hasImporter = false;
+      for (let i = 0; i < importers.length; i++) {
+        const importer = importers[i];
+        if (op_hmr_importers(importer) === null) {
+          continue;
+        }
+        hasImporter = true;
+        const importerRecord = hmrRecords.get(importer);
+        if (
+          importerRecord !== undefined && importerRecord.acceptedDeps.has(node)
+        ) {
+          ArrayPrototypePush(boundaries, { boundary: importer, via: node });
+          continue;
+        }
+        if (ArrayPrototypeIncludes(chain, importer)) {
+          continue;
+        }
+        const reason = walk(
+          importer,
+          [...new SafeArrayIterator(chain), importer],
+        );
+        if (reason !== null) {
+          return reason;
+        }
+      }
+      if (!hasImporter) {
+        return `${node} is not accepted by itself or any of its importers`;
+      }
+      return null;
+    };
+    for (let i = 0; i < changed.length; i++) {
+      const reason = walk(changed[i], [changed[i]]);
+      if (reason !== null) {
+        return reason;
+      }
+    }
+    return { invalidated, boundaries };
+  }
+
+  function hmrPayload(target, module, deps) {
+    ObjectDefineProperty(target, "module", {
+      __proto__: null,
+      value: module,
+      writable: true,
+      configurable: true,
+    });
+    ObjectDefineProperty(target, "deps", {
+      __proto__: null,
+      value: deps,
+      writable: true,
+      configurable: true,
+    });
+    return target;
+  }
+
+  async function hmrCall(callback, errorHandler, arg) {
+    try {
+      await callback(arg);
+    } catch (error) {
+      if (errorHandler === null) {
+        throw error;
+      }
+      await errorHandler(error);
+    }
+  }
+
+  async function hmrRetire(specifier, prune) {
+    const record = hmrRecords.get(specifier);
+    if (record === undefined) {
+      return;
+    }
+    const data = {};
+    const disposers = record.disposers;
+    for (let j = 0; j < disposers.length; j++) {
+      await disposers[j](data);
+    }
+    if (prune) {
+      const pruners = record.pruners;
+      for (let j = 0; j < pruners.length; j++) {
+        await pruners[j](data);
+      }
+    }
+    record.generation++;
+    record.data = data;
+    record.selfAccepted = false;
+    record.selfCallback = null;
+    record.selfErrorHandler = null;
+    record.acceptedDeps = new SafeMap();
+    record.declined = false;
+    record.disposers = [];
+    record.pruners = [];
+  }
+
+  function hmrHasLoadedImporter(specifier) {
+    const importers = op_hmr_importers(specifier);
+    for (let i = 0; i < importers.length; i++) {
+      if (op_hmr_importers(importers[i]) !== null) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  async function hmrPrune(candidates, pruned) {
+    const queue = [...new SafeArrayIterator(candidates)];
+    for (let i = 0; i < queue.length; i++) {
+      const specifier = queue[i];
+      if (
+        op_hmr_importers(specifier) === null ||
+        hmrHasLoadedImporter(specifier) ||
+        !op_hmr_evict([specifier], true)
+      ) {
+        continue;
+      }
+      const deps = op_hmr_deps(specifier);
+      await hmrRetire(specifier, true);
+      op_hmr_evict([specifier], false);
+      ArrayPrototypePush(pruned, specifier);
+      for (let j = 0; j < deps.length; j++) {
+        if (!ArrayPrototypeIncludes(queue, deps[j])) {
+          ArrayPrototypePush(queue, deps[j]);
+        }
+      }
+    }
+  }
+
+  async function hmrApplyRound(plan, pruned) {
+    const { invalidated, boundaries } = plan;
+    if (!op_hmr_evict(invalidated, true)) {
+      return "a module to update has not finished evaluating";
+    }
+
+    const pruneCandidates = [];
+    for (let i = 0; i < invalidated.length; i++) {
+      const deps = op_hmr_deps(invalidated[i]);
+      for (let j = 0; j < deps.length; j++) {
+        if (
+          !ArrayPrototypeIncludes(invalidated, deps[j]) &&
+          !ArrayPrototypeIncludes(pruneCandidates, deps[j])
+        ) {
+          ArrayPrototypePush(pruneCandidates, deps[j]);
+        }
+      }
+    }
+
+    const selfBoundaries = [];
+    const depEntries = [];
+    for (let i = 0; i < boundaries.length; i++) {
+      const { boundary, via } = boundaries[i];
+      const record = hmrRecords.get(boundary);
+      if (via === null) {
+        ArrayPrototypePush(selfBoundaries, {
+          specifier: boundary,
+          callback: record.selfCallback,
+          errorHandler: record.selfErrorHandler,
+        });
+      } else {
+        const entry = record.acceptedDeps.get(via);
+        let found = false;
+        for (let j = 0; j < depEntries.length; j++) {
+          if (depEntries[j].entry === entry) {
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          ArrayPrototypePush(depEntries, { specifier: boundary, entry });
+        }
+      }
+    }
+
+    await hmrSetStatus("dispose");
+    for (let i = 0; i < invalidated.length; i++) {
+      await hmrRetire(invalidated[i], false);
+    }
+
+    await hmrSetStatus("apply");
+    op_hmr_evict(invalidated, false);
+
+    for (let i = 0; i < selfBoundaries.length; i++) {
+      const { specifier, callback, errorHandler } = selfBoundaries[i];
+      let namespace;
+      try {
+        namespace = await import(specifier);
+      } catch (error) {
+        if (errorHandler === null) {
+          throw error;
+        }
+        await errorHandler(error);
+        continue;
+      }
+      if (callback !== null) {
+        await hmrCall(
+          callback,
+          errorHandler,
+          hmrPayload(ObjectCreate(namespace), namespace, []),
+        );
+      }
+    }
+
+    for (let i = 0; i < depEntries.length; i++) {
+      const { specifier, entry } = depEntries[i];
+      const deps = [];
+      try {
+        for (let j = 0; j < entry.deps.length; j++) {
+          ArrayPrototypePush(deps, await import(entry.deps[j]));
+        }
+      } catch (error) {
+        if (entry.errorHandler === null) {
+          throw error;
+        }
+        await entry.errorHandler(error);
+        continue;
+      }
+      if (entry.callback !== null) {
+        const module = await import(specifier);
+        const target = entry.single
+          ? ObjectCreate(deps[0])
+          : [...new SafeArrayIterator(deps)];
+        await hmrCall(
+          entry.callback,
+          entry.errorHandler,
+          hmrPayload(target, module, deps),
+        );
+      }
+    }
+    await hmrPrune(pruneCandidates, pruned);
+    return null;
+  }
+
+  async function hmrApplyUpdate(changed) {
+    if (hmrApplying) {
+      throw new Error("An HMR update is already being applied");
+    }
+    hmrApplying = true;
+    try {
+      const updated = [];
+      const pruned = [];
+      let pending = changed;
+      let forceBubble = [];
+      while (pending.length > 0) {
+        const plan = hmrPlan(pending, forceBubble);
+        if (typeof plan === "string") {
+          return { type: "needsFullReload", reason: plan };
+        }
+        hmrSelfInvalidated = [];
+        hmrBubbling = forceBubble;
+        const reason = await hmrApplyRound(plan, pruned);
+        if (reason !== null) {
+          return { type: "needsFullReload", reason };
+        }
+        for (let i = 0; i < plan.invalidated.length; i++) {
+          if (!ArrayPrototypeIncludes(updated, plan.invalidated[i])) {
+            ArrayPrototypePush(updated, plan.invalidated[i]);
+          }
+        }
+        pending = hmrSelfInvalidated;
+        forceBubble = hmrSelfInvalidated;
+      }
+      return { type: "handled", updated, pruned };
+    } finally {
+      hmrApplying = false;
+      await hmrSetStatus("idle");
+    }
+  }
+
   // Extra Deno.core.* exports
   const core = ObjectAssign(globalThis.Deno.core, {
     internalRidSymbol: Symbol("Deno.internal.rid"),
     internalFdSymbol: Symbol("Deno.internal.fd"),
     resources,
     __eventLoopTick,
+    __hmrCreateHotContext: hmrCreateHotContext,
+    __hmrApplyUpdate: hmrApplyUpdate,
     __processTimers,
     __setTickInfo(buf) {
       tickInfo = buf;

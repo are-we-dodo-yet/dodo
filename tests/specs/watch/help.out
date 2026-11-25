@@ -1,4 +1,4 @@
-Run a JavaScript or TypeScript program, watching for file changes and hot-replacing modules[WILDCARD]
+Run a JavaScript or TypeScript program, watching for file changes and applying them through import.meta.hot[WILDCARD]
 Usage: deno watch [OPTIONS] <SCRIPT_ARG>
 [WILDCARD]
 Options:

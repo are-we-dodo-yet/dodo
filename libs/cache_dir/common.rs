@@ -109,7 +109,7 @@ pub fn checksum(v: &[u8]) -> String {
 
   let mut hasher = Sha256::new();
   hasher.update(v);
-  format!("{:x}", hasher.finalize())
+  faster_hex::hex_string(&hasher.finalize())
 }
 
 #[cfg(test)]

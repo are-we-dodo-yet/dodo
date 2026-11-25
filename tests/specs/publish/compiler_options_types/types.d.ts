@@ -1,5 +1,5 @@
 interface ImportMeta {
-  hot: {
+  customHot: {
     accept(): void;
   };
 }

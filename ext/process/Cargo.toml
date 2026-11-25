@@ -22,7 +22,6 @@ deno_os.workspace = true
 deno_path_util.workspace = true
 deno_permissions.workspace = true
 deno_signals.workspace = true
-deno_subprocess_windows.workspace = true
 libc.workspace = true
 log.workspace = true
 memchr.workspace = true
@@ -37,4 +36,5 @@ tokio.workspace = true
 nix = { workspace = true, features = ["signal", "process"] }
 
 [target.'cfg(windows)'.dependencies]
+deno_subprocess_windows.workspace = true
 windows-sys = { workspace = true, features = ["Win32_System_Threading"] }

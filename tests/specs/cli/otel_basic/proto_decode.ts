@@ -166,7 +166,12 @@ const INT64_TYPES = new Set([
 // 0.32 serializes `int64` (e.g. AnyValue.intValue) and `fixed64` (e.g. the unix-nano
 // timestamps and Histogram `count`/`bucketCounts`) as strings, while `sfixed64`
 // (e.g. NumberDataPoint.asInt) stays a JSON number.
-const INT64_STRING_TYPES = new Set(["int64", "sint64", "fixed64"]);
+const INT64_STRING_TYPES = new Set([
+  "int64",
+  "sint64",
+  "fixed64",
+  "sfixed64",
+]);
 
 export function decode(typeName, buf) {
   const typeDef = typeRegistry.get(typeName);

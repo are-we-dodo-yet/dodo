@@ -1,362 +1,145 @@
 // Copyright 2018-2026 the Deno authors. MIT license.
 
-use std::collections::HashMap;
 use std::path::PathBuf;
 use std::sync::Arc;
-use std::sync::atomic::AtomicI32;
 
-use deno_core::LocalInspectorSession;
-use deno_core::error::CoreError;
-use deno_core::parking_lot::Mutex;
-use deno_core::serde_json::json;
-use deno_core::serde_json::{self};
-use deno_core::url::Url;
-use deno_error::JsErrorBox;
+use deno_core::futures::FutureExt;
+use deno_core::futures::future::LocalBoxFuture;
+use deno_lib::hmr::HmrChange;
+use deno_lib::hmr::HmrHost;
 use deno_terminal::colors;
-use tokio::select;
-use tokio::sync::mpsc;
-use tokio::sync::mpsc::UnboundedReceiver;
-use tokio::sync::mpsc::UnboundedSender;
-use tokio::sync::oneshot;
+use tokio::sync::broadcast;
+use tokio::sync::broadcast::error::RecvError;
+use tokio::sync::broadcast::error::TryRecvError;
 
-use crate::cdp;
-use crate::module_loader::CliEmitter;
+use crate::graph_container::HmrReload;
+use crate::graph_container::MainModuleGraphContainer;
 use crate::util::file_watcher::WatcherCommunicator;
 use crate::util::file_watcher::WatcherRestartMode;
-use crate::util::fs::canonicalize_path;
 
-static NEXT_MSG_ID: AtomicI32 = AtomicI32::new(0);
-fn next_id() -> i32 {
-  NEXT_MSG_ID.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
-}
-
-fn explain(response: &cdp::SetScriptSourceResponse) -> String {
-  match response.status {
-    cdp::Status::Ok => "OK".to_string(),
-    cdp::Status::CompileError => {
-      if let Some(details) = &response.exception_details {
-        let (message, description) = details.get_message_and_description();
-        format!(
-          "compile error: {}{}",
-          message,
-          if description == "undefined" {
-            "".to_string()
-          } else {
-            format!(" - {}", description)
-          }
-        )
-      } else {
-        "compile error: No exception details available".to_string()
-      }
-    }
-    cdp::Status::BlockedByActiveGenerator => {
-      "blocked by active generator".to_string()
-    }
-    cdp::Status::BlockedByActiveFunction => {
-      "blocked by active function".to_string()
-    }
-    cdp::Status::BlockedByTopLevelEsModuleChange => {
-      "blocked by top-level ES module change".to_string()
-    }
-  }
-}
-
-fn should_retry(status: &cdp::Status) -> bool {
-  match status {
-    cdp::Status::Ok => false,
-    cdp::Status::CompileError => false,
-    cdp::Status::BlockedByActiveGenerator => true,
-    cdp::Status::BlockedByActiveFunction => true,
-    cdp::Status::BlockedByTopLevelEsModuleChange => false,
-  }
-}
-
-#[derive(Debug)]
-enum InspectorMessageState {
-  Ready(serde_json::Value),
-  WaitingFor(oneshot::Sender<serde_json::Value>),
-}
-
-#[derive(Debug)]
-pub struct HmrRunnerInner {
+pub struct CliHmrHost {
   watcher_communicator: Arc<WatcherCommunicator>,
-  script_ids: HashMap<String, String>,
-  messages: HashMap<i32, InspectorMessageState>,
-  emitter: Arc<CliEmitter>,
-  exception_tx: UnboundedSender<JsErrorBox>,
-  exception_rx: Option<UnboundedReceiver<JsErrorBox>>,
+  graph_container: MainModuleGraphContainer,
+  changed_paths_rx: broadcast::Receiver<Option<Vec<PathBuf>>>,
+  pending: Option<Vec<PathBuf>>,
 }
 
-#[derive(Clone, Debug)]
-pub struct HmrRunnerState(Arc<Mutex<HmrRunnerInner>>);
-
-impl HmrRunnerState {
+impl CliHmrHost {
   pub fn new(
-    emitter: Arc<CliEmitter>,
     watcher_communicator: Arc<WatcherCommunicator>,
+    graph_container: MainModuleGraphContainer,
   ) -> Self {
-    let (exception_tx, exception_rx) = mpsc::unbounded_channel();
-
-    Self(Arc::new(Mutex::new(HmrRunnerInner {
-      emitter,
+    let changed_paths_rx = watcher_communicator.subscribe_changed_paths();
+    Self {
       watcher_communicator,
-      script_ids: HashMap::new(),
-      messages: HashMap::new(),
-      exception_tx,
-      exception_rx: Some(exception_rx),
-    })))
-  }
-
-  pub fn callback(&self, msg: deno_core::InspectorMsg) {
-    let deno_core::InspectorMsgKind::Message(msg_id) = msg.kind else {
-      let notification = serde_json::from_str(&msg.content).unwrap();
-      self.handle_notification(notification);
-      return;
-    };
-
-    let message: serde_json::Value =
-      serde_json::from_str(&msg.content).unwrap();
-    let mut state = self.0.lock();
-    let Some(message_state) = state.messages.remove(&msg_id) else {
-      state
-        .messages
-        .insert(msg_id, InspectorMessageState::Ready(message));
-      return;
-    };
-    let InspectorMessageState::WaitingFor(sender) = message_state else {
-      return;
-    };
-    let _ = sender.send(message);
-  }
-
-  fn handle_notification(&self, notification: cdp::Notification) {
-    if notification.method == "Runtime.exceptionThrown" {
-      let exception_thrown =
-        serde_json::from_value::<cdp::ExceptionThrown>(notification.params)
-          .unwrap();
-      // .map_err(JsErrorBox::from_err)?;
-      let (message, description) = exception_thrown
-        .exception_details
-        .get_message_and_description();
-      let _ = self
-        .0
-        .lock()
-        .exception_tx
-        .send(JsErrorBox::generic(format!("{} {}", message, description)));
-    } else if notification.method == "Debugger.scriptParsed" {
-      let params =
-        serde_json::from_value::<cdp::ScriptParsed>(notification.params)
-          .unwrap();
-      // .map_err(JsErrorBox::from_err)?;
-      if params.url.starts_with("file://") {
-        let file_url = Url::parse(&params.url).unwrap();
-        let file_path = file_url.to_file_path().unwrap();
-        if let Ok(canonicalized_file_path) = canonicalize_path(&file_path) {
-          let canonicalized_file_url =
-            Url::from_file_path(canonicalized_file_path).unwrap();
-          self
-            .0
-            .lock()
-            .script_ids
-            .insert(canonicalized_file_url.into(), params.script_id);
-        }
-      }
+      graph_container,
+      changed_paths_rx,
+      pending: None,
     }
   }
-}
 
-/// This structure is responsible for providing Hot Module Replacement
-/// functionality.
-///
-/// It communicates with V8 inspector over a local session and waits for
-/// notifications about changed files from the `FileWatcher`.
-///
-/// Upon receiving such notification, the runner decides if the changed
-/// path should be handled the `FileWatcher` itself (as if we were running
-/// in `--watch` mode), or if the path is eligible to be hot replaced in the
-/// current program.
-///
-/// Even if the runner decides that a path will be hot-replaced, the V8 isolate
-/// can refuse to perform hot replacement, eg. a top-level variable/function
-/// of an ES module cannot be hot-replaced. In such situation the runner will
-/// force a full restart of a program by notifying the `FileWatcher`.
-pub struct HmrRunner {
-  session: LocalInspectorSession,
-  state: HmrRunnerState,
-}
-
-impl HmrRunner {
-  pub fn new(state: HmrRunnerState, session: LocalInspectorSession) -> Self {
-    Self { session, state }
+  pub fn start(&self) {
+    self
+      .watcher_communicator
+      .change_restart_mode(WatcherRestartMode::Manual);
   }
 
-  pub fn start(&mut self) {
+  pub fn stop(&self) {
     self
-      .session
-      .post_message::<()>(next_id(), "Debugger.enable", None);
-    self
-      .session
-      .post_message::<()>(next_id(), "Runtime.enable", None);
-  }
-
-  fn watcher(&self) -> Arc<WatcherCommunicator> {
-    self.state.0.lock().watcher_communicator.clone()
-  }
-
-  pub fn stop(&mut self) {
-    self
-      .watcher()
+      .watcher_communicator
       .change_restart_mode(WatcherRestartMode::Automatic);
   }
 
-  pub async fn run(&mut self) -> Result<(), CoreError> {
-    self
-      .watcher()
-      .change_restart_mode(WatcherRestartMode::Manual);
-    let watcher = self.watcher();
-    let mut exception_rx = self.state.0.lock().exception_rx.take().unwrap();
+  async fn next_change_inner(&mut self) -> HmrChange {
     loop {
-      select! {
-        biased;
-
-        maybe_error = exception_rx.recv() => {
-          if let Some(err) = maybe_error {
-            break Err(err.into());
+      if self.pending.is_none() {
+        match self.changed_paths_rx.recv().await {
+          Ok(Some(paths)) => self.pending = Some(paths),
+          Ok(None) => {
+            return HmrChange::FullReload("unknown file change".to_string());
           }
-        },
-
-        changed_paths = watcher.watch_for_changed_paths() => {
-          let changed_paths = changed_paths.map_err(JsErrorBox::from_err)?;
-
-          let Some(changed_paths) = changed_paths else {
-            let _ = self.watcher().force_restart();
-            continue;
-          };
-
-          let filtered_paths: Vec<PathBuf> = changed_paths.into_iter().filter(|p| p.extension().is_some_and(|ext| {
-            let ext_str = ext.to_str().unwrap();
-            matches!(ext_str, "js" | "ts" | "jsx" | "tsx")
-          })).collect();
-
-          // If after filtering there are no paths it means it's either a file
-          // we can't HMR or an external file that was passed explicitly to
-          // `--watch-hmr=<file>` path.
-          if filtered_paths.is_empty() {
-            let _ = self.watcher().force_restart();
-            continue;
+          Err(RecvError::Lagged(_)) => {
+            return HmrChange::FullReload(
+              "too many file changes to track".to_string(),
+            );
           }
-
-          for path in filtered_paths {
-            let Some(path_str) = path.to_str() else {
-              let _ = self.watcher().force_restart();
-              continue;
-            };
-            let Ok(module_url) = Url::from_file_path(path_str) else {
-              let _ = self.watcher().force_restart();
-              continue;
-            };
-
-            let Some(id) = self.state.0.lock().script_ids.get(module_url.as_str()).cloned() else {
-              let _ = self.watcher().force_restart();
-              continue;
-            };
-
-            let source_code = tokio::fs::read_to_string(deno_path_util::url_to_file_path(&module_url).unwrap()).await?;
-            let source_code = self.state.0.lock().emitter.emit_for_hmr(
-              &module_url,
-              source_code,
-            )?;
-
-            let mut tries = 1;
-            loop {
-              let msg_id = self.set_script_source(&id, source_code.as_str());
-              let value = self.wait_for_response(msg_id).await;
-              let result: cdp::SetScriptSourceResponse = serde_json::from_value(value).map_err(|e| {
-                JsErrorBox::from_err(e)
-              })?;
-
-
-              if matches!(result.status, cdp::Status::Ok) {
-                self.dispatch_hmr_event(module_url.as_str());
-                self.watcher().print(format!("Replaced changed module {}", module_url.as_str()));
-                break;
+          Err(RecvError::Closed) => std::future::pending().await,
+        }
+      }
+      loop {
+        match self.changed_paths_rx.try_recv() {
+          Ok(Some(paths)) => {
+            let pending = self.pending.as_mut().unwrap();
+            for path in paths {
+              if !pending.contains(&path) {
+                pending.push(path);
               }
-
-              self.watcher().print(format!("Failed to reload module {}: {}.", module_url, colors::gray(&explain(&result))));
-              if should_retry(&result.status) && tries <= 2 {
-                tries += 1;
-                tokio::time::sleep(std::time::Duration::from_millis(100)).await;
-                continue;
-              }
-
-              let _ = self.watcher().force_restart();
-              break;
             }
           }
+          Ok(None) | Err(TryRecvError::Lagged(_)) => {
+            self.pending = None;
+            return HmrChange::FullReload("unknown file change".to_string());
+          }
+          Err(TryRecvError::Empty) | Err(TryRecvError::Closed) => break,
+        }
+      }
+      let paths = self.pending.clone().unwrap();
+      if paths.is_empty() {
+        self.pending = None;
+        return HmrChange::FullReload("a watched file was removed".to_string());
+      }
+      let result = self.graph_container.hmr_reload_paths(&paths).await;
+      self.pending = None;
+      match result {
+        Ok(HmrReload::Reloaded(specifiers)) => {
+          return HmrChange::Update(
+            specifiers.into_iter().map(String::from).collect(),
+          );
+        }
+        Ok(HmrReload::NotInGraph(path)) => {
+          return HmrChange::FullReload(format!(
+            "{} is not a module in the graph",
+            path.display()
+          ));
+        }
+        Err(err) => {
+          log::error!("{}: {}", colors::red_bold("error"), err);
+          self.watcher_communicator.print(
+            "Update not applied. Waiting for file changes...".to_string(),
+          );
         }
       }
     }
   }
+}
 
-  async fn wait_for_response(&self, msg_id: i32) -> serde_json::Value {
-    let rx = {
-      let mut state = self.state.0.lock();
-      if let Some(message_state) = state.messages.remove(&msg_id) {
-        let InspectorMessageState::Ready(value) = message_state else {
-          unreachable!();
-        };
-        return Self::extract_result(value);
-      }
-      let (tx, rx) = oneshot::channel();
-      state
-        .messages
-        .insert(msg_id, InspectorMessageState::WaitingFor(tx));
-      rx
-    };
-
-    let value = rx.await.unwrap();
-    Self::extract_result(value)
+impl HmrHost for CliHmrHost {
+  fn next_change(&mut self) -> LocalBoxFuture<'_, HmrChange> {
+    self.next_change_inner().boxed_local()
   }
 
-  #[allow(clippy::print_stderr, reason = "diagnostic for flaky CDP responses")]
-  fn extract_result(mut value: serde_json::Value) -> serde_json::Value {
-    let result = value["result"].take();
-    if result.is_null() {
-      eprintln!(
-        "CDP response has null result. Full response: {}",
-        serde_json::to_string(&value).unwrap_or_default()
-      );
+  fn on_unloaded_changed(&mut self, specifiers: &[String]) -> Option<String> {
+    Some(format!("{} is not a loaded module", specifiers[0]))
+  }
+
+  fn on_updated(&mut self, updated: &[String]) {
+    for specifier in updated {
+      self
+        .watcher_communicator
+        .print(format!("Updated {}", specifier));
     }
-    result
   }
 
-  fn set_script_source(&mut self, script_id: &str, source: &str) -> i32 {
-    let msg_id = next_id();
-    self.session.post_message(
-      msg_id,
-      "Debugger.setScriptSource",
-      Some(json!({
-        "scriptId": script_id,
-        "scriptSource": source,
-        "allowTopFrameEditing": true,
-      })),
-    );
-    msg_id
+  fn on_pruned(&mut self, pruned: &[String]) {
+    for specifier in pruned {
+      self
+        .watcher_communicator
+        .print(format!("Pruned {}", specifier));
+    }
   }
 
-  fn dispatch_hmr_event(&mut self, script_id: &str) {
-    let expr = format!(
-      "dispatchEvent(new CustomEvent(\"hmr\", {{ detail: {{ path: \"{}\" }} }}));",
-      script_id
-    );
-
-    self.session.post_message(
-      next_id(),
-      "Runtime.evaluate",
-      Some(json!({
-        "expression": expr,
-        "contextId": Some(1),
-      })),
-    );
+  fn full_reload(&mut self, reason: &str) {
+    log::debug!("HMR full reload: {}", reason);
+    let _ = self.watcher_communicator.force_restart();
   }
 }

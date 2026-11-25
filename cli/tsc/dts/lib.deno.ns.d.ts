@@ -80,6 +80,113 @@ interface ImportMeta {
    * ```
    */
   resolve(specifier: string): string;
+
+  /** The hot module replacement API. Only defined for local modules when the
+   * program runs with hot module replacement enabled (`deno run --watch-hmr`,
+   * `deno serve --watch-hmr`, `deno desktop --hmr`), so guard its usage:
+   *
+   * ```ts
+   * if (import.meta.hot) {
+   *   import.meta.hot.accept();
+   * }
+   * ```
+   */
+  hot?: ImportMetaHot;
+}
+
+/** The value passed to an `import.meta.hot.accept()` callback.
+ *
+ * It can be used both as the updated module namespace (`payload.someExport`,
+ * or as an array of namespaces when an array of dependencies was accepted)
+ * and as the `{ module, deps }` object described by the ESM-HMR spec. An
+ * export named `module` or `deps` is shadowed by these two properties.
+ *
+ * @category Runtime
+ */
+// deno-lint-ignore no-explicit-any
+type ImportMetaHotPayload<T = any> = T & {
+  /** The updated module when a module accepted itself, otherwise the
+   * namespace of the module that accepted its dependencies. */
+  // deno-lint-ignore no-explicit-any
+  readonly module: any;
+  /** The updated namespaces of the accepted dependencies. */
+  // deno-lint-ignore no-explicit-any
+  readonly deps: any[];
+};
+
+/** The status of the hot module replacement runtime.
+ *
+ * @category Runtime
+ */
+type ImportMetaHotStatus = "idle" | "dispose" | "apply";
+
+/** @category Runtime */
+interface ImportMetaHot {
+  /** State handed over from the previous instance of this module by its
+   * `dispose` handlers. */
+  // deno-lint-ignore no-explicit-any
+  readonly data: any;
+
+  /** Accept updates of this module. The module is evaluated again and the
+   * callback registered by the previous instance receives the new instance.
+   * If evaluation or the callback throws and `errorHandler` is given, it is
+   * called instead of restarting the program. */
+  accept(
+    callback?: (payload: ImportMetaHotPayload) => void | Promise<void>,
+    errorHandler?: (error: unknown) => void | Promise<void>,
+  ): void;
+  /** Accept updates of a dependency without evaluating this module again. */
+  accept(
+    dep: string,
+    callback?: (payload: ImportMetaHotPayload) => void | Promise<void>,
+    errorHandler?: (error: unknown) => void | Promise<void>,
+  ): void;
+  /** Accept updates of several dependencies without evaluating this module
+   * again. */
+  accept(
+    deps: readonly string[],
+    // deno-lint-ignore no-explicit-any
+    callback?: (payload: ImportMetaHotPayload<any[]>) => void | Promise<void>,
+    errorHandler?: (error: unknown) => void | Promise<void>,
+  ): void;
+
+  /** Mark this module as not updatable. A change that reaches it restarts
+   * the program. */
+  decline(): void;
+
+  /** Register a handler that runs before this module instance is replaced.
+   * Values stored on `data` are available to the next instance as
+   * `import.meta.hot.data`. */
+  // deno-lint-ignore no-explicit-any
+  dispose(callback: (data: any) => void | Promise<void>): void;
+  /** Alias of `dispose`. */
+  // deno-lint-ignore no-explicit-any
+  addDisposeHandler(callback: (data: any) => void | Promise<void>): void;
+  // deno-lint-ignore no-explicit-any
+  removeDisposeHandler(callback: (data: any) => void | Promise<void>): void;
+
+  /** Register a handler that runs when this module is no longer imported by
+   * any module after an update. Its `dispose` handlers run first. */
+  // deno-lint-ignore no-explicit-any
+  prune(callback: (data: any) => void | Promise<void>): void;
+
+  /** Reject the update that is currently being applied to this module and
+   * let its importers handle it instead. Can only be called while an update
+   * is being applied. */
+  invalidate(): void;
+
+  /** Returns the current status, or registers a status handler when one is
+   * passed. */
+  status(): ImportMetaHotStatus;
+  status(
+    handler: (status: ImportMetaHotStatus) => void | Promise<void>,
+  ): void;
+  addStatusHandler(
+    handler: (status: ImportMetaHotStatus) => void | Promise<void>,
+  ): void;
+  removeStatusHandler(
+    handler: (status: ImportMetaHotStatus) => void | Promise<void>,
+  ): void;
 }
 
 /** Deno supports [User Timing Level 3](https://w3c.github.io/user-timing)

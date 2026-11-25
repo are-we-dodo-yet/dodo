@@ -35,6 +35,78 @@ pub(crate) enum SymbolicModule {
   Mod(ModuleId),
 }
 
+trait AliasTarget {
+  fn alias_target(&self) -> Option<&str>;
+}
+
+impl AliasTarget for SymbolicModule {
+  fn alias_target(&self) -> Option<&str> {
+    match self {
+      SymbolicModule::Alias(target) => Some(target.as_str()),
+      SymbolicModule::Mod(_) => None,
+    }
+  }
+}
+
+#[derive(Default)]
+pub(crate) struct HmrGraph {
+  deps: HashMap<String, HashSet<String>>,
+  importers: HashMap<String, HashSet<String>>,
+  evicted_main: Option<String>,
+}
+
+impl HmrGraph {
+  fn clear_deps(&mut self, importer: &str) {
+    let Some(deps) = self.deps.remove(importer) else {
+      return;
+    };
+    for dep in deps {
+      if let Some(importers) = self.importers.get_mut(&dep) {
+        importers.remove(importer);
+        if importers.is_empty() {
+          self.importers.remove(&dep);
+        }
+      }
+    }
+  }
+
+  pub(crate) fn add_dep(&mut self, importer: &str, dep: &str) {
+    if importer == dep {
+      return;
+    }
+    self
+      .deps
+      .entry(importer.to_string())
+      .or_default()
+      .insert(dep.to_string());
+    self
+      .importers
+      .entry(dep.to_string())
+      .or_default()
+      .insert(importer.to_string());
+  }
+
+  pub(crate) fn deps_of(&self, name: &str) -> Vec<String> {
+    let mut deps = self
+      .deps
+      .get(name)
+      .map(|set| set.iter().cloned().collect::<Vec<_>>())
+      .unwrap_or_default();
+    deps.sort();
+    deps
+  }
+
+  pub(crate) fn importers_of(&self, name: &str) -> Vec<String> {
+    let mut importers = self
+      .importers
+      .get(name)
+      .map(|set| set.iter().cloned().collect::<Vec<_>>())
+      .unwrap_or_default();
+    importers.sort();
+    importers
+  }
+}
+
 /// Map of [`ModuleName`] and [`RequestedModuleType`] to a data field.
 struct ModuleNameTypeMap<T> {
   submaps: Vec<HashMap<ModuleName, T>>,
@@ -95,6 +167,24 @@ impl<T> ModuleNameTypeMap<T> {
       .is_none()
     {
       self.len += 1;
+    }
+  }
+
+  pub fn get_all<'a>(&'a self, name: &'a str) -> impl Iterator<Item = &'a T> {
+    self.submaps.iter().filter_map(move |map| map.get(name))
+  }
+
+  pub fn remove_name(&mut self, name: &str, mut on_removed: impl FnMut(T))
+  where
+    T: AliasTarget,
+  {
+    for map in &mut self.submaps {
+      let before = map.len();
+      if let Some(removed) = map.remove(name) {
+        on_removed(removed);
+      }
+      map.retain(|_, v| v.alias_target() != Some(name));
+      self.len -= before - map.len();
     }
   }
 
@@ -239,6 +329,7 @@ pub(crate) struct ModuleMapData {
   /// JS `core.loadExtScript` wrapper. Runtime-only — not snapshotted.
   pub(crate) captured_bootstrap: RefCell<Option<v8::Global<v8::Value>>>,
   pub(crate) sources: HashMap<ModuleSourceKey, v8::Global<v8::Object>>,
+  pub(crate) hmr: Option<HmrGraph>,
   /// Import edges dropped by `ModuleMap::drop_instantiated_requests`, kept
   /// only in test builds so tests can still assert on what was parsed out of
   /// the module source.
@@ -366,6 +457,17 @@ impl ModuleMapData {
         sources.remove(name.as_str());
       }
     }
+    let mut main = main;
+    if let Some(hmr) = &mut data.hmr {
+      hmr.clear_deps(name.as_str());
+      for request in &requests {
+        hmr.add_dep(name.as_str(), request.reference.specifier.as_str());
+      }
+      if hmr.evicted_main.as_deref() == Some(name.as_str()) {
+        hmr.evicted_main = None;
+        main = true;
+      }
+    }
     let (name1, name2) = name.into_cheap_copy();
     data.handles_inverted.insert(handle.clone(), id);
     data.handles.push(handle);
@@ -387,6 +489,40 @@ impl ModuleMapData {
     });
 
     id
+  }
+
+  pub(crate) fn get_ids_of_any_type(&self, name: &str) -> Vec<ModuleId> {
+    self
+      .by_name
+      .get_all(name)
+      .filter_map(|module| match module {
+        SymbolicModule::Mod(id) => Some(*id),
+        SymbolicModule::Alias(_) => None,
+      })
+      .collect()
+  }
+
+  pub(crate) fn evict(&mut self, names: &[String]) {
+    for name in names {
+      let mut removed_ids = Vec::new();
+      self.by_name.remove_name(name, |module| {
+        if let SymbolicModule::Mod(id) = module {
+          removed_ids.push(id);
+        }
+      });
+      if let Some(main_id) = self.main_module_id
+        && removed_ids.contains(&main_id)
+      {
+        self.main_module_id = None;
+        if let Some(hmr) = &mut self.hmr {
+          hmr.evicted_main = Some(name.clone());
+        }
+      }
+      self.sources.retain(|key, _| key.name.as_str() != name);
+      if let Some(hmr) = &mut self.hmr {
+        hmr.clear_deps(name);
+      }
+    }
   }
 
   /// Get module id, following all aliases in case of module specifier

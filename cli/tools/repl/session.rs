@@ -191,7 +191,6 @@ pub struct ReplSession {
   decorators: deno_ast::DecoratorsTranspileOption,
 }
 
-// TODO: duplicated in `cli/tools/run/hmr.rs`
 #[derive(Debug)]
 enum InspectorMessageState {
   Ready(serde_json::Value),
@@ -583,7 +582,7 @@ impl ReplSession {
     let wrapped_line = if line.trim_start().starts_with('{')
       && !line.trim_end().ends_with(';')
     {
-      format!("({})", &line)
+      format!("({})", line)
     } else {
       line.to_string()
     };

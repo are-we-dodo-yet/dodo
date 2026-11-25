@@ -91,6 +91,10 @@ impl<K: std::hash::Hash + Eq + Clone, V> LruCache<K, V> {
     }
     self.entries.insert(key, (value, self.clock));
   }
+
+  fn retain(&mut self, mut f: impl FnMut(&K) -> bool) {
+    self.entries.retain(|k, _| f(k));
+  }
 }
 
 /// How many decoded source maps to keep. Stack traces walk a handful of
@@ -152,6 +156,12 @@ impl SourceMapper {
     source_map_url: String,
   ) {
     self.source_map_urls.insert(module_name, source_map_url);
+  }
+
+  pub(crate) fn invalidate(&mut self, file_name: &str) {
+    self.maps.retain(|k| k != file_name);
+    self.source_lines.retain(|(k, _)| k != file_name);
+    self.source_map_urls.remove(file_name);
   }
 
   /// Returns the decoded source map for `file_name`, decoding it on first

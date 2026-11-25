@@ -263,7 +263,7 @@ impl DatabaseHandler for SqliteDbHandler {
           conn,
           match versionstamp_rng_seed {
             Some(seed) => Box::new(rand::rngs::StdRng::seed_from_u64(seed)),
-            None => Box::new(rand::rngs::StdRng::from_entropy()),
+            None => Box::new(rand::make_rng::<rand::rngs::StdRng>()),
           },
         ))
       },

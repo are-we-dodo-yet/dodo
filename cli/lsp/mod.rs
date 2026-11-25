@@ -1,10 +1,6 @@
 // Copyright 2018-2026 the Deno authors. MIT license.
 
 use deno_core::error::AnyError;
-use tower_lsp::LspService;
-use tower_lsp::Server;
-
-use crate::lsp::language_server::LanguageServer;
 
 mod analysis;
 mod cache;
@@ -30,6 +26,7 @@ mod registries;
 mod resolver;
 mod search;
 mod semantic_tokens;
+mod server;
 mod test_code_actions;
 mod testing;
 mod text;
@@ -39,43 +36,5 @@ mod tsc;
 mod urls;
 
 pub async fn start() -> Result<(), AnyError> {
-  let stdin = tokio::io::stdin();
-  let stdout = tokio::io::stdout();
-
-  let builder = LspService::build(|client| {
-    language_server::LanguageServer::new(client::Client::from_tower(client))
-  })
-  .custom_method(
-    lsp_custom::PERFORMANCE_REQUEST,
-    LanguageServer::performance_request,
-  )
-  .custom_method(
-    lsp_custom::INFERRED_TYPE_REQUEST,
-    LanguageServer::inferred_type,
-  )
-  .custom_method(lsp_custom::TASK_REQUEST, LanguageServer::task_definitions)
-  .custom_method(testing::TEST_RUN_REQUEST, LanguageServer::test_run_request)
-  .custom_method(
-    testing::TEST_RUN_CANCEL_REQUEST,
-    LanguageServer::test_run_cancel_request,
-  )
-  .custom_method(
-    lsp_custom::VIRTUAL_TEXT_DOCUMENT,
-    LanguageServer::virtual_text_document,
-  )
-  .custom_method(
-    lsp_custom::VIRTUAL_TEXT_DOCUMENT,
-    LanguageServer::virtual_text_document,
-  )
-  .custom_method(
-    lsp_custom::VIRTUAL_TEXT_DOCUMENT,
-    LanguageServer::virtual_text_document,
-  );
-
-  let (service, socket, pending) = builder.finish();
-  Server::new(stdin, stdout, socket, pending)
-    .concurrency_level(32)
-    .serve(service)
-    .await;
-  Ok(())
+  server::serve().await
 }

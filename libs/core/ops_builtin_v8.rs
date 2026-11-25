@@ -41,6 +41,48 @@ pub fn op_add_main_module_handler(
     .push(f);
 }
 
+#[op2]
+#[serde]
+pub fn op_hmr_importers(
+  scope: &mut v8::PinScope,
+  #[string] specifier: &str,
+) -> Option<Vec<String>> {
+  JsRealm::module_map_from(scope).hmr_importers(specifier)
+}
+
+#[op2]
+#[serde]
+pub fn op_hmr_deps(
+  scope: &mut v8::PinScope,
+  #[string] specifier: &str,
+) -> Vec<String> {
+  JsRealm::module_map_from(scope).hmr_deps(specifier)
+}
+
+#[op2]
+pub fn op_hmr_evict(
+  scope: &mut v8::PinScope,
+  #[serde] specifiers: Vec<String>,
+  check_only: bool,
+) -> bool {
+  JsRealm::module_map_from(scope).hmr_evict(scope, &specifiers, check_only)
+}
+
+#[op2]
+#[string]
+pub fn op_hmr_resolve(
+  scope: &mut v8::PinScope,
+  #[string] specifier: &str,
+  #[string] referrer: &str,
+) -> Result<String, JsErrorBox> {
+  let resolved = JsRealm::module_map_from(scope).resolve(
+    specifier,
+    referrer,
+    crate::modules::ResolutionKind::DynamicImport,
+  )?;
+  Ok(resolved.into())
+}
+
 #[op2(fast)]
 pub fn op_set_handled_promise_rejection_handler(
   scope: &mut v8::PinScope,

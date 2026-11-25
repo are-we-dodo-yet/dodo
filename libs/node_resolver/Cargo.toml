@@ -35,7 +35,6 @@ log.workspace = true
 once_cell.workspace = true
 path-clean.workspace = true
 percent-encoding.workspace = true
-pretty_assertions.workspace = true
 regex.workspace = true
 rustc-hash.workspace = true
 serde.workspace = true
@@ -45,4 +44,5 @@ thiserror.workspace = true
 url.workspace = true
 
 [dev-dependencies]
+pretty_assertions.workspace = true
 sys_traits = { workspace = true, features = ["memory"] }

@@ -814,7 +814,7 @@ impl<'a> DenoCompileBinaryWriter<'a> {
         asset_module_urls.swap_remove(module.specifier());
         let maybe_cjs_export_analysis = maybe_cjs_analysis
           .as_ref()
-          .map(bincode::serialize)
+          .map(serde_json::to_vec)
           .transpose()?;
         if module.specifier().scheme() == "file" {
           let file_path = deno_path_util::url_to_file_path(module.specifier())?;
@@ -909,6 +909,12 @@ impl<'a> DenoCompileBinaryWriter<'a> {
       // falls outside what the root of where the VFS will be based
       vfs.add_possible_min_root_dir(import_map_parent_dir);
     }
+    if let crate::args::DenoSubcommand::Desktop(desktop_flags) =
+      self.cli_options.sub_command()
+      && desktop_flags.hmr
+    {
+      vfs.add_possible_min_root_dir(self.cli_options.initial_cwd());
+    }
     if let Some(node_modules_dir) = self.npm_resolver.root_node_modules_path() {
       // ensure the vfs doesn't go below the node_modules directory's parent
       if let Some(parent) = node_modules_dir.parent() {
@@ -987,7 +993,7 @@ impl<'a> DenoCompileBinaryWriter<'a> {
             CjsExportAnalysisEntry::Error(err.to_string())
           }
         };
-        to_add.push((file_path, bincode::serialize(&analysis)?));
+        to_add.push((file_path, serde_json::to_vec(&analysis)?));
       }
     }
     for (file_path, analysis) in to_add {

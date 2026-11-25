@@ -5,6 +5,7 @@ use std::cell::RefCell;
 use std::collections::HashSet;
 use std::future::Future;
 use std::io::IsTerminal;
+use std::path::Path;
 use std::path::PathBuf;
 use std::rc::Rc;
 use std::sync::Arc;
@@ -27,7 +28,6 @@ use notify::Watcher;
 use notify::event::Event as NotifyEvent;
 use notify::event::EventKind;
 use tokio::select;
-use tokio::sync::broadcast::error::RecvError;
 use tokio::sync::mpsc;
 use tokio::sync::mpsc::UnboundedReceiver;
 use tokio::sync::mpsc::error::SendError;
@@ -208,11 +208,10 @@ impl WatcherCommunicator {
     self.restart_tx.send(())
   }
 
-  pub async fn watch_for_changed_paths(
+  pub fn subscribe_changed_paths(
     &self,
-  ) -> Result<Option<Vec<PathBuf>>, RecvError> {
-    let mut rx = self.changed_paths_rx.resubscribe();
-    rx.recv().await
+  ) -> tokio::sync::broadcast::Receiver<Option<Vec<PathBuf>>> {
+    self.changed_paths_rx.resubscribe()
   }
 
   pub fn change_restart_mode(&self, restart_mode: WatcherRestartMode) {
@@ -513,11 +512,31 @@ where
   }
 }
 
+#[derive(Default)]
+struct WatchedPaths {
+  files: HashSet<PathBuf>,
+  dirs: Vec<PathBuf>,
+}
+
+impl WatchedPaths {
+  fn contains(&self, path: &Path) -> bool {
+    self.files.contains(path)
+      || self.dirs.iter().any(|dir| path.starts_with(dir))
+  }
+}
+
+struct PathWatcher {
+  watcher: RecommendedWatcher,
+  watched: Arc<Mutex<WatchedPaths>>,
+}
+
 fn new_watcher(
   sender: Arc<mpsc::UnboundedSender<Vec<PathBuf>>>,
   exclude_set: Arc<PathOrPatternSet>,
-) -> Result<RecommendedWatcher, AnyError> {
-  Ok(Watcher::new(
+) -> Result<PathWatcher, AnyError> {
+  let watched: Arc<Mutex<WatchedPaths>> = Default::default();
+  let watched_ = watched.clone();
+  let watcher = Watcher::new(
     move |res: Result<NotifyEvent, NotifyError>| {
       let Ok(event) = res else {
         return;
@@ -530,10 +549,25 @@ fn new_watcher(
         return;
       }
 
-      let canonicalized: Vec<PathBuf> = event
-        .paths
-        .iter()
-        .filter_map(|path| canonicalize_path(path).ok())
+      let event_paths: Vec<(&PathBuf, Option<PathBuf>)> = {
+        let watched = watched_.lock();
+        event
+          .paths
+          .iter()
+          .map(|path| (path, canonicalize_path(path).ok()))
+          .filter(|(path, canonicalized)| {
+            watched.contains(path)
+              || canonicalized.as_ref().is_some_and(|p| watched.contains(p))
+          })
+          .collect()
+      };
+      if event_paths.is_empty() {
+        return;
+      }
+
+      let canonicalized: Vec<PathBuf> = event_paths
+        .into_iter()
+        .map(|(path, canonicalized)| canonicalized.unwrap_or(path.clone()))
         .collect();
       let paths: Vec<PathBuf> = canonicalized
         .iter()
@@ -551,7 +585,8 @@ fn new_watcher(
       sender.send(paths).unwrap();
     },
     Default::default(),
-  )?)
+  )?;
+  Ok(PathWatcher { watcher, watched })
 }
 
 /// Computes the set of paths a watcher should observe for a given set of file
@@ -574,7 +609,7 @@ pub fn watch_paths_for_file_patterns(patterns: &FilePatterns) -> Vec<PathBuf> {
 }
 
 fn add_paths_to_watcher(
-  watcher: &mut RecommendedWatcher,
+  watcher: &mut PathWatcher,
   paths: &[PathBuf],
   paths_to_exclude: &PathOrPatternSet,
 ) {
@@ -587,13 +622,31 @@ fn add_paths_to_watcher(
     }
 
     watched_paths.push(path.clone());
-    let _ = watcher.watch(path, RecursiveMode::Recursive);
+    let canonicalized = canonicalize_path(path).ok();
+    // https://github.com/denoland/deno/issues/31053
+    if !path.is_dir()
+      && let Some(parent) = path.parent()
+    {
+      {
+        let mut watched = watcher.watched.lock();
+        watched.files.insert(path.clone());
+        watched.files.extend(canonicalized);
+      }
+      let _ = watcher.watcher.watch(parent, RecursiveMode::NonRecursive);
+    } else {
+      {
+        let mut watched = watcher.watched.lock();
+        watched.dirs.push(path.clone());
+        watched.dirs.extend(canonicalized);
+      }
+      let _ = watcher.watcher.watch(path, RecursiveMode::Recursive);
+    }
   }
   log::debug!("Watching paths: {:?}", watched_paths);
 }
 
 fn consume_paths_to_watch(
-  watcher: &mut RecommendedWatcher,
+  watcher: &mut PathWatcher,
   receiver: &mut UnboundedReceiver<Vec<PathBuf>>,
   exclude_set: &PathOrPatternSet,
 ) {

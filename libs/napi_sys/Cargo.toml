@@ -14,4 +14,4 @@ repository.workspace = true
 description = "Node-API FFI bindings for Deno's NAPI test suite"
 
 [target.'cfg(windows)'.dependencies]
-libloading = "0.7"
+libloading.workspace = true

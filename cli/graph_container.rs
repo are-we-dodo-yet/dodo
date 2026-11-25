@@ -1,18 +1,26 @@
 // Copyright 2018-2026 the Deno authors. MIT license.
 
+use std::path::Path;
+use std::path::PathBuf;
 use std::sync::Arc;
 
 use deno_ast::ModuleSpecifier;
 use deno_config::glob::FilePatterns;
 use deno_config::glob::PathOrPatternSet;
+use deno_core::anyhow::bail;
 use deno_core::error::AnyError;
 use deno_core::parking_lot::RwLock;
+use deno_graph::GraphKind;
+use deno_graph::Module;
 use deno_graph::ModuleGraph;
+use deno_graph::WalkOptions;
 use deno_runtime::deno_permissions::PermissionsContainer;
 
 use crate::args::CliOptions;
+use crate::graph_util::GraphRootsValidOptions;
 use crate::module_loader::ModuleLoadPreparer;
 use crate::module_loader::PrepareModuleLoadOptions;
+use crate::util::fs::canonicalize_path;
 use crate::util::fs::collect_specifiers;
 use crate::util::path::is_script_ext;
 
@@ -52,6 +60,34 @@ pub struct MainModuleGraphContainer {
 pub struct CheckSpecifiersOptions<'a> {
   pub ext_overwrite: Option<&'a String>,
   pub allow_unknown_media_types: bool,
+}
+
+pub enum HmrReload {
+  Reloaded(Vec<ModuleSpecifier>),
+  NotInGraph(PathBuf),
+}
+
+fn find_graph_specifier(
+  graph: &ModuleGraph,
+  path: &Path,
+) -> Option<ModuleSpecifier> {
+  if let Ok(specifier) = ModuleSpecifier::from_file_path(path)
+    && graph.contains(&specifier)
+  {
+    return Some(specifier);
+  }
+  graph
+    .specifiers()
+    .map(|(specifier, _)| specifier)
+    .filter(|specifier| specifier.scheme() == "file")
+    .find(|specifier| {
+      specifier
+        .to_file_path()
+        .ok()
+        .and_then(|p| canonicalize_path(&p).ok())
+        .is_some_and(|p| p == path)
+    })
+    .cloned()
 }
 
 pub struct CollectSpecifiersOptions {
@@ -104,6 +140,75 @@ impl MainModuleGraphContainer {
       .await?;
     graph_permit.commit();
     Ok(())
+  }
+
+  pub async fn hmr_reload_paths(
+    &self,
+    paths: &[PathBuf],
+  ) -> Result<HmrReload, AnyError> {
+    let mut graph_permit = self.acquire_update_permit().await;
+    let graph = graph_permit.graph_mut();
+    let mut specifiers = Vec::with_capacity(paths.len());
+    let mut specifiers_to_reload = Vec::with_capacity(paths.len());
+    let mut removed = Vec::new();
+    for path in paths {
+      let Some(specifier) = find_graph_specifier(graph, path) else {
+        return Ok(HmrReload::NotInGraph(path.clone()));
+      };
+      if !path.exists() {
+        removed.push(specifier);
+        continue;
+      }
+      let is_unchanged = match graph.get(&specifier) {
+        Some(Module::Js(module)) => std::fs::read_to_string(path)
+          .is_ok_and(|text| *text == *module.source.text),
+        _ => false,
+      };
+      if !is_unchanged {
+        specifiers_to_reload.push(specifier.clone());
+      }
+      specifiers.push(specifier);
+    }
+    if !specifiers_to_reload.is_empty() {
+      self
+        .module_load_preparer
+        .reload_specifiers(
+          graph,
+          specifiers_to_reload,
+          false,
+          self.root_permissions.clone(),
+        )
+        .await?;
+      self.module_load_preparer.graph_roots_valid(
+        graph,
+        &graph.roots.iter().cloned().collect::<Vec<_>>(),
+        GraphRootsValidOptions {
+          allow_unknown_media_types: true,
+          allow_unknown_jsr_exports: false,
+          allow_sloppy_imports_hints_for_unreferenced_roots: true,
+        },
+      )?;
+      graph_permit.commit();
+    }
+    if !removed.is_empty() {
+      let graph = self.graph();
+      let roots = graph.roots.iter().collect::<Vec<_>>();
+      let reachable = graph.walk(
+        roots.into_iter(),
+        WalkOptions {
+          check_js: deno_graph::CheckJsOption::False,
+          follow_dynamic: true,
+          kind: GraphKind::CodeOnly,
+          prefer_fast_check_graph: false,
+        },
+      );
+      for (specifier, _) in reachable {
+        if removed.contains(specifier) {
+          bail!("{} was removed but is still imported", specifier);
+        }
+      }
+    }
+    Ok(HmrReload::Reloaded(specifiers))
   }
 
   pub fn collect_specifiers(

@@ -291,7 +291,7 @@ pub mod reporter {
         " {} |",
         colors::yellow(&format!("{:>15}", fmt_duration(stats.avg)))
       ));
-      s.push_str(&format!(" {:>13} |", &avg_to_iter_per_s(stats.avg)));
+      s.push_str(&format!(" {:>13} |", avg_to_iter_per_s(stats.avg)));
     }
     if options.min_max {
       s.push_str(&format!(

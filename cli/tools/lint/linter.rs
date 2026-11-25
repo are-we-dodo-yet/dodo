@@ -303,7 +303,7 @@ fn apply_lint_fixes_and_relint(
               u32::from(utf16_start),
               u32::from(utf16_end)
             ));
-            changes_text.push_str(&format!("Text: {:?}\n\n", &change.new_text));
+            changes_text.push_str(&format!("Text: {:?}\n\n", change.new_text));
           }
           return Err(err).context(format!(
             "The '{}' rule caused a syntax error applying '{}'.\n\n{}",

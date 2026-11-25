@@ -109,7 +109,7 @@ use crate::standalone::binary::DenoCompileBinaryWriter;
 use crate::sys::CliSys;
 use crate::tools::installer::BinNameResolver;
 use crate::tools::lint::LintRuleProvider;
-use crate::tools::run::hmr::HmrRunnerState;
+use crate::tools::run::hmr::CliHmrHost;
 use crate::tsc::TypeCheckingCjsTracker;
 use crate::type_checker::TypeChecker;
 use crate::util::file_watcher::WatcherCommunicator;
@@ -1325,7 +1325,9 @@ impl CliFactory {
       self.npm_installer_if_managed().await?.cloned(),
       npm_resolver.clone(),
       self.text_only_progress_bar().clone(),
-      self.create_cli_main_worker_options()?,
+      self.create_cli_main_worker_options(
+        self.main_module_graph_container().await?.as_ref().clone(),
+      )?,
       self.root_permissions_container()?.clone(),
     ))
   }
@@ -1394,13 +1396,16 @@ impl CliFactory {
 
   fn create_cli_main_worker_options(
     &self,
+    main_module_graph_container: MainModuleGraphContainer,
   ) -> Result<CliMainWorkerOptions, AnyError> {
     let cli_options = self.cli_options()?;
     let create_hmr_runner = if cli_options.has_hmr() {
       let watcher_communicator = self.watcher_communicator.clone().unwrap();
-      let emitter = self.emitter()?.clone();
       let fn_: crate::worker::CreateHmrRunnerCb = Box::new(move || {
-        HmrRunnerState::new(emitter.clone(), watcher_communicator.clone())
+        CliHmrHost::new(
+          watcher_communicator.clone(),
+          main_module_graph_container.clone(),
+        )
       });
       Some(fn_)
     } else {

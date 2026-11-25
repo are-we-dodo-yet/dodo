@@ -4,8 +4,7 @@ use std::os::windows::io::RawHandle;
 use std::sync::atomic::AtomicU32;
 use std::sync::atomic::Ordering;
 
-use rand::RngCore;
-use rand::thread_rng;
+use rand::Rng;
 use windows_sys::Win32::Foundation::CloseHandle;
 use windows_sys::Win32::Foundation::GENERIC_READ;
 use windows_sys::Win32::Foundation::GENERIC_WRITE;
@@ -38,7 +37,7 @@ fn create_named_pipe_inner() -> io::Result<(RawHandle, RawHandle)> {
   // Create an extremely-likely-unique pipe name from randomness, identity and a serial counter.
   let pipe_name = format!(
     concat!(r#"\\.\pipe\deno_pipe_{:x}.{:x}.{:x}"#, "\0"),
-    thread_rng().next_u64(),
+    rand::rng().next_u64(),
     std::process::id(),
     NEXT_ID.fetch_add(1, Ordering::SeqCst),
   );

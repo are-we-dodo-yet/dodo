@@ -185,7 +185,7 @@ fn multifile_coverage() {
       "test".to_string(),
       "--quiet".to_string(),
       format!("--coverage={}", tempdir),
-      format!("coverage/multifile/"),
+      "coverage/multifile/".to_string(),
     ])
     .run();
   eprintln!("after test");
@@ -325,7 +325,7 @@ fn no_npm_cache_coverage() {
       "--quiet".to_string(),
       "--allow-read".to_string(),
       format!("--coverage={}", tempdir),
-      format!("coverage/no_npm_coverage/no_npm_coverage_test.ts"),
+      "coverage/no_npm_coverage/no_npm_coverage_test.ts".to_string(),
     ])
     .envs(env_vars_for_npm_tests())
     .run();

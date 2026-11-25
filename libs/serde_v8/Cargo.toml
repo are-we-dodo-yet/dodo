@@ -15,7 +15,9 @@ path = "lib.rs"
 
 [features]
 default = ["v8"]
+jsc = ["v8/jsc", "serde_v8_utilities/jsc"]
 quickjs = ["v8/quickjs", "serde_v8_utilities/quickjs"]
+system_jsc = ["v8/system_jsc", "serde_v8_utilities/system_jsc"]
 v8 = ["v8/v8", "serde_v8_utilities/v8"]
 
 [dependencies]
