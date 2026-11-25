@@ -1,6 +1,6 @@
 # Dodo
 
-[![Discord badge][]][Discord link]
+**[Project Board + Roadmap](https://github.com/orgs/are-we-dodo-yet/projects/2?pane=info)** | [![Discord badge][]][Discord link]
 
 A community fork of [Deno](https://github.com/denoland/deno):
 
@@ -39,30 +39,6 @@ We also plan to compartmentalize many of Deno's auxiliary features _(a.k.a.
 anything not critical to Deno's internal libraries)_ as **dynamically-linked
 extensions**. The hope is that this will allow the community to decentralize the
 maintenance burden and enable developers to keep their runtimes lean.
-
-### Current Roadmap
-
-#### Now
-
-- **[IN PROGRESS]** Get the Monorepo stable, with passing CI.
-- **[IN PROGRESS]** Triage top Deno issues in
-  [our own project board](https://github.com/orgs/are-we-dodo-yet/projects/2).
-- Release our first build!
-- Setup a basic fundraising mechanism.
-
-#### Near
-
-- **[IN PROGRESS]** A proposal for Dodo Extensions emerges.
-- The Dodo Volunteers are equipped to take in security patches as Deno releases
-  them.
-- Dodo becomes the most-starred Deno fork 🤞
-
-#### Far
-
-- Dodo Volunteers are equipped to author their _own_ security patches and
-  dependency updates (like support for new releases of v8 and TypeScript)
-- Deno Desktop adds support for Mobile.
-- Dodo pursues official buy-in from organizations previously dependent on Deno.
 
 ---
 
