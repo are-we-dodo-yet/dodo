@@ -1,0 +1,81 @@
+name: ci
+
+on: [push, pull_request]
+
+concurrency:
+  group: "${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}"
+  cancel-in-progress: true
+
+jobs:
+  deno:
+    if: |
+      github.event_name == 'push' ||
+      !startsWith(github.event.pull_request.head.label, 'denoland:')
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 30
+
+    strategy:
+      matrix:
+        os: [macOS-latest, ubuntu-latest, windows-latest]
+
+    steps:
+      - name: Change Windows git settings
+        if: contains(matrix.os, 'windows')
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol native
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+
+      - uses: denoland/setup-deno@v2
+        with:
+          cache: true
+          deno-version: canary
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src/rs_lib
+
+      - name: build
+        run: deno task build
+
+      - name: fmt
+        if: contains(matrix.os, 'ubuntu')
+        run: deno fmt --check
+
+      - name: lint
+        if: contains(matrix.os, 'ubuntu')
+        run: |
+          deno lint
+          cd src/rs_lib && cargo clippy
+
+      - name: check
+        run: deno check --doc
+
+      - name: test
+        run: deno test -A
+
+  jsr:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: true
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: canary
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src/rs_lib
+      - name: build
+        run: deno task build
+      - name: Publish to JSR on tag
+        run: deno run -A jsr:@david/publish-on-tag@0.2.0

@@ -1,0 +1,90 @@
+[package]
+name = "rs_lib"
+version = "0.0.0"
+edition = "2024"
+
+[lib]
+crate-type = ["cdylib"]
+path = "lib.rs"
+
+# update this by running ./scripts/update-deps.ts
+[dependencies]
+anyhow = "1.0.57"
+base64 = { version = "0.22", default-features = false, features = ["alloc"] }
+console_error_panic_hook = "0.1.6"
+js-sys = "=0.3.82"
+log = "0.4.28"
+serde = "1.0.149"
+serde-wasm-bindgen = "=0.6.5"
+wasm-bindgen = "=0.2.105"
+wasm-bindgen-futures = "=0.4.55"
+async-trait = "0.1.73"
+deno_error = "=0.7.1"
+deno_path_util = "=0.6.4"
+deno_semver = "=0.9.1"
+url = "2.5"
+
+[dependencies.chrono]
+version = "0.4"
+default-features = false
+
+[dependencies.flate2]
+version = "1.0.30"
+default-features = false
+features = ["rust_backend"]
+
+[dependencies.deno_ast]
+version = "=0.53.1"
+features = ["transpiling"]
+
+[dependencies.deno_cache_dir]
+path = "../../deno/libs/cache_dir"
+features = ["sync"]
+
+[dependencies.deno_config]
+path = "../../deno/libs/config"
+features = ["workspace","sync"]
+
+[dependencies.deno_graph]
+version = "=0.107.1"
+features = ["swc"]
+default-features = false
+
+[dependencies.deno_npm]
+path = "../../deno/libs/npm"
+
+[dependencies.deno_npmrc]
+path = "../../deno/libs/npmrc"
+
+[dependencies.deno_npm_cache]
+path = "../../deno/libs/npm_cache"
+
+[dependencies.deno_npm_installer]
+path = "../../deno/libs/npm_installer"
+default-features = false
+
+[dependencies.deno_resolver]
+path = "../../deno/libs/resolver"
+features = ["deno_ast","graph","sync"]
+
+[dependencies.deno_unsync]
+version = "0.4.4"
+default-features = false
+
+[dependencies.node_resolver]
+path = "../../deno/libs/node_resolver"
+features = ["sync"]
+
+[dependencies.sys_traits]
+version = "=0.1.27"
+features = ["real"]
+
+[target."cfg(target_arch = \"wasm32\")".dependencies.sys_traits]
+version = "=0.1.27"
+features = ["real","wasm"]
+
+[profile.release]
+codegen-units = 1
+incremental = true
+lto = true
+opt-level = "z"
