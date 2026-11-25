@@ -531,34 +531,33 @@ impl EmbeddedModuleLoader {
 
     match self.shared.modules.read(original_specifier) {
       Ok(Some(module)) => {
-        match options.requested_module_type {
-          RequestedModuleType::Text | RequestedModuleType::Bytes => {
-            let module_source = DenoCompileModuleSource::Bytes(module.data);
-            return deno_core::ModuleLoadResponse::Sync(Ok(
-              deno_core::ModuleSource::new_with_redirect(
-                match options.requested_module_type {
-                  RequestedModuleType::Text => ModuleType::Text,
-                  RequestedModuleType::Bytes => ModuleType::Bytes,
-                  _ => unreachable!(),
-                },
-                match options.requested_module_type {
-                  RequestedModuleType::Text => module_source.into_for_v8(),
-                  RequestedModuleType::Bytes => {
-                    ModuleSourceCode::Bytes(module_source.into_bytes_for_v8())
-                  }
-                  _ => unreachable!(),
-                },
-                original_specifier,
-                module.specifier,
-                None,
-              ),
-            ));
+        let raw_module_type = match &options.requested_module_type {
+          RequestedModuleType::Text => Some(ModuleType::Text),
+          RequestedModuleType::Bytes => Some(ModuleType::Bytes),
+          RequestedModuleType::Other(kind) if kind == "css" => {
+            Some(ModuleType::Other(kind.clone()))
           }
           RequestedModuleType::Other(_)
           | RequestedModuleType::None
-          | RequestedModuleType::Json => {
-            // ignore
-          }
+          | RequestedModuleType::Json => None,
+        };
+        if let Some(module_type) = raw_module_type {
+          let module_source = DenoCompileModuleSource::Bytes(module.data);
+          let code = match module_type {
+            ModuleType::Bytes => {
+              ModuleSourceCode::Bytes(module_source.into_bytes_for_v8())
+            }
+            _ => module_source.into_for_v8(),
+          };
+          return deno_core::ModuleLoadResponse::Sync(Ok(
+            deno_core::ModuleSource::new_with_redirect(
+              module_type,
+              code,
+              original_specifier,
+              module.specifier,
+              None,
+            ),
+          ));
         }
 
         let media_type = module.media_type;
