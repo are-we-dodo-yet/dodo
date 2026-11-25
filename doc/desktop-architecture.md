@@ -128,25 +128,29 @@ correctly.
 The JS namespace the webview sees is `bindings` — `set_js_namespace("bindings")`
 at `lib.rs:1212`, so calls are `window.bindings.foo()`.
 
-## HMR: three outcomes, decided by V8
+## HMR: `import.meta.hot`, shared with `deno run`
 
-`cli/rt/hmr.rs` watches the source dir (`notify`, debounced) and classifies each
-change into `ChangeOutcome` (`hmr.rs:331`), which the desktop side maps to a
-`ReloadKind` callback (`lib.rs:1642`):
+`deno desktop --hmr` uses the same engine as `deno run --watch-hmr`: the
+`import.meta.hot` runtime in `libs/core` and the driver in `cli/lib/hmr.rs`.
+`cli/rt/hmr.rs` is only the desktop host: it watches the source dir (`notify`,
+debounced), maps changed files to their VFS module URLs and reacts to the
+outcome of each update:
 
-- **Replaced** — a script edit that V8 accepts via `Debugger.setScriptSource`
-  after `deno_ast` transpile. Hot-patched in place, no reload.
-- **SoftReload → ReloadKind::Soft** — a static asset changed, or a module was
-  removed. Runs `location.reload()` on **every** window in `open_windows`
-  (`lib.rs:1648`), which re-fetches from the still-running server.
-- **Restart → ReloadKind::Restart** — V8 rejected the edit as a top-level
-  ES-module change (imports / exported bindings / top-level `let` changed). The
-  module graph can't be patched and a reload wouldn't help (the stale runtime
-  keeps serving), so `restart_desktop_app()` calls `exit(75)` (`lib.rs:1537`).
-  The `deno desktop --hmr` supervisor owns the child, catches code 75, and
-  relaunches — exiting via sentinel rather than re-exec keeps the process group,
-  Ctrl-C handling, and temp-entrypoint cleanup with the supervisor
-  (`HMR_RESTART_EXIT_CODE`, `lib.rs:1529`).
+- **Updated** - a module on the path from the changed file to an
+  `import.meta.hot.accept()` boundary was evaluated again. Every window in
+  `open_windows` then runs `location.reload()` so it re-fetches from the
+  still-running server.
+- **Not a loaded module** - the changed file is not part of the backend's module
+  graph (frontend code served to the webview). Only the windows reload.
+- **Full reload** - no module accepts the change, or applying it failed. The
+  runtime exits with `HMR_RESTART_EXIT_CODE` (75) and the `deno desktop --hmr`
+  supervisor in `cli/tools/desktop.rs` relaunches the app, so the backend never
+  keeps running stale code.
+
+In HMR mode project modules are read from the source dir on disk instead of from
+the copies embedded in the binary (`enable_hmr_sources` in `cli/rt/binary.rs`),
+and the VFS root is pinned to the project dir at compile time so the two trees
+line up.
 
 For framework dev servers (`is_framework_dev`), Deno-level HMR is disabled
 entirely — the framework's own websocket HMR runs and cwd is left at the source

@@ -1502,6 +1502,23 @@ pub extern "C" fn host_initialize_import_meta_object_callback(
 
   maybe_add_import_meta_filename_dirname(scope, meta, &name);
 
+  if module_map.hmr_is_enabled()
+    && name.starts_with("file:")
+    && !name.contains("/node_modules/")
+    && let Some(create_hot) = state.hmr_create_hot_context_fn.borrow().clone()
+  {
+    let create_hot = v8::Local::new(scope, create_hot);
+    let is_current = module_map.hmr_is_current(&name, &module_global);
+    let is_current = v8::Boolean::new(scope, is_current);
+    let undefined = v8::undefined(scope).into();
+    if let Some(hot) =
+      create_hot.call(scope, undefined, &[url_val.into(), is_current.into()])
+    {
+      let hot_key = HOT.v8_string(scope).unwrap();
+      meta.create_data_property(scope, hot_key.into(), hot);
+    }
+  }
+
   if name.starts_with("ext:")
     && let Some(proto) = state.ext_import_meta_proto.borrow().clone()
   {

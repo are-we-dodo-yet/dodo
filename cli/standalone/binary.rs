@@ -909,6 +909,12 @@ impl<'a> DenoCompileBinaryWriter<'a> {
       // falls outside what the root of where the VFS will be based
       vfs.add_possible_min_root_dir(import_map_parent_dir);
     }
+    if let crate::args::DenoSubcommand::Desktop(desktop_flags) =
+      self.cli_options.sub_command()
+      && desktop_flags.hmr
+    {
+      vfs.add_possible_min_root_dir(self.cli_options.initial_cwd());
+    }
     if let Some(node_modules_dir) = self.npm_resolver.root_node_modules_path() {
       // ensure the vfs doesn't go below the node_modules directory's parent
       if let Some(parent) = node_modules_dir.parent() {

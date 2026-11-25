@@ -628,6 +628,33 @@ impl StandaloneModules {
       let mut source_map = None;
       let mut cjs_export_analysis = None;
       let mut is_valid_utf8 = false;
+      if let Some(bytes) = read_hmr_source(&path) {
+        let media_type = MediaType::from_specifier(specifier);
+        let transpiled = if matches!(
+          media_type,
+          MediaType::TypeScript
+            | MediaType::Mts
+            | MediaType::Cts
+            | MediaType::Jsx
+            | MediaType::Tsx
+        ) {
+          let text = String::from_utf8_lossy(&bytes).into_owned();
+          let transpiled_text =
+            transpile_runtime_module(specifier, media_type, text)?;
+          Some(Cow::Owned(transpiled_text.into_bytes()))
+        } else {
+          None
+        };
+        return Ok(Some(DenoCompileModuleData {
+          media_type,
+          specifier,
+          is_valid_utf8: std::str::from_utf8(&bytes).is_ok(),
+          data: Cow::Owned(bytes),
+          transpiled,
+          source_map: None,
+          cjs_export_analysis: None,
+        }));
+      }
       let bytes = match self.vfs.file_entry(&path) {
         Ok(entry) => {
           let bytes = self
@@ -692,6 +719,49 @@ impl StandaloneModules {
       self.modules.read(specifier).map_err(JsErrorBox::from_err)
     }
   }
+}
+
+struct HmrSourceRoot {
+  vfs_root: PathBuf,
+  source_dir: PathBuf,
+}
+
+static HMR_SOURCE_ROOT: OnceLock<HmrSourceRoot> = OnceLock::new();
+
+pub(crate) fn enable_hmr_sources(vfs_root: PathBuf, source_dir: PathBuf) {
+  if let Ok(config_url) = Url::from_file_path(source_dir.join("deno.json")) {
+    runtime_transpile_options(&config_url);
+  }
+  let _ = HMR_SOURCE_ROOT.set(HmrSourceRoot {
+    vfs_root,
+    source_dir,
+  });
+}
+
+pub(crate) fn hmr_sources_enabled() -> bool {
+  HMR_SOURCE_ROOT.get().is_some()
+}
+
+pub(crate) fn hmr_source_path(path: &Path) -> Option<PathBuf> {
+  let root = HMR_SOURCE_ROOT.get()?;
+  let relative = path.strip_prefix(&root.vfs_root).ok()?;
+  Some(root.source_dir.join(relative))
+}
+
+fn read_hmr_source(path: &Path) -> Option<Vec<u8>> {
+  let root = HMR_SOURCE_ROOT.get()?;
+  let relative = path.strip_prefix(&root.vfs_root).ok()?;
+  if relative
+    .components()
+    .any(|c| c.as_os_str() == "node_modules")
+  {
+    return None;
+  }
+  #[allow(
+    clippy::disallowed_methods,
+    reason = "reads the project source from the real file system"
+  )]
+  std::fs::read(root.source_dir.join(relative)).ok()
 }
 
 /// Transpile TypeScript/JSX source to JavaScript for modules that are not

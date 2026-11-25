@@ -73,12 +73,10 @@ pub async fn serve(
     let _ = open::that_detached(url);
   }
 
-  let hmr = cli_options.has_hmr();
   do_serve(
     worker_factory,
     main_module.clone(),
     parallelism_count(serve_flags.parallel),
-    hmr,
     unconfigured_runtime,
   )
   .await
@@ -88,7 +86,6 @@ async fn do_serve(
   worker_factory: Arc<CliMainWorkerFactory>,
   main_module: ModuleSpecifier,
   parallelism_count: NonZeroUsize,
-  hmr: bool,
   unconfigured_runtime: Option<UnconfiguredRuntime>,
 ) -> Result<i32, AnyError> {
   let worker_count = parallelism_count.get() - 1;
@@ -125,7 +122,7 @@ async fn do_serve(
       .spawn(move || {
         deno_runtime::tokio_util::create_and_run_current_thread(async move {
           let result = tokio::select! {
-            result = run_worker(i, worker_factory, main_module, hmr) => result,
+            result = run_worker(i, worker_factory, main_module) => result,
             _ = shutdown_token.cancelled() => Ok(0),
           };
           let _ = tx.send(result);
@@ -156,7 +153,6 @@ async fn run_worker(
   worker_index: usize,
   worker_factory: Arc<CliMainWorkerFactory>,
   main_module: ModuleSpecifier,
-  hmr: bool,
 ) -> Result<i32, AnyError> {
   let mut worker: crate::worker::CliMainWorker = worker_factory
     .create_main_worker(
@@ -167,11 +163,7 @@ async fn run_worker(
       vec![],
     )
     .await?;
-  if hmr {
-    worker.run_for_watcher().await.map_err(Into::into)
-  } else {
-    worker.run().await.map_err(Into::into)
-  }
+  worker.run().await.map_err(Into::into)
 }
 
 async fn serve_with_watch(
@@ -179,7 +171,6 @@ async fn serve_with_watch(
   watch_flags: WatchFlagsWithPaths,
   parallelism_count: NonZeroUsize,
 ) -> Result<i32, AnyError> {
-  let hmr = watch_flags.hmr;
   crate::util::file_watcher::watch_recv(
     flags,
     crate::util::file_watcher::PrintConfig::new_with_banner(
@@ -215,7 +206,6 @@ async fn serve_with_watch(
           worker_factory,
           main_module.clone(),
           parallelism_count,
-          hmr,
           None,
         )
         .await?;

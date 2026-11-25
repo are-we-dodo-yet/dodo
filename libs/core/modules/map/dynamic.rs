@@ -29,7 +29,7 @@ pub(super) type PrepareLoadFuture =
 
 pub(super) struct DynImportModEvaluate {
   load_id: ModuleLoadId,
-  module_id: ModuleId,
+  pub(super) module_id: ModuleId,
   promise: v8::Global<v8::Promise>,
 }
 
@@ -60,6 +60,13 @@ impl ModuleMap {
       ResolutionKind::DynamicImport,
       &HashMap::new(),
     );
+
+    if self.data.borrow().hmr.is_some()
+      && let Ok(module_specifier) = &resolve_response
+      && let Some(hmr) = &mut self.data.borrow_mut().hmr
+    {
+      hmr.add_dep(&referrer, module_specifier.as_str());
+    }
 
     // Fast path: if the module is already loaded, resolve the import
     // immediately without async work.

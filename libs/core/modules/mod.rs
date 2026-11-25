@@ -26,6 +26,8 @@ mod module_map_data;
 pub(crate) mod recursive_load;
 
 #[cfg(all(test, not(miri)))]
+mod hmr_tests;
+#[cfg(all(test, not(miri)))]
 mod tests;
 
 pub use loaders::ExtCodeCache;

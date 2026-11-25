@@ -191,7 +191,6 @@ pub struct ReplSession {
   decorators: deno_ast::DecoratorsTranspileOption,
 }
 
-// TODO: duplicated in `cli/tools/run/hmr.rs`
 #[derive(Debug)]
 enum InspectorMessageState {
   Ready(serde_json::Value),

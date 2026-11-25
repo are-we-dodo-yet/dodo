@@ -3120,10 +3120,10 @@ console.log("Listening...")
     "#,
   );
 
-  wait_contains("Replaced changed module", &mut stderr_lines).await;
-  // Re-evaluating the module calls `Deno.serve` again, so there is a window
-  // right after the module is replaced where the listener has been closed and
-  // not yet rebound and a connection is refused. Retry until it is accepting.
+  wait_contains("Restarting! File change detected", &mut stderr_lines).await;
+  // The restarted process calls `Deno.serve` again, so there is a window
+  // right after the restart where the listener has been closed and not yet
+  // rebound and a connection is refused. Retry until it is accepting.
   //
   // This used to spawn a fire-and-forget `deno eval` child that fetched once
   // and was never awaited: a refused connection there silently dropped the
@@ -3198,7 +3198,7 @@ export function foo() {
     "#,
   );
 
-  wait_contains("Replaced changed module", &mut stderr_lines).await;
+  wait_contains("Restarting! File change detected", &mut stderr_lines).await;
   wait_contains("<h1>Hello world</h1>", &mut stdout_lines).await;
 
   check_alive_then_kill(child);
@@ -3381,8 +3381,263 @@ setInterval(() => {
 "#,
   );
 
-  wait_contains("compile error: Uncaught SyntaxError", &mut stderr_lines).await;
+  wait_contains_without("Update not applied", "Restarting", &mut stderr_lines)
+    .await;
   check_alive_then_kill(child);
+}
+
+async fn wait_contains_without<R>(
+  s: &str,
+  forbidden: &str,
+  lines: &mut LoggingLines<R>,
+) -> String
+where
+  R: tokio::io::AsyncBufRead + Unpin,
+{
+  let timeout = tokio::time::Duration::from_secs(60);
+  tokio::time::timeout(timeout, async {
+    while let Some(line) = lines.next_line().await.unwrap() {
+      assert_not_contains!(line, forbidden);
+      if line.contains(s) {
+        return line;
+      }
+    }
+    panic!("Output ended without containing \"{}\"", s)
+  })
+  .await
+  .unwrap_or_else(|_| {
+    panic!(
+      "Output did not contain \"{}\" after {} seconds",
+      s,
+      timeout.as_secs()
+    )
+  })
+}
+
+fn spawn_run_hmr(t: &TempDir, entry: &str) -> DenoChild {
+  util::deno_cmd()
+    .current_dir(t.path())
+    .arg("run")
+    .arg("--watch-hmr")
+    .arg("-L")
+    .arg("debug")
+    .arg(t.path().join(entry))
+    .env("NO_COLOR", "1")
+    .piped_output()
+    .spawn()
+    .unwrap()
+}
+
+#[test(flaky)]
+async fn run_hmr_self_accept_keeps_state() {
+  let t = TempDir::new();
+  t.path()
+    .join("main.ts")
+    .write("import './counter.ts';\nsetInterval(() => {}, 1000);\n");
+  let counter = t.path().join("counter.ts");
+  let counter_source = |version: u32| {
+    format!(
+      r#"
+const count: number = (import.meta.hot.data.count ?? 0) + 1;
+console.log("counter v{version} run", count);
+import.meta.hot.dispose((data) => {{
+  data.count = count;
+}});
+import.meta.hot.accept();
+"#
+    )
+  };
+  counter.write(counter_source(1));
+
+  let mut child = spawn_run_hmr(&t, "main.ts");
+  let (mut stdout_lines, mut stderr_lines) = child_lines(&mut child);
+  wait_for_watcher("counter.ts", &mut stderr_lines).await;
+  wait_contains("counter v1 run 1", &mut stdout_lines).await;
+
+  counter.write(counter_source(2));
+  wait_contains_without("Updated file", "Restarting", &mut stderr_lines).await;
+  wait_contains("counter v2 run 2", &mut stdout_lines).await;
+
+  counter.write(counter_source(3));
+  wait_contains_without("Updated file", "Restarting", &mut stderr_lines).await;
+  wait_contains("counter v3 run 3", &mut stdout_lines).await;
+
+  check_alive_then_kill(child);
+}
+
+#[test(flaky)]
+async fn run_hmr_dep_accept_through_chain() {
+  let t = TempDir::new();
+  t.path().join("main.js").write(
+    r#"
+import { value } from "./b.js";
+console.log("main started", value);
+import.meta.hot.accept("./b.js", ({ deps }) => {
+  console.log("main got", deps[0].value);
+});
+setInterval(() => {}, 1000);
+"#,
+  );
+  t.path()
+    .join("b.js")
+    .write("import { c } from './c.jsx';\nexport const value = `b(${c})`;\n");
+  let c = t.path().join("c.jsx");
+  c.write("export const c = 'c1';\n");
+
+  let mut child = spawn_run_hmr(&t, "main.js");
+  let (mut stdout_lines, mut stderr_lines) = child_lines(&mut child);
+  wait_for_watcher("c.jsx", &mut stderr_lines).await;
+  wait_contains("main started b(c1)", &mut stdout_lines).await;
+
+  c.write("export const c = 'c2';\n");
+  wait_contains_without("Updated file", "Restarting", &mut stderr_lines).await;
+  let line = wait_contains("main", &mut stdout_lines).await;
+  assert_contains!(line, "main got b(c2)");
+
+  check_alive_then_kill(child);
+}
+
+#[test(flaky)]
+async fn run_hmr_syntax_error_keeps_old_module() {
+  let t = TempDir::new();
+  t.path()
+    .join("main.js")
+    .write("import './mod.js';\nsetInterval(() => {}, 1000);\n");
+  let module = t.path().join("mod.js");
+  module.write("console.log('mod v1');\nimport.meta.hot.accept();\n");
+
+  let mut child = spawn_run_hmr(&t, "main.js");
+  let (mut stdout_lines, mut stderr_lines) = child_lines(&mut child);
+  wait_for_watcher("mod.js", &mut stderr_lines).await;
+  wait_contains("mod v1", &mut stdout_lines).await;
+
+  module.write("console.log('mod v2'\nimport.meta.hot.accept();\n");
+  wait_contains_without("Update not applied", "Restarting", &mut stderr_lines)
+    .await;
+
+  module.write("console.log('mod v3');\nimport.meta.hot.accept();\n");
+  wait_contains_without("Updated file", "Restarting", &mut stderr_lines).await;
+  let line = wait_contains("mod", &mut stdout_lines).await;
+  assert_contains!(line, "mod v3");
+
+  check_alive_then_kill(child);
+}
+
+#[test(flaky)]
+async fn run_hmr_added_import_and_quick_saves() {
+  let t = TempDir::new();
+  t.path()
+    .join("main.js")
+    .write("import './mod.js';\nsetInterval(() => {}, 1000);\n");
+  t.path()
+    .join("extra.js")
+    .write("export const extra = 'extra';\n");
+  let module = t.path().join("mod.js");
+  module.write("console.log('mod v1');\nimport.meta.hot.accept();\n");
+
+  let mut child = spawn_run_hmr(&t, "main.js");
+  let (mut stdout_lines, mut stderr_lines) = child_lines(&mut child);
+  wait_for_watcher("mod.js", &mut stderr_lines).await;
+  wait_contains("mod v1", &mut stdout_lines).await;
+
+  module.write(
+    "import { extra } from './extra.js';\nconsole.log('mod v2', extra);\nimport.meta.hot.accept();\n",
+  );
+  wait_contains_without("Updated file", "Restarting", &mut stderr_lines).await;
+  wait_contains("mod v2 extra", &mut stdout_lines).await;
+
+  module.write("console.log('mod v3');\nimport.meta.hot.accept();\n");
+  module.write("console.log('mod v4');\nimport.meta.hot.accept();\n");
+  wait_contains_without("Updated file", "Restarting", &mut stderr_lines).await;
+  wait_contains("mod v4", &mut stdout_lines).await;
+
+  check_alive_then_kill(child);
+}
+
+#[test(flaky)]
+async fn serve_hmr_parallel() {
+  let t = TempDir::new();
+  t.path().join("main.js").write(
+    r#"
+import { handler } from "./handler.js";
+let current = handler;
+import.meta.hot.accept("./handler.js", ({ deps }) => {
+  current = deps[0].handler;
+});
+export default {
+  fetch(request) {
+    return current(request);
+  },
+};
+"#,
+  );
+  let handler = t.path().join("handler.js");
+  handler.write("export const handler = () => new Response('v1');\n");
+
+  let mut child = util::deno_cmd()
+    .current_dir(t.path())
+    .arg("serve")
+    .arg("--parallel")
+    .arg("--watch-hmr")
+    .arg("--port")
+    .arg("0")
+    .arg("-L")
+    .arg("debug")
+    .arg(t.path().join("main.js"))
+    .env("NO_COLOR", "1")
+    .env("DENO_JOBS", "3")
+    .piped_output()
+    .spawn()
+    .unwrap();
+
+  let result = futures::FutureExt::catch_unwind(std::panic::AssertUnwindSafe(
+    serve_hmr_parallel_inner(&handler, &mut child),
+  ))
+  .await;
+  if let Err(panic) = result {
+    let _ = child.kill();
+    std::panic::resume_unwind(panic);
+  }
+
+  check_alive_then_kill(child);
+}
+
+async fn serve_hmr_parallel_inner(
+  handler: &util::PathRef,
+  child: &mut DenoChild,
+) {
+  let (_stdout_lines, mut stderr_lines) = child_lines(child);
+  let port_regex =
+    regex::Regex::new(r"Listening on https?:[^:]+:(\d+)/").unwrap();
+  let line = wait_for_server_and_watcher("handler.js", &mut stderr_lines).await;
+  let port = port_regex.captures(&line).unwrap()[1].to_string();
+
+  let client = reqwest::Client::builder()
+    .pool_max_idle_per_host(0)
+    .connect_timeout(std::time::Duration::from_secs(5))
+    .timeout(std::time::Duration::from_secs(10))
+    .build()
+    .unwrap();
+  let get = || async {
+    client
+      .get(format!("http://127.0.0.1:{port}/"))
+      .send()
+      .await
+      .unwrap()
+      .text()
+      .await
+      .unwrap()
+  };
+  assert_eq!(get().await, "v1");
+
+  handler.write("export const handler = () => new Response('v2');\n");
+  for _ in 0..3 {
+    wait_contains_without("Updated file", "Restarting", &mut stderr_lines)
+      .await;
+  }
+  for _ in 0..30 {
+    assert_eq!(get().await, "v2");
+  }
 }
 
 #[test(flaky)]

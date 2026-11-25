@@ -683,6 +683,13 @@ impl RuntimeOptions {
   }
 }
 
+#[derive(Debug, Clone, PartialEq, Eq, serde::Deserialize)]
+#[serde(tag = "type", rename_all = "camelCase")]
+pub enum HmrUpdateOutcome {
+  Handled { updated: Vec<String> },
+  NeedsFullReload { reason: String },
+}
+
 #[derive(Copy, Clone, Debug, Default)]
 pub struct PollEventLoopOptions {
   pub wait_for_inspector: bool,
@@ -1694,6 +1701,8 @@ impl JsRuntime {
       run_immediate_callbacks_cb,
       wasm_instance_fn,
       wasm_instances_map,
+      hmr_create_hot_context_fn,
+      hmr_apply_update_fn,
     ) = {
       scope!(scope, self);
       let context = realm.context();
@@ -1752,6 +1761,18 @@ impl JsRuntime {
         core_obj,
         RUN_IMMEDIATE_CALLBACKS,
         "Deno.core.runImmediateCallbacks",
+      );
+      let hmr_create_hot_context_fn: v8::Local<v8::Function> = bindings::get(
+        scope,
+        core_obj,
+        HMR_CREATE_HOT_CONTEXT,
+        "Deno.core.__hmrCreateHotContext",
+      );
+      let hmr_apply_update_fn: v8::Local<v8::Function> = bindings::get(
+        scope,
+        core_obj,
+        HMR_APPLY_UPDATE,
+        "Deno.core.__hmrApplyUpdate",
       );
       let mut wasm_instance_fn = None;
       let mut wasm_instances_map = None;
@@ -1893,6 +1914,8 @@ impl JsRuntime {
         v8::Global::new(scope, run_immediate_callbacks_cb),
         wasm_instance_fn.map(|f| v8::Global::new(scope, f)),
         wasm_instances_map.map(|m| v8::Global::new(scope, m)),
+        v8::Global::new(scope, hmr_create_hot_context_fn),
+        v8::Global::new(scope, hmr_apply_update_fn),
       )
     };
 
@@ -1932,6 +1955,14 @@ impl JsRuntime {
       .run_immediate_callbacks_cb
       .borrow_mut()
       .replace(run_immediate_callbacks_cb);
+    state_rc
+      .hmr_create_hot_context_fn
+      .borrow_mut()
+      .replace(hmr_create_hot_context_fn);
+    state_rc
+      .hmr_apply_update_fn
+      .borrow_mut()
+      .replace(hmr_apply_update_fn);
     if let Some(wasm_instance_fn) = wasm_instance_fn {
       state_rc
         .wasm_instance_fn
@@ -1960,6 +1991,61 @@ impl JsRuntime {
 
   /// Returns the runtime's source mapper, which can be used to apply
   /// source maps to file locations.
+  pub fn enable_hmr(&mut self) {
+    self.inner.main_realm.0.module_map().hmr_enable();
+  }
+
+  pub fn hmr_is_module_loaded(&self, specifier: &str) -> bool {
+    self
+      .inner
+      .main_realm
+      .0
+      .module_map()
+      .hmr_importers(specifier)
+      .is_some()
+  }
+
+  pub async fn hmr_apply_update(
+    &mut self,
+    specifiers: Vec<String>,
+  ) -> Result<HmrUpdateOutcome, CoreError> {
+    let promise = {
+      let apply_fn = self
+        .inner
+        .main_realm
+        .0
+        .state()
+        .hmr_apply_update_fn
+        .borrow()
+        .clone()
+        .unwrap();
+      scope!(scope, self);
+      v8::tc_scope!(let tc_scope, scope);
+      let apply_fn = v8::Local::new(tc_scope, apply_fn);
+      let specifiers = serde_v8::to_v8(tc_scope, specifiers)
+        .map_err(|e| CoreErrorKind::JsBox(JsErrorBox::from_err(e)))?;
+      let undefined = v8::undefined(tc_scope).into();
+      match apply_fn.call(tc_scope, undefined, &[specifiers]) {
+        Some(promise) => v8::Global::new(tc_scope, promise),
+        None => {
+          let exception = tc_scope.exception().unwrap();
+          return Err(
+            CoreErrorKind::Js(JsError::from_v8_exception(tc_scope, exception))
+              .into_box(),
+          );
+        }
+      }
+    };
+    let fut = self.resolve(promise);
+    let value = self
+      .with_event_loop_promise(Box::pin(fut), PollEventLoopOptions::default())
+      .await?;
+    scope!(scope, self);
+    let value = v8::Local::new(scope, value);
+    serde_v8::from_v8::<HmrUpdateOutcome>(scope, value)
+      .map_err(|e| CoreErrorKind::JsBox(JsErrorBox::from_err(e)).into_box())
+  }
+
   pub fn source_mapper(&self) -> Rc<RefCell<crate::source_map::SourceMapper>> {
     self.inner.state.source_mapper.clone()
   }

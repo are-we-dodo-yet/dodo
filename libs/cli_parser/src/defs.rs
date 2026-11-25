@@ -631,7 +631,7 @@ static RUN_ARGS: &[ArgDef] = &[
     .require_equals()
     .value_delimiter(',')
     .conflicts_with(&["watch"])
-.help("Watch for file changes and hot-replace modules. The process restarts if hot replacement fails.\n  Local files from entry point module graph are watched by default.\n  Additional paths might be watched by passing them as arguments to this flag."),
+.help("Watch for file changes and apply them through import.meta.hot. The process restarts if no module accepts the change.\n  Local files from entry point module graph are watched by default.\n  Additional paths might be watched by passing them as arguments to this flag."),
   ArgDef::new("watch-exclude")
     .long("watch-exclude")
     .action(ArgAction::Append)
@@ -713,7 +713,7 @@ pub static RUN_SUBCOMMAND: CommandDef = CommandDef {
 
 pub static WATCH_SUBCOMMAND: CommandDef = CommandDef {
   name: "watch",
-  about: "Run a JavaScript or TypeScript program, watching for file changes and hot-replacing modules",
+  about: "Run a JavaScript or TypeScript program, watching for file changes and applying them through import.meta.hot",
   aliases: &[],
   args: RUN_ARGS,
   arg_groups: RUN_ARG_GROUPS,
@@ -777,7 +777,7 @@ pub static SERVE_SUBCOMMAND: CommandDef = CommandDef {
       .require_equals()
       .value_delimiter(',')
       .conflicts_with(&["watch"])
-.help("Watch for file changes and hot-replace modules. The process restarts if hot replacement fails.\n  Local files from entry point module graph are watched by default.\n  Additional paths might be watched by passing them as arguments to this flag."),
+.help("Watch for file changes and apply them through import.meta.hot. The process restarts if no module accepts the change.\n  Local files from entry point module graph are watched by default.\n  Additional paths might be watched by passing them as arguments to this flag."),
     ArgDef::new("watch-exclude")
       .long("watch-exclude")
       .action(ArgAction::Append)

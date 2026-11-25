@@ -27,7 +27,6 @@ use notify::Watcher;
 use notify::event::Event as NotifyEvent;
 use notify::event::EventKind;
 use tokio::select;
-use tokio::sync::broadcast::error::RecvError;
 use tokio::sync::mpsc;
 use tokio::sync::mpsc::UnboundedReceiver;
 use tokio::sync::mpsc::error::SendError;
@@ -208,11 +207,10 @@ impl WatcherCommunicator {
     self.restart_tx.send(())
   }
 
-  pub async fn watch_for_changed_paths(
+  pub fn subscribe_changed_paths(
     &self,
-  ) -> Result<Option<Vec<PathBuf>>, RecvError> {
-    let mut rx = self.changed_paths_rx.resubscribe();
-    rx.recv().await
+  ) -> tokio::sync::broadcast::Receiver<Option<Vec<PathBuf>>> {
+    self.changed_paths_rx.resubscribe()
   }
 
   pub fn change_restart_mode(&self, restart_mode: WatcherRestartMode) {

@@ -374,6 +374,77 @@ impl ModuleMap {
     &self.data
   }
 
+  pub(crate) fn hmr_enable(&self) {
+    let mut data = self.data.borrow_mut();
+    if data.hmr.is_none() {
+      data.hmr = Some(Default::default());
+    }
+  }
+
+  pub(crate) fn hmr_is_enabled(&self) -> bool {
+    self.data.borrow().hmr.is_some()
+  }
+
+  pub(crate) fn hmr_is_current(
+    &self,
+    name: &str,
+    module: &v8::Global<v8::Module>,
+  ) -> bool {
+    let data = self.data.borrow();
+    data
+      .get_ids_of_any_type(name)
+      .into_iter()
+      .any(|id| data.handles.get(id) == Some(module))
+  }
+
+  pub(crate) fn hmr_importers(&self, name: &str) -> Option<Vec<String>> {
+    let data = self.data.borrow();
+    if data.get_ids_of_any_type(name).is_empty() {
+      return None;
+    }
+    Some(
+      data
+        .hmr
+        .as_ref()
+        .map(|hmr| hmr.importers_of(name))
+        .unwrap_or_default(),
+    )
+  }
+
+  pub(crate) fn hmr_evict(
+    &self,
+    scope: &mut v8::PinScope,
+    names: &[String],
+    check_only: bool,
+  ) -> bool {
+    {
+      let data = self.data.borrow();
+      let pending = self.pending_dyn_mod_evaluations.borrow();
+      for name in names {
+        for id in data.get_ids_of_any_type(name) {
+          let Some(handle) = data.handles.get(id) else {
+            return false;
+          };
+          let module = v8::Local::new(scope, handle);
+          if module.get_status() != v8::ModuleStatus::Evaluated
+            || pending.iter().any(|pending| pending.module_id == id)
+          {
+            return false;
+          }
+        }
+      }
+    }
+    if check_only {
+      return true;
+    }
+    self.data.borrow_mut().evict(names);
+    let mut source_mapper = self.source_mapper.borrow_mut();
+    for name in names {
+      source_mapper.invalidate(name);
+    }
+    true
+  }
+
   #[cfg(test)]
   pub fn assert_module_map(
     &self,
