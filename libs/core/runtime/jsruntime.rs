@@ -686,8 +686,13 @@ impl RuntimeOptions {
 #[derive(Debug, Clone, PartialEq, Eq, serde::Deserialize)]
 #[serde(tag = "type", rename_all = "camelCase")]
 pub enum HmrUpdateOutcome {
-  Handled { updated: Vec<String> },
-  NeedsFullReload { reason: String },
+  Handled {
+    updated: Vec<String>,
+    pruned: Vec<String>,
+  },
+  NeedsFullReload {
+    reason: String,
+  },
 }
 
 #[derive(Copy, Clone, Debug, Default)]

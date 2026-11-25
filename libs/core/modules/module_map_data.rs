@@ -86,6 +86,16 @@ impl HmrGraph {
       .insert(importer.to_string());
   }
 
+  pub(crate) fn deps_of(&self, name: &str) -> Vec<String> {
+    let mut deps = self
+      .deps
+      .get(name)
+      .map(|set| set.iter().cloned().collect::<Vec<_>>())
+      .unwrap_or_default();
+    deps.sort();
+    deps
+  }
+
   pub(crate) fn importers_of(&self, name: &str) -> Vec<String> {
     let mut importers = self
       .importers
@@ -509,6 +519,9 @@ impl ModuleMapData {
         }
       }
       self.sources.retain(|key, _| key.name.as_str() != name);
+      if let Some(hmr) = &mut self.hmr {
+        hmr.clear_deps(name);
+      }
     }
   }
 

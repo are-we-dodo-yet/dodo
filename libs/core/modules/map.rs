@@ -397,6 +397,16 @@ impl ModuleMap {
       .any(|id| data.handles.get(id) == Some(module))
   }
 
+  pub(crate) fn hmr_deps(&self, name: &str) -> Vec<String> {
+    self
+      .data
+      .borrow()
+      .hmr
+      .as_ref()
+      .map(|hmr| hmr.deps_of(name))
+      .unwrap_or_default()
+  }
+
   pub(crate) fn hmr_importers(&self, name: &str) -> Option<Vec<String>> {
     let data = self.data.borrow();
     if data.get_ids_of_any_type(name).is_empty() {

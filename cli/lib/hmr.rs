@@ -17,6 +17,7 @@ pub trait HmrHost {
   fn next_change(&mut self) -> LocalBoxFuture<'_, HmrChange>;
   fn on_unloaded_changed(&mut self, specifiers: &[String]) -> Option<String>;
   fn on_updated(&mut self, updated: &[String]);
+  fn on_pruned(&mut self, _pruned: &[String]) {}
   fn full_reload(&mut self, reason: &str);
 }
 
@@ -53,7 +54,8 @@ impl LibMainWorker {
             continue;
           }
           match self.js_runtime().hmr_apply_update(specifiers).await {
-            Ok(HmrUpdateOutcome::Handled { updated }) => {
+            Ok(HmrUpdateOutcome::Handled { updated, pruned }) => {
+              host.on_pruned(&pruned);
               host.on_updated(&updated)
             }
             Ok(HmrUpdateOutcome::NeedsFullReload { reason }) => {

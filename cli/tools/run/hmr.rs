@@ -130,6 +130,14 @@ impl HmrHost for CliHmrHost {
     }
   }
 
+  fn on_pruned(&mut self, pruned: &[String]) {
+    for specifier in pruned {
+      self
+        .watcher_communicator
+        .print(format!("Pruned {}", specifier));
+    }
+  }
+
   fn full_reload(&mut self, reason: &str) {
     log::debug!("HMR full reload: {}", reason);
     let _ = self.watcher_communicator.force_restart();

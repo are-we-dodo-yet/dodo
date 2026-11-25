@@ -105,6 +105,7 @@ builtin_ops! {
   ops_builtin_types::op_is_weak_set,
   ops_builtin_v8::op_add_main_module_handler,
   ops_builtin_v8::op_hmr_importers,
+  ops_builtin_v8::op_hmr_deps,
   ops_builtin_v8::op_hmr_evict,
   ops_builtin_v8::op_hmr_resolve,
   ops_builtin_v8::op_set_handled_promise_rejection_handler,

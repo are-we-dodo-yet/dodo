@@ -51,6 +51,15 @@ pub fn op_hmr_importers(
 }
 
 #[op2]
+#[serde]
+pub fn op_hmr_deps(
+  scope: &mut v8::PinScope,
+  #[string] specifier: &str,
+) -> Vec<String> {
+  JsRealm::module_map_from(scope).hmr_deps(specifier)
+}
+
+#[op2]
 pub fn op_hmr_evict(
   scope: &mut v8::PinScope,
   #[serde] specifiers: Vec<String>,

@@ -567,7 +567,7 @@ fn new_watcher(
 
       let canonicalized: Vec<PathBuf> = event_paths
         .into_iter()
-        .filter_map(|(_, canonicalized)| canonicalized)
+        .map(|(path, canonicalized)| canonicalized.unwrap_or(path.clone()))
         .collect();
       let paths: Vec<PathBuf> = canonicalized
         .iter()

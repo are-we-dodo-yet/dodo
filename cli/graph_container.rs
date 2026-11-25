@@ -7,10 +7,13 @@ use std::sync::Arc;
 use deno_ast::ModuleSpecifier;
 use deno_config::glob::FilePatterns;
 use deno_config::glob::PathOrPatternSet;
+use deno_core::anyhow::bail;
 use deno_core::error::AnyError;
 use deno_core::parking_lot::RwLock;
+use deno_graph::GraphKind;
 use deno_graph::Module;
 use deno_graph::ModuleGraph;
+use deno_graph::WalkOptions;
 use deno_runtime::deno_permissions::PermissionsContainer;
 
 use crate::args::CliOptions;
@@ -147,10 +150,15 @@ impl MainModuleGraphContainer {
     let graph = graph_permit.graph_mut();
     let mut specifiers = Vec::with_capacity(paths.len());
     let mut specifiers_to_reload = Vec::with_capacity(paths.len());
+    let mut removed = Vec::new();
     for path in paths {
       let Some(specifier) = find_graph_specifier(graph, path) else {
         return Ok(HmrReload::NotInGraph(path.clone()));
       };
+      if !path.exists() {
+        removed.push(specifier);
+        continue;
+      }
       let is_unchanged = match graph.get(&specifier) {
         Some(Module::Js(module)) => std::fs::read_to_string(path)
           .is_ok_and(|text| *text == *module.source.text),
@@ -181,6 +189,24 @@ impl MainModuleGraphContainer {
         },
       )?;
       graph_permit.commit();
+    }
+    if !removed.is_empty() {
+      let graph = self.graph();
+      let roots = graph.roots.iter().collect::<Vec<_>>();
+      let reachable = graph.walk(
+        roots.into_iter(),
+        WalkOptions {
+          check_js: deno_graph::CheckJsOption::False,
+          follow_dynamic: true,
+          kind: GraphKind::CodeOnly,
+          prefer_fast_check_graph: false,
+        },
+      );
+      for (specifier, _) in reachable {
+        if removed.contains(specifier) {
+          bail!("{} was removed but is still imported", specifier);
+        }
+      }
     }
     Ok(HmrReload::Reloaded(specifiers))
   }

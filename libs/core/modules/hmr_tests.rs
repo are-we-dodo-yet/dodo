@@ -118,8 +118,16 @@ impl Harness {
 }
 
 fn handled(names: &[&str]) -> HmrUpdateOutcome {
+  handled_pruned(names, &[])
+}
+
+fn handled_pruned(names: &[&str], pruned: &[&str]) -> HmrUpdateOutcome {
   HmrUpdateOutcome::Handled {
     updated: names.iter().map(|name| format!("file:///{name}")).collect(),
+    pruned: pruned
+      .iter()
+      .map(|name| format!("file:///{name}"))
+      .collect(),
   }
 }
 
@@ -328,7 +336,10 @@ async fn hmr_removed_and_added_import() {
   .await;
   h.log();
   h.write("b.js", "import './d.js'; import.meta.hot.accept();");
-  assert_eq!(h.update(&["b.js"]).await, handled(&["b.js"]));
+  assert_eq!(
+    h.update(&["b.js"]).await,
+    handled_pruned(&["b.js"], &["c.js"])
+  );
   assert_eq!(h.log(), vec!["d"]);
   h.write("c.js", "log.push('c2');");
   assert!(is_full_reload(&h.update(&["c.js"]).await));
@@ -469,4 +480,44 @@ async fn hmr_dynamic_import_edge() {
   h.write("b.js", "export const v = 'b2';");
   assert_eq!(h.update(&["b.js"]).await, handled(&["b.js"]));
   assert_eq!(h.log(), vec!["b1", "a got b2"]);
+}
+
+#[tokio::test]
+async fn hmr_prune_removed_import() {
+  let mut h = Harness::new(
+    &[
+      (
+        "a.js",
+        "import './b.js'; import './keep.js'; import.meta.hot.accept();",
+      ),
+      (
+        "b.js",
+        "import './c.js'; import './keep.js';
+         import.meta.hot.dispose(() => log.push('b dispose'));
+         import.meta.hot.prune(() => log.push('b prune'));",
+      ),
+      ("c.js", "import.meta.hot.prune(() => log.push('c prune'));"),
+      (
+        "keep.js",
+        "import.meta.hot.prune(() => log.push('keep prune'));",
+      ),
+    ],
+    "a.js",
+  )
+  .await;
+  h.write("a.js", "import './keep.js'; import.meta.hot.accept();");
+  assert_eq!(
+    h.update(&["a.js"]).await,
+    handled_pruned(&["a.js"], &["b.js", "c.js"])
+  );
+  assert_eq!(h.log(), vec!["b dispose", "b prune", "c prune"]);
+  assert!(is_full_reload(&h.update(&["b.js"]).await));
+
+  h.write("a.js", "import './b.js'; import.meta.hot.accept();");
+  h.write("b.js", "log.push('b again');");
+  assert_eq!(
+    h.update(&["a.js"]).await,
+    handled_pruned(&["a.js"], &["keep.js"])
+  );
+  assert_eq!(h.log(), vec!["b again", "keep prune"]);
 }

@@ -3584,6 +3584,40 @@ async fn run_hmr_atomic_save() {
 }
 
 #[test(flaky)]
+async fn run_hmr_removed_module_is_pruned() {
+  let t = TempDir::new();
+  t.path().join("main.js").write(
+    "import './plugins.js';\nimport.meta.hot.accept('./plugins.js');\nsetInterval(() => {}, 1000);\n",
+  );
+  let plugins = t.path().join("plugins.js");
+  plugins.write("import './plugin.js';\nconsole.log('plugins v1');\n");
+  let plugin = t.path().join("plugin.js");
+  plugin.write(
+    "console.log('plugin loaded');\nimport.meta.hot.prune(() => console.log('plugin pruned'));\n",
+  );
+
+  let mut child = spawn_run_hmr(&t, "main.js");
+  let (mut stdout_lines, mut stderr_lines) = child_lines(&mut child);
+  wait_for_watcher("plugin.js", &mut stderr_lines).await;
+  wait_contains("plugins v1", &mut stdout_lines).await;
+
+  std::fs::remove_file(plugin.as_path()).unwrap();
+  wait_contains_without(
+    "was removed but is still imported",
+    "Restarting",
+    &mut stderr_lines,
+  )
+  .await;
+
+  plugins.write("console.log('plugins v2');\n");
+  wait_contains_without("Pruned file", "Restarting", &mut stderr_lines).await;
+  wait_contains("plugins v2", &mut stdout_lines).await;
+  wait_contains("plugin pruned", &mut stdout_lines).await;
+
+  check_alive_then_kill(child);
+}
+
+#[test(flaky)]
 async fn serve_hmr_parallel() {
   let t = TempDir::new();
   t.path().join("main.js").write(

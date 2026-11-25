@@ -165,6 +165,11 @@ interface ImportMetaHot {
   // deno-lint-ignore no-explicit-any
   removeDisposeHandler(callback: (data: any) => void | Promise<void>): void;
 
+  /** Register a handler that runs when this module is no longer imported by
+   * any module after an update. Its `dispose` handlers run first. */
+  // deno-lint-ignore no-explicit-any
+  prune(callback: (data: any) => void | Promise<void>): void;
+
   /** Reject the update that is currently being applied to this module and
    * let its importers handle it instead. Can only be called while an update
    * is being applied. */
