@@ -5,6 +5,7 @@ resolver = "2"
 members = [
   "auxiliary-js/doc",
   "auxiliary-js/graph",
+  "auxiliary-js/loader",
   "auxiliary/ast",
   "auxiliary/doc",
   "auxiliary/graph",

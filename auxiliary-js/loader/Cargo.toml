@@ -1,0 +1,44 @@
+[package]
+name = "deno_loader_wasm"
+version = "0.0.0"
+edition = "2024"
+
+[lib]
+name = "deno_loader_wasm"
+crate-type = ["cdylib"]
+path = "lib.rs"
+
+[dependencies]
+deno_ast = { workspace = true, features = ["transpiling"] }
+deno_cache_dir = { workspace = true, features = ["sync"] }
+deno_config = { workspace = true, features = ["workspace", "sync"] }
+deno_graph = { workspace = true, features = ["swc"] }
+deno_npm.workspace = true
+deno_npmrc.workspace = true
+deno_npm_cache.workspace = true
+deno_npm_installer.workspace = true
+deno_resolver = { workspace = true, features = ["deno_ast"] }
+deno_unsync.workspace = true
+node_resolver = { workspace = true, features = ["sync"] }
+sys_traits = { workspace = true, features = ["real"] }
+
+anyhow.workspace = true
+base64.workspace = true
+console_error_panic_hook.workspace = true
+js-sys.workspace = true
+log.workspace = true
+serde.workspace = true
+serde-wasm-bindgen.workspace = true
+wasm-bindgen.workspace = true
+wasm-bindgen-futures.workspace = true
+async-trait.workspace = true
+deno_error.workspace = true
+deno_path_util.workspace = true
+deno_semver.workspace = true
+url.workspace = true
+chrono.workspace = true
+flate2.workspace = true
+
+[target."cfg(target_arch = \"wasm32\")".dependencies.sys_traits]
+workspace = true
+features = ["real", "wasm"]

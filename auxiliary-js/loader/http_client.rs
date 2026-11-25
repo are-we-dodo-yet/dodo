@@ -6,6 +6,7 @@ use deno_cache_dir::file_fetcher::SendResponse;
 use deno_cache_dir::file_fetcher::StatusCode;
 use deno_error::JsErrorBox;
 use deno_npm_cache::NpmCacheHttpClientResponse;
+use deno_npm_cache::NpmPackumentRequestFormat;
 use deno_npmrc::RegistryConfig;
 use js_sys::Array;
 use js_sys::Object;
@@ -105,13 +106,14 @@ impl deno_cache_dir::file_fetcher::HttpClient for WasmHttpClient {
 
 #[async_trait::async_trait(?Send)]
 impl deno_npm_cache::NpmCacheHttpClient for WasmHttpClient {
-  // todo: implement retrying
+  // todo: implement retrying, make it reusable and share with cli/npm.rs?
   async fn download_with_retries_on_any_tokio_runtime(
     &self,
     url: Url,
     maybe_auth: Option<String>,
     maybe_etag: Option<String>,
     maybe_registry_config: Option<&RegistryConfig>,
+    maybe_packument_format: Option<NpmPackumentRequestFormat>,
   ) -> Result<NpmCacheHttpClientResponse, deno_npm_cache::DownloadError> {
     let mut headers = Vec::new();
     if let Some(auth) = maybe_auth {
@@ -119,6 +121,13 @@ impl deno_npm_cache::NpmCacheHttpClient for WasmHttpClient {
     }
     if let Some(etag) = maybe_etag {
       headers.push(("if-none-match".to_string(), etag));
+    }
+    if maybe_packument_format == Some(NpmPackumentRequestFormat::Abbreviated) {
+      headers.push((
+        "accept".to_string(),
+        "application/vnd.npm.install-v1+json; q=1.0, application/json; q=0.8, */*"
+          .to_string(),
+      ));
     }
 
     let client_cert_config = registry_config_to_js(maybe_registry_config);

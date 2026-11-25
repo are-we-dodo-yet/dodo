@@ -15,6 +15,7 @@
     "jsr:@std/path@1": "1.1.0",
     "jsr:@std/path@^1.1.0": "1.1.0",
     "jsr:@std/toml@^1.0.7": "1.0.7",
+    "npm:@dodoland/wasmbuild@0.1.0": "0.1.0",
     "npm:@types/jscodeshift@*": "17.3.0",
     "npm:@types/node@*": "22.15.15",
     "npm:jscodeshift@0.15.2": "0.15.2_@babel+core@7.27.4"
@@ -370,6 +371,10 @@
         "@babel/helper-string-parser",
         "@babel/helper-validator-identifier"
       ]
+    },
+    "@dodoland/wasmbuild@0.1.0": {
+      "integrity": "sha512-4B9VwAHVJCm851Kq5m1reYiwJXB6DnBQubb6Nc/7QQ/Pband/W5udtSrsHg8si+f/3uD0rG+x0WlkTkt27t8Dw==",
+      "bin": true
     },
     "@jridgewell/gen-mapping@0.3.8": {
       "integrity": "sha512-imAbBGkb+ebQyxKgzv5Hu2nmROxoDOXHh80evxdoXNOrvAnVx7zimzc1Oo5h9RlfV4vPXaE2iM5pOFbvOCClWA==",
@@ -816,7 +821,8 @@
     "dependencies": [
       "jsr:@david/dax@~0.43.2",
       "jsr:@std/assert@^1.0.13",
-      "jsr:@std/toml@^1.0.7"
+      "jsr:@std/toml@^1.0.7",
+      "npm:@dodoland/wasmbuild@0.1.0"
     ]
   }
 }

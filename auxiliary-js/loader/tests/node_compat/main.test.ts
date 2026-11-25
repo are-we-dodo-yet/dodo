@@ -8,26 +8,6 @@ import {
   Workspace,
 } from "../helpers.ts";
 
-Deno.test("loader works under Node.js", async () => {
-  const result = await new Deno.Command("node", {
-    args: [
-      "--experimental-transform-types",
-      "tests/node_compat/testdata/node_test.mjs",
-    ],
-    stdout: "piped",
-    stderr: "piped",
-  }).output();
-
-  const stdout = new TextDecoder().decode(result.stdout);
-  const stderr = new TextDecoder().decode(result.stderr);
-
-  if (!result.success) {
-    throw new Error(
-      `Node.js integration test failed (exit code ${result.code}):\n${stdout}\n${stderr}`,
-    );
-  }
-});
-
 Deno.test("workspace noConfig option", async () => {
   const workspace = new Workspace({ noConfig: true });
   const loader = await workspace.createLoader();

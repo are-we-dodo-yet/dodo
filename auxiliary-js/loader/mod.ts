@@ -43,7 +43,7 @@
 import type {
   DenoLoader as WasmLoaderClass,
   DenoWorkspace as WasmWorkspaceClass,
-} from "./lib/rs_lib.js";
+} from "./lib/deno_loader_wasm.js";
 
 type WasmLoader = WasmLoaderClass;
 type WasmWorkspace = WasmWorkspaceClass;
@@ -53,7 +53,7 @@ type WasmWorkspace = WasmWorkspaceClass;
 // deno-lint-ignore no-explicit-any
 let _lib: any;
 if (typeof Deno !== "undefined") {
-  _lib = await import("./lib/rs_lib.js");
+  _lib = await import("./lib/deno_loader_wasm.js");
 } else {
   _lib = await import("./rs_lib_node.js");
 }

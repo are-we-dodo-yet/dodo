@@ -11,6 +11,7 @@ use std::sync::OnceLock;
 
 use anyhow::Context;
 use anyhow::bail;
+use base64::Engine as _;
 use deno_ast::ModuleKind;
 use deno_cache_dir::file_fetcher::CacheSetting;
 use deno_cache_dir::file_fetcher::NullBlobStore;
@@ -51,6 +52,7 @@ use deno_resolver::file_fetcher::DenoGraphLoaderOptions;
 use deno_resolver::file_fetcher::PermissionedFileFetcher;
 use deno_resolver::file_fetcher::PermissionedFileFetcherOptions;
 use deno_resolver::graph::DefaultDenoResolverRc;
+use deno_resolver::graph::NpmTypesResolutionMode;
 use deno_resolver::graph::ResolveWithGraphError;
 use deno_resolver::graph::ResolveWithGraphErrorKind;
 use deno_resolver::graph::ResolveWithGraphOptions;
@@ -65,7 +67,6 @@ use deno_resolver::workspace::MappedResolutionError;
 use deno_semver::SmallStackString;
 use deno_semver::jsr::JsrPackageReqReference;
 use deno_semver::npm::NpmPackageReqReference;
-use base64::Engine as _;
 use js_sys::Object;
 use js_sys::Uint8Array;
 use log::LevelFilter;
@@ -262,6 +263,9 @@ impl DenoWorkspace {
         npm_process_state: None,
         root_node_modules_dir_override: None,
         vendor: None, // provide this via the config
+        // TODO: What was the prior behavior?
+        import_npm_lockfile: false,
+        node_modules_linker: None,
       },
     ));
     let resolver_factory = Arc::new(ResolverFactory::new(
@@ -280,6 +284,7 @@ impl DenoWorkspace {
           ),
           preserve_jsx: options.preserve_jsx.unwrap_or(false),
           force_check_js: false,
+          force_disable_verbatim_module_syntax: false,
         },
         // todo: make this configurable
         is_cjs_resolution_mode:
@@ -308,7 +313,6 @@ impl DenoWorkspace {
         package_json_dep_resolution: None,
         require_modules: Vec::new(),
         specified_import_map: None,
-        bare_node_builtins: true,
         newest_dependency_date: options
           .newest_dependency_date
           .map(NewestDependencyDate::Enabled),
@@ -331,6 +335,7 @@ impl DenoWorkspace {
         },
         caching_strategy: deno_npm_installer::graph::NpmCachingStrategy::Eager,
         clean_on_install: false,
+        dedup_lockfile_peer_variants: true,
         lifecycle_scripts_config: deno_npm_installer::LifecycleScriptsConfig {
           allowed: deno_npm_installer::PackagesAllowedScripts::None,
           denied: Vec::new(),
@@ -341,6 +346,8 @@ impl DenoWorkspace {
             .root_dir_path(),
           explicit_install: false,
         },
+        production: false,
+        skip_types: false,
         resolve_npm_resolution_snapshot: Box::new(|| Ok(None)),
       },
     ));
@@ -493,10 +500,13 @@ impl DenoLoader {
             &self.compiler_options_resolver,
           )?;
 
-        let graph_resolver =
-          self
-            .resolver
-            .as_graph_resolver(&self.cjs_tracker, &jsx_config, None);
+        let graph_resolver = self.resolver.as_graph_resolver(
+          &self.cjs_tracker,
+          &jsx_config,
+          None,
+          // FIXME: I don't know which mode should be used here
+          NpmTypesResolutionMode::Strict,
+        );
         let loader = DenoGraphLoader::new(
           self.file_fetcher.clone(),
           self.workspace_factory.global_http_cache()?.clone(),
@@ -507,6 +517,7 @@ impl DenoLoader {
             permissions: None,
             reporter: None,
             include_npm_sources: false,
+            file_permission_api_name: None,
           },
         );
 
@@ -547,8 +558,11 @@ impl DenoLoader {
               reporter: None,
               resolver: Some(&graph_resolver),
               unstable_bytes_imports: true,
-              unstable_text_imports: true,
+              unstable_css_imports: true,
+              unstable_config_imports: false,
               jsr_metadata_store: Some(self.jsr_metadata_store.clone()),
+              // TODO?
+              prefer_cached_jsr_versions: true,
             },
           )
           .await;
@@ -741,7 +755,8 @@ impl DenoLoader {
 
     match self
       .module_loader
-      .load(&self.graph.get(), &url, None, requested_module_type)
+      // TODO: Do we need CjsAnalysisSourceProvider here?
+      .load(&self.graph.get(), &url, None, requested_module_type, None)
       .await
     {
       Ok(LoadedModuleOrAsset::Module(m)) => {
@@ -969,7 +984,8 @@ fn deno_resolve_error_code(err: &DenoResolveError) -> Option<NodeJsErrorCode> {
     },
     DenoResolveErrorKind::Node(err) => err.maybe_code(),
     DenoResolveErrorKind::ResolveNpmReqRef(err) => err.err.maybe_code(),
-    DenoResolveErrorKind::NodeModulesOutOfDate(_)
+    DenoResolveErrorKind::CatalogPackageNotFound(_)
+    | DenoResolveErrorKind::NodeModulesOutOfDate(_)
     | DenoResolveErrorKind::PackageJsonDepValueParse(_)
     | DenoResolveErrorKind::PackageJsonDepValueUrlParse(_)
     | DenoResolveErrorKind::PathToUrl(_)
