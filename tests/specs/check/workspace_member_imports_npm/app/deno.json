@@ -1,0 +1,6 @@
+{
+  "imports": {
+    "~utils": "./utils.ts",
+    "~components/": "./components/"
+  }
+}

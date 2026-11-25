@@ -458,6 +458,15 @@ pub async fn sync_types_command(
   let type_check_remote =
     cli_options.type_check_mode() == crate::args::TypeCheckMode::All;
 
+  let imports = factory
+    .workspace_resolver()
+    .await?
+    .maybe_import_map()
+    .map(|import_map| {
+      super::npm_compat::workspace_imports(&project_root, import_map)
+    })
+    .unwrap_or_default();
+
   let installed = super::npm_compat::setup_npm_compat(
     &project_root,
     &file_fetcher,
@@ -470,6 +479,7 @@ pub async fn sync_types_command(
     resolved_compiler_options.as_ref(),
     manage_root_tsconfig,
     type_check_remote,
+    &imports,
   )
   .await?;
 

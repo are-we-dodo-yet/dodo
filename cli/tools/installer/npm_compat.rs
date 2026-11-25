@@ -299,6 +299,7 @@ pub async fn setup_npm_compat(
   resolved_compiler_options: Option<&Value>,
   manage_root_tsconfig: bool,
   type_check_remote: bool,
+  imports: &[(String, Value)],
 ) -> Result<Vec<InstalledJsrPackage>, AnyError> {
   crate::tsc::tsconfig_gen::ensure_deno_dir(project_root)?;
   let deno_json = read_deno_json(project_root)?;
@@ -319,19 +320,11 @@ pub async fn setup_npm_compat(
   // the specifiers discovered in the module graph. Graph specifiers (e.g.
   // `jsr:@std/path` written directly in source) are keyed by themselves so the
   // import-map-driven generation maps them like an alias.
-  let mut combined = deno_json
-    .as_ref()
-    .and_then(|d| d.get("imports"))
-    .and_then(|v| v.as_object())
-    .cloned()
-    .unwrap_or_default();
-  if let Some(map_imports) = deno_json
-    .as_ref()
-    .and_then(|d| read_referenced_import_map(project_root, d))
-  {
-    for (k, v) in map_imports {
-      combined.entry(k).or_insert(v);
-    }
+  let mut combined = serde_json::Map::new();
+  for (alias, target) in imports {
+    combined
+      .entry(alias.clone())
+      .or_insert_with(|| target.clone());
   }
   // Snapshot the import-map alias -> target pairs (before adding graph specs)
   // so we can resolve bare specifiers against them.
@@ -697,18 +690,6 @@ fn resolve_version_req(meta: &Value, req: &str) -> Option<String> {
     .map(|v| v.to_string())
 }
 
-/// If `deno_json` references an external import map via `importMap`, read that
-/// file and return its `imports` object.
-fn read_referenced_import_map(
-  project_root: &Path,
-  deno_json: &Value,
-) -> Option<serde_json::Map<String, Value>> {
-  let rel = deno_json.get("importMap").and_then(|v| v.as_str())?;
-  let content = std::fs::read_to_string(project_root.join(rel)).ok()?;
-  let parsed: Value = serde_json::from_str(&content).ok()?;
-  parsed.get("imports").and_then(|v| v.as_object()).cloned()
-}
-
 /// Build tsconfig `paths` entries that map each workspace member's package name
 /// (and subpath exports) to its local source files, so stock tooling resolves
 /// e.g. `@std/assert` and `@std/assert/equals` to `../assert/mod.ts` and
@@ -764,6 +745,50 @@ fn workspace_member_paths(
     }
   }
   paths
+}
+
+pub fn workspace_imports(
+  project_root: &Path,
+  import_map: &import_map::ImportMap,
+) -> Vec<(String, Value)> {
+  let Ok(root_url) = Url::from_directory_path(project_root) else {
+    return Vec::new();
+  };
+  let mut imports = Vec::new();
+  let mut push_entries = |map: &import_map::SpecifierMap| {
+    for entry in map.entries() {
+      let Some(url) = entry.value else {
+        continue;
+      };
+      let target = if url.scheme() == "file" {
+        let Some(rel) = root_url.make_relative(url) else {
+          continue;
+        };
+        if rel.starts_with("../") {
+          rel
+        } else {
+          format!("./{rel}")
+        }
+      } else {
+        let target = entry.raw_value.unwrap_or(url.as_str());
+        let is_expanded_subpath = entry.raw_key.ends_with('/')
+          && (target.starts_with("jsr:/") || target.starts_with("npm:/"))
+          && map
+            .entries()
+            .any(|e| Some(e.raw_key) == entry.raw_key.strip_suffix('/'));
+        if is_expanded_subpath {
+          continue;
+        }
+        target.to_string()
+      };
+      imports.push((entry.raw_key.to_string(), Value::String(target)));
+    }
+  };
+  push_entries(import_map.imports());
+  for scope in import_map.scopes() {
+    push_entries(scope.imports);
+  }
+  imports
 }
 
 /// Expand workspace member patterns into concrete member directories (relative
@@ -1729,6 +1754,55 @@ mod tests {
     );
     // non-member alias produced no new entry
     assert!(!member_paths.contains_key("chalk"));
+  }
+
+  #[test]
+  fn test_workspace_imports() {
+    let root = if cfg!(windows) {
+      "C:\\work\\project"
+    } else {
+      "/work/project"
+    };
+    let base = Url::from_file_path(Path::new(root).join("deno.json")).unwrap();
+    let import_map = import_map::parse_from_value(
+      base,
+      json!({
+        "imports": {
+          "root": "./root.ts",
+          "outside/": "../outside/",
+          "@std/assert": "jsr:@std/assert@^1",
+          "@std/assert/": "jsr:/@std/assert@^1/",
+        },
+        "scopes": {
+          "./app/": {
+            "root": "./app/shadowed.ts",
+            "~utils": "./app/utils.ts",
+            "~components/": "./app/components/",
+            "chalk": "npm:chalk@5",
+          },
+        },
+      }),
+    )
+    .unwrap()
+    .import_map;
+
+    let imports = workspace_imports(Path::new(root), &import_map);
+    let mut combined = serde_json::Map::new();
+    for (alias, target) in imports {
+      combined.entry(alias).or_insert(target);
+    }
+
+    assert_eq!(
+      Value::Object(combined),
+      json!({
+        "root": "./root.ts",
+        "outside/": "../outside/",
+        "@std/assert": "jsr:@std/assert@^1",
+        "~utils": "./app/utils.ts",
+        "~components/": "./app/components/",
+        "chalk": "npm:chalk@5",
+      })
+    );
   }
 
   #[test]
