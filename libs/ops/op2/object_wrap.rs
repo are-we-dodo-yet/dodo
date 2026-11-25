@@ -103,6 +103,7 @@ pub(crate) fn generate_impl_ops(
       let mut func = ItemFn {
         attrs: item_fn_attrs,
         vis: method.vis,
+        modifiers: Default::default(),
         sig: method.sig,
         block: Box::new(method.block),
       };

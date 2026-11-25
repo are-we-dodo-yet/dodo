@@ -5,9 +5,9 @@
 
 use deno_core::serde::Deserialize;
 use deno_core::serde::Serialize;
-use lsp_types::Uri;
 use once_cell::sync::Lazy;
-use tower_lsp::lsp_types as lsp;
+use tower_lsp_server::ls_types as lsp;
+use tower_lsp_server::ls_types::Uri;
 
 pub struct RefactorCodeActionKind {
   pub kind: lsp::CodeActionKind,

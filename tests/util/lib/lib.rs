@@ -285,7 +285,12 @@ pub fn std_file_url() -> String {
 
 pub fn target_dir() -> PathRef {
   let current_exe = std::env::current_exe().unwrap();
-  let target_dir = current_exe.parent().unwrap().parent().unwrap();
+  let exe_dir = current_exe.parent().unwrap();
+  let target_dir = match exe_dir.file_name().and_then(|n| n.to_str()) {
+    Some("deps") => exe_dir.parent().unwrap(),
+    Some("out") => exe_dir.ancestors().nth(4).unwrap(),
+    _ => exe_dir,
+  };
   PathRef::new(target_dir)
 }
 

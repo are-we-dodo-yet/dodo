@@ -354,7 +354,7 @@ pub fn op_node_udp_set_ttl(
 ) -> Result<(), NodeUdpError> {
   let resource = state.resource_table.get::<NodeUdpSocketResource>(rid)?;
   let sock_ref = socket2::SockRef::from(&resource.socket);
-  sock_ref.set_ttl(ttl)?;
+  sock_ref.set_ttl_v4(ttl)?;
   Ok(())
 }
 

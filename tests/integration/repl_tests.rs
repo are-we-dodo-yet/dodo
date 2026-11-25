@@ -227,7 +227,7 @@ fn pty_internal_repl() {
     console.expect("Length: 0");
 
     console.write_line_raw("__\t\t");
-    console.expect("> __");
+    console.expect("__");
     let output = console.read_until("> __");
     assert_contains!(output, "__defineGetter__");
     // should not contain the internal repl variable
@@ -866,8 +866,9 @@ fn pty_tab_handler() {
       // windows
       "a;         a + 2;",
       // unix
-      "a; \t\ta + 2;",
+      "> a; \t\t",
     ]);
+    console.expect("7");
   });
 }
 
@@ -1087,7 +1088,7 @@ fn pty_tab_indexable_props() {
     console.write_line("const arr = [1, 2, 3]");
     console.expect("undefined");
     console.write_raw("arr.\t\t");
-    console.expect("> arr.");
+    console.expect("arr.");
     let output = console.read_until("> arr.");
     assert_contains!(output, "constructor");
     assert_contains!(output, "sort");

@@ -21,15 +21,6 @@ use crate::buffer::GPUBuffer;
 use crate::error::GPUGenericError;
 use crate::texture::GPUTextureFormat;
 
-fn c_string_truncated_at_first_nul<T: Into<Vec<u8>>>(
-  src: T,
-) -> std::ffi::CString {
-  std::ffi::CString::new(src).unwrap_or_else(|err| {
-    let nul_pos = err.nul_position();
-    std::ffi::CString::new(err.into_vec().split_at(nul_pos).0).unwrap()
-  })
-}
-
 pub struct GPURenderBundleEncoder {
   pub instance: Instance,
   pub error_handler: super::error::ErrorHandler,
@@ -75,8 +66,9 @@ impl GPURenderBundleEncoder {
       label: crate::transform_label(descriptor.label.clone()),
     };
 
+    let mut encoder = self.encoder.borrow_mut().take().unwrap();
     let (id, err) = self.instance.render_bundle_encoder_finish(
-      self.encoder.borrow_mut().take().unwrap(),
+      &mut encoder,
       &wgpu_descriptor,
       None,
     );
@@ -100,15 +92,11 @@ impl GPURenderBundleEncoder {
       JsErrorBox::generic("Encoder has already been finished")
     })?;
 
-    let label = c_string_truncated_at_first_nul(group_label);
-    // SAFETY: the string the raw pointer points to lives longer than the below
-    // function invocation.
-    unsafe {
-      wgpu_core::command::bundle_ffi::wgpu_render_bundle_push_debug_group(
-        encoder,
-        label.as_ptr(),
-      );
-    }
+    let err = self
+      .instance
+      .render_bundle_encoder_push_debug_group(encoder, &group_label)
+      .err();
+    self.error_handler.push_error(err);
 
     Ok(())
   }
@@ -120,7 +108,11 @@ impl GPURenderBundleEncoder {
     let encoder = encoder.as_mut().ok_or_else(|| {
       JsErrorBox::generic("Encoder has already been finished")
     })?;
-    wgpu_core::command::bundle_ffi::wgpu_render_bundle_pop_debug_group(encoder);
+    let err = self
+      .instance
+      .render_bundle_encoder_pop_debug_group(encoder)
+      .err();
+    self.error_handler.push_error(err);
     Ok(())
   }
 
@@ -134,15 +126,11 @@ impl GPURenderBundleEncoder {
       JsErrorBox::generic("Encoder has already been finished")
     })?;
 
-    let label = c_string_truncated_at_first_nul(marker_label);
-    // SAFETY: the string the raw pointer points to lives longer than the below
-    // function invocation.
-    unsafe {
-      wgpu_core::command::bundle_ffi::wgpu_render_bundle_insert_debug_marker(
-        encoder,
-        label.as_ptr(),
-      );
-    }
+    let err = self
+      .instance
+      .render_bundle_encoder_insert_debug_marker(encoder, &marker_label)
+      .err();
+    self.error_handler.push_error(err);
     Ok(())
   }
 
@@ -216,16 +204,16 @@ impl GPURenderBundleEncoder {
 
       let offsets = &data[start..end];
 
-      // SAFETY: wgpu FFI call
-      unsafe {
-        wgpu_core::command::bundle_ffi::wgpu_render_bundle_set_bind_group(
+      let err = self
+        .instance
+        .render_bundle_encoder_set_bind_group(
           encoder,
           index,
           bind_group.into_option().map(|bind_group| bind_group.id),
-          offsets.as_ptr(),
-          offsets.len(),
-        );
-      }
+          offsets,
+        )
+        .err();
+      self.error_handler.push_error(err);
     } else {
       let offsets = <Option<Vec<u32>>>::convert(
         scope,
@@ -239,16 +227,16 @@ impl GPURenderBundleEncoder {
       )?
       .unwrap_or_default();
 
-      // SAFETY: wgpu FFI call
-      unsafe {
-        wgpu_core::command::bundle_ffi::wgpu_render_bundle_set_bind_group(
+      let err = self
+        .instance
+        .render_bundle_encoder_set_bind_group(
           encoder,
           index,
           bind_group.into_option().map(|bind_group| bind_group.id),
-          offsets.as_ptr(),
-          offsets.len(),
-        );
-      }
+          &offsets,
+        )
+        .err();
+      self.error_handler.push_error(err);
     }
 
     Ok(())
@@ -264,10 +252,11 @@ impl GPURenderBundleEncoder {
       JsErrorBox::generic("Encoder has already been finished")
     })?;
 
-    wgpu_core::command::bundle_ffi::wgpu_render_bundle_set_pipeline(
-      encoder,
-      pipeline.id,
-    );
+    let err = self
+      .instance
+      .render_bundle_encoder_set_pipeline(encoder, pipeline.id)
+      .err();
+    self.error_handler.push_error(err);
     Ok(())
   }
 
@@ -285,12 +274,17 @@ impl GPURenderBundleEncoder {
       JsErrorBox::generic("Encoder has already been finished")
     })?;
 
-    encoder.set_index_buffer(
-      buffer.id,
-      index_format.into(),
-      offset,
-      size.and_then(NonZeroU64::new),
-    );
+    let err = self
+      .instance
+      .render_bundle_encoder_set_index_buffer(
+        encoder,
+        buffer.id,
+        index_format.into(),
+        offset,
+        size.and_then(NonZeroU64::new),
+      )
+      .err();
+    self.error_handler.push_error(err);
     Ok(())
   }
 
@@ -308,13 +302,17 @@ impl GPURenderBundleEncoder {
       JsErrorBox::generic("Encoder has already been finished")
     })?;
 
-    wgpu_core::command::bundle_ffi::wgpu_render_bundle_set_vertex_buffer(
-      encoder,
-      slot,
-      buffer.id,
-      offset,
-      size.and_then(NonZeroU64::new),
-    );
+    let err = self
+      .instance
+      .render_bundle_encoder_set_vertex_buffer(
+        encoder,
+        slot,
+        Some(buffer.id),
+        offset,
+        size.and_then(NonZeroU64::new),
+      )
+      .err();
+    self.error_handler.push_error(err);
     Ok(())
   }
 
@@ -332,13 +330,17 @@ impl GPURenderBundleEncoder {
       JsErrorBox::generic("Encoder has already been finished")
     })?;
 
-    wgpu_core::command::bundle_ffi::wgpu_render_bundle_draw(
-      encoder,
-      vertex_count,
-      instance_count,
-      first_vertex,
-      first_instance,
-    );
+    let err = self
+      .instance
+      .render_bundle_encoder_draw(
+        encoder,
+        vertex_count,
+        instance_count,
+        first_vertex,
+        first_instance,
+      )
+      .err();
+    self.error_handler.push_error(err);
     Ok(())
   }
 
@@ -357,14 +359,18 @@ impl GPURenderBundleEncoder {
       JsErrorBox::generic("Encoder has already been finished")
     })?;
 
-    wgpu_core::command::bundle_ffi::wgpu_render_bundle_draw_indexed(
-      encoder,
-      index_count,
-      instance_count,
-      first_index,
-      base_vertex,
-      first_instance,
-    );
+    let err = self
+      .instance
+      .render_bundle_encoder_draw_indexed(
+        encoder,
+        index_count,
+        instance_count,
+        first_index,
+        base_vertex,
+        first_instance,
+      )
+      .err();
+    self.error_handler.push_error(err);
     Ok(())
   }
 
@@ -380,11 +386,15 @@ impl GPURenderBundleEncoder {
       JsErrorBox::generic("Encoder has already been finished")
     })?;
 
-    wgpu_core::command::bundle_ffi::wgpu_render_bundle_draw_indirect(
-      encoder,
-      indirect_buffer.id,
-      indirect_offset,
-    );
+    let err = self
+      .instance
+      .render_bundle_encoder_draw_indirect(
+        encoder,
+        indirect_buffer.id,
+        indirect_offset,
+      )
+      .err();
+    self.error_handler.push_error(err);
     Ok(())
   }
 
@@ -400,11 +410,15 @@ impl GPURenderBundleEncoder {
       JsErrorBox::generic("Encoder has already been finished")
     })?;
 
-    wgpu_core::command::bundle_ffi::wgpu_render_bundle_draw_indexed_indirect(
-      encoder,
-      indirect_buffer.id,
-      indirect_offset,
-    );
+    let err = self
+      .instance
+      .render_bundle_encoder_draw_indexed_indirect(
+        encoder,
+        indirect_buffer.id,
+        indirect_offset,
+      )
+      .err();
+    self.error_handler.push_error(err);
     Ok(())
   }
 }

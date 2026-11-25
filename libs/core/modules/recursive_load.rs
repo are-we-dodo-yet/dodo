@@ -363,7 +363,7 @@ impl RecursiveModuleLoad {
         scope,
         &format!(
           "Source phase imports are not supported for {} modules",
-          &module_source.module_type
+          module_source.module_type
         ),
       )
       .unwrap();

@@ -3,11 +3,13 @@
 use std::borrow::Cow;
 use std::cell::RefCell;
 use std::fmt::Formatter;
+use std::fs::FileTimes;
 use std::io;
 use std::path::Path;
 #[cfg(unix)]
 use std::process::Stdio as StdStdio;
 use std::rc::Rc;
+use std::time::Duration;
 use std::time::SystemTime;
 use std::time::UNIX_EPOCH;
 
@@ -109,6 +111,33 @@ impl From<Canceled> for FsError {
 }
 
 pub type FsResult<T> = Result<T, FsError>;
+
+fn unix_time(secs: i64, nanos: u32) -> io::Result<SystemTime> {
+  let whole = Duration::from_secs(secs.unsigned_abs());
+  let time = if secs >= 0 {
+    UNIX_EPOCH.checked_add(whole)
+  } else {
+    UNIX_EPOCH.checked_sub(whole)
+  };
+  time
+    .and_then(|time| time.checked_add(Duration::from_nanos(nanos.into())))
+    .ok_or_else(|| {
+      io::Error::new(io::ErrorKind::InvalidInput, "time is out of range")
+    })
+}
+
+pub fn file_times(
+  atime_secs: i64,
+  atime_nanos: u32,
+  mtime_secs: i64,
+  mtime_nanos: u32,
+) -> io::Result<FileTimes> {
+  Ok(
+    FileTimes::new()
+      .set_accessed(unix_time(atime_secs, atime_nanos)?)
+      .set_modified(unix_time(mtime_secs, mtime_nanos)?),
+  )
+}
 
 pub struct FsStat {
   pub is_file: bool,

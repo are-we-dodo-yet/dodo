@@ -36,7 +36,6 @@ deno_npm.workspace = true
 deno_semver.workspace = true
 futures.workspace = true
 hashlink.workspace = true
-import_map.workspace = true
 indexmap.workspace = true
 serde.workspace = true
 serde_json.workspace = true

@@ -41,7 +41,7 @@ fn enrich_url_pattern_error(
   // to whichever component the string expanded to, not the whole string, so we
   // echo the input but cannot place a caret.
   let (pattern, caret_pos) = match input {
-    StringOrInit::String(s) => (Some(("URLPattern", s.as_str())), None),
+    StringOrInit::String(s) => (Some(("URLPattern", s.as_ref())), None),
     StringOrInit::Init(init) => (single_init_component(init), pos),
   };
 
@@ -143,7 +143,7 @@ pub fn op_urlpattern_parse(
     quirks::process_construct_pattern_input(input.clone(), base_url.as_deref())
       .map_err(|e| enrich_url_pattern_error(e, &input))?;
 
-  let pattern = quirks::parse_pattern(init, options)
+  let pattern = quirks::parse_pattern::<quirks::EcmaRegexp>(init, options)
     .map_err(|e| enrich_url_pattern_error(e, &input))?;
 
   Ok(UrlPatternResult {

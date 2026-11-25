@@ -644,7 +644,7 @@ Deno.test({
   permissions: { run: true, read: true },
   fn: async () => {
     const [statusCode, output] = await execCode(`
-      const timer = setTimeout(() => console.log("1"), 1);
+      const timer = setTimeout(() => console.log("1"), 1000);
       Deno.unrefTimer(+timer);
       console.log(timer.hasRef());
     `);

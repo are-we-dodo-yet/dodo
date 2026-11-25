@@ -1,0 +1,40 @@
+{
+  "name": "@deno/loader",
+  "tasks": {
+    "build": "deno run -A wasmbuild --project deno_loader_wasm"
+  },
+  "fmt": {
+    "exclude": [
+      "lib"
+    ]
+  },
+  "lint": {
+    "rules": {
+      "exclude": [
+        "no-explicit-any"
+      ]
+    }
+  },
+  "publish": {
+    "exclude": [
+      ".github",
+      ".vscode",
+      ".gitmodules",
+      "deno.lock",
+      "src/package.json",
+      "!./src/lib",
+      "scripts",
+      "tests/"
+    ]
+  },
+  "exports": "./mod.ts",
+  "exclude": [
+    "tests/**/testdata"
+  ],
+  "imports": {
+    "@david/dax": "jsr:@david/dax@^0.43.2",
+    "@std/assert": "jsr:@std/assert@^1.0.13",
+    "@std/toml": "jsr:@std/toml@^1.0.7",
+    "wasmbuild": "npm:@dodoland/wasmbuild@0.1.0"
+  }
+}

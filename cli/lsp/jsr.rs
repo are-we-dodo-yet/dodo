@@ -192,7 +192,7 @@ impl JsrCacheResolver {
       workspace_package.dir_url.join(path).ok()
     } else {
       jsr_url()
-        .join(&format!("{}/{}/{}", &nv.name, &nv.version, &path))
+        .join(&format!("{}/{}/{}", nv.name, nv.version, path))
         .ok()
     }
   }
@@ -335,7 +335,7 @@ impl JsrCacheResolver {
     }
     let read_cached_package_version_info = || {
       let meta_url = jsr_url()
-        .join(&format!("{}/{}_meta.json", &nv.name, &nv.version))
+        .join(&format!("{}/{}_meta.json", nv.name, nv.version))
         .ok()?;
       let meta_bytes = read_cached_url(&meta_url, &self.cache)?;
       partial_jsr_package_version_info_from_slice(&meta_bytes).ok()

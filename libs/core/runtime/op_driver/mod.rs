@@ -269,7 +269,7 @@ mod tests {
           assert_eq!(driver.len(), count - i);
           reap_task(&driver, &mut bitset, "1").await;
         }
-        assert_eq!(bitset.len(), count);
+        assert_eq!(bitset.count(), count);
       }
     });
   }
@@ -307,7 +307,7 @@ mod tests {
           assert_eq!(driver.len(), count - i);
           reap_task(&driver, &mut bitset, "4").await;
         }
-        assert_eq!(bitset.len(), count);
+        assert_eq!(bitset.count(), count);
       }
     });
   }
@@ -350,7 +350,7 @@ mod tests {
         assert_eq!(driver.len(), count - i);
         reap_task(&driver, &mut bitset, "10").await;
       }
-      assert_eq!(bitset.len(), count);
+      assert_eq!(bitset.count(), count);
     });
   }
 
@@ -389,7 +389,7 @@ mod tests {
         assert_eq!(driver.len(), count - i);
         reap_task(&driver, &mut bitset, "1").await;
       }
-      assert_eq!(bitset.len(), count);
+      assert_eq!(bitset.count(), count);
     });
   }
 }

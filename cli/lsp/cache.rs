@@ -171,9 +171,6 @@ impl LspCache {
     let Ok(path) = url_to_file_path(specifier) else {
       return false;
     };
-    if path.starts_with(&self.deno_dir().root) {
-      return true;
-    }
-    false
+    path.starts_with(&self.deno_dir().root)
   }
 }

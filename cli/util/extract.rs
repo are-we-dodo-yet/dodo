@@ -289,11 +289,7 @@ fn extract_files_from_source_comments(
   let files = comments
     .iter()
     .filter(|comment| {
-      if comment.kind != CommentKind::Block || !comment.text.starts_with('*') {
-        return false;
-      }
-
-      true
+      comment.kind == CommentKind::Block && comment.text.starts_with('*')
     })
     .flat_map(|comment| {
       extract_files_from_regex_blocks(

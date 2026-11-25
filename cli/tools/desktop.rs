@@ -2270,8 +2270,20 @@ fn extract_laufey_archive(
       // components. Anything that fails this check is a zip-slip attempt
       // (or a legitimately weird archive we don't want to handle).
       let Some(rel_path) = entry.enclosed_name() else {
-        bail!("refusing zip entry with unsafe path: {}", entry.name());
+        bail!(
+          "refusing zip entry with unsafe path: {}",
+          String::from_utf8_lossy(entry.name_raw())
+        );
       };
+      let raw_name = entry.name_raw();
+      if matches!(raw_name.first(), Some(b'/' | b'\\'))
+        || raw_name.get(1) == Some(&b':')
+      {
+        bail!(
+          "refusing zip entry with unsafe path: {}",
+          String::from_utf8_lossy(raw_name)
+        );
+      }
       // Defence in depth — re-check the components ourselves.
       if rel_path.components().any(|c| {
         matches!(
@@ -4844,7 +4856,7 @@ fn create_windows_msi(
     summary.set_author(manufacturer.to_string());
     summary.set_comments(format!("{app_name} desktop application"));
     summary.set_arch(arch);
-    summary.set_languages(&[msi::Language::from_code(1033)]);
+    summary.set_languages(&[msi::LanguageId::from(1033)]);
     summary.set_creating_application("deno desktop");
     // Package code: a fresh GUID identifying this exact package build.
     summary.set_uuid(uuid::Uuid::new_v5(
@@ -7945,8 +7957,10 @@ def456  other.zip
         let mut s = comp.open_stream(format!("/{raw}")).unwrap();
         let mut b = Vec::new();
         s.read_to_end(&mut b).unwrap();
-        b.chunks_exact(2)
-          .map(|c| u16::from_le_bytes([c[0], c[1]]))
+        b.as_chunks::<2>()
+          .0
+          .iter()
+          .map(|c| u16::from_le_bytes(*c))
           .collect()
       };
 

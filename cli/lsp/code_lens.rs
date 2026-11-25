@@ -17,13 +17,13 @@ use deno_core::serde::Serialize;
 use deno_core::serde_json;
 use deno_core::serde_json::json;
 use lazy_regex::lazy_regex;
-use lsp_types::Uri;
 use once_cell::sync::Lazy;
 use regex::Regex;
 use tokio_util::sync::CancellationToken;
-use tower_lsp::jsonrpc::Error as LspError;
-use tower_lsp::jsonrpc::Result as LspResult;
-use tower_lsp::lsp_types as lsp;
+use tower_lsp_server::jsonrpc::Error as LspError;
+use tower_lsp_server::jsonrpc::Result as LspResult;
+use tower_lsp_server::ls_types as lsp;
+use tower_lsp_server::ls_types::Uri;
 
 use super::analysis::source_range_to_lsp_range;
 use super::config::CodeLensSettings;
