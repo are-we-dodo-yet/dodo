@@ -141,6 +141,59 @@
                 };
               }
             );
+
+          nixLdLibs = with pkgs; [
+            glib
+            nss
+            nspr
+            at-spi2-core
+            dbus
+            expat
+            libxkbcommon
+            alsa-lib
+            libgbm
+            libx11
+            libxcomposite
+            libxdamage
+            libxext
+            libxfixes
+            libxrandr
+            libxcb
+            libxi
+            gtk3
+            cairo
+            pango
+            cups
+            webkitgtk_4_1
+            libsoup_3
+            libglvnd
+          ];
+
+          libdenortName = "libdenort${pkgs.stdenv.hostPlatform.extensions.sharedLibrary}";
+          libdenort =
+            let
+              args = commonArgs // {
+                pname = "libdenort";
+                cargoExtraArgs = "--locked -p denort_desktop";
+              };
+            in
+            craneLib.buildPackage (
+              args
+              // {
+                cargoArtifacts = craneLib.buildDepsOnly (
+                  args
+                  // {
+                    buildPhaseCargoCommand = "cargoWithProfile build ${args.cargoExtraArgs}";
+                  }
+                );
+
+                postFixup = lib.optionalString isLinux ''
+                  patchelf --add-rpath ${lib.makeLibraryPath [ pkgs.vulkan-loader ]} $out/lib/${libdenortName}
+                '';
+
+                meta.platforms = builtins.attrNames rustyV8Targets;
+              }
+            );
         in
         {
           _module.args.pkgs = import nixpkgs {
@@ -151,6 +204,20 @@
           packages = {
             deno = buildDenoBin "deno";
             denort = buildDenoBin "denort";
+            inherit libdenort;
+            deno-desktop =
+              pkgs.runCommand "deno-desktop-${denoVersion}"
+                {
+                  nativeBuildInputs = [ pkgs.makeWrapper ];
+                  meta = {
+                    mainProgram = "deno";
+                    platforms = builtins.attrNames rustyV8Targets;
+                  };
+                }
+                ''
+                  makeWrapper ${lib.getExe config.packages.deno} $out/bin/deno \
+                    --set-default DENORT_DESKTOP_BIN ${libdenort}/lib/${libdenortName} ${lib.optionalString isLinux "--prefix NIX_LD_LIBRARY_PATH : ${lib.makeLibraryPath nixLdLibs}"}
+                '';
 
             default = config.packages.deno;
           };
@@ -215,29 +282,7 @@
                 export LD_LIBRARY_PATH="${
                   lib.makeLibraryPath [ pkgs.vulkan-loader ]
                 }''${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
-                export NIX_LD_LIBRARY_PATH="${
-                  lib.makeLibraryPath (
-                    with pkgs;
-                    [
-                      glib
-                      nss
-                      nspr
-                      at-spi2-core
-                      dbus
-                      expat
-                      libxkbcommon
-                      alsa-lib
-                      libgbm
-                      libx11
-                      libxcomposite
-                      libxdamage
-                      libxext
-                      libxfixes
-                      libxrandr
-                      libxcb
-                    ]
-                  )
-                }''${NIX_LD_LIBRARY_PATH:+:$NIX_LD_LIBRARY_PATH}"
+                export NIX_LD_LIBRARY_PATH="${lib.makeLibraryPath nixLdLibs}''${NIX_LD_LIBRARY_PATH:+:$NIX_LD_LIBRARY_PATH}"
               fi
             '';
           };
