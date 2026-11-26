@@ -135,7 +135,10 @@
                   patchelf --add-rpath ${lib.makeLibraryPath [ pkgs.vulkan-loader ]} $out/bin/${pname}
                 '';
 
-                meta.mainProgram = pname;
+                meta = {
+                  mainProgram = pname;
+                  platforms = builtins.attrNames rustyV8Targets;
+                };
               }
             );
         in
