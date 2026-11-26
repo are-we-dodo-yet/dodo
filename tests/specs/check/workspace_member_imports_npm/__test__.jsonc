@@ -1,0 +1,13 @@
+{
+  "tests": {
+    "root": {
+      "args": "check app/main.ts",
+      "output": "check.out"
+    },
+    "member": {
+      "args": "check main.ts",
+      "cwd": "app",
+      "output": "check.out"
+    }
+  }
+}
