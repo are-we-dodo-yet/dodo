@@ -1904,6 +1904,8 @@ async fn package_linux_app_dir(
 /// are searched the same way the old sibling-checkout heuristic searched.
 const LAUFEY_DEV_DIR_ENV: &str = "LAUFEY_DEV_DIR";
 
+const LAUFEY_PREBUILT_DIR_ENV: &str = "DENO_DESKTOP_LAUFEY_DIR";
+
 /// Resolves LAUFEY backend binaries and `.app` bundles, falling back to
 /// downloading prebuilt archives from the laufey GitHub releases when
 /// `LAUFEY_DEV_DIR` is not set.
@@ -1911,20 +1913,34 @@ struct LaufeyBackendResolver {
   http_client_provider: Arc<HttpClientProvider>,
   /// `<deno_dir>/laufey/<version>/`
   cache_root: PathBuf,
+  prebuilt_root: Option<PathBuf>,
 }
 
 impl LaufeyBackendResolver {
   fn new(factory: &CliFactory) -> Result<Self, AnyError> {
     let cache_root =
       factory.deno_dir()?.root.join("laufey").join(LAUFEY_VERSION);
+    let prebuilt_root = std::env::var_os(LAUFEY_PREBUILT_DIR_ENV)
+      .filter(|raw| !raw.is_empty())
+      .map(PathBuf::from);
     Ok(Self {
       http_client_provider: factory.http_client_provider().clone(),
       cache_root,
+      prebuilt_root,
     })
   }
 
   fn backend_cache_dir(&self, backend: &str, target: &str) -> PathBuf {
     self.cache_root.join(backend).join(target)
+  }
+
+  fn backend_prebuilt_dir(
+    &self,
+    backend: &str,
+    target: &str,
+  ) -> Option<PathBuf> {
+    let dir = self.prebuilt_root.as_ref()?.join(backend).join(target);
+    dir.is_dir().then_some(dir)
   }
 
   /// Download + verify + extract a backend archive if it isn't already in
@@ -1934,6 +1950,10 @@ impl LaufeyBackendResolver {
     backend: &str,
     target: &str,
   ) -> Result<PathBuf, AnyError> {
+    if let Some(dir) = self.backend_prebuilt_dir(backend, target) {
+      return Ok(dir);
+    }
+
     let dir = self.backend_cache_dir(backend, target);
     let marker = dir.join(".downloaded");
     if marker.exists() {

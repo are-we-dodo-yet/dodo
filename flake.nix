@@ -73,6 +73,52 @@
               .${system};
           };
 
+          laufeyVersion = (builtins.head (builtins.filter (p: p.name == "laufey") cargoLock.package)).version;
+          laufeySums = lib.listToAttrs (
+            map
+              (
+                line:
+                let
+                  m = builtins.match "([0-9a-f]{64})[[:space:]]+[*]?([^[:space:]]+)[[:space:]]*" line;
+                in
+                lib.nameValuePair (builtins.elemAt m 1) (builtins.elemAt m 0)
+              )
+              (
+                lib.filter (line: builtins.match "[0-9a-f]{64}[[:space:]].*" line != null) (
+                  lib.splitString "\n" (builtins.readFile ./cli/laufey_sums.lock)
+                )
+              )
+          );
+          laufeyBackends = lib.filterAttrs (_: archive: laufeySums ? ${archive}) (
+            lib.mapAttrs (_: name: "laufey-${name}-${rustyV8Target}.tar.gz") {
+              cef = "cef";
+              webview = "webview";
+              raw = "winit";
+            }
+          );
+          laufey =
+            pkgs.runCommand "laufey-${laufeyVersion}"
+              {
+                meta.platforms = builtins.attrNames rustyV8Targets;
+              }
+              (
+                lib.concatStrings (
+                  lib.mapAttrsToList (
+                    backend: archive:
+                    let
+                      src = pkgs.fetchurl {
+                        url = "https://github.com/littledivy/laufey/releases/download/v${laufeyVersion}/${archive}";
+                        sha256 = laufeySums.${archive};
+                      };
+                    in
+                    ''
+                      mkdir -p $out/${backend}/${rustyV8Target}
+                      tar -xzf ${src} -C $out/${backend}/${rustyV8Target}
+                    ''
+                  ) laufeyBackends
+                )
+              );
+
           commonArgs = {
             src = ./.;
             version = denoVersion;
@@ -204,7 +250,7 @@
           packages = {
             deno = buildDenoBin "deno";
             denort = buildDenoBin "denort";
-            inherit libdenort;
+            inherit libdenort laufey;
             deno-desktop =
               pkgs.runCommand "deno-desktop-${denoVersion}"
                 {
@@ -216,7 +262,8 @@
                 }
                 ''
                   makeWrapper ${lib.getExe config.packages.deno} $out/bin/deno \
-                    --set-default DENORT_DESKTOP_BIN ${libdenort}/lib/${libdenortName} ${lib.optionalString isLinux "--prefix NIX_LD_LIBRARY_PATH : ${lib.makeLibraryPath nixLdLibs}"}
+                    --set-default DENORT_DESKTOP_BIN ${libdenort}/lib/${libdenortName} \
+                    --set-default DENO_DESKTOP_LAUFEY_DIR ${laufey} ${lib.optionalString isLinux "--prefix NIX_LD_LIBRARY_PATH : ${lib.makeLibraryPath nixLdLibs}"}
                 '';
 
             default = config.packages.deno;
