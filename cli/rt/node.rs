@@ -92,7 +92,7 @@ impl CjsCodeAnalyzer {
         .and_then(|d| d.cjs_export_analysis);
       match data {
         Some(data) => {
-          let data: CjsExportAnalysisEntry = bincode::deserialize(&data)
+          let data: CjsExportAnalysisEntry = serde_json::from_slice(&data)
             .map_err(|err| JsErrorBox::generic(err.to_string()))?;
           match data {
             CjsExportAnalysisEntry::Esm => {

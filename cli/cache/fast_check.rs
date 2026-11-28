@@ -1,6 +1,7 @@
 // Copyright 2018-2026 the Deno authors. MIT license.
 
 use deno_core::error::AnyError;
+use deno_core::serde_json;
 use deno_graph::fast_check::FastCheckCacheItem;
 use deno_graph::fast_check::FastCheckCacheKey;
 use deno_runtime::deno_webstorage::rusqlite::params;
@@ -82,14 +83,14 @@ impl FastCheckCacheInner {
       FROM
         fastcheckcache
       WHERE
-        hash=?1
+        hash=?1 AND typeof(data)='text'
       LIMIT 1";
     let res = self.conn.query_row(
       query,
       params![CacheDBHash::new(key.as_u64())],
       |row| {
-        let value: Vec<u8> = row.get(0)?;
-        Ok(bincode::deserialize::<FastCheckCacheItem>(&value)?)
+        let value: String = row.get(0)?;
+        Ok(serde_json::from_str::<FastCheckCacheItem>(&value)?)
       },
     )?;
     Ok(res)
@@ -107,7 +108,10 @@ impl FastCheckCacheInner {
         (?1, ?2)";
     self.conn.execute(
       sql,
-      params![CacheDBHash::new(key.as_u64()), &bincode::serialize(data)?],
+      params![
+        CacheDBHash::new(key.as_u64()),
+        &serde_json::to_string(data)?
+      ],
     )?;
     Ok(())
   }

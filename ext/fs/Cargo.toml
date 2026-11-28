@@ -25,7 +25,6 @@ deno_io.workspace = true
 deno_maybe_sync.workspace = true
 deno_path_util.workspace = true
 deno_permissions.workspace = true
-filetime.workspace = true
 libc.workspace = true
 rand.workspace = true
 rayon.workspace = true

@@ -10,8 +10,8 @@ use serde_json::Value;
 use serde_json::json;
 use test_util::PathRef;
 use test_util::lsp::LspClientBuilder;
-use tower_lsp::lsp_types as lsp;
-use tower_lsp::lsp_types::Uri;
+use tower_lsp_server::ls_types as lsp;
+use tower_lsp_server::ls_types::Uri;
 
 static FIXTURE_CODE_LENS_TS: &str = include_str!("testdata/code_lens.ts");
 static FIXTURE_DB_TS: &str = include_str!("testdata/db.ts");
@@ -43,7 +43,7 @@ struct FixtureMessage {
 /// replaces the root directory in the URIs of the requests
 /// with the given root path
 fn patch_uris<'a>(
-  reqs: impl IntoIterator<Item = &'a mut tower_lsp::jsonrpc::Request>,
+  reqs: impl IntoIterator<Item = &'a mut tower_lsp_server::jsonrpc::Request>,
   root: &PathRef,
 ) {
   for req in reqs {
@@ -57,7 +57,8 @@ fn patch_uris<'a>(
             &format!("file://{}/", root.to_string_lossy()),
           ));
       }
-      let builder = tower_lsp::jsonrpc::Request::build(req.method().to_owned());
+      let builder =
+        tower_lsp_server::jsonrpc::Request::build(req.method().to_owned());
       let builder = if let Some(id) = req.id() {
         builder.id(id.clone())
       } else {
@@ -70,13 +71,13 @@ fn patch_uris<'a>(
     };
 
     if let Some(new_req) = new_req {
-      *req = new_req.request;
+      *req = new_req;
     }
   }
 }
 
 fn bench_deco_apps_edits(deno_exe: &Path) -> Duration {
-  let mut requests: Vec<tower_lsp::jsonrpc::Request> =
+  let mut requests: Vec<tower_lsp_server::jsonrpc::Request> =
     serde_json::from_slice(FIXTURE_DECO_APPS).unwrap();
   let apps =
     test_util::root_path().join("tests/bench/testdata/lsp_benchdata/apps");
@@ -90,10 +91,12 @@ fn bench_deco_apps_edits(deno_exe: &Path) -> Duration {
     .deno_exe(deno_exe)
     .build();
   client.initialize(|c| {
-    c.set_workspace_folders(vec![tower_lsp::lsp_types::WorkspaceFolder {
-      uri: apps.uri_dir(),
-      name: "apps".to_string(),
-    }]);
+    c.set_workspace_folders(vec![
+      tower_lsp_server::ls_types::WorkspaceFolder {
+        uri: apps.uri_dir(),
+        name: "apps".to_string(),
+      },
+    ]);
     c.set_deno_enable(true);
     c.set_unstable(true);
     c.set_preload_limit(1000);

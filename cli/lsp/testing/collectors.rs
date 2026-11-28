@@ -10,7 +10,7 @@ use deno_ast::swc::ecma_visit::Visit;
 use deno_ast::swc::ecma_visit::VisitWith;
 use deno_core::ModuleSpecifier;
 use lsp::Range;
-use tower_lsp::lsp_types as lsp;
+use tower_lsp_server::ls_types as lsp;
 
 use super::definitions::TestModule;
 use crate::lsp::analysis::source_range_to_lsp_range;

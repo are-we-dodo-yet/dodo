@@ -1118,10 +1118,7 @@ fn package_ships_no_types(pkg_dir: &Path) -> bool {
     Some((base, _)) => format!("{base}.d.ts"),
     None => format!("{main}.d.ts"),
   };
-  if pkg_dir.join(&main_dts).exists() || pkg_dir.join("index.d.ts").exists() {
-    return false;
-  }
-  true
+  !pkg_dir.join(&main_dts).exists() && !pkg_dir.join("index.d.ts").exists()
 }
 
 /// Shorthand `declare module` lines for imported npm packages that ship no

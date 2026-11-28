@@ -6,6 +6,7 @@ use std::ptr::NonNull;
 use std::sync::atomic::AtomicUsize;
 use std::sync::atomic::Ordering;
 
+use parking_lot::lock_api::GuardNoSend;
 use parking_lot::lock_api::RawMutex;
 
 use super::alloc;
@@ -280,7 +281,7 @@ impl<T> ArenaSharedAtomic<T> {
   ) -> &'s mut ArenaSharedAtomicDataProtected<T> {
     unsafe {
       let mutex = &*std::ptr::addr_of!((*arena.as_ptr()).mutex);
-      while !mutex.try_lock() {
+      while mutex.try_lock().is_none() {
         std::thread::yield_now();
       }
       &mut *std::ptr::addr_of_mut!((*arena.as_ptr()).protected)
@@ -291,7 +292,7 @@ impl<T> ArenaSharedAtomic<T> {
   unsafe fn unlock(arena: NonNull<ArenaSharedAtomicData<T>>) {
     unsafe {
       let mutex = &*std::ptr::addr_of!((*arena.as_ptr()).mutex);
-      mutex.unlock()
+      mutex.unlock(GuardNoSend::new())
     }
   }
 

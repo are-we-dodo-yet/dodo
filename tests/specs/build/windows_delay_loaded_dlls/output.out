@@ -6,6 +6,7 @@ bcryptprimitives.dll: eager
 combase.dll: delay
 crypt32.dll: eager
 dbghelp.dll: delay
+dxgi.dll: delay
 gdi32.dll: delay
 iphlpapi.dll: delay
 kernel32.dll: eager

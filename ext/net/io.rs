@@ -168,7 +168,7 @@ impl TcpStreamResource {
   }
 
   pub fn set_nodelay(self: Rc<Self>, nodelay: bool) -> Result<(), MapError> {
-    self.map_socket(Box::new(move |socket| socket.set_nodelay(nodelay)))
+    self.map_socket(Box::new(move |socket| socket.set_tcp_nodelay(nodelay)))
   }
 
   pub fn set_keepalive(

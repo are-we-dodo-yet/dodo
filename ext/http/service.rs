@@ -671,11 +671,7 @@ fn validate_request(req: &Request) -> bool {
     }
   }
 
-  if req.method() == http::Method::CONNECT && req.uri().authority().is_none() {
-    return false;
-  }
-
-  true
+  req.method() != http::Method::CONNECT || req.uri().authority().is_some()
 }
 
 pub(crate) async fn handle_request<F>(

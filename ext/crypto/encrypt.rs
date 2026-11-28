@@ -1,15 +1,11 @@
 // Copyright 2018-2026 the Deno authors. MIT license.
 
-use aes::cipher::BlockEncryptMut;
-use aes::cipher::KeyIvInit;
-use aes::cipher::StreamCipher;
-use aes::cipher::block_padding::Pkcs7;
-use aes_gcm::AeadInPlace;
+use aes_gcm::AeadInOut;
 use aes_gcm::KeyInit;
 use aes_gcm::Nonce;
-use aes_gcm::aead::generic_array::ArrayLength;
-use aes_gcm::aead::generic_array::typenum::U12;
-use aes_gcm::aead::generic_array::typenum::U16;
+use aes_gcm::aead::array::ArraySize;
+use aes_gcm::aead::consts::U12;
+use aes_gcm::aead::consts::U16;
 use aes_gcm::aes::Aes128;
 use aes_gcm::aes::Aes192;
 use aes_gcm::aes::Aes256;
@@ -18,10 +14,15 @@ use aws_lc_rs::aead::CHACHA20_POLY1305;
 use aws_lc_rs::aead::LessSafeKey;
 use aws_lc_rs::aead::Nonce as AwsNonce;
 use aws_lc_rs::aead::UnboundKey;
+use cbc::cipher::BlockModeEncrypt;
+use cbc::cipher::KeyIvInit;
+use cbc::cipher::StreamCipher;
+use cbc::cipher::block_padding::Pkcs7;
 use ctr::Ctr32BE;
 use ctr::Ctr64BE;
 use ctr::Ctr128BE;
-use rand::rngs::OsRng;
+use rand::rand_core::UnwrapErr;
+use rand::rngs::SysRng;
 use rsa::pkcs1::DecodeRsaPublicKey;
 
 use crate::shared::*;
@@ -71,12 +72,10 @@ pub(crate) fn encrypt_rsa_oaep(
   data: &[u8],
 ) -> Result<Vec<u8>, EncryptError> {
   let public_key = key.as_rsa_public_key()?;
-  let public_key = rsa::RsaPublicKey::from_pkcs1_der(&public_key)
+  let public_key = rsa::PublicKey::from_pkcs1_der(&public_key)
     .map_err(|_| SharedError::FailedDecodePublicKey)?;
-  let mut rng = OsRng;
-  let padding = rsa_oaep_padding(hash, &label);
-  let encrypted = public_key
-    .encrypt(&mut rng, padding, data)
+  let mut rng = UnwrapErr(SysRng);
+  let encrypted = rsa_oaep_encrypt(&public_key, &mut rng, hash, &label, data)
     .map_err(|_| EncryptError::Failed)?;
   Ok(encrypted)
 }
@@ -95,7 +94,7 @@ pub(crate) fn encrypt_aes_cbc(
 
       let cipher = Aes128CbcEnc::new_from_slices(key, &iv)
         .map_err(|_| EncryptError::InvalidKeyOrIv)?;
-      cipher.encrypt_padded_vec_mut::<Pkcs7>(data)
+      cipher.encrypt_padded_vec::<Pkcs7>(data)
     }
     192 => {
       // Section 10.3 Step 2 of RFC 2315 https://www.rfc-editor.org/rfc/rfc2315
@@ -103,7 +102,7 @@ pub(crate) fn encrypt_aes_cbc(
 
       let cipher = Aes192CbcEnc::new_from_slices(key, &iv)
         .map_err(|_| EncryptError::InvalidKeyOrIv)?;
-      cipher.encrypt_padded_vec_mut::<Pkcs7>(data)
+      cipher.encrypt_padded_vec::<Pkcs7>(data)
     }
     256 => {
       // Section 10.3 Step 2 of RFC 2315 https://www.rfc-editor.org/rfc/rfc2315
@@ -111,41 +110,44 @@ pub(crate) fn encrypt_aes_cbc(
 
       let cipher = Aes256CbcEnc::new_from_slices(key, &iv)
         .map_err(|_| EncryptError::InvalidKeyOrIv)?;
-      cipher.encrypt_padded_vec_mut::<Pkcs7>(data)
+      cipher.encrypt_padded_vec::<Pkcs7>(data)
     }
     _ => return Err(EncryptError::InvalidLength),
   };
   Ok(ciphertext)
 }
 
-fn encrypt_aes_gcm_general<N: ArrayLength<u8>>(
+fn encrypt_aes_gcm_general<N: ArraySize>(
   key: &[u8],
   iv: Vec<u8>,
   length: usize,
   ciphertext: &mut [u8],
   additional_data: Vec<u8>,
 ) -> Result<aes_gcm::Tag, EncryptError> {
-  let nonce = Nonce::<N>::from_slice(&iv);
+  let nonce: &Nonce<N> = iv
+    .as_slice()
+    .try_into()
+    .map_err(|_| EncryptError::InvalidIvLength)?;
   let tag = match length {
     128 => {
       let cipher = aes_gcm::AesGcm::<Aes128, N>::new_from_slice(key)
         .map_err(|_| EncryptError::Failed)?;
       cipher
-        .encrypt_in_place_detached(nonce, &additional_data, ciphertext)
+        .encrypt_inout_detached(nonce, &additional_data, ciphertext.into())
         .map_err(|_| EncryptError::Failed)?
     }
     192 => {
       let cipher = aes_gcm::AesGcm::<Aes192, N>::new_from_slice(key)
         .map_err(|_| EncryptError::Failed)?;
       cipher
-        .encrypt_in_place_detached(nonce, &additional_data, ciphertext)
+        .encrypt_inout_detached(nonce, &additional_data, ciphertext.into())
         .map_err(|_| EncryptError::Failed)?
     }
     256 => {
       let cipher = aes_gcm::AesGcm::<Aes256, N>::new_from_slice(key)
         .map_err(|_| EncryptError::Failed)?;
       cipher
-        .encrypt_in_place_detached(nonce, &additional_data, ciphertext)
+        .encrypt_inout_detached(nonce, &additional_data, ciphertext.into())
         .map_err(|_| EncryptError::Failed)?
     }
     _ => return Err(EncryptError::InvalidLength),
@@ -203,21 +205,21 @@ pub(crate) fn encrypt_aes_ocb(
   additional_data: Option<Vec<u8>>,
   data: &[u8],
 ) -> Result<Vec<u8>, EncryptError> {
-  use aes_gcm::aead::generic_array::GenericArray;
-  use aes_gcm::aead::generic_array::typenum::U6;
-  use aes_gcm::aead::generic_array::typenum::U7;
-  use aes_gcm::aead::generic_array::typenum::U8;
-  use aes_gcm::aead::generic_array::typenum::U9;
-  use aes_gcm::aead::generic_array::typenum::U10;
-  use aes_gcm::aead::generic_array::typenum::U11;
-  use aes_gcm::aead::generic_array::typenum::U12;
-  use aes_gcm::aead::generic_array::typenum::U13;
-  use aes_gcm::aead::generic_array::typenum::U14;
-  use aes_gcm::aead::generic_array::typenum::U15;
-  use aes_gcm::aead::generic_array::typenum::U16;
   use ocb3::Ocb3;
-  use ocb3::aead::AeadInPlace as Ocb3AeadInPlace;
+  use ocb3::aead::AeadInOut as Ocb3AeadInOut;
   use ocb3::aead::KeyInit as Ocb3KeyInit;
+  use ocb3::aead::array::Array;
+  use ocb3::aead::consts::U6;
+  use ocb3::aead::consts::U7;
+  use ocb3::aead::consts::U8;
+  use ocb3::aead::consts::U9;
+  use ocb3::aead::consts::U10;
+  use ocb3::aead::consts::U11;
+  use ocb3::aead::consts::U12;
+  use ocb3::aead::consts::U13;
+  use ocb3::aead::consts::U14;
+  use ocb3::aead::consts::U15;
+  use ocb3::aead::consts::U16;
 
   let key = key.as_secret_key()?;
   let additional_data = additional_data.unwrap_or_default();
@@ -248,9 +250,16 @@ pub(crate) fn encrypt_aes_ocb(
     ($aes:ty, $nonce:ty, $tag:ty) => {{
       let cipher = Ocb3::<$aes, $nonce, $tag>::new_from_slice(key)
         .map_err(|_| EncryptError::Failed)?;
-      let nonce = GenericArray::<u8, $nonce>::from_slice(&iv);
+      let nonce: &Array<u8, $nonce> = iv
+        .as_slice()
+        .try_into()
+        .map_err(|_| EncryptError::InvalidIvLength)?;
       cipher
-        .encrypt_in_place_detached(nonce, &additional_data, &mut ciphertext)
+        .encrypt_inout_detached(
+          nonce,
+          &additional_data,
+          ciphertext.as_mut_slice().into(),
+        )
         .map_err(|_| EncryptError::Failed)?
         .to_vec()
     }};
@@ -347,7 +356,8 @@ fn encrypt_aes_ctr_gen<B>(
 where
   B: KeyIvInit + StreamCipher,
 {
-  let mut cipher = B::new(key.into(), counter.into());
+  let mut cipher = B::new_from_slices(key, counter)
+    .map_err(|_| EncryptError::InvalidKeyOrIv)?;
 
   let mut ciphertext = data.to_vec();
   cipher

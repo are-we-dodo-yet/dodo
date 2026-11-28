@@ -51,7 +51,7 @@ sys_traits = { workspace = true, features = ["real", "getrandom", "libc", "winap
 tempfile.workspace = true
 test_util = { workspace = true, features = ["lsp"] }
 tokio.workspace = true
-tower-lsp.workspace = true
+tower-lsp-server.workspace = true
 url.workspace = true
 uuid = { workspace = true, features = ["serde"] }
 # Real, spec-compliant ZMTP implementation used by the Jupyter integration

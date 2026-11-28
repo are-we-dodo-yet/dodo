@@ -18,7 +18,6 @@ async-trait.workspace = true
 deno_core.workspace = true
 deno_error.workspace = true
 deno_permissions.workspace = true
-filetime.workspace = true
 log.workspace = true
 pin-project.workspace = true
 tokio.workspace = true

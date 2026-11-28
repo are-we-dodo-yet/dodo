@@ -1379,11 +1379,11 @@ impl crate::fs::File for StdFileResourceInner {
     mtime_secs: i64,
     mtime_nanos: u32,
   ) -> FsResult<()> {
-    let atime = filetime::FileTime::from_unix_time(atime_secs, atime_nanos);
-    let mtime = filetime::FileTime::from_unix_time(mtime_secs, mtime_nanos);
+    let times =
+      fs::file_times(atime_secs, atime_nanos, mtime_secs, mtime_nanos)?;
 
     self.with_sync(|file| {
-      filetime::set_file_handle_times(file, Some(atime), Some(mtime))?;
+      file.set_times(times)?;
       Ok(())
     })
   }
@@ -1394,12 +1394,12 @@ impl crate::fs::File for StdFileResourceInner {
     mtime_secs: i64,
     mtime_nanos: u32,
   ) -> FsResult<()> {
-    let atime = filetime::FileTime::from_unix_time(atime_secs, atime_nanos);
-    let mtime = filetime::FileTime::from_unix_time(mtime_secs, mtime_nanos);
+    let times =
+      fs::file_times(atime_secs, atime_nanos, mtime_secs, mtime_nanos)?;
 
     self
       .with_inner_blocking_task(move |file| {
-        filetime::set_file_handle_times(file, Some(atime), Some(mtime))?;
+        file.set_times(times)?;
         Ok(())
       })
       .await

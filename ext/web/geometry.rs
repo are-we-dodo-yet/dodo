@@ -27,7 +27,6 @@ use deno_core::webidl::WebIdlErrorKind;
 use deno_core::webidl::try_convert_sequence_with_policy;
 
 use crate::css_value::CSSValueError;
-use crate::css_value::ParserInput;
 use crate::css_value::Transform;
 use crate::css_value::TransformListParser;
 use crate::f64::maximum;
@@ -100,14 +99,14 @@ pub enum GeometryError {
   FailedToParse(String),
 }
 
-impl<'i> From<CSSValueError<'i>> for GeometryError {
+impl From<CSSValueError> for GeometryError {
   fn from(error: CSSValueError) -> Self {
     use cssparser::BasicParseErrorKind;
     use cssparser::ParseErrorKind;
 
     // Suppress Debug output for cssparser::Token
     let message: String = match error.kind {
-      ParseErrorKind::Basic(BasicParseErrorKind::UnexpectedToken(_)) => {
+      ParseErrorKind::Basic(BasicParseErrorKind::UnexpectedToken) => {
         "unexpected token".into()
       }
       _ => format!("{}", error),
@@ -1373,8 +1372,7 @@ impl DOMMatrixReadOnly {
       let matrix = DOMMatrixReadOnly::identity();
       let string = value.to_rust_string_lossy(scope);
       if !string.is_empty() {
-        let mut input = ParserInput::new(&string);
-        for result in TransformListParser::new(&mut input) {
+        for result in TransformListParser::new(&string) {
           let transform = result?;
           matrix.exec_css_transform(&transform)?;
         }
@@ -3067,8 +3065,7 @@ pub fn op_geometry_matrix_set_matrix_value<'a>(
     Ok(())
   } else {
     let result = DOMMatrixReadOnly::identity();
-    let mut input = ParserInput::new(&transform_list);
-    for transform_result in TransformListParser::new(&mut input) {
+    for transform_result in TransformListParser::new(&transform_list) {
       let transform = transform_result?;
       result.exec_css_transform(&transform)?;
     }

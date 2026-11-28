@@ -408,6 +408,7 @@ class ChannelWrap extends AsyncWrap implements ChannelWrapQuery {
           recordType,
           options: resolveOptions,
           cancelRid,
+          noRetry: true,
         }, /* useEdns0 */ false);
         if (ttl) {
           ret = res;

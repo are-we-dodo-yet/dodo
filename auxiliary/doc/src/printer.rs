@@ -1248,6 +1248,10 @@ fn render_markdown(
         | NodeValue::Subscript
         | NodeValue::Subtext
         | NodeValue::Alert(_)
+        | NodeValue::Callout(_)
+        | NodeValue::CalloutTitle
+        | NodeValue::CommentInline(_)
+        | NodeValue::MultilineComment(_)
         | NodeValue::BlockDirective(_) => {}
         NodeValue::Escaped
         | NodeValue::Table(_)
@@ -1389,6 +1393,10 @@ fn render_markdown(
         | NodeValue::Subscript
         | NodeValue::Subtext
         | NodeValue::Alert(_)
+        | NodeValue::Callout(_)
+        | NodeValue::CalloutTitle
+        | NodeValue::CommentInline(_)
+        | NodeValue::MultilineComment(_)
         | NodeValue::BlockDirective(_) => {}
         // container nodes with no special end handling
         NodeValue::Escaped

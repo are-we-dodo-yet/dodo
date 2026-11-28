@@ -130,7 +130,7 @@ pub async fn install_global(
             "Did you mean `deno install -g {} -- {}`? Or maybe provide a `jsr:` or `npm:` prefix?",
           ),
           entry_text,
-          &install_flags_global.module_urls[0],
+          install_flags_global.module_urls[0],
           install_flags_global.module_urls[1..].join(" "),
         );
       }
@@ -1372,7 +1372,7 @@ impl JsrLockfileFetcher<'_> {
     let req = pkg_ref.req();
     let nv = self.jsr_resolver.req_to_nv(req).await.ok().flatten()?;
     let lockfile_url = crate::args::jsr_url()
-      .join(&format!("{}/{}/deno.lock", &nv.name, &nv.version))
+      .join(&format!("{}/{}/deno.lock", nv.name, nv.version))
       .ok()?;
     let file = match self
       .file_fetcher
@@ -2364,13 +2364,13 @@ mod tests {
     let mut expected_string = format!(
       "run --config {} '{}'",
       config_path.to_string_lossy(),
-      &file_module_string
+      file_module_string
     );
     if cfg!(windows) {
       expected_string = format!(
         "\"run\" \"--config\" \"{}\" \"{}\"",
         config_path.to_string_lossy(),
-        &file_module_string
+        file_module_string
       );
     }
 

@@ -36,16 +36,16 @@ use deno_semver::package::PackageNvReference;
 use deno_semver::package::PackageReq;
 use deno_semver::package::PackageReqReference;
 use import_map::ImportMap;
-use lsp_types::Uri;
 use node_resolver::InNpmPackageChecker;
 use node_resolver::NodeResolutionKind;
 use node_resolver::ResolutionMode;
 use once_cell::sync::Lazy;
 use regex::Regex;
 use tokio_util::sync::CancellationToken;
-use tower_lsp::lsp_types as lsp;
-use tower_lsp::lsp_types::Position;
-use tower_lsp::lsp_types::Range;
+use tower_lsp_server::ls_types as lsp;
+use tower_lsp_server::ls_types::Position;
+use tower_lsp_server::ls_types::Range;
+use tower_lsp_server::ls_types::Uri;
 
 use super::diagnostics::DiagnosticSource;
 use super::documents::DocumentModule;
@@ -1207,7 +1207,7 @@ pub fn prepend_whitespace(
       .find_map(|(i, c)| (!c.is_whitespace()).then_some(i))
       .unwrap_or(0);
     let whitespace = &line[0..whitespace_end];
-    format!("{}{}", &whitespace, content)
+    format!("{}{}", whitespace, content)
   } else {
     content
   }

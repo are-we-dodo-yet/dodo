@@ -481,7 +481,7 @@ impl HtmlEntrypoint {
     if self.scripts.is_empty() {
       let html_out_path =
         // TODO(nathanwhit): not really correct
-        { outdir.join(format!("{}.html", &original_entry_name)) };
+        { outdir.join(format!("{}.html", original_entry_name)) };
       html_output_files.output_files.push(OutputFile {
         path: html_out_path,
         contents: Cow::Owned(self.contents.into_bytes()),

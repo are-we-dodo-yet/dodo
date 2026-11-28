@@ -1006,7 +1006,7 @@ mod tests {
     {
       let mut files = HashMap::new();
 
-      for (((specifier, ty), _), _) in code_cache.cache.lock().iter() {
+      for ((specifier, ty), _) in code_cache.cache.lock().keys() {
         let specifier = specifier.to_string();
         if files.contains_key(&specifier) {
           panic!("should have only 1 entry per specifier");

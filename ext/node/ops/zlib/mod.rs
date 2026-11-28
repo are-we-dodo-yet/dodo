@@ -876,7 +876,9 @@ impl BrotliDecoder {
       for (i, &value) in params.iter().enumerate() {
         if let Some(param) = decoder_param(i as u32) {
           ffi::decompressor::ffi::BrotliDecoderSetParameter(
-            state, param, value,
+            state,
+            param as i32,
+            value,
           );
         }
       }

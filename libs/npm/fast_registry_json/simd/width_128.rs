@@ -36,7 +36,7 @@ impl<T> Simd8<T> {
 
   #[inline(always)]
   pub fn eq_mask(&self, rhs: &Simd8<T>) -> Simd8<bool> {
-    self.base.cmp_eq(rhs.base).into()
+    self.base.simd_eq(rhs.base).into()
   }
 }
 
@@ -100,7 +100,7 @@ impl Simd8<u8> {
 
   #[inline(always)]
   pub fn store(&self, dst: &mut [u8; 16]) {
-    dst.copy_from_slice(self.base.as_array_ref());
+    dst.copy_from_slice(self.base.as_array());
   }
 }
 
@@ -141,7 +141,7 @@ impl Simd8<bool> {
             let mut tmp = m_input + m_input;
             tmp = tmp + tmp;
             tmp = tmp + tmp;
-            bytemuck::must_cast::<u8x16, wide::u16x8>(tmp).as_array_ref()[0] as u32
+            bytemuck::must_cast::<u8x16, wide::u16x8>(tmp).as_array()[0] as u32
         }
     }
   }
@@ -256,7 +256,7 @@ impl Simd8x64<bool> {
             let sum0 = sum0.pairwise_add(sum1);
             let sum0 = sum0.pairwise_add(sum0);
 
-            bytemuck::must_cast::<u8x16, wide::u64x2>(sum0).as_array_ref()[0]
+            bytemuck::must_cast::<u8x16, wide::u64x2>(sum0).as_array()[0]
         }
     }
   }
@@ -273,7 +273,7 @@ impl Simd8<u8> {
             let shifted = unsafe { std::arch::aarch64::vshrq_n_u8(inner, N) };
             bytemuck::must_cast::<uint8x16_t, u8x16>(shifted).into()
         } else {
-            let inner = self.base.as_array_ref();
+            let inner = self.base.as_array();
             let mut arr = [0u8; 16];
             for i in 0..16 {
                 arr[i] = inner[i] >> N;
@@ -292,7 +292,7 @@ impl Simd8<u8> {
             let shifted = unsafe { std::arch::aarch64::vshlq_n_u8(inner, N) };
             bytemuck::must_cast::<uint8x16_t, u8x16>(shifted).into()
         } else {
-            let inner = self.base.as_array_ref();
+            let inner = self.base.as_array();
             let mut arr = [0u8; 16];
             for i in 0..16 {
                 arr[i] = inner[i] << N;
@@ -312,8 +312,8 @@ impl Simd8<u8> {
             let looked_up = unsafe { std::arch::aarch64::vqtbl1q_u8(inner, inner2) };
             bytemuck::must_cast::<uint8x16_t, u8x16>(looked_up).into()
         } else {
-            let inner = self.base.as_array_ref();
-            let inner2 = original.base.as_array_ref();
+            let inner = self.base.as_array();
+            let inner2 = original.base.as_array();
             let mut arr = [0u8; 16];
             for i in 0..16 {
                 if inner2[i] < 16 {
@@ -415,8 +415,8 @@ impl U8x16Ext for u8x16 {
             let summed = unsafe { std::arch::aarch64::vpaddq_u8(inner, inner2) };
             bytemuck::must_cast::<uint8x16_t, u8x16>(summed)
         } else {
-            let arr = self.as_array_ref();
-            let arr2 = other.as_array_ref();
+            let arr = self.as_array();
+            let arr2 = other.as_array();
             u8x16::new([
                 arr[0] + arr[1],
                 arr[2] + arr[3],

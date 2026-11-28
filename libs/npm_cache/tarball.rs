@@ -183,7 +183,7 @@ impl<THttpClient: NpmCacheHttpClient, TSys: NpmCacheSys>
           "NotCached",
           format!(
             "npm package not found in cache: \"{}\", --cached-only is specified.",
-            &package_nv.name
+            package_nv.name
           )
         )
         );

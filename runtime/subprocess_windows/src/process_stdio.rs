@@ -370,10 +370,9 @@ mod buffer {
       }
 
       unsafe {
-        std::ptr::drop_in_place(self.ptr);
         std::alloc::dealloc(
-          self.ptr as *mut _,
-          std::alloc::Layout::array::<u8>(self.get_count()).unwrap(),
+          self.ptr,
+          std::alloc::Layout::array::<u8>(self.size()).unwrap(),
         );
       }
     }

@@ -174,10 +174,7 @@ impl TestFilter {
     {
       return false;
     }
-    if self.exclude.contains(name) {
-      return false;
-    }
-    true
+    !self.exclude.contains(name)
   }
 
   pub fn from_flag(flag: &Option<String>) -> Self {

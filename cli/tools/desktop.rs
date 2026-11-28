@@ -1904,6 +1904,8 @@ async fn package_linux_app_dir(
 /// are searched the same way the old sibling-checkout heuristic searched.
 const LAUFEY_DEV_DIR_ENV: &str = "LAUFEY_DEV_DIR";
 
+const LAUFEY_PREBUILT_DIR_ENV: &str = "DENO_DESKTOP_LAUFEY_DIR";
+
 /// Resolves LAUFEY backend binaries and `.app` bundles, falling back to
 /// downloading prebuilt archives from the laufey GitHub releases when
 /// `LAUFEY_DEV_DIR` is not set.
@@ -1911,20 +1913,34 @@ struct LaufeyBackendResolver {
   http_client_provider: Arc<HttpClientProvider>,
   /// `<deno_dir>/laufey/<version>/`
   cache_root: PathBuf,
+  prebuilt_root: Option<PathBuf>,
 }
 
 impl LaufeyBackendResolver {
   fn new(factory: &CliFactory) -> Result<Self, AnyError> {
     let cache_root =
       factory.deno_dir()?.root.join("laufey").join(LAUFEY_VERSION);
+    let prebuilt_root = std::env::var_os(LAUFEY_PREBUILT_DIR_ENV)
+      .filter(|raw| !raw.is_empty())
+      .map(PathBuf::from);
     Ok(Self {
       http_client_provider: factory.http_client_provider().clone(),
       cache_root,
+      prebuilt_root,
     })
   }
 
   fn backend_cache_dir(&self, backend: &str, target: &str) -> PathBuf {
     self.cache_root.join(backend).join(target)
+  }
+
+  fn backend_prebuilt_dir(
+    &self,
+    backend: &str,
+    target: &str,
+  ) -> Option<PathBuf> {
+    let dir = self.prebuilt_root.as_ref()?.join(backend).join(target);
+    dir.is_dir().then_some(dir)
   }
 
   /// Download + verify + extract a backend archive if it isn't already in
@@ -1934,6 +1950,10 @@ impl LaufeyBackendResolver {
     backend: &str,
     target: &str,
   ) -> Result<PathBuf, AnyError> {
+    if let Some(dir) = self.backend_prebuilt_dir(backend, target) {
+      return Ok(dir);
+    }
+
     let dir = self.backend_cache_dir(backend, target);
     let marker = dir.join(".downloaded");
     if marker.exists() {
@@ -2270,8 +2290,20 @@ fn extract_laufey_archive(
       // components. Anything that fails this check is a zip-slip attempt
       // (or a legitimately weird archive we don't want to handle).
       let Some(rel_path) = entry.enclosed_name() else {
-        bail!("refusing zip entry with unsafe path: {}", entry.name());
+        bail!(
+          "refusing zip entry with unsafe path: {}",
+          String::from_utf8_lossy(entry.name_raw())
+        );
       };
+      let raw_name = entry.name_raw();
+      if matches!(raw_name.first(), Some(b'/' | b'\\'))
+        || raw_name.get(1) == Some(&b':')
+      {
+        bail!(
+          "refusing zip entry with unsafe path: {}",
+          String::from_utf8_lossy(raw_name)
+        );
+      }
       // Defence in depth — re-check the components ourselves.
       if rel_path.components().any(|c| {
         matches!(
@@ -4844,7 +4876,7 @@ fn create_windows_msi(
     summary.set_author(manufacturer.to_string());
     summary.set_comments(format!("{app_name} desktop application"));
     summary.set_arch(arch);
-    summary.set_languages(&[msi::Language::from_code(1033)]);
+    summary.set_languages(&[msi::LanguageId::from(1033)]);
     summary.set_creating_application("deno desktop");
     // Package code: a fresh GUID identifying this exact package build.
     summary.set_uuid(uuid::Uuid::new_v5(
@@ -7945,8 +7977,10 @@ def456  other.zip
         let mut s = comp.open_stream(format!("/{raw}")).unwrap();
         let mut b = Vec::new();
         s.read_to_end(&mut b).unwrap();
-        b.chunks_exact(2)
-          .map(|c| u16::from_le_bytes([c[0], c[1]]))
+        b.as_chunks::<2>()
+          .0
+          .iter()
+          .map(|c| u16::from_le_bytes(*c))
           .collect()
       };
 
